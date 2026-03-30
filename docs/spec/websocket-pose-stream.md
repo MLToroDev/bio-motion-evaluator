@@ -54,6 +54,8 @@ Campos habituales:
 | `note` | string \| null | Nota humana (p. ej. sin pose) |
 | `landmarks` | array \| null | Lista de puntos `{ index, x, y, z, visibility? }` |
 | `knees` | object \| null | Ángulos; p. ej. `left_knee_flexion_angle_deg`, `right_knee_flexion_angle_deg` (grados) |
+| `total_frames` | number \| null | Total de fotogramas del vídeo cuando `source=file` y OpenCV reporta `CAP_PROP_FRAME_COUNT` fiable; si no aplica, puede ser `null` (cámara, URL o códec sin metadatos). |
+| `server_ts_ms` | number | Marca de tiempo del servidor (epoch ms) al enviar el mensaje; útil para estimar latencia red + procesamiento. |
 | `preview_jpeg_base64` | string | Presente solo si `include_preview` era truthy en la config; JPEG en Base64 |
 
 ### Mensaje de error operativo
@@ -67,7 +69,7 @@ Puede incluir **`error`** (string), p. ej. `sin_frame`, o cierre con código HTT
 | Router WS | `backend/app/routers/live_pose.py` |
 | Modelo config | `backend/app/models/schemas.py` — clase `PoseStreamConfig` |
 | URI cliente (Flutter) | `app/lib/utils/ws_uri.dart` — `buildPoseStreamWebSocketUri` |
-| Pantalla de prueba | `app/lib/screens/server_test_video_screen.dart` |
+| Pantalla de análisis | `app/lib/screens/video_analysis/video_analysis_screen.dart` |
 
 ## Incidencias y decisiones
 

@@ -4,11 +4,15 @@
 
 - **Estado:** Activo  
 - **Alcance:** Patrones aplicables a pantallas que usan `web_socket_channel` contra el backend (*pose stream*, video binario, etc.).  
-- **Referencia principal:** `app/lib/screens/server_test_video_screen.dart`, `app/lib/screens/camera_stream_screen.dart`, `app/lib/utils/ws_uri.dart`
+- **Referencia principal:** `app/lib/screens/video_analysis/video_analysis_screen.dart`, `app/lib/screens/live_analysis/live_analysis_screen.dart`, `app/lib/utils/ws_uri.dart`, `app/lib/pose/pose_ws_payload.dart` (parseo compartido de respuestas pose JSON)
 
 ## Resumen
 
 En **Flutter Web**, JSON decodificado y el estado de widgets pueden interactuar mal con **hot reload** o con valores **`null`** que en otros lenguajes se envían explícitamente. Este spec documenta decisiones para evitar fallos en runtime (`Null is not a subtype of bool`, etc.) y mantener contrato con el backend descrito en [websocket-pose-stream.md](websocket-pose-stream.md).
+
+## Parseo compartido de respuestas JSON (pose)
+
+Los mensajes de texto con `landmarks`, `knees`, `frame_index` (y opcionalmente `total_frames`, `error`) se interpretan en **`app/lib/pose/pose_ws_payload.dart`**: `PoseWsServerFrame.fromJsonMap`, `poseWsErrorMessage`, `parsePoseFrameIndex`, `parsePoseTotalFrames`, highlights `kPoseKneeHighlightIndices` y texto de resumen de sesión (`poseSessionSummaryFromKneesMap`). Cualquier cambio de contrato del backend en esos campos debe actualizarse **una sola vez** ahí; las pantallas en vivo y vídeo solo orquestan WebSocket y UI.
 
 ## Contrato hacia el servidor
 
@@ -17,7 +21,7 @@ En **Flutter Web**, JSON decodificado y el estado de widgets pueden interactuar 
 
 ## Implementación: bandera `include_preview` (pantalla servidor)
 
-Archivo: `app/lib/screens/server_test_video_screen.dart`.
+Archivo: `app/lib/screens/video_analysis/video_analysis_screen.dart`.
 
 | Elemento | Decisión |
 |----------|----------|
@@ -29,7 +33,7 @@ Archivo: `app/lib/screens/server_test_video_screen.dart`.
 
 ## Otros clientes WS
 
-- **`/ws/video`** (`camera_stream_screen.dart`): primer mensaje texto `{"analyze_pose": true}`; frames binarios JPEG después. Si en el futuro se añaden flags booleanos al JSON, aplicar la misma regla: **nunca asumir no-null sin `??` o helper** al leer `Map<String, dynamic>` desde `jsonDecode`.
+- **`/ws/video`** (`live_analysis_screen.dart`): primer mensaje texto `{"analyze_pose": true}`; luego JPEG binarios. La **latencia RTT** en HUD se estima con `Stopwatch` entre envío del JPEG y la primera respuesta JSON del mismo ciclo; **resp/s** cuenta mensajes recibidos por segundo (no es el FPS de captura de la cámara). Si se añaden flags booleanos al JSON, aplicar la misma regla: **nunca asumir no-null sin `??` o helper** al leer `Map<String, dynamic>` desde `jsonDecode`.
 
 ## Incidencias registradas
 

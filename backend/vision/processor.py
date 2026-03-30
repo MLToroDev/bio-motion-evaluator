@@ -49,6 +49,13 @@ class VideoSource:
         if self._cap is None or not self._cap.isOpened():
             raise RuntimeError(f"No se pudo abrir la fuente: {source_type} {file_path!r}")
 
+        #: Número reportado por el códec para `file` (OpenCV). Puede ser 0 o inexacto; `None` si no aplica.
+        self.total_frame_count: int | None = None
+        if source_type == "file":
+            reported = float(self._cap.get(cv2.CAP_PROP_FRAME_COUNT))
+            if reported > 0.0 and reported < 1e9:
+                self.total_frame_count = int(reported)
+
     def get_frame(self) -> np.ndarray | None:
         """Lee un frame BGR. Devuelve None si la fuente falla (excepto archivo en loop)."""
         if self._cap is None:

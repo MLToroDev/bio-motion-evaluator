@@ -11,6 +11,7 @@ import asyncio
 import base64
 import json
 import logging
+import time
 from pathlib import Path
 
 import cv2
@@ -64,6 +65,7 @@ async def pose_stream(ws: WebSocket) -> None:
         raw = await ws.receive_text()
         cfg = PoseStreamConfig.model_validate_json(raw)
         source = _build_video_source(cfg)
+        total_frames = source.total_frame_count
         model_path = settings.resolve_model_path(BACKEND_ROOT)
         interval = 1.0 / cfg.target_fps
         frame_index = 0
@@ -76,6 +78,8 @@ async def pose_stream(ws: WebSocket) -> None:
                         "frame_index": frame_index,
                         "error": "sin_frame",
                         "knees": None,
+                        "total_frames": total_frames,
+                        "server_ts_ms": int(time.time() * 1000),
                     }
                 )
                 await asyncio.sleep(interval)
@@ -90,6 +94,8 @@ async def pose_stream(ws: WebSocket) -> None:
                 "note": pose.note,
                 "landmarks": pose.landmarks,
                 "knees": knees,
+                "total_frames": total_frames,
+                "server_ts_ms": int(time.time() * 1000),
             }
 
             if cfg.include_preview:
