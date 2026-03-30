@@ -57,3 +57,9 @@ python scripts/download_models.py
 ```
 
 La ruta del modelo se puede configurar con `MEDIAPIPE_POSE_MODEL_PATH` en `.env` (ver `backend/.env.example`).
+
+## Desarrollo con recarga activa
+
+- **FastAPI:** usa siempre `uvicorn ... --reload`, que reinicia el servidor al guardar cambios en `.py`. Script: [`scripts/start-dev-backend.ps1`](../scripts/start-dev-backend.ps1) desde la raíz.
+- **Flutter:** el comando `flutter run` se queda en ejecución; en la misma terminal **r** = hot reload, **R** = hot restart. Script: [`scripts/start-dev-flutter.ps1`](../scripts/start-dev-flutter.ps1).
+- Mantén **dos procesos** en paralelo (dos terminales o dos tareas): API + app.

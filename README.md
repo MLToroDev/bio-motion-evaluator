@@ -38,6 +38,13 @@ python scripts/download_models.py
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
+**Recarga automática del backend:** la flag `--reload` hace que **Uvicorn reinicie el proceso** cuando guardas cambios en `.py` bajo la carpeta desde la que arrancaste (normalmente `backend/`). No hace falta parar y volver a ejecutar el comando.
+
+Atajos desde la raíz del repo (Windows):
+
+- `.\scripts\start-dev-backend.ps1`
+- `.\scripts\start-dev-flutter.ps1` (por defecto `web-server`; opcional: `.\scripts\start-dev-flutter.ps1 edge`)
+
 - Salud: `GET http://localhost:8000/health`
 - Documentación interactiva: `http://localhost:8000/docs`
 - Streaming de pose (cámara / vídeo en `tests/assets/videos` / URL): WebSocket `ws://localhost:8000/ws/pose-stream` (primer mensaje JSON; ver [`backend/README.md`](backend/README.md)).
@@ -54,6 +61,14 @@ flutter run -d edge
 # Si aparece "Failed to launch browser", usa solo el servidor y abre la URL manualmente:
 flutter run -d web-server
 ```
+
+**Hot reload en Flutter:** deja **`flutter run`** abierto en una terminal. Tras cambiar código Dart:
+
+- Pulsa **`r`** en esa terminal → *hot reload* (rápido, mantiene estado).
+- Pulsa **`R`** → *hot restart* (reinicia el estado de la app).
+- En **Cursor / VS Code**, con la extensión **Flutter**, suele existir la opción *Hot reload on save* o el botón del rayo en la barra de depuración.
+
+Abre **dos terminales**: una con el backend (`--reload`) y otra con `flutter run` para no detener nada al editar.
 
 ### IoT
 
