@@ -1,0 +1,58 @@
+# --- General ---
+.DS_Store
+Thumbs.db
+*.log
+.env
+.env.local
+*.swp
+*.swo
+.idea/
+.vscode/
+*.iml
+
+# --- Python / Backend ---
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+venv/
+.venv/
+env/
+*.egg-info/
+.eggs/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# --- Flutter / Dart ---
+app/.dart_tool/
+app/.flutter-plugins
+app/.flutter-plugins-dependencies
+app/.packages
+app/build/
+app/.pub-cache/
+app/.pub/
+app/**/doc/api/
+app/**/ios/Pods/
+app/**/ios/.symlinks/
+app/**/ios/Flutter/Flutter.framework
+app/**/ios/Flutter/Flutter.podspec
+app/**/android/.gradle/
+app/**/android/captures/
+app/**/android/local.properties
+app/**/.cxx/
+*.freezed.dart
+*.g.dart
+
+# --- IoT / firmware ---
+iot/**/.pio/
+iot/**/.vscode/
+
+# --- Docs (opcional: descomenta si NO quieres versionar el PDF final) ---
+# docs/**/*.pdf
+
+# --- Modelos descargados (opcional) ---
+backend/models/*.task
