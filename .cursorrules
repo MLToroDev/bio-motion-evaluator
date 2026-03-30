@@ -29,3 +29,10 @@ Eres un experto en Ingeniería de Software, IA y Biomecánica. Estás ayudando a
 - `iot/`: firmware/scripts de cámara.
 - `docs/`: arquitectura y material de grado.
 - `tests/`: pruebas y activos de regresión (p. ej. vídeos de referencia).
+
+## Documentación en formato spec (obligatorio para el asistente)
+
+- Las especificaciones técnicas viven en **`docs/spec/`** (archivos `.md`): contratos WebSocket/REST, coerciones de tipos, mitigaciones de bugs y rutas de código.
+- Convención y plantilla de secciones: ver **[`docs/spec/README.md`](docs/spec/README.md)**.
+- Cuando implementes o corrijas un flujo documentado (p. ej. `/ws/pose-stream`, flags `include_preview`, cliente Flutter Web), **actualiza el `.md` correspondiente** en el mismo cambio lógico, o crea un spec nuevo si el área no tenía documento.
+- Mantén **Meta, Resumen, Contrato, Implementación, Incidencias/decisiones** alineados con el código real; evita duplicar tutorial largo: prioriza contrato y trazabilidad para tesis.

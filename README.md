@@ -14,7 +14,7 @@ Monorepo para el sistema de evaluación de movimiento (web-first, cross-platform
 
 Diagrama detallado: [`docs/arquitectura.md`](docs/arquitectura.md).
 
-Contexto para asistentes de código en Cursor: [`.cursorrules`](.cursorrules) (stack, biomecánica, trazabilidad para el Cap. 6).
+Contexto para asistentes de código en Cursor: [`.cursorrules`](.cursorrules) (stack, biomecánica, trazabilidad para el Cap. 6). Especificaciones técnicas: [`docs/spec/`](docs/spec/README.md).
 
 ## Requisitos
 
