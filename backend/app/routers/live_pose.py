@@ -8,10 +8,12 @@ Cap. 7: conjunto gold standard bajo ``tests/assets/videos``.
 from __future__ import annotations
 
 import asyncio
+import base64
 import json
 import logging
 from pathlib import Path
 
+import cv2
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
 from app.config import settings
@@ -82,14 +84,29 @@ async def pose_stream(ws: WebSocket) -> None:
             pose = await asyncio.to_thread(analyze_frame_bgr, frame, model_path)
             knees = knee_angles_from_landmarks(pose.landmarks) if pose.landmarks else None
 
-            await ws.send_json(
-                {
-                    "frame_index": frame_index,
-                    "pose_ok": pose.ok,
-                    "note": pose.note,
-                    "knees": knees,
-                }
-            )
+            payload: dict = {
+                "frame_index": frame_index,
+                "pose_ok": pose.ok,
+                "note": pose.note,
+                "landmarks": pose.landmarks,
+                "knees": knees,
+            }
+
+            if cfg.include_preview:
+                try:
+                    h, w = frame.shape[:2]
+                    scale = min(640 / max(w, 1), 480 / max(h, 1), 1.0)
+                    if scale < 1.0:
+                        small = cv2.resize(frame, (int(w * scale), int(h * scale)))
+                    else:
+                        small = frame
+                    ok_j, buf = cv2.imencode(".jpg", small, [int(cv2.IMWRITE_JPEG_QUALITY), 72])
+                    if ok_j:
+                        payload["preview_jpeg_base64"] = base64.b64encode(buf.tobytes()).decode("ascii")
+                except Exception:  # noqa: BLE001
+                    pass
+
+            await ws.send_json(payload)
             frame_index += 1
             await asyncio.sleep(interval)
     except WebSocketDisconnect:

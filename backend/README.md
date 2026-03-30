@@ -19,7 +19,7 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 |--------|------|-------------|
 | GET | `/health` | Estado del servicio |
 | POST | `/analyze/pose` | Imagen multipart → landmarks |
-| WS | `/ws/video` | Frames binarios desde IoT / cliente |
+| WS | `/ws/video` | Primer mensaje JSON `{"analyze_pose":true}` luego JPEG → JSON con `landmarks` y `knees`; sin handshake, solo contadores (legado) |
 | WS | `/ws/pose-stream` | Cámara, archivo (`tests/assets/videos`) o URL → MediaPipe + ángulos de rodilla en JSON |
 
 Documentación: `http://localhost:8000/docs`

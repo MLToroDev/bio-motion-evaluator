@@ -1,6 +1,6 @@
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class HealthResponse(BaseModel):
@@ -42,3 +42,15 @@ class PoseStreamConfig(BaseModel):
     device_index: int = 0
     stream_url: str | None = None
     target_fps: float = Field(default=15.0, ge=0.5, le=60.0)
+    include_preview: bool = Field(
+        default=True,
+        description="Si True, cada mensaje incluye preview_jpeg_base64 (vista + marcas en cliente).",
+    )
+
+    @field_validator("include_preview", mode="before")
+    @classmethod
+    def include_preview_coerce_none(cls, v: object) -> bool:
+        """Flutter/JSON a veces envía null; por defecto se comporta como True."""
+        if v is None:
+            return True
+        return bool(v)
