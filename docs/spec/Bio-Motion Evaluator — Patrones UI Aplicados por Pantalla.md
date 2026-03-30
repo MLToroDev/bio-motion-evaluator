@@ -2,7 +2,10 @@
 
 > **Fuente de patrones:** `ui_patterns.md` (ui-patterns.com)  
 > **Basado en código:** vistas actuales entregadas en Sprint  
-> **Versión:** 1.0.0
+> **Versión:** 2.0.0  
+> **Última actualización:** 2026-03-30  
+>
+> **Leyenda de estado:** ✅ Implementado · ⚠️ Parcial · ❌ Pendiente
 
 ---
 
@@ -96,93 +99,64 @@ La URL por defecto `http://localhost:8000` y el ping automático al iniciar (`_l
 
 ## 2. `LiveAnalysisScreen` — Análisis en vivo con cámara
 
-### 2.1 Problema: El panel de métricas no comunica su estado cuando no hay transmisión
+### 2.1 ✅ Patrón: `Blank Slate` + estados diferenciados del panel
 
-**Código actual (`MetricsBottomPanel`):**
-```dart
-if (transmitting && (leftDeg != null || rightDeg != null))
-  Row(children: [MetricTile(...), MetricTile(...)])
-```
-Si `!transmitting`, los `MetricTile` desaparecen. El panel queda vacío o solo muestra el `AngleHistoryChart` vacío. El usuario no recibe orientación.
+**Problema original:** `MetricsBottomPanel` dejaba el área de métricas vacía cuando no había transmisión activa.
 
-**Patrón: `Blank Slate` + `Inline Hints`**
+**Implementado en:** `widgets/metrics_panel.dart` → clases `_IdleState` y `_DetectingPoseState`.
 
 ```dart
-if (!transmitting)
-  Column(
-    children: [
-      Icon(Icons.accessibility_new, size: 40, color: AppColors.textDisabled),
-      const SizedBox(height: AppSpacing.sm),
-      Text(
-        'Posiciónate a 2–3 m de la cámara,\nde cuerpo entero, y pulsa Iniciar.',
-        style: AppTypography.body.copyWith(color: AppColors.textSecondary),
-        textAlign: TextAlign.center,
-      ),
-    ],
-  )
-else if (leftDeg == null && rightDeg == null)
-  Text('Detectando pose…', style: AppTypography.caption)
-else
-  Row(children: [MetricTile(...), MetricTile(...)]),
+// Tres estados claramente diferenciados:
+if (!transmitting)           → _IdleState()           // ícono + instrucción
+else if (metrics.isEmpty)    → _DetectingPoseState()   // spinner + "Detectando pose…"
+else                         → _MetricsList(metrics)   // tarjetas de métricas
 ```
 
-Tres estados diferenciados: idle → detectando → métricas activas.
+`_IdleState` guía al usuario hacia la acción (patrón Blank Slate).  
+`_DetectingPoseState` muestra un `CircularProgressIndicator` compacto para no dejar el área vacía mientras MediaPipe busca landmarks.
 
 ---
 
-### 2.2 Problema: El `CameraHUD` siempre muestra `LiveIndicatorDot(active: true)` hardcodeado
+### 2.2 ✅ Patrón: `Feedback Loop` — indicador EN VIVO reactivo
 
-**Código actual (`camera_hud.dart` línea 77):**
-```dart
-child: LiveIndicatorDot(active: true),  // hardcodeado
-```
+**Problema original:** `LiveIndicatorDot(active: true)` hardcodeado ignoraba `serverStalled`.
 
-Si hay `serverStalled`, el dot sigue mostrándose como activo. Incoherencia visual.
-
-**Patrón: `Feedback Loop` + `Synchronization`**
+**Implementado en:** `widgets/camera_hud.dart` — CameraHUD rediseñado como una sola línea compacta.
 
 ```dart
-// En CameraHUD, añadir parámetro:
-const CameraHUD({
-  ...
-  required this.serverStalled,
-});
-
-// Y pasar al dot:
-LiveIndicatorDot(active: !serverStalled),
+LiveIndicatorDot(
+  active: !serverStalled,
+  color: serverStalled ? AppColors.angleWarn : null,
+),
+Text(serverStalled ? 'EN VIVO (esperando…)' : 'EN VIVO', ...),
 ```
 
-El indicador "EN VIVO" pasa a naranja/pulsando lento cuando hay stall, y vuelve a verde cuando los datos llegan. El estado visual siempre refleja el estado real.
+El color del indicador y el texto cambian según el estado real del servidor.  
+**Nota adicional:** CameraHUD fue compactado de 2 contenedores apilados (~50 px) a una sola línea (~22 px) para reducir la presión de espacio en el panel inferior.
 
 ---
 
-### 2.3 Problema: No hay confirmación antes de detener la transmisión si hay datos en curso
+### 2.3 ✅ Patrón: `Undo` — SnackBar con acción "Reanudar"
 
-**Código actual:** Botón "Detener" ejecuta `_stopStreaming()` inmediatamente.
+**Problema original:** Botón "Detener" ejecutaba `_stopStreaming()` sin posibilidad de deshacer.
 
-**Patrón: `Undo` adaptado → confirmación rápida tipo Snackbar**
-
-En análisis clínico, detener accidentalmente pierde el contexto de la sesión. Aplicar el patrón Undo con un `SnackBar` de acción:
+**Implementado en:** `live_analysis_screen.dart` → `_toggleTransmit()`.
 
 ```dart
-Future<void> _requestStop() async {
-  _stopStreaming(); // detiene inmediatamente (datos ya están)
-  if (!mounted) return;
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: const Text('Análisis detenido'),
-      duration: const Duration(seconds: 4),
-      action: SnackBarAction(
-        label: 'Reanudar',
-        textColor: AppColors.accent,
-        onPressed: _toggleTransmit, // reinicia
-      ),
+ScaffoldMessenger.of(context).showSnackBar(
+  SnackBar(
+    content: const Text('Análisis detenido'),
+    duration: const Duration(seconds: 4),
+    action: SnackBarAction(
+      label: 'Reanudar',
+      textColor: AppColors.accent,
+      onPressed: _toggleTransmit,
     ),
-  );
-}
+  ),
+);
 ```
 
-El dato ya se detuvo (no hay estado ambiguo) pero el usuario puede reanudar en 4 segundos si fue accidental.
+El análisis se detiene inmediatamente (no hay estado ambiguo) pero el usuario puede reanudar en 4 segundos si fue accidental.
 
 ---
 
@@ -211,13 +185,105 @@ El usuario ve exactamente qué URL quedó guardada (incluyendo la normalización
 
 ---
 
-### 2.5 Patrón actualmente bien aplicado: `Progressive Disclosure` ✅
+### 2.5 ✅ Patrón: `Dashboard` + `Module Tabs` — panel inferior refactorizado
 
-El `DraggableScrollableSheet` del panel inferior con handle visible implementa correctamente la divulgación progresiva. El historial de 30 frames solo se ve al expandir. No requiere cambios.
+**Problema:** El panel inferior (`DraggableScrollableSheet`) mezclaba métricas, log y gráfica sin jerarquía clara. Al añadir contenido causaba overflow.
+
+**Implementado en:** `widgets/live_dashboard_panel.dart` + `widgets/metrics_panel.dart`
+
+#### Estructura visual implementada
+
+```
+┌──────────────────────────────────────┐
+│  ── (handle)                         │
+│  [MÉTRICAS]  [LOG]  [HISTÓRICO]      │  ← TabBar (Module Tabs)
+├──────────────────────────────────────┤
+│                                      │
+│  Contenido del tab activo            │  ← TabBarView (Expanded)
+│                                      │
+├──────────────────────────────────────┤
+│  [  Analizar en vivo  ▶  ]           │  ← CTA siempre visible
+└──────────────────────────────────────┘
+```
+
+#### Por qué este patrón
+
+- **Dashboard (operacional):** todos los datos giran en torno a una sola meta (calidad del movimiento). Métrica principal al frente, CTA siempre accesible.
+- **Module Tabs:** cada categoría ocupa el 100% del ancho. Añadir un tab nuevo requiere únicamente un `Tab` y su widget hijo.
+
+#### Archivos implicados
+
+| Archivo | Responsabilidad |
+|---------|----------------|
+| `live_dashboard_panel.dart` | Orquestador con `TabController(length: 3)` |
+| `metrics_panel.dart` | Tab MÉTRICAS (data-driven, sin conocimiento del ejercicio) |
+| `log_panel.dart` | Tab LOG (eventos frontend/backend) |
+| `history_panel.dart` | Tab HISTÓRICO (gráfica + leyenda + blank-slate) |
 
 ---
 
-### 2.6 Patrón actualmente bien aplicado: `Feedback Loop` en métricas ✅
+### 2.6 ✅ Patrón: `Data-Driven Cards` — panel de métricas extensible
+
+**Problema:** `MetricsPanel` tenía hardcodeados `leftDeg`, `rightDeg`, `asymmetryPct` — imposible reutilizarlo para press banca, running u otros ejercicios sin modificar el widget.
+
+**Implementado en:** `core/models/live_metric.dart` + `metrics_panel.dart` + `live_analysis_screen.dart`
+
+#### Modelo `LiveMetric`
+
+```dart
+class LiveMetric {
+  const LiveMetric({
+    required this.label,   // "RODILLA IZQ.", "CADENCIA", "RANGO CODO"…
+    required this.value,   // "127.3°", "168 spm", "5.2 km/h"
+    required this.status,  // good / warn / bad / neutral
+    this.sublabel,         // contexto opcional ("Objetivo: ≥ 130°")
+    this.icon,             // IconData opcional
+  });
+}
+```
+
+#### Punto de extensión en `live_analysis_screen.dart`
+
+```dart
+// Hoy: flexión de rodilla
+final metrics = _buildLiveMetrics(leftDeg, rightDeg);
+
+// Futuro: al agregar press banca, running, etc.
+// → agregar nueva implementación aquí según ejercicio seleccionado
+List<LiveMetric> _buildLiveMetrics(double? leftDeg, double? rightDeg) {
+  // construye las LiveMetric del ejercicio activo
+}
+```
+
+**`MetricsPanel` usa `ListView.separated` + `Expanded`** → overflow imposible, independientemente de cuántas métricas devuelva el ejercicio.
+
+---
+
+### 2.7 ✅ Fix: camera preview sin barras negras (`FittedBox.cover`)
+
+**Problema:** `AspectRatio(ctrl.value.aspectRatio)` + `Align(topCenter)` dejaba una franja negra entre la cámara y el panel inferior.
+
+**Implementado en:** `live_analysis_screen.dart` → `_buildPreview()`
+
+```dart
+return ClipRect(
+  child: FittedBox(
+    fit: BoxFit.cover,
+    alignment: Alignment.topCenter,
+    child: SizedBox(
+      width: ps?.height ?? 1.0,  // ejes invertidos para portrait
+      height: ps?.width ?? 1.0,
+      child: PoseOverlay(..., child: CameraPreview(ctrl)),
+    ),
+  ),
+);
+```
+
+`BoxFit.cover` garantiza que la cámara llene el área disponible recortando los bordes sobrantes, igual que `object-fit: cover` en CSS. `PoseOverlay` sigue mapeando landmarks correctamente porque opera sobre las dimensiones nativas del sensor antes del escalado.
+
+---
+
+### 2.8 ✅ Patrón: `Feedback Loop` en métricas
 
 `CameraHUD` con `serverStalled`, `rxPerSec`, `captureMs` y `serverRttMs` cubre el bucle de feedback técnico. `MetricTile` con `MetricStatus` cubre el bucle de feedback clínico.
 
@@ -522,24 +588,40 @@ Actualmente en la UI conviven dos vocabularios:
 
 ## 6. Resumen ejecutivo de patrones por pantalla
 
-| Pantalla | Patrón | Prioridad | Estado |
-|---|---|---|---|
-| `BioHomeScreen` | Blank Slate + Inline Help (backend offline) | Alta | ❌ Pendiente |
-| `BioHomeScreen` | Zeigarnik (última sesión vacía) | Media | ❌ Pendiente |
-| `LiveAnalysisScreen` | Blank Slate (panel idle) | Alta | ❌ Pendiente |
-| `LiveAnalysisScreen` | Feedback Loop (LiveDot ↔ stall) | Alta | ⚠️ Bug (`active: true` hardcoded) |
-| `LiveAnalysisScreen` | Undo (detener accidental) | Media | ❌ Pendiente |
-| `LiveAnalysisScreen` | Input Feedback (URL config) | Baja | ❌ Pendiente |
-| `LiveAnalysisScreen` | Progressive Disclosure (panel) | Alta | ✅ Implementado |
-| `VideoAnalysisScreen` | Progress Indicator + Zeigarnik | Alta | ❌ Pendiente |
-| `VideoAnalysisScreen` | Visual Hierarchy (diálogo resumen) | Alta | ❌ Pendiente |
-| `VideoAnalysisScreen` | New Beginning Effect (post-análisis) | Media | ❌ Pendiente |
-| `VideoAnalysisScreen` | Bug fix spark derecho (dashed) | Alta | ❌ Bug activo |
-| `BackendStatusScreen` | Progress Indicator (retry countdown) | Baja | ⚠️ Solo texto |
-| Todas | Forgiving Format (normalizar URLs) | Alta | ⚠️ Parcial |
-| Todas | Input Feedback onChange (FPS) | Media | ⚠️ Solo al submit |
-| Todas | Appropriate Challenge (sublabels) | Media | ⚠️ Parcial |
-| Todas | Consistent Terminology | Media | ⚠️ Inconsistente |
+> Actualizado al 2026-03-30. ✅ = implementado en código · ⚠️ = parcial · ❌ = pendiente.
+
+### 6.1 Patrones UI/UX
+
+| Pantalla | Patrón | Prioridad | Estado | Archivo principal |
+|---|---|---|---|---|
+| `BioHomeScreen` | Inline Help Box + Blank Slate (backend offline) | Alta | ✅ | `home_screen.dart` |
+| `BioHomeScreen` | Zeigarnik (última sesión vacía) | Media | ✅ | `home_screen.dart` |
+| `LiveAnalysisScreen` | Blank Slate — idle / detectando pose | Alta | ✅ | `metrics_panel.dart` |
+| `LiveAnalysisScreen` | Feedback Loop — LiveDot reactivo a stall | Alta | ✅ | `camera_hud.dart` |
+| `LiveAnalysisScreen` | Undo — SnackBar "Reanudar" | Media | ✅ | `live_analysis_screen.dart` |
+| `LiveAnalysisScreen` | Input Feedback — URL normalizada al guardar | Baja | ✅ | `connection_config_form.dart` |
+| `LiveAnalysisScreen` | Dashboard + Module Tabs (panel inferior) | Alta | ✅ | `live_dashboard_panel.dart` |
+| `LiveAnalysisScreen` | Data-Driven Cards (`LiveMetric`) | Alta | ✅ | `metrics_panel.dart` + `live_metric.dart` |
+| `VideoAnalysisScreen` | Progress Indicator + Zeigarnik | Alta | ✅ | `video_analysis_screen.dart` |
+| `VideoAnalysisScreen` | Visual Hierarchy (diálogo resumen) | Alta | ✅ | `analysis_summary_dialog.dart` |
+| `VideoAnalysisScreen` | New Beginning Effect (SnackBar post-análisis) | Media | ✅ | `video_analysis_screen.dart` |
+| `VideoAnalysisScreen` | Bug fix spark derecho (dashed) | Alta | ✅ | `frame_log_tile.dart` |
+| `BackendStatusScreen` | Progress Indicator (retry countdown) | Baja | ✅ | `backend_status_screen.dart` |
+| Todas | Forgiving Format (normalizar URLs) | Alta | ✅ | `ws_uri.dart` → `buildHealthHttpUri` |
+| Todas | Appropriate Challenge (sublabels dinámicos) | Media | ✅ | `angle_formatter.dart` |
+| Todas | Consistent Terminology | Media | ✅ | NavCards + AppBar titles |
+
+### 6.2 Decisiones arquitectónicas de UI
+
+| Decisión | Descripción | Archivo(s) |
+|---|---|---|
+| Camera preview sin barras negras | `FittedBox(fit: BoxFit.cover)` reemplaza `AspectRatio` | `live_analysis_screen.dart` |
+| Panel inferior modular (tabs) | `LiveDashboardPanel` con `TabController(length: 3)` | `live_dashboard_panel.dart` |
+| Métricas data-driven | Modelo `LiveMetric` agnóstico del ejercicio | `core/models/live_metric.dart` |
+| Overflow imposible en métricas | `MetricsPanel` usa `ListView.separated` + `Expanded` | `metrics_panel.dart` |
+| CameraHUD compacto | Reducido de ~50 px (2 contenedores) a ~22 px (1 línea) | `camera_hud.dart` |
+| Detección de emulador Android | `defaultApiBaseUrl()` usa `DeviceInfoPlugin` | `default_api_base_url.dart` |
+| Almacenamiento multi-plataforma | `SharedPreferences` / `localStorage` según plataforma | `storage/prefs.dart` |
 
 ---
 
