@@ -41,7 +41,7 @@ Archivo: `app/lib/screens/video_analysis/video_analysis_screen.dart`.
 
 ## Otros clientes WS
 
-- **`/ws/video`** (`live_analysis_screen.dart`): primer mensaje texto `{"analyze_pose": true}`; luego JPEG binarios. La **latencia RTT** en HUD se estima con `Stopwatch` entre envío del JPEG y la primera respuesta JSON del mismo ciclo; **resp/s** cuenta mensajes recibidos por segundo (no es el FPS de captura de la cámara). Si se añaden flags booleanos al JSON, aplicar la misma regla: **nunca asumir no-null sin `??` o helper** al leer `Map<String, dynamic>` desde `jsonDecode`.
+- **`/ws/video`** (`live_analysis_screen.dart`): primer mensaje texto `{"analyze_pose": true}`; luego JPEG binarios. El HUD muestra **dos tiempos** (no confundir con “ping” HTTP): **Cap** = `takePicture()` + lectura de bytes en el cliente (en Web puede ser **mucho mayor** que el servidor); **Srv** = desde `sink.add(JPEG)` hasta el JSON de respuesta (red local despreciable + `imdecode` + **MediaPipe** + serialización). Un valor **Srv** de decenas a ~200 ms en local solo con CPU es habitual según resolución del JPEG y carga del PC. **resp/s** cuenta mensajes recibidos por segundo (no es el FPS de captura). Si se añaden flags booleanos al JSON, aplicar la misma regla: **nunca asumir no-null sin `??` o helper** al leer `Map<String, dynamic>` desde `jsonDecode`.
 
 ## Incidencias registradas
 
