@@ -30,6 +30,8 @@
 
 Desde la raíz del monorepo (donde está `README.md`):
 
+**PowerShell (Windows):** tras `gh auth login`, puedes ejecutar [`scripts/publish-github.ps1`](../scripts/publish-github.ps1).
+
 ```bash
 git add .
 git commit -m "chore: estructura inicial monorepo bio-motion-evaluator"
