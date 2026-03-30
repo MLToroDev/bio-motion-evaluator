@@ -50,7 +50,9 @@ Si aún no generaste las carpetas de plataforma:
 cd app
 flutter create . --platforms=web,android,ios --project-name bio_motion_app
 flutter pub get
-flutter run -d chrome
+flutter run -d edge
+# Si aparece "Failed to launch browser", usa solo el servidor y abre la URL manualmente:
+flutter run -d web-server
 ```
 
 ### IoT

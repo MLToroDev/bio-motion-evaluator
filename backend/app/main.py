@@ -20,13 +20,25 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title=settings.app_name, version=settings.app_version, lifespan=lifespan)
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=settings.cors_origins_list,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# CORS: con allow_credentials=True no puede usarse allow_origins=["*"] (el navegador bloquea).
+# Flutter web usa puertos aleatorios en localhost; el regex cubre cualquier puerto en dev.
+_cors_kw = {"allow_methods": ["*"], "allow_headers": ["*"]}
+_origins = settings.cors_origins_list
+if _origins == ["*"]:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=False,
+        **_cors_kw,
+    )
+else:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=_origins,
+        allow_origin_regex=r"https?://(localhost|127\.0\.0\.1)(:\d+)?$",
+        allow_credentials=True,
+        **_cors_kw,
+    )
 
 app.include_router(health.router)
 app.include_router(pose.router)
