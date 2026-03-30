@@ -116,14 +116,33 @@ def analyze_frame_bgr(bgr: np.ndarray, model_path: Path) -> PoseResult:
     return analyze_frame_rgb(rgb, model_path)
 
 
-def analyze_image_bytes(image_bytes: bytes, model_path: Path) -> PoseResult:
-    """Decodifica imagen y ejecuta Pose Landmarker."""
+def _jpeg_bytes_to_rgb(image_bytes: bytes) -> np.ndarray | None:
+    """
+    RGB H×W×3. Primero intenta decodificar con orientación EXIF (JPEG de móviles);
+    ``cv2.imdecode`` no aplica EXIF, lo que desfasa la pose respecto a la vista previa.
+    """
+    try:
+        import io
+
+        from PIL import Image, ImageOps
+
+        img = Image.open(io.BytesIO(image_bytes))
+        img = ImageOps.exif_transpose(img)
+        return np.asarray(img.convert("RGB"))
+    except Exception:
+        pass
     arr = np.frombuffer(image_bytes, dtype=np.uint8)
     bgr = cv2.imdecode(arr, cv2.IMREAD_COLOR)
     if bgr is None:
-        return PoseResult(ok=False, landmarks=[], world_landmarks=[], note="No se pudo decodificar la imagen")
+        return None
+    return cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)
 
-    rgb = cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)
+
+def analyze_image_bytes(image_bytes: bytes, model_path: Path) -> PoseResult:
+    """Decodifica imagen y ejecuta Pose Landmarker."""
+    rgb = _jpeg_bytes_to_rgb(image_bytes)
+    if rgb is None:
+        return PoseResult(ok=False, landmarks=[], world_landmarks=[], note="No se pudo decodificar la imagen")
     try:
         import mediapipe as mp
 
