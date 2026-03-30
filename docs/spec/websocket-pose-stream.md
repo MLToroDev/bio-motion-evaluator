@@ -58,6 +58,12 @@ Campos habituales:
 | `server_ts_ms` | number | Marca de tiempo del servidor (epoch ms) al enviar el mensaje; útil para estimar latencia red + procesamiento. |
 | `preview_jpeg_base64` | string | Presente solo si `include_preview` era truthy en la config; JPEG en Base64 |
 
+### Fin de stream (`source=file`)
+
+Cuando el archivo de vídeo llega al final (OpenCV ya no entrega frames), el servidor **deja de enviar fotogramas**, envía un último JSON con **`stream_done`: `true`** (junto a `frame_index`, `total_frames`, `server_ts_ms`) y **cierra el WebSocket** con código **1000**. El cliente debe dejar de tratar el canal como “en análisis” (p. ej. `onDone` en `web_socket_channel`).
+
+**Nota:** En `vision/processor.py`, `VideoSource` para archivo **no rebobina** al inicio por defecto (`loop_file=False`). Si en el futuro se necesita bucle para regresión, instanciar `VideoSource(..., loop_file=True)` o exponer un flag en `PoseStreamConfig`.
+
 ### Mensaje de error operativo
 
 Puede incluir **`error`** (string), p. ej. `sin_frame`, o cierre con código HTTP WS y cuerpo JSON según `live_pose.py`.

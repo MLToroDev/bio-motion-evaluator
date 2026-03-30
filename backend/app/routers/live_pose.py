@@ -73,6 +73,9 @@ async def pose_stream(ws: WebSocket) -> None:
         while True:
             frame = await asyncio.to_thread(source.get_frame)
             if frame is None:
+                # Fin natural del archivo: cerrar stream (no bucle ni reintentos eternos).
+                if cfg.source == "file":
+                    break
                 await ws.send_json(
                     {
                         "frame_index": frame_index,
@@ -115,6 +118,21 @@ async def pose_stream(ws: WebSocket) -> None:
             await ws.send_json(payload)
             frame_index += 1
             await asyncio.sleep(interval)
+
+        # Vídeo archivo agotado: cierre limpio para que el cliente deje de analizar.
+        if cfg.source == "file":
+            try:
+                await ws.send_json(
+                    {
+                        "stream_done": True,
+                        "frame_index": frame_index,
+                        "total_frames": total_frames,
+                        "server_ts_ms": int(time.time() * 1000),
+                    }
+                )
+            except Exception:  # noqa: BLE001
+                pass
+            await ws.close(code=1000)
     except WebSocketDisconnect:
         log.info("Cliente desconectó /ws/pose-stream")
     except json.JSONDecodeError as exc:

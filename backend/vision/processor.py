@@ -17,8 +17,8 @@ class VideoSource:
     """
     Proveedor de frames BGR intercambiable para pruebas con cámara o vídeo pre-grabado.
 
-    Para vídeo en archivo, si el stream termina se reinicia al frame 0 (útil en bucles
-    de regresión sin intervención manual).
+    Para vídeo en archivo, por defecto al llegar al final devuelve ``None`` (fin del análisis).
+    Con ``loop_file=True`` se vuelve al frame 0 (p. ej. bucles de regresión).
     """
 
     def __init__(
@@ -26,8 +26,11 @@ class VideoSource:
         source_type: SourceType = "camera",
         file_path: str | None = None,
         device_index: int = 0,
+        *,
+        loop_file: bool = False,
     ) -> None:
         self.source_type: SourceType = source_type
+        self._loop_file = loop_file
         self._cap: cv2.VideoCapture | None = None
 
         if source_type == "camera":
@@ -65,10 +68,11 @@ class VideoSource:
             return frame
 
         if self.source_type == "file":
-            self._cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
-            ok2, frame2 = self._cap.read()
-            if ok2 and frame2 is not None:
-                return frame2
+            if self._loop_file:
+                self._cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+                ok2, frame2 = self._cap.read()
+                if ok2 and frame2 is not None:
+                    return frame2
             return None
 
         log.warning("VideoSource: fallo al leer frame (%s)", self.source_type)

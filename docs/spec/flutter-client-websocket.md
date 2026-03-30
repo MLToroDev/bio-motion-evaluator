@@ -12,7 +12,15 @@ En **Flutter Web**, JSON decodificado y el estado de widgets pueden interactuar 
 
 ## Parseo compartido de respuestas JSON (pose)
 
-Los mensajes de texto con `landmarks`, `knees`, `frame_index` (y opcionalmente `total_frames`, `error`) se interpretan en **`app/lib/pose/pose_ws_payload.dart`**: `PoseWsServerFrame.fromJsonMap`, `poseWsErrorMessage`, `parsePoseFrameIndex`, `parsePoseTotalFrames`, highlights `kPoseKneeHighlightIndices` y texto de resumen de sesión (`poseSessionSummaryFromKneesMap`). Cualquier cambio de contrato del backend en esos campos debe actualizarse **una sola vez** ahí; las pantallas en vivo y vídeo solo orquestan WebSocket y UI.
+Los mensajes de texto con `landmarks`, `knees`, `frame_index` (y opcionalmente `total_frames`, `error`) se interpretan en **`app/lib/pose/pose_ws_payload.dart`** (y `landmarks` en **`app/lib/pose/landmarks_json.dart`**): `PoseWsServerFrame.fromJsonMap`, `poseWsErrorMessage`, `parsePoseFrameIndex`, `parsePoseTotalFrames`, highlights `kPoseKneeHighlightIndices` y texto de resumen de sesión (`poseSessionSummaryFromKneesMap`). Cualquier cambio de contrato del backend en esos campos debe actualizarse **una sola vez** ahí; las pantallas en vivo y vídeo solo orquestan WebSocket y UI.
+
+## Persistencia en Web (`home_prefs`)
+
+La URL del API y el resumen de sesión pasan por **`app/lib/storage/prefs.dart`**: en **IO** (Android, iOS, desktop) se usa `shared_preferences`; en **Web** (`dart.library.html` o `dart.library.js_interop`) se usa **`localStorage`** vía `package:web`, sin el canal `plugins.flutter.io/shared_preferences`. Así se evita **`MissingPluginException(No implementation found for method getAll…)`** en algunos arranques con DDC o Wasm cuando el registrador de plugins no enlaza el plugin.
+
+## Navegación y DDC (Flutter Web)
+
+La pantalla de inicio **no importa** `LiveAnalysisScreen` / `VideoAnalysisScreen` / `BackendStatusScreen`: usa rutas con nombre (`AppRoutes` en `app/lib/app_routes.dart`, tabla `routes` en `main.dart`). Así se evita un grafo denso `home → análisis → …` que en modo **desarrollo con DDC** a veces disparaba *«Library … was previously defined»* tras hot reload. Si reaparece: **hot restart** (`R`) o `flutter clean` + `flutter run`.
 
 ## Contrato hacia el servidor
 
