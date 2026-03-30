@@ -15,6 +15,9 @@ log = logging.getLogger(__name__)
 _LANDMARKER = None
 _MODEL_PATH_USED: Path | None = None
 
+# Reducción de resolución para acelerar MediaPipe sin perder demasiada precisión.
+_TARGET_MAX_DIM = 640
+
 
 @dataclass
 class PoseResult:
@@ -44,9 +47,10 @@ def _get_landmarker(model_path: Path):
         base_options=base_options,
         running_mode=mp.tasks.vision.RunningMode.IMAGE,
         num_poses=1,
-        min_pose_detection_confidence=0.5,
-        min_pose_presence_confidence=0.5,
-        min_tracking_confidence=0.5,
+        # Leve mejora en precisión (filtros menos permisivos) sin cambiar el pipeline.
+        min_pose_detection_confidence=0.6,
+        min_pose_presence_confidence=0.6,
+        min_tracking_confidence=0.6,
     )
     _LANDMARKER = mp.tasks.vision.PoseLandmarker.create_from_options(options)
     _MODEL_PATH_USED = model_path
@@ -95,6 +99,15 @@ def analyze_frame_rgb(rgb: np.ndarray, model_path: Path) -> PoseResult:
     """
     if rgb is None or rgb.size == 0:
         return PoseResult(ok=False, landmarks=[], world_landmarks=[], note="Frame vacío")
+
+    # Downscale para acelerar el infer (MediaPipe cuelga mucho de la resolución).
+    h, w = rgb.shape[:2]
+    max_dim = max(h, w)
+    if max_dim > _TARGET_MAX_DIM:
+        scale = _TARGET_MAX_DIM / max_dim
+        new_w = max(1, int(round(w * scale)))
+        new_h = max(1, int(round(h * scale)))
+        rgb = cv2.resize(rgb, (new_w, new_h), interpolation=cv2.INTER_AREA)
     try:
         import mediapipe as mp
 
@@ -127,7 +140,12 @@ def _jpeg_bytes_to_rgb(image_bytes: bytes) -> np.ndarray | None:
         from PIL import Image, ImageOps
 
         img = Image.open(io.BytesIO(image_bytes))
-        img = ImageOps.exif_transpose(img)
+        # Optimización: solo aplicar exif_transpose si la orientación no es la “normal”.
+        # Así evitamos trabajo extra en frames donde el tag no esté presente o sea 1.
+        exif = img.getexif()
+        orientation = exif.get(274)  # 274 = Orientation tag
+        if orientation not in (None, 1):
+            img = ImageOps.exif_transpose(img)
         return np.asarray(img.convert("RGB"))
     except Exception:
         pass
