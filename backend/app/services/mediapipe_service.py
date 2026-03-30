@@ -53,6 +53,69 @@ def _get_landmarker(model_path: Path):
     return _LANDMARKER
 
 
+def _pose_result_from_detection(result: Any) -> PoseResult:
+    """Convierte la salida de PoseLandmarker.detect en [PoseResult]."""
+    if not result.pose_landmarks:
+        return PoseResult(ok=True, landmarks=[], world_landmarks=[], note="No se detectó ninguna pose")
+
+    lm = result.pose_landmarks[0]
+    landmarks = [
+        {
+            "index": i,
+            "x": p.x,
+            "y": p.y,
+            "z": p.z,
+            "visibility": getattr(p, "visibility", None),
+        }
+        for i, p in enumerate(lm)
+    ]
+
+    world: list[dict[str, Any]] = []
+    if result.pose_world_landmarks:
+        wl = result.pose_world_landmarks[0]
+        world = [
+            {
+                "index": i,
+                "x": p.x,
+                "y": p.y,
+                "z": p.z,
+                "visibility": None,
+            }
+            for i, p in enumerate(wl)
+        ]
+
+    return PoseResult(ok=True, landmarks=landmarks, world_landmarks=world, note=None)
+
+
+def analyze_frame_rgb(rgb: np.ndarray, model_path: Path) -> PoseResult:
+    """
+    Ejecuta Pose Landmarker sobre un frame RGB (uint8, forma H×W×3).
+
+    Usado por el pipeline de streaming (cámara o vídeo inyectado) sin codificar a JPEG.
+    """
+    if rgb is None or rgb.size == 0:
+        return PoseResult(ok=False, landmarks=[], world_landmarks=[], note="Frame vacío")
+    try:
+        import mediapipe as mp
+
+        landmarker = _get_landmarker(model_path)
+        mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)
+        result = landmarker.detect(mp_image)
+    except FileNotFoundError as exc:
+        return PoseResult(ok=False, landmarks=[], world_landmarks=[], note=str(exc))
+    except Exception as exc:  # noqa: BLE001
+        log.exception("Error MediaPipe (frame)")
+        return PoseResult(ok=False, landmarks=[], world_landmarks=[], note=str(exc))
+
+    return _pose_result_from_detection(result)
+
+
+def analyze_frame_bgr(bgr: np.ndarray, model_path: Path) -> PoseResult:
+    """Conveniencia: convierte BGR (OpenCV) a RGB y analiza."""
+    rgb = cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)
+    return analyze_frame_rgb(rgb, model_path)
+
+
 def analyze_image_bytes(image_bytes: bytes, model_path: Path) -> PoseResult:
     """Decodifica imagen y ejecuta Pose Landmarker."""
     arr = np.frombuffer(image_bytes, dtype=np.uint8)
@@ -73,33 +136,4 @@ def analyze_image_bytes(image_bytes: bytes, model_path: Path) -> PoseResult:
         log.exception("Error MediaPipe")
         return PoseResult(ok=False, landmarks=[], world_landmarks=[], note=str(exc))
 
-    if not result.pose_landmarks:
-        return PoseResult(ok=True, landmarks=[], world_landmarks=[], note="No se detectó ninguna pose")
-
-    lm = result.pose_landmarks[0]
-    landmarks = [
-        {
-            "index": i,
-            "x": p.x,
-            "y": p.y,
-            "z": p.z,
-            "visibility": getattr(p, "visibility", None),
-        }
-        for i, p in enumerate(lm)
-    ]
-
-    world = []
-    if result.pose_world_landmarks:
-        wl = result.pose_world_landmarks[0]
-        world = [
-            {
-                "index": i,
-                "x": p.x,
-                "y": p.y,
-                "z": p.z,
-                "visibility": None,
-            }
-            for i, p in enumerate(wl)
-        ]
-
-    return PoseResult(ok=True, landmarks=landmarks, world_landmarks=world, note=None)
+    return _pose_result_from_detection(result)

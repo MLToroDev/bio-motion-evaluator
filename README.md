@@ -10,8 +10,11 @@ Monorepo para el sistema de evaluación de movimiento (web-first, cross-platform
 | Backend (API, WebSockets, IA) | Python + FastAPI | [`backend/`](backend/) |
 | IoT (cámara externa) | ESP32-CAM / Raspberry Pi | [`iot/`](iot/) |
 | Documentación / tesis | Markdown, diagramas | [`docs/`](docs/) |
+| Pruebas y vídeos gold standard | pytest, activos MP4 | [`tests/`](tests/) |
 
 Diagrama detallado: [`docs/arquitectura.md`](docs/arquitectura.md).
+
+Contexto para asistentes de código en Cursor: [`.cursorrules`](.cursorrules) (stack, biomecánica, trazabilidad para el Cap. 6).
 
 ## Requisitos
 
@@ -37,6 +40,7 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 - Salud: `GET http://localhost:8000/health`
 - Documentación interactiva: `http://localhost:8000/docs`
+- Streaming de pose (cámara / vídeo en `tests/assets/videos` / URL): WebSocket `ws://localhost:8000/ws/pose-stream` (primer mensaje JSON; ver [`backend/README.md`](backend/README.md)).
 
 ### App Flutter
 

@@ -32,5 +32,15 @@ class Settings(BaseSettings):
             p = backend_root / p
         return p
 
+    @staticmethod
+    def repo_root() -> Path:
+        """Raíz del monorepo (directorio que contiene `app/`, `backend/`, `tests/`)."""
+        return Path(__file__).resolve().parents[2]
+
+    @classmethod
+    def gold_standard_videos_dir(cls) -> Path:
+        """Directorio de vídeos de referencia para regresión y validación (Capítulo 7)."""
+        return cls.repo_root() / "tests" / "assets" / "videos"
+
 
 settings = Settings()

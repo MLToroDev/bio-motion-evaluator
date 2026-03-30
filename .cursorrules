@@ -1,0 +1,31 @@
+# Contexto del Proyecto: Bio-Motion Evaluator (Tesis de Grado)
+
+Eres un experto en Ingeniería de Software, IA y Biomecánica. Estás ayudando a Mateo Londoño a construir su trabajo de grado para el Tecnológico de Antioquia.
+
+## Stack Tecnológico Obligatorio
+
+- Frontend: Flutter (Web/Mobile) — Clean Architecture.
+- Backend: Python con FastAPI (REST & WebSockets).
+- IA: MediaPipe (Pose Estimation) y Hugging Face (Clasificación).
+- IoT: Protocolos RTSP/WebSockets para cámaras externas.
+- Calidad de software: criterios alineados con ISO/IEC 25010 (mantenibilidad, seguridad, fiabilidad, rendimiento, usabilidad donde aplique).
+
+## Reglas de Desarrollo
+
+1. **Código académico:** Respetar principios SOLID. En Python usar docstrings útiles en módulos públicos y funciones no triviales. En Dart, documentar APIs públicas cuando aporten claridad (evitar ruido en getters obvios).
+2. **Modularidad:** El núcleo de cálculo biomecánico debe estar separado de la capa HTTP/WebSocket (FastAPI). La lógica reproducible vive en paquetes tipo `vision/` o servicios dedicados, no en los routers.
+3. **Tratamiento de datos:** Trabajar con landmarks de MediaPipe en coordenadas normalizadas de imagen (x, y, z) o con `world_landmarks` cuando se requiera consistencia 3D. Los ángulos articulares en documentación y payloads deben expresarse en **grados** (típicamente 0–180° según la definición anatómica acordada para cada articulación).
+4. **Nombramiento:** Preferir términos biomecánicos explícitos en clave e inglés técnico (`knee_flexion_angle_deg`, `valgus_knee_indicator`, `scapular_rhythm_score`, etc.) y documentar la convención en docstrings.
+
+## Reglas de Tesis
+
+- Tras funcionalidades core, sugerir brevemente cómo documentarlas en el **Capítulo 6: Desarrollo del proyecto** (módulo, requerimiento, prueba).
+- Mantener trazabilidad mental: Requisito → Historia de usuario → Implementación → Prueba (incluyendo vídeos gold standard bajo `tests/assets/videos` cuando aplique).
+
+## Alcance del Monorepo
+
+- `app/`: Flutter.
+- `backend/`: FastAPI, MediaPipe, Hugging Face opcional.
+- `iot/`: firmware/scripts de cámara.
+- `docs/`: arquitectura y material de grado.
+- `tests/`: pruebas y activos de regresión (p. ej. vídeos de referencia).

@@ -1,0 +1,87 @@
+"""Cálculos biomecánicos a partir de landmarks MediaPipe Pose (índices estándar)."""
+
+from __future__ import annotations
+
+import math
+from typing import Any, TypedDict
+
+import numpy as np
+
+# Índices MediaPipe Pose (33 puntos) — https://developers.google.com/mediapipe/solutions/vision/pose_landmarker
+LEFT_HIP = 23
+LEFT_KNEE = 25
+LEFT_ANKLE = 27
+RIGHT_HIP = 24
+RIGHT_KNEE = 26
+RIGHT_ANKLE = 28
+
+
+class KneeAnglesPayload(TypedDict, total=False):
+    """Ángulos de rodilla en grados, convención verbal en docstring de función pública."""
+
+    left_knee_flexion_angle_deg: float
+    right_knee_flexion_angle_deg: float
+    left_knee_internal_angle_deg: float
+    right_knee_internal_angle_deg: float
+
+
+def _lm_xyz(landmarks: list[dict[str, Any]], index: int) -> np.ndarray | None:
+    if index < 0 or index >= len(landmarks):
+        return None
+    p = landmarks[index]
+    return np.array([float(p["x"]), float(p["y"]), float(p["z"])], dtype=np.float64)
+
+
+def _angle_between_vectors_deg(u: np.ndarray, v: np.ndarray) -> float:
+    """Ángulo entre dos vectores en grados, rango [0, 180]."""
+    nu = np.linalg.norm(u)
+    nv = np.linalg.norm(v)
+    if nu < 1e-9 or nv < 1e-9:
+        return float("nan")
+    c = float(np.clip(np.dot(u, v) / (nu * nv), -1.0, 1.0))
+    return float(math.degrees(math.acos(c)))
+
+
+def knee_angles_from_landmarks(landmarks: list[dict[str, Any]]) -> KneeAnglesPayload | None:
+    """
+    Calcula ángulos de rodilla usando tres puntos por lado: cadera–rodilla–tobillo.
+
+    - ``*_knee_internal_angle_deg``: ángulo en la rodilla entre los vectores
+      (rodilla→cadera) y (rodilla→tobillo). En extensión aproximada del miembro suele
+      acercarse a 180° en vista lateral ideal; al flexionar, el valor disminuye.
+
+    - ``*_knee_flexion_angle_deg``: complemento respecto a 180° (0° ≈ extensión,
+      valores mayores ≈ más flexión), acotado a [0, 180].
+
+    Landmarks esperados: lista indexada como salida estándar de MediaPipe (33 puntos).
+    """
+    lk = _lm_xyz(landmarks, LEFT_KNEE)
+    lh = _lm_xyz(landmarks, LEFT_HIP)
+    la = _lm_xyz(landmarks, LEFT_ANKLE)
+    rk = _lm_xyz(landmarks, RIGHT_KNEE)
+    rh = _lm_xyz(landmarks, RIGHT_HIP)
+    ra = _lm_xyz(landmarks, RIGHT_ANKLE)
+
+    if lk is None or lh is None or la is None or rk is None or rh is None or ra is None:
+        return None
+
+    # Vectores con origen en la rodilla
+    u_left = lh - lk
+    v_left = la - lk
+    u_right = rh - rk
+    v_right = ra - rk
+
+    int_l = _angle_between_vectors_deg(u_left, v_left)
+    int_r = _angle_between_vectors_deg(u_right, v_right)
+
+    def flex(interior: float) -> float:
+        if math.isnan(interior):
+            return float("nan")
+        return float(max(0.0, min(180.0, 180.0 - interior)))
+
+    return {
+        "left_knee_internal_angle_deg": int_l,
+        "right_knee_internal_angle_deg": int_r,
+        "left_knee_flexion_angle_deg": flex(int_l),
+        "right_knee_flexion_angle_deg": flex(int_r),
+    }
