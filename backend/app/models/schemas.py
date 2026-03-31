@@ -3,6 +3,58 @@ from typing import Any, Literal
 from pydantic import BaseModel, Field, field_validator
 
 
+class ExerciseClassifierConfig(BaseModel):
+    """Parámetros centralizados del clasificador (umbral, ventana, histéresis, EMA)."""
+
+    min_confidence: float = Field(default=0.72, ge=0.0, le=1.0)
+    window_size_frames: int = Field(default=45, ge=2, le=300)
+    hysteresis_frames: int = Field(default=10, ge=0, le=120)
+    unknown_label: str = Field(default="unknown", min_length=1)
+    confidence_ema_alpha: float = Field(default=0.25, ge=0.0, le=1.0)
+
+
+class PipelineTimingMs(BaseModel):
+    """Tiempos por etapa en ms (payload WS ``pipeline_ms``)."""
+
+    extract: float = 0.0
+    feature: float = 0.0
+    classify: float = 0.0
+    track: float = 0.0
+    total: float = 0.0
+
+
+class UnifiedWsFrameV1(BaseModel):
+    """
+    Contrato unificado servidor → cliente (v1).
+    En runtime el WebSocket puede enviar un ``dict``; este modelo documenta/valida tests.
+    """
+
+    schema_version: int = Field(default=1, ge=1)
+    frame_index: int = Field(default=-1)
+    server_ts_ms: int = 0
+    pose_ok: bool = False
+    note: str | None = None
+    landmarks: list[dict[str, Any]] | None = None
+    knees: dict[str, Any] | None = None
+    exercise_label: str = "unknown"
+    exercise_confidence: float = Field(default=0.0, ge=0.0, le=1.0)
+    rep_phase: str = "idle"
+    rep_count: int = 0
+    quality_flags: list[str] = Field(default_factory=list)
+    pipeline_ms: dict[str, float] | None = None
+    preview_jpeg_base64: str | None = None
+    total_frames: int | None = None
+    error: str | None = None
+    stream_done: bool | None = None
+
+    @field_validator("quality_flags", mode="before")
+    @classmethod
+    def quality_flags_coerce_none(cls, v: object) -> list[str]:
+        if v is None:
+            return []
+        return [str(x) for x in v] if isinstance(v, list) else []
+
+
 class HealthResponse(BaseModel):
     status: str = "ok"
     version: str = Field(..., examples=["0.1.0"])

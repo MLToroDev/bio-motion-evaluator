@@ -19,10 +19,9 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
 from app.config import settings
 from app.models.schemas import PoseStreamConfig
-from app.services.mediapipe_service import analyze_frame_bgr
-from vision.biomechanics import knee_angles_from_landmarks
 from vision.paths import resolve_gold_standard_video
 from vision.processor import VideoSource
+from vision.realtime_engine import RealtimeEngineSession
 
 log = logging.getLogger(__name__)
 
@@ -67,6 +66,11 @@ async def pose_stream(ws: WebSocket) -> None:
         source = _build_video_source(cfg)
         total_frames = source.total_frame_count
         model_path = settings.resolve_model_path(BACKEND_ROOT)
+        engine = RealtimeEngineSession(
+            BACKEND_ROOT,
+            model_path,
+            settings.exercise_classifier_config(),
+        )
         interval = 1.0 / cfg.target_fps
         frame_index = 0
 
@@ -78,6 +82,7 @@ async def pose_stream(ws: WebSocket) -> None:
                     break
                 await ws.send_json(
                     {
+                        "schema_version": 1,
                         "frame_index": frame_index,
                         "error": "sin_frame",
                         "knees": None,
@@ -88,18 +93,8 @@ async def pose_stream(ws: WebSocket) -> None:
                 await asyncio.sleep(interval)
                 continue
 
-            pose = await asyncio.to_thread(analyze_frame_bgr, frame, model_path)
-            knees = knee_angles_from_landmarks(pose.landmarks) if pose.landmarks else None
-
-            payload: dict = {
-                "frame_index": frame_index,
-                "pose_ok": pose.ok,
-                "note": pose.note,
-                "landmarks": pose.landmarks,
-                "knees": knees,
-                "total_frames": total_frames,
-                "server_ts_ms": int(time.time() * 1000),
-            }
+            payload: dict = await asyncio.to_thread(engine.process_bgr, frame, frame_index)
+            payload["total_frames"] = total_frames
 
             if cfg.include_preview:
                 try:
@@ -124,6 +119,7 @@ async def pose_stream(ws: WebSocket) -> None:
             try:
                 await ws.send_json(
                     {
+                        "schema_version": 1,
                         "stream_done": True,
                         "frame_index": frame_index,
                         "total_frames": total_frames,

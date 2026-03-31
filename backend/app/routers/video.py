@@ -6,8 +6,7 @@ from pathlib import Path
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
 from app.config import settings
-from app.services.mediapipe_service import analyze_image_bytes
-from vision.biomechanics import knee_angles_from_landmarks
+from vision.realtime_engine import RealtimeEngineSession
 
 log = logging.getLogger(__name__)
 
@@ -29,6 +28,7 @@ async def video_stream(ws: WebSocket) -> None:
     """
     await ws.accept()
     model_path = settings.resolve_model_path(BACKEND_ROOT)
+    engine: RealtimeEngineSession | None = None
 
     analyze_pose = False
     frames = 0
@@ -51,17 +51,14 @@ async def video_stream(ws: WebSocket) -> None:
             frames += 1
             bytes_in += len(chunk)
             if analyze_pose:
-                pose = await asyncio.to_thread(analyze_image_bytes, chunk, model_path)
-                knees = knee_angles_from_landmarks(pose.landmarks) if pose.landmarks else None
-                await ws.send_json(
-                    {
-                        "frame_index": frame_idx,
-                        "pose_ok": pose.ok,
-                        "note": pose.note,
-                        "landmarks": pose.landmarks,
-                        "knees": knees,
-                    }
-                )
+                if engine is None:
+                    engine = RealtimeEngineSession(
+                        BACKEND_ROOT,
+                        model_path,
+                        settings.exercise_classifier_config(),
+                    )
+                payload = await asyncio.to_thread(engine.process_jpeg, chunk, frame_idx)
+                await ws.send_json(payload)
                 frame_idx += 1
             else:
                 await ws.send_json({"frames": frames, "last_chunk_bytes": len(chunk), "total_bytes": bytes_in})
@@ -76,17 +73,14 @@ async def video_stream(ws: WebSocket) -> None:
                 frames += 1
                 bytes_in += len(chunk)
                 if analyze_pose:
-                    pose = await asyncio.to_thread(analyze_image_bytes, chunk, model_path)
-                    knees = knee_angles_from_landmarks(pose.landmarks) if pose.landmarks else None
-                    await ws.send_json(
-                        {
-                            "frame_index": frame_idx,
-                            "pose_ok": pose.ok,
-                            "note": pose.note,
-                            "landmarks": pose.landmarks,
-                            "knees": knees,
-                        }
-                    )
+                    if engine is None:
+                        engine = RealtimeEngineSession(
+                            BACKEND_ROOT,
+                            model_path,
+                            settings.exercise_classifier_config(),
+                        )
+                    payload = await asyncio.to_thread(engine.process_jpeg, chunk, frame_idx)
+                    await ws.send_json(payload)
                     frame_idx += 1
                 else:
                     await ws.send_json({"frames": frames, "last_chunk_bytes": len(chunk), "total_bytes": bytes_in})

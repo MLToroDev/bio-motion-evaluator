@@ -19,10 +19,24 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 |--------|------|-------------|
 | GET | `/health` | Estado del servicio |
 | POST | `/analyze/pose` | Imagen multipart → landmarks |
-| WS | `/ws/video` | Primer mensaje JSON `{"analyze_pose":true}` luego JPEG → JSON con `landmarks` y `knees`; sin handshake, solo contadores (legado) |
-| WS | `/ws/pose-stream` | Cámara, archivo (`tests/assets/videos`) o URL → MediaPipe + ángulos de rodilla en JSON |
+| POST | `/api/v1/auth/token` | JWT stub (requiere `DATABASE_URL`; crea usuario por email) |
+| POST | `/api/v1/sessions` | Crear sesión de análisis (Bearer JWT) |
+| GET | `/api/v1/sessions` | Listar sesiones del usuario |
+| WS | `/ws/video` | Primer mensaje JSON `{"analyze_pose":true}` luego JPEG → JSON **contrato unificado v1** (`schema_version`, `knees`, `exercise_label`, `pipeline_ms`, …) |
+| WS | `/ws/pose-stream` | Cámara, archivo (`tests/assets/videos`) o URL → motor tiempo real (`RealtimeEngineSession`) + payload unificado |
 
 Documentación: `http://localhost:8000/docs`
+
+### Base de datos (PostgreSQL + Alembic)
+
+1. Define `DATABASE_URL` en `.env` (p. ej. `postgresql://user:pass@localhost:5432/bio_motion`).
+2. Migraciones (desde `backend/`, con la misma variable en el entorno):
+
+```bash
+alembic upgrade head
+```
+
+Sin `DATABASE_URL`, la API sigue funcionando para WebSockets y `/analyze/pose`; rutas `/api/v1/*` que dependen de BD responderán 503.
 
 ### WebSocket `/ws/pose-stream`
 
@@ -39,6 +53,6 @@ o cámara local:
 {"source": "camera", "device_index": 0, "target_fps": 10}
 ```
 
-3. Recibirás por cada frame un JSON con `knees`: `left_knee_flexion_angle_deg`, `right_knee_flexion_angle_deg`, etc.
+3. Recibirás por cada frame un JSON **v1** con `schema_version`, `knees` (compatibilidad), `exercise_label`, `rep_phase`, `rep_count`, `quality_flags`, `pipeline_ms`, etc. (ver `docs/spec/websocket-pose-stream.md`).
 
 Coloca los vídeos en [`../tests/assets/videos`](../tests/assets/videos) (solo el nombre del archivo en la petición).

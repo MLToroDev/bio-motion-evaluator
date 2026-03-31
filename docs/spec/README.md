@@ -21,7 +21,8 @@ Al cambiar protocolos o comportamiento visible, **actualizar el spec correspondi
 
 | Documento | Descripción |
 |-----------|-------------|
-| [websocket-pose-stream.md](websocket-pose-stream.md) | `/ws/pose-stream`: config inicial, frames JSON, `include_preview` |
+| [websocket-pose-stream.md](websocket-pose-stream.md) | `/ws/pose-stream`: config inicial, frames JSON, contrato unificado v1, `include_preview` |
 | [flutter-client-websocket.md](flutter-client-websocket.md) | Patrones Flutter/Web (null-safety, hot reload, WS) |
+| [api-v1-rest.md](api-v1-rest.md) | `/api/v1`: JWT stub, sesiones, métricas (PostgreSQL opcional) |
 
 Referencias de arquitectura general: [../arquitectura.md](../arquitectura.md).

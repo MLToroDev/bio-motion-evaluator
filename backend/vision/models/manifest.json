@@ -1,0 +1,12 @@
+{
+  "active": "exercise_classifier_stub",
+  "models": {
+    "exercise_classifier_stub": {
+      "path": "models/exercise_classifier_stub.onnx",
+      "classes": ["unknown", "squat", "shoulder_press", "bench_press", "triceps_extension"],
+      "window_size": 45,
+      "created_at": "2025-01-01",
+      "note": "Archivo .onnx opcional; sin archivo el backend usa NopExerciseClassifier (Fase 1)."
+    }
+  }
+}

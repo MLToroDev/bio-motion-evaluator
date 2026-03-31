@@ -1,6 +1,10 @@
+import json
 from pathlib import Path
+from typing import Any
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+from app.models.schemas import ExerciseClassifierConfig
 
 
 class Settings(BaseSettings):
@@ -18,6 +22,31 @@ class Settings(BaseSettings):
 
     hf_api_token: str | None = None
     hf_inference_url: str | None = None
+
+    # Clasificador / motor (env opcional; ver ExerciseClassifierConfig)
+    classifier_min_confidence: float = 0.72
+    classifier_window_size_frames: int = 45
+    classifier_hysteresis_frames: int = 10
+    classifier_unknown_label: str = "unknown"
+    classifier_confidence_ema_alpha: float = 0.25
+
+    # Persistencia (Fase 1: schema listo; dejar vacío en dev sin Docker)
+    database_url: str | None = None
+
+    # Auth stub (Fase 1): JWT para trazabilidad; clave debe cambiarse en producción
+    jwt_secret: str = "dev-insecure-change-me"
+    jwt_algorithm: str = "HS256"
+    access_token_expire_minutes: int = 60 * 24 * 7
+
+    # Usuario fantasma cuando no hay login (user_id en sesiones)
+    stub_user_email: str = "anonymous@local.test"
+
+    # Feature flags JSON, p. ej. {"enable_onnx_classifier": false}
+    feature_flags_json: str = "{}"
+
+    # ARCH-T14 — umbral de latencia / backpressure (activar drop en routers cuando se integre cola)
+    server_pipeline_warn_ms: float = 300.0
+    enable_adaptive_frame_drop: bool = False
 
     @property
     def cors_origins_list(self) -> list[str]:
@@ -41,6 +70,22 @@ class Settings(BaseSettings):
     def gold_standard_videos_dir(cls) -> Path:
         """Directorio de vídeos de referencia para regresión y validación (Capítulo 7)."""
         return cls.repo_root() / "tests" / "assets" / "videos"
+
+    def exercise_classifier_config(self) -> ExerciseClassifierConfig:
+        return ExerciseClassifierConfig(
+            min_confidence=self.classifier_min_confidence,
+            window_size_frames=self.classifier_window_size_frames,
+            hysteresis_frames=self.classifier_hysteresis_frames,
+            unknown_label=self.classifier_unknown_label,
+            confidence_ema_alpha=self.classifier_confidence_ema_alpha,
+        )
+
+    def feature_flags(self) -> dict[str, Any]:
+        try:
+            data = json.loads(self.feature_flags_json or "{}")
+            return data if isinstance(data, dict) else {}
+        except json.JSONDecodeError:
+            return {}
 
 
 settings = Settings()

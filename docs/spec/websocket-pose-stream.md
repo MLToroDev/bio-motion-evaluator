@@ -4,11 +4,11 @@
 
 - **Estado:** Activo  
 - **Alcance:** Primer mensaje de configuración y mensajes por frame desde el backend FastAPI hacia el cliente Flutter (u otros).  
-- **Código principal:** `backend/app/routers/live_pose.py`, `backend/app/models/schemas.py`
+- **Código principal:** `backend/app/routers/live_pose.py`, `backend/vision/realtime_engine.py`, `backend/app/models/schemas.py`
 
 ## Resumen
 
-El cliente abre un WebSocket en **`/ws/pose-stream`**, envía **un único mensaje de texto JSON** con la configuración (`PoseStreamConfig`), y el servidor responde con **mensajes JSON por fotograma** (ángulos de rodilla, landmarks opcionales, vista previa JPEG opcional).
+El cliente abre un WebSocket en **`/ws/pose-stream`**, envía **un único mensaje de texto JSON** con la configuración (`PoseStreamConfig`), y el servidor responde con **mensajes JSON por fotograma** según el **contrato unificado v1**: motor (`exercise_label`, `rep_phase`, `rep_count`, `pipeline_ms`, …) más compatibilidad con `knees` y landmarks (ver `UnifiedWsFrameV1` en `schemas.py`). Vista previa JPEG opcional sin cambios.
 
 ## Contrato: mensaje inicial (cliente → servidor)
 
@@ -49,11 +49,18 @@ Campos habituales:
 
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
+| `schema_version` | int | Versión del contrato (v1 = **1**). Incrementar ante cambios breaking. |
 | `frame_index` | number | Índice entero del frame |
 | `pose_ok` | bool | Resultado de detección (ver `PoseResult` en servicio MediaPipe) |
 | `note` | string \| null | Nota humana (p. ej. sin pose) |
 | `landmarks` | array \| null | Lista de puntos `{ index, x, y, z, visibility? }` |
 | `knees` | object \| null | Ángulos; p. ej. `left_knee_flexion_angle_deg`, `right_knee_flexion_angle_deg` (grados) |
+| `exercise_label` | string | Clasificación actual (`unknown` en Fase 1 sin ONNX) |
+| `exercise_confidence` | number | Confianza 0–1 (suavizada EMA en servidor) |
+| `rep_phase` | string | `idle` \| `eccentric` \| `concentric` \| `hold` (según `RepTracker` activo) |
+| `rep_count` | int | Repeticiones completas en la sesión del WebSocket |
+| `quality_flags` | array[string] | Flags p. ej. `asymmetry_high`, `rom_low` |
+| `pipeline_ms` | object \| null | Tiempos por etapa: `extract`, `feature`, `classify`, `track`, `total` |
 | `total_frames` | number \| null | Total de fotogramas del vídeo cuando `source=file` y OpenCV reporta `CAP_PROP_FRAME_COUNT` fiable; si no aplica, puede ser `null` (cámara, URL o códec sin metadatos). |
 | `server_ts_ms` | number | Marca de tiempo del servidor (epoch ms) al enviar el mensaje; útil para estimar latencia red + procesamiento. |
 | `preview_jpeg_base64` | string | Presente solo si `include_preview` era truthy en la config; JPEG en Base64 |
@@ -73,6 +80,8 @@ Puede incluir **`error`** (string), p. ej. `sin_frame`, o cierre con código HTT
 | Pieza | Ruta |
 |-------|------|
 | Router WS | `backend/app/routers/live_pose.py` |
+| Motor tiempo real | `backend/vision/realtime_engine.py` — `RealtimeEngineSession` |
+| Contrato documentado | `backend/app/models/schemas.py` — `UnifiedWsFrameV1`, `ExerciseClassifierConfig` |
 | Modelo config | `backend/app/models/schemas.py` — clase `PoseStreamConfig` |
 | URI cliente (Flutter) | `app/lib/utils/ws_uri.dart` — `buildPoseStreamWebSocketUri` |
 | Pantalla de análisis | `app/lib/screens/video_analysis/video_analysis_screen.dart` |

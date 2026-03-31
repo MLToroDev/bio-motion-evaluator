@@ -1,0 +1,17 @@
+#!/usr/bin/env python3
+# ARCH-T11 — Placeholder: entrenar/exportar ONNX para exercise_classifier (ver docs/bio_motion_plan_v2.md).
+"""
+Punto de partida para el dataset propio y el entrenamiento en Hugging Face.
+
+Pasos sugeridos (no automatizados aquí):
+1. Grabar video por ejercicio bajo ``tests/assets/videos/`` con nombre consistente.
+2. Extraer secuencias de landmarks (offline) y ventanas de N frames → matriz X, etiquetas y.
+3. Entrenar modelo temporal (p. ej. scikit-learn / PyTorch) y exportar a ONNX (16 features por ventana
+   debe coincidir con :meth:`vision.feature_engine.FeatureEngine.build_feature_vector` o adaptar el modelo).
+4. Colocar el ``.onnx`` en ``backend/models/`` y actualizar ``vision/models/manifest.json``.
+
+Este script solo documenta el flujo hasta que exista el dataset curado de tesis.
+"""
+from __future__ import annotations
+
+print(__doc__)

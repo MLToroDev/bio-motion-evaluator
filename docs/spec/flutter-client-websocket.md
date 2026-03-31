@@ -12,7 +12,7 @@ En **Flutter Web**, JSON decodificado y el estado de widgets pueden interactuar 
 
 ## Parseo compartido de respuestas JSON (pose)
 
-Los mensajes de texto con `landmarks`, `knees`, `frame_index` (y opcionalmente `total_frames`, `error`) se interpretan en **`app/lib/pose/pose_ws_payload.dart`** (y `landmarks` en **`app/lib/pose/landmarks_json.dart`**): `PoseWsServerFrame.fromJsonMap`, `poseWsErrorMessage`, `parsePoseFrameIndex`, `parsePoseTotalFrames`, highlights `kPoseKneeHighlightIndices` y texto de resumen de sesión (`poseSessionSummaryFromKneesMap`). Cualquier cambio de contrato del backend en esos campos debe actualizarse **una sola vez** ahí; las pantallas en vivo y vídeo solo orquestan WebSocket y UI.
+Los mensajes de texto con `landmarks`, `knees`, `frame_index` (y opcionalmente `total_frames`, `error`, **`schema_version`**, **`exercise_label`**, **`exercise_confidence`**, **`rep_phase`**, **`rep_count`**, **`quality_flags`**, **`pipeline_ms`**) se interpretan en **`app/lib/pose/pose_ws_payload.dart`** (y `landmarks` en **`app/lib/pose/landmarks_json.dart`**): `PoseWsServerFrame.fromJsonMap`, `poseWsErrorMessage`, `parsePoseFrameIndex`, `parsePoseTotalFrames`, highlights `kPoseKneeHighlightIndices` y texto de resumen de sesión (`poseSessionSummaryFromKneesMap`). Cualquier cambio de contrato del backend en esos campos debe actualizarse **una sola vez** ahí; las pantallas en vivo y vídeo solo orquestan WebSocket y UI. Campos nuevos deben usar **null-safety** (`??`) — ver plan v2 §6.2.
 
 ## Persistencia en Web (`home_prefs`)
 
