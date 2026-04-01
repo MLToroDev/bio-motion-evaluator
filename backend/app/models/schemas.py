@@ -125,6 +125,16 @@ class PoseStreamConfig(BaseModel):
         default=True,
         description="Si True, cada mensaje incluye preview_jpeg_base64 (vista + marcas en cliente).",
     )
+    preview_fps: Literal[8, 10, 12] = Field(
+        default=10,
+        description="FPS objetivo para la vista previa JPEG (8/10/12).",
+    )
+    preview_jpeg_quality: int = Field(
+        default=84,
+        ge=70,
+        le=90,
+        description="Calidad JPEG de la vista previa (70-90).",
+    )
     capture_only: bool = Field(
         default=False,
         description="Si True, extrae pose (landmarks/knees) sin clasificador ni rep tracker.",

@@ -75,6 +75,11 @@ async def pose_stream(ws: WebSocket) -> None:
         )
         interval = 1.0 / cfg.target_fps
         frame_index = 0
+        # El análisis puede ir alto, pero el preview JPEG en web se vuelve inestable
+        # cuando se intenta pintar todos los frames. El cliente calibra este valor.
+        preview_target_fps = float(cfg.preview_fps)
+        preview_jpeg_quality = int(cfg.preview_jpeg_quality)
+        preview_stride = max(1, int(round(cfg.target_fps / preview_target_fps)))
 
         while True:
             frame = await asyncio.to_thread(source.get_frame)
@@ -98,15 +103,20 @@ async def pose_stream(ws: WebSocket) -> None:
             payload: dict = await asyncio.to_thread(engine.process_bgr, frame, frame_index)
             payload["total_frames"] = total_frames
 
-            if cfg.include_preview:
+            if cfg.include_preview and (frame_index % preview_stride == 0):
                 try:
                     h, w = frame.shape[:2]
-                    scale = min(640 / max(w, 1), 480 / max(h, 1), 1.0)
+                    # Mejor nitidez percibida sin disparar ancho de banda.
+                    scale = min(800 / max(w, 1), 600 / max(h, 1), 1.0)
                     if scale < 1.0:
                         small = cv2.resize(frame, (int(w * scale), int(h * scale)))
                     else:
                         small = frame
-                    ok_j, buf = cv2.imencode(".jpg", small, [int(cv2.IMWRITE_JPEG_QUALITY), 72])
+                    ok_j, buf = cv2.imencode(
+                        ".jpg",
+                        small,
+                        [int(cv2.IMWRITE_JPEG_QUALITY), preview_jpeg_quality],
+                    )
                     if ok_j:
                         payload["preview_jpeg_base64"] = base64.b64encode(buf.tobytes()).decode("ascii")
                 except Exception:  # noqa: BLE001
@@ -114,6 +124,24 @@ async def pose_stream(ws: WebSocket) -> None:
 
             await ws.send_json(payload)
             frame_index += 1
+            # Ajustes de preview en caliente (mensaje texto opcional desde cliente).
+            try:
+                control_raw = await asyncio.wait_for(ws.receive_text(), timeout=0.0)
+            except asyncio.TimeoutError:
+                control_raw = None
+            if control_raw:
+                try:
+                    ctrl = json.loads(control_raw)
+                except json.JSONDecodeError:
+                    ctrl = None
+                if isinstance(ctrl, dict):
+                    pf = ctrl.get("preview_fps")
+                    if pf in (8, 10, 12):
+                        preview_target_fps = float(pf)
+                        preview_stride = max(1, int(round(cfg.target_fps / preview_target_fps)))
+                    q = ctrl.get("preview_jpeg_quality")
+                    if isinstance(q, (int, float)):
+                        preview_jpeg_quality = max(70, min(90, int(round(q))))
             await asyncio.sleep(interval)
 
         # Vídeo archivo agotado: cierre limpio para que el cliente deje de analizar.
