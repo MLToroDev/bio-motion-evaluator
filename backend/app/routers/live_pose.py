@@ -71,6 +71,7 @@ async def pose_stream(ws: WebSocket) -> None:
             model_path,
             settings.exercise_classifier_config(),
             inference_stride=settings.pose_inference_stride,
+            analysis_enabled=not cfg.capture_only,
         )
         interval = 1.0 / cfg.target_fps
         frame_index = 0

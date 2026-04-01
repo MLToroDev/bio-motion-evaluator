@@ -14,7 +14,7 @@ from vision.model_registry import ModelRegistry
 from vision.pipeline_timer import StageTimer
 from vision.pose_extractor import extract_pose_bgr, extract_pose_jpeg
 from vision.rep_tracker import RepTrackerRouter
-from vision.types import PoseFrame
+from vision.types import PoseFrame, RepState
 from vision.unified_payload import build_frame_payload_v1
 
 
@@ -26,10 +26,12 @@ class RealtimeEngineSession:
         classifier_cfg: ExerciseClassifierConfig | None = None,
         *,
         inference_stride: int = 1,
+        analysis_enabled: bool = True,
     ) -> None:
         self._model_path = model_path
         self._cfg = classifier_cfg or ExerciseClassifierConfig()
         self._inference_stride = max(1, int(inference_stride))
+        self._analysis_enabled = bool(analysis_enabled)
         self._last_pose: PoseFrame | None = None
         self._features = FeatureEngine(self._cfg)
         self._classifier = build_classifier(self._cfg, ModelRegistry(backend_root))
@@ -71,6 +73,15 @@ class RealtimeEngineSession:
 
     def _after_extract(self, st: StageTimer, pose: PoseFrame, frame_index: int) -> dict:
         st.mark_extract()
+        if not self._analysis_enabled:
+            return build_frame_payload_v1(
+                frame_index,
+                pose,
+                "unknown",
+                0.0,
+                RepState(),
+                st.finish().as_dict(),
+            )
         self._features.push(pose)
         vec = self._features.build_feature_vector()
         st.mark_feature()

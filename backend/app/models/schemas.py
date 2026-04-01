@@ -1,4 +1,4 @@
-﻿from typing import Any, Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -125,6 +125,10 @@ class PoseStreamConfig(BaseModel):
         default=True,
         description="Si True, cada mensaje incluye preview_jpeg_base64 (vista + marcas en cliente).",
     )
+    capture_only: bool = Field(
+        default=False,
+        description="Si True, extrae pose (landmarks/knees) sin clasificador ni rep tracker.",
+    )
 
     @field_validator("include_preview", mode="before")
     @classmethod
@@ -132,5 +136,12 @@ class PoseStreamConfig(BaseModel):
         """Flutter/JSON a veces envía null; por defecto se comporta como True."""
         if v is None:
             return True
+        return bool(v)
+
+    @field_validator("capture_only", mode="before")
+    @classmethod
+    def capture_only_coerce_none(cls, v: object) -> bool:
+        if v is None:
+            return False
         return bool(v)
 

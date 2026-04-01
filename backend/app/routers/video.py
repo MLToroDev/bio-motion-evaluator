@@ -69,6 +69,7 @@ async def video_stream(ws: WebSocket) -> None:
     engine: RealtimeEngineSession | None = None
 
     analyze_pose = False
+    capture_only = False
     frames = 0
     bytes_in = 0
     frame_idx = 0
@@ -80,6 +81,7 @@ async def video_stream(ws: WebSocket) -> None:
             try:
                 data = json.loads(first["text"])
                 analyze_pose = bool(data.get("analyze_pose"))
+                capture_only = bool(data.get("capture_only", False))
             except json.JSONDecodeError:
                 await ws.send_json({"error": 'Primer mensaje inválido. Usa {"analyze_pose": true} antes de los JPEG.'})
                 await ws.close(code=4000)
@@ -95,6 +97,7 @@ async def video_stream(ws: WebSocket) -> None:
                         model_path,
                         settings.exercise_classifier_config(),
                         inference_stride=settings.pose_inference_stride,
+                        analysis_enabled=not capture_only,
                     )
                 payload = await asyncio.to_thread(_process_jpeg_frame, engine, chunk, frame_idx)
                 _maybe_log_pose_timing(frame_idx, payload)
@@ -119,6 +122,7 @@ async def video_stream(ws: WebSocket) -> None:
                             model_path,
                             settings.exercise_classifier_config(),
                             inference_stride=settings.pose_inference_stride,
+                            analysis_enabled=not capture_only,
                         )
                     payload = await asyncio.to_thread(_process_jpeg_frame, engine, chunk, frame_idx)
                     _maybe_log_pose_timing(frame_idx, payload)
