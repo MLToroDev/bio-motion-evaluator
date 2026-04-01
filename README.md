@@ -1,4 +1,4 @@
-﻿# Bio-Motion Evaluator
+# Bio-Motion Evaluator
 
 Monorepo para el sistema de evaluación de movimiento (web-first, cross-platform, comunicación IoT). Incluye frontend Flutter, backend FastAPI con visión por computador e integración con dispositivos de captura.
 
@@ -33,7 +33,7 @@ cd backend
 python -m venv .venv
 .venv\Scripts\activate
 pip install -r requirements.txt
-# Opcional: descargar modelo MediaPipe Pose
+# Modelo MediaPipe Pose Landmarker (full por defecto; lite: python scripts/download_models.py lite)
 python scripts/download_models.py
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```

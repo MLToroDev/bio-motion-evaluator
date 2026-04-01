@@ -10,7 +10,7 @@ python -m venv .venv
 pip install -r requirements.txt
 copy .env.example .env
 python scripts\download_models.py
-# (opcional) modelo más pesado: python scripts\download_models.py full
+# modelo más ligero (más FPS): python scripts\download_models.py lite
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 

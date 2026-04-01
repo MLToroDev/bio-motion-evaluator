@@ -18,8 +18,8 @@ class Settings(BaseSettings):
     app_version: str = "0.1.0"
     cors_origins: str = "*"
 
-    # Lite ≈ menor costo CPU (similar a BlazePose "complexity 0"); full/heavy vía .env si hace falta precisión.
-    mediapipe_pose_model_path: str = "models/pose_landmarker_lite.task"
+    # Full = más precisión; lite = menos CPU (cambiar con MEDIAPIPE_POSE_MODEL_PATH o scripts/download_models.py lite).
+    mediapipe_pose_model_path: str = "models/pose_landmarker_full.task"
     # 1 = inferir cada frame; 2–3 = reutilizar última pose OK en frames intermedios (más FPS, menos resolución temporal).
     pose_inference_stride: int = 1
 

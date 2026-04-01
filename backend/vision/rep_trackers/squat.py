@@ -1,4 +1,4 @@
-﻿# ARCH-T12: RepTracker concreto — sentadilla (rodilla); máquina de estados simple.
+# ARCH-T12: RepTracker concreto — sentadilla (rodilla); máquina de estados simple.
 from __future__ import annotations
 
 import math
@@ -62,7 +62,9 @@ class SquatRepTracker(RepTracker):
 
         down_enter = 55.0  # entrar en bajada
         up_exit = 35.0  # vuelta a extendido
-        bottom = 75.0  # mínimo flex para contar rep
+        # Fondo mínimo alineado con Wan Izzul & Kumaresan (2026), JIWE: flexión ~80–100° «buena»
+        # (ángulo interno cadera–rodilla–tobillo 80–100°; ver vision/biomechanics.py).
+        bottom = 80.0
 
         if self._phase in ("idle", "hold"):
             if flex >= down_enter:
@@ -80,7 +82,7 @@ class SquatRepTracker(RepTracker):
         rpc: RepPhase = self._phase if self._phase != "hold" else "hold"
 
         # ROM bajo si nunca llegamos a fondo en la fase actual
-        if self._phase == "eccentric" and self._flex_peak < bottom - 10.0:
+        if self._phase == "eccentric" and self._flex_peak < bottom - 8.0:
             self._flags.append("rom_low")
 
         return RepState(rep_phase=rpc, rep_count=self._rep_count, quality_flags=list(self._flags))

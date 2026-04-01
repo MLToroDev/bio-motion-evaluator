@@ -1,4 +1,4 @@
-﻿# Configuración del entorno (Windows)
+# Configuración del entorno (Windows)
 
 ## GitHub CLI (`gh`)
 
@@ -55,6 +55,8 @@ Tras `pip install -r requirements.txt`, descarga el modelo de pose:
 cd backend
 python scripts/download_models.py
 ```
+
+Por defecto se descarga **pose_landmarker_full.task** (más preciso). Para **lite** (más FPS): `python scripts/download_models.py lite` y `MEDIAPIPE_POSE_MODEL_PATH=models/pose_landmarker_lite.task` en `.env`.
 
 La ruta del modelo se puede configurar con `MEDIAPIPE_POSE_MODEL_PATH` en `.env` (ver `backend/.env.example`).
 

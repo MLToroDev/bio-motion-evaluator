@@ -1,4 +1,4 @@
-﻿"""Cálculos biomecánicos a partir de landmarks MediaPipe Pose (índices estándar)."""
+"""Cálculos biomecánicos a partir de landmarks MediaPipe Pose (índices estándar)."""
 
 from __future__ import annotations
 
@@ -58,6 +58,9 @@ def knee_angles_from_landmarks(landmarks: list[dict[str, Any]]) -> KneeAnglesPay
 
     - ``*_knee_flexion_angle_deg``: complemento respecto a 180° (0° ≈ extensión,
       valores mayores ≈ más flexión), acotado a [0, 180].
+      Convención coherente con literatura CV en rehabilitación (p. ej. Wan Izzul &
+      Kumaresan 2026, JIWE): sentadilla «buena» con ángulo interno 80–100° equivale
+      aquí a flexión 80–100°.
 
     Landmarks esperados: lista indexada como salida estándar de MediaPipe (33 puntos).
     """

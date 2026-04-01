@@ -1,4 +1,4 @@
-"""Descarga el bundle .task de Pose Landmarker (lite por defecto; full opcional)."""
+"""Descarga el bundle .task de Pose Landmarker (full por defecto; lite opcional para más FPS)."""
 
 from __future__ import annotations
 
@@ -25,9 +25,9 @@ def main() -> None:
     parser.add_argument(
         "variant",
         nargs="?",
-        default="lite",
+        default="full",
         choices=list(MODELS.keys()),
-        help="lite (rápido, default) o full (más preciso)",
+        help="full (más preciso, default) o lite (más rápido)",
     )
     args = parser.parse_args()
 

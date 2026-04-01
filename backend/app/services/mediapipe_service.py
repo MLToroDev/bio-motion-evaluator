@@ -55,7 +55,10 @@ def _build_landmarker_options(model_path: Path, running_mode: str):
 def _get_landmarker(model_path: Path, running_mode: str = "image"):
     global _LANDMARKER_IMAGE, _LANDMARKER_VIDEO, _MODEL_PATH_IMAGE, _MODEL_PATH_VIDEO, _LAST_VIDEO_TIMESTAMP_MS
     if not model_path.is_file():
-        msg = f"Modelo no encontrado: {model_path}. Ejecuta: python scripts/download_models.py"
+        msg = (
+            f"Modelo no encontrado: {model_path}. Ejecuta: python scripts/download_models.py "
+            "(full por defecto; para lite: python scripts/download_models.py lite)"
+        )
         log.warning(msg)
         raise FileNotFoundError(msg)
 
