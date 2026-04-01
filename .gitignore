@@ -56,3 +56,15 @@ iot/**/.vscode/
 
 # --- Modelos descargados (opcional) ---
 backend/models/*.task
+
+# --- Tests / assets (vídeos locales, no versionar) ---
+tests/assets/**/*.mp4
+tests/assets/**/*.MP4
+tests/assets/**/*.mov
+tests/assets/**/*.MOV
+tests/assets/**/*.avi
+tests/assets/**/*.AVI
+tests/assets/**/*.mkv
+tests/assets/**/*.MKV
+tests/assets/**/*.webm
+tests/assets/**/*.WEBM
