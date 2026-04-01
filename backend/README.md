@@ -1,4 +1,4 @@
-﻿# Bio-Motion Evaluator — Backend
+# Bio-Motion Evaluator — Backend
 
 API **FastAPI** con WebSockets para streaming y análisis de pose (**MediaPipe**).
 
@@ -10,6 +10,7 @@ python -m venv .venv
 pip install -r requirements.txt
 copy .env.example .env
 python scripts\download_models.py
+# (opcional) modelo más pesado: python scripts\download_models.py full
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 

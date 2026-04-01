@@ -94,6 +94,7 @@ async def video_stream(ws: WebSocket) -> None:
                         BACKEND_ROOT,
                         model_path,
                         settings.exercise_classifier_config(),
+                        inference_stride=settings.pose_inference_stride,
                     )
                 payload = await asyncio.to_thread(_process_jpeg_frame, engine, chunk, frame_idx)
                 _maybe_log_pose_timing(frame_idx, payload)
@@ -117,6 +118,7 @@ async def video_stream(ws: WebSocket) -> None:
                             BACKEND_ROOT,
                             model_path,
                             settings.exercise_classifier_config(),
+                            inference_stride=settings.pose_inference_stride,
                         )
                     payload = await asyncio.to_thread(_process_jpeg_frame, engine, chunk, frame_idx)
                     _maybe_log_pose_timing(frame_idx, payload)

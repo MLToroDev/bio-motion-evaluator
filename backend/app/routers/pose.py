@@ -1,4 +1,4 @@
-﻿from pathlib import Path
+from pathlib import Path
 
 from fastapi import APIRouter, File, HTTPException, UploadFile
 
@@ -24,6 +24,7 @@ async def analyze_pose(file: UploadFile = File(...)) -> PoseAnalysisResponse:
         _BACKEND_ROOT,
         model_path,
         settings.exercise_classifier_config(),
+        inference_stride=settings.pose_inference_stride,
     )
     try:
         payload = session.process_jpeg(data, frame_index=0)

@@ -18,7 +18,10 @@ class Settings(BaseSettings):
     app_version: str = "0.1.0"
     cors_origins: str = "*"
 
-    mediapipe_pose_model_path: str = "models/pose_landmarker_full.task"
+    # Lite ≈ menor costo CPU (similar a BlazePose "complexity 0"); full/heavy vía .env si hace falta precisión.
+    mediapipe_pose_model_path: str = "models/pose_landmarker_lite.task"
+    # 1 = inferir cada frame; 2–3 = reutilizar última pose OK en frames intermedios (más FPS, menos resolución temporal).
+    pose_inference_stride: int = 1
 
     hf_api_token: str | None = None
     hf_inference_url: str | None = None

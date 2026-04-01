@@ -1,4 +1,4 @@
-﻿# ARCH-5: realtime_engine.py — Orquestador < 80 líneas (ver docs/bio_motion_plan_v2.md §2.2)
+# ARCH-5: realtime_engine.py — Orquestador < 80 líneas (ver docs/bio_motion_plan_v2.md §2.2)
 """Sesión stateful: extractor → features → clasificador → rep tracker → payload unificado."""
 
 from __future__ import annotations
@@ -24,27 +24,50 @@ class RealtimeEngineSession:
         backend_root: Path,
         model_path: Path,
         classifier_cfg: ExerciseClassifierConfig | None = None,
+        *,
+        inference_stride: int = 1,
     ) -> None:
         self._model_path = model_path
         self._cfg = classifier_cfg or ExerciseClassifierConfig()
+        self._inference_stride = max(1, int(inference_stride))
+        self._last_pose: PoseFrame | None = None
         self._features = FeatureEngine(self._cfg)
         self._classifier = build_classifier(self._cfg, ModelRegistry(backend_root))
         self._router = RepTrackerRouter(unknown_label=self._cfg.unknown_label)
 
     def process_bgr(self, bgr: np.ndarray, frame_index: int) -> dict:
         st = StageTimer()
-        pose = extract_pose_bgr(bgr, self._model_path)
+        pose = self._extract_pose(bgr=bgr, jpeg_bytes=None, frame_index=frame_index)
         return self._after_extract(st, pose, frame_index)
 
     def process_jpeg(self, image_bytes: bytes, frame_index: int) -> dict:
         st = StageTimer()
-        pose = extract_pose_jpeg(image_bytes, self._model_path)
+        pose = self._extract_pose(bgr=None, jpeg_bytes=image_bytes, frame_index=frame_index)
         return self._after_extract(st, pose, frame_index)
 
     def reset(self) -> None:
+        self._last_pose = None
         self._features.reset()
         self._classifier.reset()
         self._router.reset_all()
+
+    def _extract_pose(
+        self,
+        frame_index: int,
+        bgr: np.ndarray | None = None,
+        jpeg_bytes: bytes | None = None,
+    ) -> PoseFrame:
+        s = self._inference_stride
+        if s > 1 and (frame_index % s) != 0 and self._last_pose is not None:
+            return self._last_pose
+        if bgr is not None:
+            pose = extract_pose_bgr(bgr, self._model_path)
+        else:
+            assert jpeg_bytes is not None
+            pose = extract_pose_jpeg(jpeg_bytes, self._model_path)
+        if pose.ok and pose.landmarks:
+            self._last_pose = pose
+        return pose
 
     def _after_extract(self, st: StageTimer, pose: PoseFrame, frame_index: int) -> dict:
         st.mark_extract()
