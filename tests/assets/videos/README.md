@@ -1,4 +1,4 @@
-# Vídeos gold standard (inyección / regresión)
+﻿# Vídeos gold standard (inyección / regresión)
 
 Coloca aquí vídeos **pre-grabados** para probar MediaPipe y el cálculo de ángulos **sin cámara en vivo**.
 
@@ -18,3 +18,4 @@ Coloca aquí vídeos **pre-grabados** para probar MediaPipe y el cálculo de án
 - Toma lateral para **dorsiflexión** de tobillo si amplías el análisis.
 
 > Los archivos `.mp4` pueden ser grandes: valora Git LFS o almacenamiento externo según normas de tu programa.
+

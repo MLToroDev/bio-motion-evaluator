@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import os
 import sys
@@ -10,6 +10,14 @@ from alembic import context
 _BACKEND_ROOT = Path(__file__).resolve().parents[1]
 if str(_BACKEND_ROOT) not in sys.path:
     sys.path.insert(0, str(_BACKEND_ROOT))
+
+# Misma fuente que la app: `DATABASE_URL` en `backend/.env` (Alembic no usa pydantic-settings).
+try:
+    from dotenv import load_dotenv
+
+    load_dotenv(_BACKEND_ROOT / ".env")
+except ImportError:
+    pass
 from sqlalchemy import engine_from_config, pool
 
 from app.db.base import Base
@@ -25,7 +33,10 @@ target_metadata = Base.metadata
 def get_sync_url() -> str:
     url = os.environ.get("DATABASE_URL", "").strip()
     if not url:
-        raise RuntimeError("DATABASE_URL is required for Alembic migrations")
+        raise RuntimeError(
+            "DATABASE_URL is required for Alembic migrations. "
+            "Define it in backend/.env (ej. postgresql+asyncpg://user:pass@localhost:5432/bio_motion)."
+        )
     if "+asyncpg" in url:
         url = url.replace("postgresql+asyncpg://", "postgresql://", 1)
     return url
@@ -64,3 +75,4 @@ if context.is_offline_mode():
     run_migrations_offline()
 else:
     run_migrations_online()
+

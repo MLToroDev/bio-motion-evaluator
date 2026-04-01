@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import uuid
 from datetime import UTC, datetime
@@ -67,6 +67,7 @@ async def list_sessions(
 
 
 class SessionMetricBody(BaseModel):
+    frame_index: int | None = None
     rep_count: int | None = None
     avg_confidence: float | None = None
     quality_score: float | None = None
@@ -90,6 +91,7 @@ async def add_session_metric(
         raise HTTPException(status_code=404, detail="Session not found")
     m = SessionMetricORM(
         session_id=session_id,
+        frame_index=body.frame_index,
         rep_count=body.rep_count,
         avg_confidence=body.avg_confidence,
         quality_score=body.quality_score,
@@ -118,3 +120,4 @@ async def end_session(
     await session.commit()
     await session.refresh(row)
     return row
+

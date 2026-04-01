@@ -1,4 +1,4 @@
-# pylint: disable=invalid-name
+﻿# pylint: disable=invalid-name
 """Esquema inicial: users, sessions, session_metrics (plan v2 §4)."""
 
 from __future__ import annotations
@@ -54,3 +54,4 @@ def downgrade() -> None:
     op.drop_table("sessions")
     op.drop_index("ix_users_email", table_name="users")
     op.drop_table("users")
+

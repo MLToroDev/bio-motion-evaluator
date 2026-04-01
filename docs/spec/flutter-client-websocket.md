@@ -1,10 +1,14 @@
-# Spec: Cliente Flutter — WebSockets y robustez (Web)
+﻿# Spec: Cliente Flutter — WebSockets y robustez (Web)
 
 ## Meta
 
 - **Estado:** Activo  
 - **Alcance:** Patrones aplicables a pantallas que usan `web_socket_channel` contra el backend (*pose stream*, video binario, etc.).  
 - **Referencia principal:** `app/lib/screens/video_analysis/video_analysis_screen.dart`, `app/lib/screens/live_analysis/live_analysis_screen.dart`, `app/lib/utils/ws_uri.dart`, `app/lib/pose/pose_ws_payload.dart` (parseo compartido de respuestas pose JSON)
+
+## Salud HTTP
+
+La aplicación usa **`GET /api/v1/health`** (misma base que el WebSocket, sin path extra en el host). Ver `buildHealthHttpUri` en `app/lib/utils/ws_uri.dart`.
 
 ## Resumen
 
@@ -59,3 +63,4 @@ Archivo: `app/lib/screens/video_analysis/video_analysis_screen.dart`.
 
 - `app/lib/pose/pose_overlay.dart` — `parseLandmarksJson`  
 - `backend/app/models/schemas.py` — `PoseStreamConfig.include_preview`
+

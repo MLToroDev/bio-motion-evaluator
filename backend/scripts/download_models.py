@@ -1,4 +1,4 @@
-"""Descarga pose_landmarker_full.task para MediaPipe Tasks."""
+﻿"""Descarga pose_landmarker_full.task para MediaPipe Tasks."""
 
 from __future__ import annotations
 
@@ -25,3 +25,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

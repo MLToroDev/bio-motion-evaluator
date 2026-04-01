@@ -1,4 +1,4 @@
-# Spec: WebSocket `/ws/pose-stream`
+﻿# Spec: WebSocket `/ws/pose-stream`
 
 ## Meta
 
@@ -9,6 +9,8 @@
 ## Resumen
 
 El cliente abre un WebSocket en **`/ws/pose-stream`**, envía **un único mensaje de texto JSON** con la configuración (`PoseStreamConfig`), y el servidor responde con **mensajes JSON por fotograma** según el **contrato unificado v1**: motor (`exercise_label`, `rep_phase`, `rep_count`, `pipeline_ms`, …) más compatibilidad con `knees` y landmarks (ver `UnifiedWsFrameV1` en `schemas.py`). Vista previa JPEG opcional sin cambios.
+
+Análisis **REST** de una sola imagen con el mismo motor: **`POST /api/v1/analyze/pose`** (ver [api-v1-rest.md](api-v1-rest.md)).
 
 ## Contrato: mensaje inicial (cliente → servidor)
 
@@ -102,3 +104,4 @@ Puede incluir **`error`** (string), p. ej. `sin_frame`, o cierre con código HTT
 2. Flutter Web (`flutter run -d web-server`), pantalla “Vídeo de prueba (servidor)”.  
 3. Conectar, enviar FPS y nombre de archivo existente en `tests/assets/videos/`.  
 4. Con y sin “Vista previa desde servidor”, comprobar presencia/ausencia de `preview_jpeg_base64` en payloads.
+

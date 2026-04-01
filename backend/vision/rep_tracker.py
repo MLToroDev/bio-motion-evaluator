@@ -1,4 +1,4 @@
-# ARCH-4: rep_tracker.py — Interfaz base RepTracker (ver docs/bio_motion_plan_v2.md §2.3)
+﻿# ARCH-4: rep_tracker.py — Interfaz base RepTracker (ver docs/bio_motion_plan_v2.md §2.3)
 """Router de trackers por etiqueta de ejercicio; la ABC vive en ``rep_tracker_abc``."""
 
 from __future__ import annotations
@@ -6,7 +6,7 @@ from __future__ import annotations
 from vision.rep_tracker_abc import RepTracker
 from vision.rep_trackers.squat import SquatRepTracker
 from vision.rep_trackers.unknown import UnknownRepTracker
-from vision.types import RepState, TrackingFrame
+from vision.types import FeatureFrame, RepState
 
 
 def _norm_label(label: str, unknown: str) -> str:
@@ -30,7 +30,7 @@ class RepTrackerRouter:
         for t in self._trackers.values():
             t.reset()
 
-    def update(self, frame: TrackingFrame) -> RepState:
+    def update(self, frame: FeatureFrame) -> RepState:
         label = _norm_label(frame.exercise_label, self._unknown_label)
         effective = label if label in self._trackers else self._unknown_label
 
@@ -43,3 +43,4 @@ class RepTrackerRouter:
 
         tracker = self._trackers.get(effective) or self._trackers[self._unknown_label]
         return tracker.update(frame)
+

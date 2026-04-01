@@ -1,4 +1,4 @@
-"""Detección de pose con MediaPipe Tasks (Pose Landmarker)."""
+﻿"""Detección de pose con MediaPipe Tasks (Pose Landmarker)."""
 
 from __future__ import annotations
 
@@ -174,3 +174,4 @@ def analyze_image_bytes(image_bytes: bytes, model_path: Path) -> PoseResult:
         return PoseResult(ok=False, landmarks=[], world_landmarks=[], note=str(exc))
 
     return _pose_result_from_detection(result)
+

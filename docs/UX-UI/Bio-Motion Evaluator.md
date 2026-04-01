@@ -1,4 +1,4 @@
-# Bio-Motion Evaluator — Estándar de Diseño y Plan de Refactorización de Vistas
+﻿# Bio-Motion Evaluator — Estándar de Diseño y Plan de Refactorización de Vistas
 
 > **Proyecto:** Bio-Motion Evaluator · Trabajo de Grado · Mateo Londoño Toro  
 > **Institución:** Tecnológico de Antioquia — Ingeniería en Software  

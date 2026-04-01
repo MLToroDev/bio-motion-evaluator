@@ -1,4 +1,4 @@
-"""Abstracción de captura de video: cámara local, archivo o URL/RTSP (OpenCV)."""
+﻿"""Abstracción de captura de video: cámara local, archivo o URL/RTSP (OpenCV)."""
 
 from __future__ import annotations
 
@@ -89,3 +89,4 @@ class VideoSource:
 
     def __exit__(self, *args: object) -> None:
         self.release()
+

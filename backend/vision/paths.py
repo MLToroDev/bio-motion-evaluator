@@ -1,4 +1,4 @@
-"""Resolución segura de rutas a vídeos gold standard (anti path traversal)."""
+﻿"""Resolución segura de rutas a vídeos gold standard (anti path traversal)."""
 
 from __future__ import annotations
 
@@ -26,3 +26,4 @@ def resolve_gold_standard_video(filename: str, base_dir: Path) -> Path:
     except ValueError as exc:
         raise ValueError("Ruta fuera del directorio de vídeos de referencia.") from exc
     return target
+

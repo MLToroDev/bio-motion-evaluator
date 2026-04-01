@@ -1,4 +1,4 @@
-# ARCH-T13: JWT stub — desacoplado de routers; ampliar OAuth2 en Fase 2.
+﻿# ARCH-T13: JWT stub — desacoplado de routers; ampliar OAuth2 en Fase 2.
 from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
@@ -27,3 +27,4 @@ def decode_token_safe(token: str) -> dict[str, Any] | None:
         return decode_token(token)
     except JWTError:
         return None
+

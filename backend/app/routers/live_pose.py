@@ -1,4 +1,4 @@
-"""
+﻿"""
 WebSocket de pose en tiempo (semi-)real con fuente intercambiable (cámara / archivo / URL).
 
 Documentación sugerida — Cap. 6: requisito de trazabilidad en pruebas con vídeo inyectado;
@@ -147,3 +147,4 @@ async def pose_stream(ws: WebSocket) -> None:
     finally:
         if source is not None:
             source.release()
+

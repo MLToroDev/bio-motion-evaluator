@@ -1,4 +1,4 @@
-**BIO-MOTION EVALUATOR: SISTEMA DE SOFTWARE PARA LA VALORACIÓN AUTOMÁTICA DE MOVILIDAD ARTICULAR Y DETECCIÓN DE ASIMETRÍAS MEDIANTE VISIÓN ARTIFICIAL**
+﻿**BIO-MOTION EVALUATOR: SISTEMA DE SOFTWARE PARA LA VALORACIÓN AUTOMÁTICA DE MOVILIDAD ARTICULAR Y DETECCIÓN DE ASIMETRÍAS MEDIANTE VISIÓN ARTIFICIAL**
 
 Mateo Londoño Toro
 
@@ -586,8 +586,8 @@ flowchart TD
 
     subgraph backendLayer [Capa de Lógica - FastAPI / Python]
         WS["WebSocket /ws/pose-stream\n(live_pose.py)"]
-        PoseRouter["POST /analyze/pose\n(pose.py)"]
-        HealthRouter["GET /health\n(health.py)"]
+        PoseRouter["POST /api/v1/analyze/pose\n(pose.py)"]
+        HealthRouter["GET /api/v1/health\n(health.py)"]
         MediaPipeSvc["MediaPipe Service\n(analyze_frame_bgr)"]
         VideoSource["VideoSource\n(cámara / archivo / URL)"]
         Biomech["vision/biomechanics\n(knee_angles_from_landmarks)"]
@@ -596,7 +596,7 @@ flowchart TD
     ESP32 -->|"frames JPEG via WebSocket"| WS
     LiveScreen -->|"WebSocket (config JSON + frames)"| WS
     VideoScreen -->|"WebSocket (config JSON)"| WS
-    HomeScreen -->|"HTTP GET /health"| HealthRouter
+    HomeScreen -->|"HTTP GET /api/v1/health"| HealthRouter
     WS --> VideoSource
     WS --> MediaPipeSvc
     MediaPipeSvc --> Biomech
@@ -744,7 +744,7 @@ _\[Según formato institucional, adjuntar como anexo: arquitectura, escalabilida
 | **ESCALABILIDAD** — Facilidad de adaptar el software a los cambios especificados. El software debe instanciar una definición basada en objetos y componentes que permita incrementar funcionalidades y adaptarse a cambios. | El frontend implementa el **patrón data-driven** para las métricas: el modelo `LiveMetric` desacopla la semántica biomecánica de los widgets de UI. Agregar un nuevo tipo de ejercicio (tobillo, cadera, hombro) requiere únicamente implementar un nuevo método `_buildLiveMetrics()` sin modificar los componentes visuales. En el backend, el `VideoSource` es intercambiable mediante el campo `source` (cámara / archivo / URL / IoT) sin cambios en el pipeline de inferencia. El modelo de inferencia (MediaPipe) es reemplazable por modelos de Hugging Face sin afectar el contrato de la API. |
 | **SEGURIDAD** — Garantiza autenticidad, confidencialidad e integridad de la información incorporando niveles de acceso que permiten el uso de los datos acorde a los perfiles definidos. | El backend configura **CORS** con lista blanca de orígenes (`allow_origin_regex` para localhost en desarrollo; orígenes explícitos en producción). La comunicación WebSocket se realiza sobre la misma capa de red que la API REST, con soporte para TLS/WSS en despliegue productivo. En la versión actual el sistema no gestiona datos personales sensibles ni autenticación de usuarios (fuera del alcance del presente trabajo de grado; contemplado para versiones futuras). |
 | **USABILIDAD** — El software es fácil de ejecutar, brindando accesibilidad, navegabilidad y comprensión para la operatividad de la herramienta. | La interfaz implementa el **sistema de diseño Bio-Motion**: paleta oscura biomédica con contraste WCAG AA, tipografía DM Sans para etiquetas y DM Mono para valores numéricos (legibilidad en entornos de gimnasio con luz variable), indicadores semánticos de color (verde/amarillo/rojo) para estados biomecánicos legibles de un vistazo. La navegación es lineal y de máximo 2 niveles de profundidad desde la pantalla principal. El indicador de conexión al backend en la barra superior informa permanentemente el estado del servidor. Los errores de conectividad se presentan con guías de resolución expandibles. |
-| **MANTENIBILIDAD** — Fácil de modificar para corregir errores y mejorar el rendimiento. Requiere un patrón de diseño que garantice la modularidad de los componentes. | El código fuente sigue la convención de separación por responsabilidad: `Screen` (estado y lógica de negocio) → `Panel` (orquestación de tabs) → `Widget` (presentación atómica). Los **specs técnicos** bajo `docs/spec/` documentan los contratos de API, decisiones de arquitectura e incidencias resueltas, garantizando trazabilidad para mantenimiento futuro. El backend separa routers (`/health`, `/pose`, `/ws/pose-stream`), servicios (`mediapipe_service`, `huggingface_service`) y módulos de visión (`vision/biomechanics`, `vision/processor`) en archivos independientes con responsabilidad acotada. |
+| **MANTENIBILIDAD** — Fácil de modificar para corregir errores y mejorar el rendimiento. Requiere un patrón de diseño que garantice la modularidad de los componentes. | El código fuente sigue la convención de separación por responsabilidad: `Screen` (estado y lógica de negocio) → `Panel` (orquestación de tabs) → `Widget` (presentación atómica). Los **specs técnicos** bajo `docs/spec/` documentan los contratos de API, decisiones de arquitectura e incidencias resueltas, garantizando trazabilidad para mantenimiento futuro. El backend agrupa REST versionado bajo `/api/v1` (salud, análisis de pose, auth y sesiones) y mantiene WebSockets en `/ws/video`, `/ws/pose-stream`, con servicios (`mediapipe_service`, `huggingface_service`) y módulos de visión (`vision/biomechanics`, `vision/feature_engine`, etc.) en archivos independientes con responsabilidad acotada. |
 | **DOCUMENTACIÓN** — Debe contar con: descripción del negocio (BPMN), historias de usuario, manual de instalación, manual de usuario, diagramas de arquitectura/clases/ER, plan de pruebas funcionales. | ✅ Descripción del negocio: sección 6.1 (proceso de valoración funcional). ✅ Arquitectura: sección 6.6.1 y `docs/arquitectura.md`. ✅ Contratos de API: `docs/spec/websocket-pose-stream.md` y `docs/spec/flutter-client-websocket.md`. ✅ Sistema de diseño UI/UX: `docs/UX-UI/` con tokens, tipografía y patrones por pantalla. ⏳ Historias de usuario: en construcción (secciones 6.3–6.5). ⏳ Diagrama de clases: pendiente al cierre de módulos. ⏳ Plan de pruebas: pendiente (sección 6.7). ⏳ Manual de usuario e instalación: pendientes (sección 6.8). |
 
 _\]_

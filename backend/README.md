@@ -1,4 +1,4 @@
-# Bio-Motion Evaluator — Backend
+﻿# Bio-Motion Evaluator — Backend
 
 API **FastAPI** con WebSockets para streaming y análisis de pose (**MediaPipe**).
 
@@ -17,8 +17,8 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 | Método | Ruta | Descripción |
 |--------|------|-------------|
-| GET | `/health` | Estado del servicio |
-| POST | `/analyze/pose` | Imagen multipart → landmarks |
+| GET | `/api/v1/health` | Estado del servicio |
+| POST | `/api/v1/analyze/pose` | Imagen multipart → pose + motor v1 (`PoseAnalysisResponse`) |
 | POST | `/api/v1/auth/token` | JWT stub (requiere `DATABASE_URL`; crea usuario por email) |
 | POST | `/api/v1/sessions` | Crear sesión de análisis (Bearer JWT) |
 | GET | `/api/v1/sessions` | Listar sesiones del usuario |
@@ -36,7 +36,7 @@ Documentación: `http://localhost:8000/docs`
 alembic upgrade head
 ```
 
-Sin `DATABASE_URL`, la API sigue funcionando para WebSockets y `/analyze/pose`; rutas `/api/v1/*` que dependen de BD responderán 503.
+Sin `DATABASE_URL`, la API sigue funcionando para WebSockets y `/api/v1/analyze/pose`; rutas `/api/v1/auth` y `/api/v1/sessions` responderán 503.
 
 ### WebSocket `/ws/pose-stream`
 
@@ -56,3 +56,4 @@ o cámara local:
 3. Recibirás por cada frame un JSON **v1** con `schema_version`, `knees` (compatibilidad), `exercise_label`, `rep_phase`, `rep_count`, `quality_flags`, `pipeline_ms`, etc. (ver `docs/spec/websocket-pose-stream.md`).
 
 Coloca los vídeos en [`../tests/assets/videos`](../tests/assets/videos) (solo el nombre del archivo en la petición).
+

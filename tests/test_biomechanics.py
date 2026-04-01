@@ -1,4 +1,4 @@
-"""Pruebas del módulo de ángulos articulares (regresión numérica)."""
+﻿"""Pruebas del módulo de ángulos articulares (regresión numérica)."""
 
 from __future__ import annotations
 
@@ -53,3 +53,4 @@ def test_resolve_path_rejects_traversal() -> None:
         raise AssertionError("expected ValueError")
     except ValueError:
         pass
+

@@ -1,4 +1,4 @@
-import json
+﻿import json
 from pathlib import Path
 from typing import Any
 
@@ -29,6 +29,11 @@ class Settings(BaseSettings):
     classifier_hysteresis_frames: int = 10
     classifier_unknown_label: str = "unknown"
     classifier_confidence_ema_alpha: float = 0.25
+    classifier_confidence_filter: str = "ema"
+    classifier_kalman_process_noise: float = 1e-4
+    classifier_kalman_measurement_noise: float = 0.05
+    feature_default_dt_s: float = 1.0 / 15.0
+    feature_calibration_min_frames: int = 10
 
     # Persistencia (Fase 1: schema listo; dejar vacío en dev sin Docker)
     database_url: str | None = None
@@ -72,12 +77,20 @@ class Settings(BaseSettings):
         return cls.repo_root() / "tests" / "assets" / "videos"
 
     def exercise_classifier_config(self) -> ExerciseClassifierConfig:
+        cf = (self.classifier_confidence_filter or "ema").strip().lower()
+        if cf not in ("ema", "kalman"):
+            cf = "ema"
         return ExerciseClassifierConfig(
             min_confidence=self.classifier_min_confidence,
             window_size_frames=self.classifier_window_size_frames,
             hysteresis_frames=self.classifier_hysteresis_frames,
             unknown_label=self.classifier_unknown_label,
             confidence_ema_alpha=self.classifier_confidence_ema_alpha,
+            confidence_filter=cf,
+            kalman_process_noise=self.classifier_kalman_process_noise,
+            kalman_measurement_noise=self.classifier_kalman_measurement_noise,
+            feature_default_dt_s=float(self.feature_default_dt_s),
+            feature_calibration_min_frames=int(self.feature_calibration_min_frames),
         )
 
     def feature_flags(self) -> dict[str, Any]:
@@ -89,3 +102,4 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+

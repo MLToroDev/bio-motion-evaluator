@@ -1,4 +1,4 @@
-# ARCH-T13 — Autenticación JWT básica (ampliar OAuth2 después).
+﻿# ARCH-T13 — Autenticación JWT básica (ampliar OAuth2 después).
 from __future__ import annotations
 
 import uuid
@@ -42,3 +42,4 @@ async def login_stub(
         await session.refresh(user)
     token = create_access_token(str(user.id), {"email": user.email})
     return TokenResponse(access_token=token)
+

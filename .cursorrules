@@ -36,3 +36,10 @@ Eres un experto en Ingeniería de Software, IA y Biomecánica. Estás ayudando a
 - Convención y plantilla de secciones: ver **[`docs/spec/README.md`](docs/spec/README.md)**.
 - Cuando implementes o corrijas un flujo documentado (p. ej. `/ws/pose-stream`, flags `include_preview`, cliente Flutter Web), **actualiza el `.md` correspondiente** en el mismo cambio lógico, o crea un spec nuevo si el área no tenía documento.
 - Mantén **Meta, Resumen, Contrato, Implementación, Incidencias/decisiones** alineados con el código real; evita duplicar tutorial largo: prioriza contrato y trazabilidad para tesis.
+
+
+## Reglas de Codificación y Formato
+
+5. **Encoding UTF-8 estricto:** Todo archivo generado debe guardarse y transmitirse en UTF-8. Nunca uses caracteres Latin-1/ISO-8859-1 ni secuencias de escape mal codificadas (â€, Ã, Â, â€¢, etc.). Si necesitas un carácter especial en un string de Dart/Python, escríbelo directamente en UTF-8 o usa su escape Unicode explícito (`\u00e9` para é, `\u2022` para •, etc.).
+
+6. **Sin caracteres corruptos en strings:** Antes de generar cualquier fragmento de código, verifica que los literales de string no contengan secuencias tipo `â€¢`, `Ã¡`, `Â«`, `â€"` u otras resultantes de doble-encoding. Si el texto original tiene tildes, eñes o comillas tipográficas, mantenlas en UTF-8 limpio o sustitúyelas por ASCII equivalente (`->` en lugar de `→`, `-` en lugar de `—`, etc.).

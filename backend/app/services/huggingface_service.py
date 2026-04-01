@@ -1,4 +1,4 @@
-"""Cliente opcional para Hugging Face Inference API."""
+﻿"""Cliente opcional para Hugging Face Inference API."""
 
 from __future__ import annotations
 
@@ -35,3 +35,4 @@ async def run_optional_inference(payload: dict[str, Any]) -> dict[str, Any] | No
     except Exception as exc:  # noqa: BLE001
         log.warning("Hugging Face inference falló: %s", exc)
         return {"error": str(exc)}
+

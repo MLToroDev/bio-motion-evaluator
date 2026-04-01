@@ -1,1 +1,2 @@
-"""Implementaciones concretas de :class:`vision.rep_tracker.RepTracker`."""
+﻿"""Implementaciones concretas de :class:`vision.rep_tracker.RepTracker`."""
+

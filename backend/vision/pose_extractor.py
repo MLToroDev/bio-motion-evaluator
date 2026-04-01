@@ -1,4 +1,4 @@
-# ARCH-1: pose_extractor.py — Capa 1 del motor (ver docs/bio_motion_plan_v2.md §2.1)
+﻿# ARCH-1: pose_extractor.py — Capa 1 del motor (ver docs/bio_motion_plan_v2.md §2.1)
 """Extracción de pose: wrapper sobre mediapipe_service + ángulos de rodilla."""
 
 from __future__ import annotations
@@ -21,6 +21,7 @@ def extract_pose_jpeg(image_bytes: bytes, model_path: Path) -> PoseFrame:
         landmarks=result.landmarks,
         note=result.note,
         knees=knees,
+        world_landmarks=result.world_landmarks or None,
     )
 
 
@@ -33,4 +34,6 @@ def extract_pose_bgr(bgr: np.ndarray, model_path: Path) -> PoseFrame:
         landmarks=result.landmarks,
         note=result.note,
         knees=knees,
+        world_landmarks=result.world_landmarks or None,
     )
+

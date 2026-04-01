@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 from collections.abc import AsyncGenerator
 
@@ -58,3 +58,4 @@ async def create_all_tables() -> None:
         return
     async with _engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+

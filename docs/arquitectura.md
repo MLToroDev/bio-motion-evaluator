@@ -1,4 +1,4 @@
-# Arquitectura del sistema
+﻿# Arquitectura del sistema
 
 ## Visión general
 
@@ -21,7 +21,7 @@ flowchart TD
     end
     subgraph backendLayer [Backend - FastAPI]
         WS["WebSocket /ws/video"]
-        PoseAPI["POST /analyze/pose"]
+        PoseAPI["POST /api/v1/analyze/pose"]
         MediaPipeService["MediaPipe Service"]
         HFService["Hugging Face Service"]
     end
@@ -92,3 +92,4 @@ Para agregar un nuevo ejercicio (press banca, running, mancuerna…):
 | `HistoryPanel` | Tab HISTÓRICO: gráfica de series temporales |
 | `CameraHUD` | Línea compacta de estado del servidor (frame, FPS, latencia) |
 | `PoseOverlay` | `CustomPaint` de landmarks sobre `CameraPreview` |
+

@@ -1,4 +1,4 @@
-# Bio-Motion Evaluator — Guías UX
+﻿# Bio-Motion Evaluator — Guías UX
 
 > **Complemento de:** `bio_motion_design_standard.md`  
 > **Fuentes aplicadas:** Nielsen Norman Group (Eyetracking, 2000), Digital Studio (Principios UX), UI-Patterns.com  

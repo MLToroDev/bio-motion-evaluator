@@ -1,4 +1,4 @@
-**BIO-MOTION EVALUATOR**
+﻿**BIO-MOTION EVALUATOR**
 
 Plan de Arquitectura e Implementación
 
@@ -420,28 +420,30 @@ Para mantener trazabilidad entre decisiones y código (requerida para la defensa
 
 \# ARCH-7: pipeline_timer.py - Telemetría desde Fase 1 (ver plan sección 7.1)
 
-## **10.1 Tabla de TODOs Técnicos**
+## **10.1 Trazabilidad ARCH-T\* (código vs plan)**
+
+> Esta tabla **documenta el estado frente al repositorio**; no es la lista de trabajo del producto ni un compromiso de fechas.
 
 | **ID**   | **Tarea**                                                              | **Fase** | **Estado** |
 | -------- | ---------------------------------------------------------------------- | -------- | ---------- |
-| ARCH-T1  | Documentar contrato actual WS y puntos de extensión                    | 1        | Pendiente  |
-| ARCH-T2  | Crear pose_extractor.py con interfaz pose → features                   | 1        | Pendiente  |
-| ARCH-T3  | Crear feature_engine.py con ventana deslizante                         | 1        | Pendiente  |
-| ARCH-T4  | Crear interfaz base RepTracker (ABC)                                   | 1        | Pendiente  |
-| ARCH-T5  | Crear exercise_classifier.py (emite 'unknown' en Fase 1)               | 1        | Pendiente  |
-| ARCH-T6  | Crear realtime_engine.py (orquestador < 80 líneas)                     | 1        | Pendiente  |
-| ARCH-T7  | Crear model_registry.py con manifest.json                              | 1        | Pendiente  |
-| ARCH-T8  | Crear pipeline_timer.py con PipelineTiming dataclass                   | 1        | Pendiente  |
-| ARCH-T9  | Definir UnifiedWSPayload con schema_version en schemas.py              | 1        | Pendiente  |
-| ARCH-T10 | Configurar PostgreSQL + Alembic + tablas base                          | 1        | Pendiente  |
-| ARCH-T11 | Extender pose_ws_payload.dart con campos nuevos + null-safety          | 1        | Pendiente  |
-| ARCH-T12 | Entrenar clasificador MVP (3-5 ejercicios) con dataset propio          | 2        | Pendiente  |
-| ARCH-T13 | Implementar RepTracker concreto por ejercicio                          | 2        | Pendiente  |
-| ARCH-T14 | Integrar auth JWT + OAuth2 desacoplado                                 | 2        | Pendiente  |
-| ARCH-T15 | Versionar API pública bajo /api/v1/                                    | 2        | Pendiente  |
-| ARCH-T16 | Implementar smoothing temporal (Kalman / EMA sobre confidence)         | 3        | Pendiente  |
-| ARCH-T17 | Pipeline de reentrenamiento con datos de usuarios (con consentimiento) | 3        | Pendiente  |
-| ARCH-T18 | Compliance GDPR mínimo: exportar + borrar datos de usuario             | 3        | Pendiente  |
+| ARCH-T1  | Documentar contrato WS y extensión (`docs/spec/*`)                   | 1        | Hecho      |
+| ARCH-T2  | `pose_extractor.py` (pose enriquecida + rodillas)                    | 1        | Hecho      |
+| ARCH-T3  | `feature_engine.py` ventana + vector fijo 32 + `FeatureFrame`        | 1        | Hecho      |
+| ARCH-T4  | ABC `RepTracker` + `FeatureFrame`                                      | 1        | Hecho      |
+| ARCH-T5  | `exercise_classifier.py` + stub / ONNX                               | 1        | Hecho      |
+| ARCH-T6  | `realtime_engine.py` orquestador                                       | 1        | Hecho      |
+| ARCH-T7  | `model_registry.py` + `manifest.json` (incl. `feature_vector_dim` 32) | 1        | Hecho      |
+| ARCH-T8  | `pipeline_timer.py` / `PipelineTimingMs`                             | 1        | Hecho      |
+| ARCH-T9  | `UnifiedWsFrameV1` / payload v1 en `schemas.py`                        | 1        | Hecho      |
+| ARCH-T10 | PostgreSQL + Alembic + tablas base (+ `frame_index` en métricas)       | 1        | Hecho      |
+| ARCH-T11 | `pose_ws_payload.dart` (v1 + quality_flags)                        | 1        | Hecho      |
+| ARCH-T12 | RepTracker sentadilla + router; ONNX entrenado producción            | 2        | Parcial    |
+| ARCH-T13 | RepTrackers adicionales (press, etc.)                                | 2        | Pendiente  |
+| ARCH-T14 | JWT stub `/api/v1/auth/token`; OAuth2 desacoplado                    | 2        | Parcial    |
+| ARCH-T15 | API pública bajo `/api/v1` (salud, analyze pose, auth, sesiones)       | 2        | Hecho      |
+| ARCH-T16 | Suavizado confianza EMA + Kalman (`scalar_kalman.py`)                  | 2        | Hecho      |
+| ARCH-T17 | Pipeline de reentrenamiento con datos de usuarios (consentimiento)   | 3        | Pendiente  |
+| ARCH-T18 | Compliance GDPR mínimo: exportar + borrar datos                       | 3        | Pendiente  |
 
 # **11\. Principios de Cierre**
 

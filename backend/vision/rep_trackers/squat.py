@@ -1,11 +1,11 @@
-# ARCH-T12: RepTracker concreto — sentadilla (rodilla); máquina de estados simple.
+﻿# ARCH-T12: RepTracker concreto — sentadilla (rodilla); máquina de estados simple.
 from __future__ import annotations
 
 import math
 from typing import Literal
 
 from vision.rep_tracker_abc import RepTracker
-from vision.types import RepPhase, RepState, TrackingFrame
+from vision.types import FeatureFrame, RepPhase, RepState
 
 Phase = Literal["idle", "eccentric", "concentric", "hold"]
 
@@ -27,7 +27,7 @@ class SquatRepTracker(RepTracker):
         self._flex_peak = 0.0
         self._flags: list[str] = []
 
-    def _avg_flex(self, frame: TrackingFrame) -> float | None:
+    def _avg_flex(self, frame: FeatureFrame) -> float | None:
         k = frame.pose.knees
         if not k:
             return None
@@ -41,7 +41,7 @@ class SquatRepTracker(RepTracker):
         except (TypeError, ValueError):
             return None
 
-    def update(self, frame: TrackingFrame) -> RepState:
+    def update(self, frame: FeatureFrame) -> RepState:
         self._flags = []
         flex = self._avg_flex(frame)
         if flex is None or not frame.pose.ok:
@@ -84,3 +84,4 @@ class SquatRepTracker(RepTracker):
             self._flags.append("rom_low")
 
         return RepState(rep_phase=rpc, rep_count=self._rep_count, quality_flags=list(self._flags))
+

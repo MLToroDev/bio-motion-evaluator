@@ -1,4 +1,4 @@
-# ARCH-7: pipeline_timer.py — Telemetría desde Fase 1 (ver docs/bio_motion_plan_v2.md §7.1)
+﻿# ARCH-7: pipeline_timer.py — Telemetría desde Fase 1 (ver docs/bio_motion_plan_v2.md §7.1)
 """Medición de latencia por etapa del motor de análisis (pose → features → classify → track)."""
 
 from __future__ import annotations
@@ -67,3 +67,4 @@ class StageTimer:
     def finish(self) -> PipelineTiming:
         self.timing.total_ms = (time.perf_counter() - self._absolute_start) * 1000.0
         return self.timing
+

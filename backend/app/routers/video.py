@@ -1,4 +1,4 @@
-import asyncio
+﻿import asyncio
 import json
 import logging
 from pathlib import Path
@@ -90,3 +90,4 @@ async def video_stream(ws: WebSocket) -> None:
                 break
     except WebSocketDisconnect:
         log.info("WebSocket /ws/video desconectado; frames=%s bytes=%s analyze_pose=%s", frames, bytes_in, analyze_pose)
+

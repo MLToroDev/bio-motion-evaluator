@@ -1,4 +1,4 @@
-# ARCH-6: model_registry.py — Carga dinámica de modelos (ver docs/bio_motion_plan_v2.md §8)
+﻿# ARCH-6: model_registry.py — Carga dinámica de modelos (ver docs/bio_motion_plan_v2.md §8)
 """Lectura de ``manifest.json`` para versionar el clasificador de ejercicios."""
 
 from __future__ import annotations
@@ -84,3 +84,4 @@ class ModelRegistry:
         with p.open("w", encoding="utf-8") as f:
             json.dump(data, f, indent=2)
             f.write("\n")
+

@@ -1,4 +1,4 @@
-# Spec: API REST `/api/v1`
+﻿# Spec: API REST `/api/v1`
 
 ## Meta
 
@@ -13,17 +13,28 @@ Rutas versionadas para **identidad mínima** y **sesiones** cuando `DATABASE_URL
 
 | Método | Ruta | Auth | Descripción |
 |--------|------|------|-------------|
+| GET | `/api/v1/health` | No | Estado y versión (`HealthResponse`) |
+| POST | `/api/v1/analyze/pose` | No | Multipart imagen → landmarks + campos motor v1 (`PoseAnalysisResponse`) |
 | POST | `/api/v1/auth/token` | No | Body JSON `{ "email": "..." }` → JWT |
 | POST | `/api/v1/sessions` | Bearer | Crea fila en `sessions` |
 | GET | `/api/v1/sessions` | Bearer | Lista últimas 50 sesiones del usuario |
-| POST | `/api/v1/sessions/{id}/metrics` | Bearer | Inserta `session_metrics` |
+| POST | `/api/v1/sessions/{id}/metrics` | Bearer | Inserta `session_metrics` (body puede incluir `frame_index` opcional) |
 | POST | `/api/v1/sessions/{id}/end` | Bearer | Marca `ended_at` |
+
+### `PoseAnalysisResponse` (alineado semánticamente al WS v1)
+
+Campos opcionales además de pose clásica: `schema_version`, `exercise_label`, `exercise_confidence`, `rep_phase`, `rep_count`, `quality_flags`, `pipeline_ms`. El análisis usa la misma sesión de motor que el stream (`RealtimeEngineSession` por petición).
+
+### `session_metrics`
+
+- `frame_index` (integer, nullable): índice de fotograma asociado a la muestra, si aplica.
 
 ## Implementación
 
-- Migraciones: `backend/alembic/versions/20250331_0001_initial_schema.py`
+- Migraciones: `backend/alembic/versions/20250331_0001_initial_schema.py`, `20250331_0002_session_metrics_frame_index.py`
 - Modelos: `backend/app/db/models.py`
 
 ## Incidencias
 
 1. **503 sin `DATABASE_URL`** — esperado en demos solo-vision; el motor WebSocket no requiere BD.
+

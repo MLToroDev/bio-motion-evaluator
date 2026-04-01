@@ -1,4 +1,4 @@
-import logging
+﻿import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1.router import api_router
 from app.config import settings
 from app.db.session import init_engine
-from app.routers import health, live_pose, pose, video
+from app.routers import live_pose, video
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
@@ -43,8 +43,6 @@ else:
         **_cors_kw,
     )
 
-app.include_router(health.router)
-app.include_router(pose.router)
 app.include_router(video.router)
 app.include_router(live_pose.router)
 app.include_router(api_router, prefix="/api/v1")
@@ -52,4 +50,5 @@ app.include_router(api_router, prefix="/api/v1")
 
 @app.get("/")
 async def root():
-    return {"service": settings.app_name, "docs": "/docs", "health": "/health"}
+    return {"service": settings.app_name, "docs": "/docs", "health": "/api/v1/health"}
+

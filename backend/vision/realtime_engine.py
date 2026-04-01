@@ -1,4 +1,4 @@
-# ARCH-5: realtime_engine.py — Orquestador < 80 líneas (ver docs/bio_motion_plan_v2.md §2.2)
+﻿# ARCH-5: realtime_engine.py — Orquestador < 80 líneas (ver docs/bio_motion_plan_v2.md §2.2)
 """Sesión stateful: extractor → features → clasificador → rep tracker → payload unificado."""
 
 from __future__ import annotations
@@ -14,7 +14,7 @@ from vision.model_registry import ModelRegistry
 from vision.pipeline_timer import StageTimer
 from vision.pose_extractor import extract_pose_bgr, extract_pose_jpeg
 from vision.rep_tracker import RepTrackerRouter
-from vision.types import PoseFrame, TrackingFrame
+from vision.types import PoseFrame
 from vision.unified_payload import build_frame_payload_v1
 
 
@@ -53,8 +53,10 @@ class RealtimeEngineSession:
         st.mark_feature()
         c = self._classifier.classify(vec, self._features.window_full())
         st.mark_classify()
-        r = self._router.update(TrackingFrame(c.label, c.confidence, pose, frame_index))
+        ff = self._features.build_feature_frame(pose, frame_index, c.label, c.confidence)
+        r = self._router.update(ff)
         st.mark_track()
         return build_frame_payload_v1(
             frame_index, pose, c.label, float(c.confidence), r, st.finish().as_dict()
         )
+

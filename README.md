@@ -1,4 +1,4 @@
-# Bio-Motion Evaluator
+﻿# Bio-Motion Evaluator
 
 Monorepo para el sistema de evaluación de movimiento (web-first, cross-platform, comunicación IoT). Incluye frontend Flutter, backend FastAPI con visión por computador e integración con dispositivos de captura.
 
@@ -45,7 +45,7 @@ Atajos desde la raíz del repo (Windows):
 - `.\scripts\start-dev-backend.ps1`
 - `.\scripts\start-dev-flutter.ps1` (por defecto `web-server`; opcional: `.\scripts\start-dev-flutter.ps1 edge`)
 
-- Salud: `GET http://localhost:8000/health`
+- Salud: `GET http://localhost:8000/api/v1/health`
 - Documentación interactiva: `http://localhost:8000/docs`
 - Streaming de pose (cámara / vídeo en `tests/assets/videos` / URL): WebSocket `ws://localhost:8000/ws/pose-stream` (primer mensaje JSON; ver [`backend/README.md`](backend/README.md)).
 
@@ -59,7 +59,7 @@ flutter create . --platforms=web,android,ios --project-name bio_motion_app
 flutter pub get
 flutter run -d edge
 # Si aparece "Failed to launch browser", usa solo el servidor y abre la URL manualmente:
-flutter run -d web-server
+flutter run -d web-server --web-port 8080 --web-hostname localhost
 ```
 
 **Hot reload en Flutter:** deja **`flutter run`** abierto en una terminal. Tras cambiar código Dart:
@@ -77,3 +77,4 @@ Ver [`iot/README.md`](iot/README.md).
 ## Licencia
 
 Define la licencia de tu trabajo de grado en esta sección cuando corresponda.
+

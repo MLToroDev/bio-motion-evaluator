@@ -1,1 +1,2 @@
-"""Capa de persistencia (PostgreSQL + SQLAlchemy async)."""
+﻿"""Capa de persistencia (PostgreSQL + SQLAlchemy async)."""
+

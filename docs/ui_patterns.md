@@ -1,4 +1,4 @@
-# UI Design Patterns
+﻿# UI Design Patterns
 
 This document contains descriptions and examples of various UI Design Patterns extracted from ui-patterns.com.
 
@@ -5822,4 +5822,5 @@ Break down complex experiences. Split content into smaller parts making each por
 	Reminder to finish. An interrupted or incomplete task leads to a strong motivation to complete the action. Find ways to remind users that they have unfinished business and show them ways to finish it.
 
 ---
+
 

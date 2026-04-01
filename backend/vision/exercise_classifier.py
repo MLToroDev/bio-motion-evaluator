@@ -1,4 +1,4 @@
-# ARCH-3: exercise_classifier.py — Capa 3 + ExerciseClassifierConfig (ver docs/bio_motion_plan_v2.md §2.4)
+﻿# ARCH-3: exercise_classifier.py — Capa 3 + ExerciseClassifierConfig (ver docs/bio_motion_plan_v2.md §2.4)
 """Clasificación de ejercicio con umbral, histéresis y suavizado EMA (Fase 3 / ARCH-T14)."""
 
 from __future__ import annotations
@@ -10,6 +10,7 @@ import numpy as np
 
 from app.models.schemas import ExerciseClassifierConfig
 from vision.model_registry import ExerciseModelManifest, ModelRegistry
+from vision.scalar_kalman import ScalarKalman1D
 from vision.types import ClassificationResult
 
 log = logging.getLogger(__name__)
@@ -41,21 +42,26 @@ class HysteresisClassifier:
         self._candidate: str | None = None
         self._candidate_frames = 0
         self._ema_confidence = 0.0
+        self._kalman = ScalarKalman1D(cfg.kalman_process_noise, cfg.kalman_measurement_noise)
 
     def reset(self) -> None:
         self._stable_label = self._cfg.unknown_label
         self._candidate = None
         self._candidate_frames = 0
         self._ema_confidence = 0.0
+        self._kalman.reset()
 
     def classify(self, features: np.ndarray, window_full: bool) -> ClassificationResult:
         raw = self._inner.classify(features, window_full)
         conf = float(raw.confidence)
-        alpha = self._cfg.confidence_ema_alpha
-        self._ema_confidence = alpha * conf + (1.0 - alpha) * self._ema_confidence
+        if self._cfg.confidence_filter == "kalman":
+            eff_conf = self._kalman.update(conf)
+        else:
+            alpha = self._cfg.confidence_ema_alpha
+            self._ema_confidence = alpha * conf + (1.0 - alpha) * self._ema_confidence
+            eff_conf = self._ema_confidence
 
         label = raw.label
-        eff_conf = self._ema_confidence
 
         if not window_full:
             return ClassificationResult(label=self._cfg.unknown_label, confidence=eff_conf, raw_scores=raw.raw_scores)
@@ -145,3 +151,4 @@ def _try_onnx_classifier(manifest: ExerciseModelManifest, cfg: ExerciseClassifie
             return ClassificationResult(label=label, confidence=confidence, raw_scores=raw)
 
     return _OnnxCls()
+

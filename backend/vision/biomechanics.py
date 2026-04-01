@@ -1,4 +1,4 @@
-"""Cálculos biomecánicos a partir de landmarks MediaPipe Pose (índices estándar)."""
+﻿"""Cálculos biomecánicos a partir de landmarks MediaPipe Pose (índices estándar)."""
 
 from __future__ import annotations
 
@@ -14,6 +14,12 @@ LEFT_ANKLE = 27
 RIGHT_HIP = 24
 RIGHT_KNEE = 26
 RIGHT_ANKLE = 28
+LEFT_SHOULDER = 11
+LEFT_ELBOW = 13
+LEFT_WRIST = 15
+RIGHT_SHOULDER = 12
+RIGHT_ELBOW = 14
+RIGHT_WRIST = 16
 
 
 class KneeAnglesPayload(TypedDict, total=False):
@@ -85,3 +91,42 @@ def knee_angles_from_landmarks(landmarks: list[dict[str, Any]]) -> KneeAnglesPay
         "left_knee_flexion_angle_deg": flex(int_l),
         "right_knee_flexion_angle_deg": flex(int_r),
     }
+
+
+def _elbow_flex_for_side(
+    landmarks: list[dict[str, Any]],
+    shoulder_i: int,
+    elbow_i: int,
+    wrist_i: int,
+) -> float:
+    """Flexión de codo como 180° − ángulo interno hombro–codo–muñeca (0≈extensión)."""
+    se = _lm_xyz(landmarks, shoulder_i)
+    el = _lm_xyz(landmarks, elbow_i)
+    wr = _lm_xyz(landmarks, wrist_i)
+    if se is None or el is None or wr is None:
+        return float("nan")
+    u = se - el
+    v = wr - el
+    interior = _angle_between_vectors_deg(u, v)
+    if math.isnan(interior):
+        return float("nan")
+    return float(max(0.0, min(180.0, 180.0 - interior)))
+
+
+def elbow_flex_angles_from_landmarks(landmarks: list[dict[str, Any]]) -> dict[str, float]:
+    """Flexión de codo izq./der. en grados (convención similar a rodilla)."""
+    return {
+        "left_elbow_flexion_angle_deg": _elbow_flex_for_side(landmarks, LEFT_SHOULDER, LEFT_ELBOW, LEFT_WRIST),
+        "right_elbow_flexion_angle_deg": _elbow_flex_for_side(landmarks, RIGHT_SHOULDER, RIGHT_ELBOW, RIGHT_WRIST),
+    }
+
+
+def shoulder_width_proxy(landmarks: list[dict[str, Any]]) -> float | None:
+    """Distancia euclidiana 2D (x,y) hombros normalizada ~ ancho torso."""
+    a = _lm_xyz(landmarks, LEFT_SHOULDER)
+    b = _lm_xyz(landmarks, RIGHT_SHOULDER)
+    if a is None or b is None:
+        return None
+    d = float(np.linalg.norm(a[:2] - b[:2]))
+    return d if d > 1e-6 else None
+

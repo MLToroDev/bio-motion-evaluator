@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 from typing import Annotated
 
@@ -31,3 +31,4 @@ async def require_user_id(
     if payload is None or payload.get("sub") is None:
         raise HTTPException(status_code=401, detail="Invalid token")
     return str(payload["sub"])
+

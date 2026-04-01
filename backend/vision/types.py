@@ -1,4 +1,4 @@
-# Tipos compartidos del motor de análisis (pose, tracking, clasificación; plan v2).
+﻿# Tipos compartidos del motor de análisis (pose, tracking, clasificación; plan v2).
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -15,6 +15,7 @@ class PoseFrame:
     landmarks: list[dict[str, Any]]
     note: str | None
     knees: dict[str, float] | None = None
+    world_landmarks: list[dict[str, Any]] | None = None
 
 
 @dataclass
@@ -36,11 +37,18 @@ class RepState:
 
 
 @dataclass
-class TrackingFrame:
-    """Entrada al RepTracker: contexto por fotograma."""
+class FeatureFrame:
+    """
+    Entrada unificada al RepTracker: pose + derivadas por frame + contexto de clasificación.
+    """
 
-    exercise_label: str
-    exercise_confidence: float
     pose: PoseFrame
     frame_index: int
+    exercise_label: str
+    exercise_confidence: float
+    dt_s: float
+    angular_velocity_deg_s: dict[str, float] = field(default_factory=dict)
+    periodicity_score: float = 0.0
+    calibration_scale: float = 1.0
+
 

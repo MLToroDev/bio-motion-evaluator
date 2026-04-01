@@ -1,4 +1,4 @@
-# Payload unificado WS v1 (complemento ARCH-5 realtime_engine).
+﻿# Payload unificado WS v1 (complemento ARCH-5 realtime_engine).
 """Construcción del dict JSON por fotograma (contrato WS unificado v1)."""
 
 from __future__ import annotations
@@ -19,7 +19,7 @@ def build_frame_payload_v1(
     rep: RepState,
     pipeline_ms: dict[str, float],
 ) -> dict[str, Any]:
-    return {
+    out: dict[str, Any] = {
         "schema_version": SCHEMA_VERSION,
         "frame_index": frame_index,
         "server_ts_ms": int(time.time() * 1000),
@@ -34,3 +34,7 @@ def build_frame_payload_v1(
         "quality_flags": rep.quality_flags,
         "pipeline_ms": pipeline_ms,
     }
+    if pose.world_landmarks:
+        out["world_landmarks"] = pose.world_landmarks
+    return out
+
