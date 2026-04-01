@@ -18,7 +18,7 @@ Identificar que archivos y etapas estan involucrados en el retraso observado en 
 ### Frontend (Flutter)
 
 - `app/lib/views/analysis/video/video_analysis_screen.dart`
-  - Construye payload inicial (`source`, `video_filename`, `target_fps`, `include_preview`, `capture_only`, `preview_fps`, `preview_jpeg_quality`).
+  - Construye payload inicial (`source`, `video_filename`, `target_fps`, `include_preview`, `capture_only`, `diagnostics`, `preview_fps`, `preview_jpeg_quality`).
   - Procesa stream con `asyncMap` y aplica estado en `_applyServerFrame(...)`.
   - Decodifica preview y renderiza imagen de fondo + landmarks.
   - Envia ajustes "en caliente" de preview (`preview_fps`, `preview_jpeg_quality`).
@@ -32,15 +32,18 @@ Identificar que archivos y etapas estan involucrados en el retraso observado en 
 ### Backend (API y stream)
 
 - `backend/app/routers/live_pose.py`
-  - Orquesta el loop principal de `/ws/pose-stream`.
-  - Controla ritmo con `interval = 1.0 / cfg.target_fps` y `await asyncio.sleep(interval)`.
-  - Lee frame (`source.get_frame`) en `to_thread`.
+  - Orquesta el loop principal de `/ws/pose-stream` (productor en hilo + cola + consumidor async).
+  - Sleep compensado respecto al presupuesto por frame (`target_fps`).
   - Ejecuta motor (`engine.process_bgr`) en `to_thread`.
-  - Codifica preview JPEG (resize + `cv2.imencode`) segun `preview_fps` y `preview_jpeg_quality`.
+  - Codifica preview JPEG en `to_thread` cuando toca stride.
+  - Si `diagnostics: true`, añade `consumer_timing_ms` al JSON por frame.
   - Envia payload por WS.
 
 - `backend/app/models/schemas.py`
-  - Define `PoseStreamConfig` (incluye `target_fps`, `include_preview`, `capture_only`, `preview_fps`, `preview_jpeg_quality`).
+  - Define `PoseStreamConfig` (incluye `target_fps`, `include_preview`, `capture_only`, `diagnostics`, `preview_fps`, `preview_jpeg_quality`).
+
+- `backend/scripts/profile_pose_stream.py`
+  - Conecta al WS, acumula métricas e imprime tablas (mean / p50 / p95 / max) para localizar cuellos de botella.
 
 ### Backend (motor de vision)
 
@@ -91,6 +94,32 @@ Identificar que archivos y etapas estan involucrados en el retraso observado en 
 - `pipeline_ms.extract`: costo de MediaPipe.
 - `server_wall_ms` (si se usa `/ws/video`): latencia real por frame del backend.
 - `displayRxPerSec` en UI: ritmo real de mensajes procesados/renderizados.
+- `consumer_timing_ms` (si `diagnostics: true` en el primer mensaje del WS): desglose en el consumidor del stream.
+
+### Campos tipicos de `consumer_timing_ms`
+
+| Campo | Significado |
+|-------|-------------|
+| `queue_wait_ms` | Tiempo esperando el siguiente frame en la cola (productor vs consumidor). |
+| `process_bgr_ms` | Wall-clock del `to_thread(engine.process_bgr)` (MediaPipe + motor). |
+| `jpeg_encode_ms` | Codificación preview JPEG en ese frame (0 si no toca stride o sin preview). |
+| `wall_before_send_ms` | Tiempo desde inicio de iteración hasta justo antes de `send_json` (incluye cola + pose + jpeg + poll de control). |
+| `residual_before_send_ms` | `wall_before_send` menos suma de queue + process + jpeg (overhead fino). |
+| `scheduled_sleep_ms` | Tiempo que se va a dormir para respetar `target_fps` (throttle). |
+| `frame_budget_ms` | `1000 / target_fps` (presupuesto nominal por frame). |
+
+**Nota:** El coste real de `send_json` con un JPEG grande en base64 no va desgranado en un campo aparte; para aislarlo, comparar ejecuciones con `include_preview: false` vs `true` (el script lo permite con `--no-preview`).
+
+## Script de agregacion
+
+Desde `backend/` con el API levantado:
+
+```bash
+python scripts/profile_pose_stream.py --video RunningParcial.mp4 --fps 15 --max-frames 300
+python scripts/profile_pose_stream.py --video RunningParcial.mp4 --no-preview --max-frames 300
+```
+
+En la app Flutter: activar **Diagnóstico servidor (timing)** antes de iniciar (envía `diagnostics: true`); puedes inspeccionar el JSON en el LOG o usar el script contra el mismo backend.
 
 ## Hipotesis principal para el caso reportado
 
@@ -134,7 +163,8 @@ Los frames "si llegan" pero "con retraso" suele indicar que no hay perdida de co
 Hacer una sesion de medicion de 10 minutos con el equipo usando este checklist:
 
 - fijar 1 video de referencia;
-- correr 3 perfiles (8/10/12 preview FPS);
-- documentar `pipeline_ms` promedio y p95;
+- ejecutar `profile_pose_stream.py` con y sin `--no-preview`;
+- correr 3 perfiles (8/10/12 preview FPS) si usas preview;
+- documentar `pipeline_ms` y `consumer_timing_ms` (mean / p95) del script;
 - anotar percepcion visual (sin negro, con negro leve, inestable);
 - elegir preset base para desarrollo.

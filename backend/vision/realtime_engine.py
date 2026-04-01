@@ -12,7 +12,7 @@ from vision.exercise_classifier import build_classifier
 from vision.feature_engine import FeatureEngine
 from vision.model_registry import ModelRegistry
 from vision.pipeline_timer import StageTimer
-from vision.pose_extractor import extract_pose_bgr, extract_pose_jpeg
+from vision.pose_extractor import extract_pose_bgr, extract_pose_bgr_video, extract_pose_jpeg
 from vision.rep_tracker import RepTrackerRouter
 from vision.types import PoseFrame, RepState
 from vision.unified_payload import build_frame_payload_v1
@@ -33,13 +33,24 @@ class RealtimeEngineSession:
         self._inference_stride = max(1, int(inference_stride))
         self._analysis_enabled = bool(analysis_enabled)
         self._last_pose: PoseFrame | None = None
-        self._features = FeatureEngine(self._cfg)
-        self._classifier = build_classifier(self._cfg, ModelRegistry(backend_root))
-        self._router = RepTrackerRouter(unknown_label=self._cfg.unknown_label)
+        if self._analysis_enabled:
+            self._features = FeatureEngine(self._cfg)
+            self._classifier = build_classifier(self._cfg, ModelRegistry(backend_root))
+            self._router = RepTrackerRouter(unknown_label=self._cfg.unknown_label)
+        else:
+            # Solo captura: no manifest/ONNX, ni ventana de features ni rep tracker.
+            self._features = None
+            self._classifier = None
+            self._router = None
 
-    def process_bgr(self, bgr: np.ndarray, frame_index: int) -> dict:
+    def process_bgr(self, bgr: np.ndarray, frame_index: int, timestamp_ms: int | None = None) -> dict:
         st = StageTimer()
-        pose = self._extract_pose(bgr=bgr, jpeg_bytes=None, frame_index=frame_index)
+        pose = self._extract_pose(
+            bgr=bgr,
+            jpeg_bytes=None,
+            frame_index=frame_index,
+            timestamp_ms=timestamp_ms,
+        )
         return self._after_extract(st, pose, frame_index)
 
     def process_jpeg(self, image_bytes: bytes, frame_index: int) -> dict:
@@ -49,21 +60,28 @@ class RealtimeEngineSession:
 
     def reset(self) -> None:
         self._last_pose = None
-        self._features.reset()
-        self._classifier.reset()
-        self._router.reset_all()
+        if self._features is not None:
+            self._features.reset()
+        if self._classifier is not None:
+            self._classifier.reset()
+        if self._router is not None:
+            self._router.reset_all()
 
     def _extract_pose(
         self,
         frame_index: int,
         bgr: np.ndarray | None = None,
         jpeg_bytes: bytes | None = None,
+        timestamp_ms: int | None = None,
     ) -> PoseFrame:
         s = self._inference_stride
         if s > 1 and (frame_index % s) != 0 and self._last_pose is not None:
             return self._last_pose
         if bgr is not None:
-            pose = extract_pose_bgr(bgr, self._model_path)
+            if timestamp_ms is not None:
+                pose = extract_pose_bgr_video(bgr, self._model_path, timestamp_ms)
+            else:
+                pose = extract_pose_bgr(bgr, self._model_path)
         else:
             assert jpeg_bytes is not None
             pose = extract_pose_jpeg(jpeg_bytes, self._model_path)
@@ -82,6 +100,7 @@ class RealtimeEngineSession:
                 RepState(),
                 st.finish().as_dict(),
             )
+        assert self._features is not None and self._classifier is not None and self._router is not None
         self._features.push(pose)
         vec = self._features.build_feature_vector()
         st.mark_feature()
