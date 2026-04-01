@@ -11,6 +11,8 @@ pip install -r requirements.txt
 copy .env.example .env
 python scripts\download_models.py
 # modelo más ligero (más FPS): python scripts\download_models.py lite
+# Dataset clasificador (MP4 en tests\assets\videos): scripts\export_features_from_video.py o scripts\export_features_gold_batch.py
+# Entrenar ONNX: pip install -r requirements-train.txt && python scripts\train_exercise_classifier_from_csv.py ...
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 

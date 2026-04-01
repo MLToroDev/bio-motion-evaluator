@@ -20,6 +20,27 @@ _MODEL_PATH_VIDEO: Path | None = None
 _LAST_VIDEO_TIMESTAMP_MS = -1
 _VIDEO_LANDMARKER_LOCK = threading.Lock()
 
+
+def reset_pose_video_timestamp_anchor() -> None:
+    """
+    Prepara un nuevo clip para ``RunningMode.VIDEO``: cierra el landmarker VIDEO global (si existe)
+    y pone la ancla temporal en -1.
+
+    MediaPipe exige timestamps estrictamente crecientes **por instancia**; no basta con reiniciar
+    el contador si se reutiliza el mismo objeto. En batch offline hay que llamar esto al cambiar de archivo.
+    """
+    global _LANDMARKER_VIDEO, _MODEL_PATH_VIDEO, _LAST_VIDEO_TIMESTAMP_MS
+    with _VIDEO_LANDMARKER_LOCK:
+        lm = _LANDMARKER_VIDEO
+        _LANDMARKER_VIDEO = None
+        _MODEL_PATH_VIDEO = None
+        _LAST_VIDEO_TIMESTAMP_MS = -1
+    if lm is not None:
+        try:
+            lm.close()
+        except Exception:  # noqa: BLE001
+            log.exception("Error al cerrar PoseLandmarker VIDEO (sesión nueva)")
+
 # Reducción de resolución para acelerar MediaPipe sin perder demasiada precisión.
 _TARGET_MAX_DIM = 640
 
