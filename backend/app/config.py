@@ -1,4 +1,4 @@
-﻿import json
+import json
 from pathlib import Path
 from typing import Any
 
@@ -52,6 +52,9 @@ class Settings(BaseSettings):
     # ARCH-T14 — umbral de latencia / backpressure (activar drop en routers cuando se integre cola)
     server_pipeline_warn_ms: float = 300.0
     enable_adaptive_frame_drop: bool = False
+
+    # Telemetría: log INFO por frame con pipeline_ms (extract/feature/classify/track/total) en /ws/video
+    log_pose_pipeline_timing: bool = False
 
     @property
     def cors_origins_list(self) -> list[str]:
