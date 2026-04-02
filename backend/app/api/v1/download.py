@@ -1,9 +1,10 @@
 import os
+from typing import Literal
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import FileResponse
-from pydantic import BaseModel, HttpUrl
+from pydantic import BaseModel, Field, HttpUrl
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
@@ -12,9 +13,15 @@ from app.workers.tasks import download_and_process_video
 
 router = APIRouter(prefix="/download", tags=["Descargas de Video"])
 
+DownloadQuality = Literal["best", "1080p", "720p", "480p", "360p", "worst"]
+
 
 class DownloadRequest(BaseModel):
     url: HttpUrl
+    quality: DownloadQuality = Field(
+        default="best",
+        description="best = máxima disponible; 1080p…360p = tope de altura; worst = más ligera.",
+    )
 
 
 class DownloadResponse(BaseModel):
@@ -41,7 +48,7 @@ def request_download(payload: DownloadRequest, db: Session = Depends(get_db)):
     db.refresh(job)
 
     # Disparar tarea a celery
-    download_and_process_video.delay(str(job.id), str(payload.url))
+    download_and_process_video.delay(str(job.id), str(payload.url), payload.quality)
 
     return DownloadResponse(
         job_id=job.id,

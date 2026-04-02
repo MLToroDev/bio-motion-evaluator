@@ -14,7 +14,7 @@ log = logging.getLogger(__name__)
 
 
 @celery_app.task(bind=True, name="download_and_process_video")
-def download_and_process_video(self, job_id_str: str, url: str) -> dict:
+def download_and_process_video(self, job_id_str: str, url: str, quality: str = "best") -> dict:
     """
     Celery task run in background.
     """
@@ -34,7 +34,12 @@ def download_and_process_video(self, job_id_str: str, url: str) -> dict:
 
             # Descargar video
             output_dir = settings.downloads_dir
-            filepath = download_video(url=url, output_dir=output_dir, filename_template=f"{job.id}.%(ext)s")
+            filepath = download_video(
+                url=url,
+                output_dir=output_dir,
+                filename_template=f"{job.id}.%(ext)s",
+                quality=quality,
+            )
 
             # Actualizar job db al terminar
             job.status = "completed"
