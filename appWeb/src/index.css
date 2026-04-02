@@ -12,3 +12,10 @@ body {
 #root {
   min-height: 100vh;
 }
+
+body {
+  font-family: var(--bm-font-body);
+  background: var(--bm-background);
+  color: var(--bm-text-primary);
+  line-height: 1.45;
+}

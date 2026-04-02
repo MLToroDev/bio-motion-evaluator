@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
+import { BmButton } from '../components/BmButton';
+import { BmInput } from '../components/BmInput';
 import { MetricTile } from '../components/MetricTile';
-import { buildHealthHttpUrl } from '../lib/wsUri';
 import { readApiBase } from '../lib/prefs';
+import { buildHealthHttpUrl } from '../lib/wsUri';
 
 function latencyStatus(ms: number | null): 'good' | 'warn' | 'bad' | 'neutral' {
   if (ms == null) return 'neutral';
@@ -47,38 +49,29 @@ export default function BackendStatusPage() {
   return (
     <div style={{ maxWidth: 560 }}>
       <h1 className="bm-screen-title">Conexión al servidor</h1>
-      <label className="field" style={{ display: 'block', margin: '16px 0' }}>
-        <span>URL base</span>
-        <input
-          value={baseUrl}
-          onChange={(e) => setBaseUrl(e.target.value)}
-          style={{ width: '100%', padding: 8, marginTop: 4, borderRadius: 8, border: '1px solid var(--bm-border)', background: 'var(--bm-surface)', color: 'inherit' }}
-        />
-      </label>
-      <button type="button" onClick={() => void check()} disabled={loading} style={{ marginBottom: 16 }}>
-        {loading ? 'Comprobando…' : 'Comprobar /api/v1/health'}
-      </button>
-      <MetricTile
-        label="Latencia"
-        value={latencyMs != null ? `${latencyMs} ms` : '—'}
-        status={latencyStatus(latencyMs)}
-      />
-      {error && <p style={{ color: 'var(--bm-angle-warn)', marginTop: 12 }}>{error}</p>}
+      <BmInput label="URL base" value={baseUrl} onChange={(e) => setBaseUrl(e.target.value)} />
+      <BmButton variant="outline" onClick={() => void check()} loading={loading} style={{ marginBottom: 'var(--bm-space-md)' }}>
+        Comprobar /api/v1/health
+      </BmButton>
+      <MetricTile label="Latencia" value={latencyMs != null ? `${latencyMs} ms` : '—'} status={latencyStatus(latencyMs)} />
+      {error && <p className="bm-caption" style={{ color: 'var(--bm-angle-warn)', marginTop: 'var(--bm-space-md)' }}>{error}</p>}
       {health && (
         <pre
+          className="bm-caption bm-mono"
           style={{
-            marginTop: 16,
-            padding: 12,
+            marginTop: 'var(--bm-space-md)',
+            padding: 'var(--bm-space-sm)',
             background: 'var(--bm-surface)',
-            borderRadius: 8,
-            fontSize: 12,
+            borderRadius: 'var(--bm-radius-md)',
+            border: '1px solid var(--bm-border)',
             overflow: 'auto',
+            color: 'var(--bm-text-secondary)',
           }}
         >
           {JSON.stringify(health, null, 2)}
         </pre>
       )}
-      <p className="bm-caption" style={{ marginTop: 16 }}>
+      <p className="bm-caption" style={{ marginTop: 'var(--bm-space-md)' }}>
         <a href={baseUrl} target="_blank" rel="noreferrer" style={{ color: 'var(--bm-accent)' }}>
           Abrir API en navegador
         </a>

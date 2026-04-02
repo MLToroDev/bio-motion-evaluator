@@ -1,0 +1,26 @@
+.bm-status-badge {
+  display: inline-block;
+  font-family: var(--bm-font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--bm-radius-sm);
+  border: 1px solid var(--bm-border);
+}
+
+.bm-status-badge--connected {
+  background: var(--bm-accent-muted);
+  color: var(--bm-accent);
+  border-color: rgba(0, 230, 118, 0.2);
+}
+
+.bm-status-badge--disconnected {
+  background: rgba(255, 82, 82, 0.08);
+  color: var(--bm-angle-bad);
+  border-color: rgba(255, 82, 82, 0.2);
+}
+
+.bm-status-badge--checking {
+  background: var(--bm-surface-elevated);
+  color: var(--bm-text-secondary);
+}

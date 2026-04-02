@@ -1,0 +1,23 @@
+.bm-section-header-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--bm-space-md);
+  margin: var(--bm-space-lg) 0 var(--bm-space-sm);
+}
+
+.bm-section-header__text {
+  font-family: var(--bm-font-body);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.075em;
+  text-transform: uppercase;
+  color: var(--bm-text-secondary);
+  margin: 0;
+  white-space: nowrap;
+}
+
+.bm-section-header__rule {
+  flex: 1;
+  height: 1px;
+  background: var(--bm-border);
+}

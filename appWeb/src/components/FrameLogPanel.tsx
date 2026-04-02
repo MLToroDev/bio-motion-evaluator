@@ -15,15 +15,18 @@ export function FrameLogPanel({ entries }: { entries: FrameLogEntry[] }) {
   const rev = [...entries].reverse();
   return (
     <div className="frame-log">
-      <div className="frame-log__row" style={{ fontWeight: 700, borderBottom: '2px solid var(--bm-border)' }}>
-        <span>#</span>
+      <div
+        className="frame-log__row bm-caption"
+        style={{ fontWeight: 700, borderBottom: '2px solid var(--bm-border)' }}
+      >
+        <span className="bm-mono">#</span>
         <span>Izq.</span>
         <span>Der.</span>
         <span>Est.</span>
       </div>
       {rev.map((e, idx) => (
-        <div key={`${e.frame}-${idx}`} className="frame-log__row">
-          <span>{e.frame}</span>
+        <div key={`${e.frame}-${idx}`} className="frame-log__row bm-caption">
+          <span className="bm-mono">{e.frame}</span>
           <span className="bm-mono">{e.leftDeg != null ? `${e.leftDeg.toFixed(0)}°` : '—'}</span>
           <span className="bm-mono">{e.rightDeg != null ? `${e.rightDeg.toFixed(0)}°` : '—'}</span>
           <span

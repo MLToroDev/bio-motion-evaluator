@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { BmButton } from '../components/BmButton';
 import { useSessions } from '../hooks/useSessions';
 import { readApiBase } from '../lib/prefs';
 
@@ -13,22 +14,23 @@ export default function SessionsHistoryPage() {
   return (
     <div>
       <h1 className="bm-screen-title">Historial de sesiones</h1>
-      <button type="button" onClick={() => void load()} disabled={loading} style={{ margin: '12px 0' }}>
-        {loading ? 'Cargando…' : 'Actualizar'}
-      </button>
-      {error && <p style={{ color: 'var(--bm-angle-warn)' }}>{error}</p>}
+      <BmButton variant="outline" onClick={() => void load()} loading={loading} style={{ margin: 'var(--bm-space-md) 0' }}>
+        Actualizar
+      </BmButton>
+      {error && <p className="bm-caption" style={{ color: 'var(--bm-angle-warn)' }}>{error}</p>}
       {!loading && !error && rows.length === 0 && <p className="bm-caption">No hay sesiones.</p>}
       <ul style={{ listStyle: 'none', padding: 0 }}>
         {rows.map((r, i) => (
           <li
             key={i}
             style={{
-              padding: 12,
+              padding: 'var(--bm-space-sm)',
               borderBottom: '1px solid var(--bm-border)',
-              fontSize: '0.85rem',
             }}
           >
-            <pre style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{JSON.stringify(r, null, 2)}</pre>
+            <pre className="bm-caption bm-mono" style={{ margin: 0, whiteSpace: 'pre-wrap', color: 'var(--bm-text-secondary)' }}>
+              {JSON.stringify(r, null, 2)}
+            </pre>
           </li>
         ))}
       </ul>

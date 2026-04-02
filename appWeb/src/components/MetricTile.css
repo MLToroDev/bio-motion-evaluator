@@ -1,0 +1,38 @@
+.bm-metric-tile {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bm-space-xs);
+  padding: var(--bm-space-md) calc(var(--bm-space-sm) + var(--bm-space-xs));
+  background: var(--bm-surface);
+  border-radius: var(--bm-radius-md);
+  border: 1px solid var(--bm-border);
+  transition:
+    border-color var(--bm-transition-fast),
+    padding var(--bm-transition-fast);
+}
+
+.bm-metric-tile--bad {
+  padding: calc(var(--bm-space-sm) + var(--bm-space-xs)) var(--bm-space-md);
+  border-color: var(--bm-angle-bad);
+}
+
+.bm-metric-tile--compact {
+  padding: var(--bm-space-sm) var(--bm-space-md);
+}
+
+.bm-metric-tile__label {
+  font-family: var(--bm-font-body);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.075em;
+  text-transform: uppercase;
+  color: var(--bm-text-secondary);
+}
+
+.bm-metric-tile__sublabel {
+  margin-top: 2px;
+}
+
+.bm-metric-tile__value {
+  word-break: break-word;
+}

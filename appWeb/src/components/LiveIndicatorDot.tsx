@@ -1,5 +1,15 @@
-import './ui.css';
+import './LiveIndicatorDot.css';
 
-export function LiveIndicatorDot({ active }: { active: boolean }) {
-  return <span className={`live-dot ${active ? 'live-dot--on' : ''}`} title={active ? 'Conectado' : 'Sin conexión'} />;
+interface LiveIndicatorDotProps {
+  active: boolean;
+}
+
+export function LiveIndicatorDot({ active }: LiveIndicatorDotProps) {
+  return (
+    <span
+      className={`bm-live-dot ${active ? 'bm-live-dot--active' : ''}`}
+      aria-label={active ? 'Sesión activa' : 'Inactivo'}
+      role="status"
+    />
+  );
 }

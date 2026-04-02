@@ -1,7 +1,32 @@
 import type { AnalysisSummary } from '../lib/videoAnalysisAccumulator';
 import { summaryQualityStatus } from '../lib/videoAnalysisAccumulator';
+import { BmButton } from './BmButton';
 import { MetricTile } from './MetricTile';
 import './ui.css';
+
+function peakHighlight(s: AnalysisSummary): { label: string; value: string } {
+  const ml = s.maxLeftDeg;
+  const mr = s.maxRightDeg;
+  if (ml == null && mr == null) return { label: 'Pico ROM', value: '—' };
+  if (mr == null || (ml != null && ml >= mr)) {
+    return { label: 'Pico rodilla izq.', value: `${ml!.toFixed(1)}°` };
+  }
+  return { label: 'Pico rodilla der.', value: `${mr!.toFixed(1)}°` };
+}
+
+function motivationalLine(s: AnalysisSummary): string {
+  const ml = s.meanLeftDeg;
+  const mr = s.meanRightDeg;
+  if (ml != null && mr != null) {
+    const diff = Math.abs(ml - mr);
+    if (diff < 5) return 'Buena simetría entre ambas rodillas.';
+    if (mr > ml) return 'Buena movilidad de rodilla derecha. Trabaja el rango izquierdo.';
+    return 'Buena movilidad de rodilla izquierda. Trabaja el rango derecho.';
+  }
+  if (mr != null && ml == null) return 'Datos destacados en rodilla derecha.';
+  if (ml != null && mr == null) return 'Datos destacados en rodilla izquierda.';
+  return 'Sigue registrando sesiones para comparar ambos lados.';
+}
 
 export function AnalysisSummaryDialog({
   summary,
@@ -22,12 +47,20 @@ export function AnalysisSummaryDialog({
         : qs === 'bad'
           ? 'Requiere trabajo de movilidad específico'
           : null;
+  const peak = peakHighlight(summary);
 
   return (
     <div className="modal-backdrop" role="dialog" aria-modal onClick={onClose}>
       <div className="modal-dialog" onClick={(e) => e.stopPropagation()}>
         <h2>Resumen del análisis</h2>
         <p className="bm-label-large" style={{ color: 'var(--bm-text-secondary)', marginBottom: 8 }}>
+          Mejor ángulo logrado
+        </p>
+        <MetricTile label={peak.label} value={peak.value} status="good" />
+        <p className="bm-body" style={{ marginTop: 12, color: 'var(--bm-text-secondary)' }}>
+          {motivationalLine(summary)}
+        </p>
+        <p className="bm-label-large" style={{ color: 'var(--bm-text-secondary)', marginTop: 16, marginBottom: 8 }}>
           Zona principal (calidad ROM)
         </p>
         <MetricTile
@@ -43,7 +76,7 @@ export function AnalysisSummaryDialog({
             <p className="bm-label-large" style={{ color: 'var(--bm-text-secondary)' }}>
               Motor (último frame)
             </p>
-            <p style={{ marginTop: 4 }}>
+            <p className="bm-body" style={{ marginTop: 4 }}>
               {summary.lastExerciseLabel.toUpperCase()} · reps {summary.lastRepCount} · fase {summary.lastRepPhase}
             </p>
             {summary.lastQualityFlags.length > 0 && (
@@ -70,41 +103,30 @@ export function AnalysisSummaryDialog({
             compact
           />
         </div>
-        <p className="bm-caption" style={{ marginTop: 12 }}>
+        <p className="bm-caption bm-mono" style={{ marginTop: 12 }}>
           Frames procesados: {summary.framesProcessed} · Con ambas rodillas: {summary.framesWithBothKnees}
         </p>
         <details style={{ marginTop: 12 }}>
-          <summary className="bm-label-large" style={{ cursor: 'pointer' }}>
+          <summary className="bm-label-large" style={{ cursor: 'pointer', color: 'var(--bm-text-secondary)' }}>
             Detalles por frame
           </summary>
           {summary.minLeftDeg != null && (
-            <p className="bm-caption" style={{ marginTop: 8 }}>
+            <p className="bm-caption bm-mono" style={{ marginTop: 8 }}>
               Rodilla I — Mín: {summary.minLeftDeg.toFixed(1)}° (f {summary.minLeftFrame}) · Máx:{' '}
               {summary.maxLeftDeg!.toFixed(1)}° (f {summary.maxLeftFrame})
             </p>
           )}
           {summary.minRightDeg != null && (
-            <p className="bm-caption">
+            <p className="bm-caption bm-mono">
               Rodilla D — Mín: {summary.minRightDeg.toFixed(1)}° (f {summary.minRightFrame}) · Máx:{' '}
               {summary.maxRightDeg!.toFixed(1)}° (f {summary.maxRightFrame})
             </p>
           )}
         </details>
         <div className="modal-actions">
-          <button
-            type="button"
-            className="btn-primary"
-            onClick={onClose}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              color: 'var(--bm-accent)',
-              cursor: 'pointer',
-              fontWeight: 600,
-            }}
-          >
+          <BmButton variant="ghost" onClick={onClose}>
             Cerrar
-          </button>
+          </BmButton>
         </div>
       </div>
     </div>

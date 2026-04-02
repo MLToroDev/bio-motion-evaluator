@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { BmButton } from '../components/BmButton';
 import { LiveIndicatorDot } from '../components/LiveIndicatorDot';
 import { NavCard } from '../components/NavCard';
 import { SectionHeader } from '../components/SectionHeader';
+import { StatusBadge } from '../components/StatusBadge';
 import { useBackendHealth } from '../hooks/useBackendHealth';
 import { readApiBase, readLastSessionSummary } from '../lib/prefs';
 
@@ -17,53 +19,43 @@ export default function HomePage() {
     setLastSession(readLastSessionSummary());
   }, []);
 
+  const badgeStatus = loading ? 'checking' : ok ? 'connected' : 'disconnected';
+
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <LiveIndicatorDot active={ok && !loading} />
-          <h1 className="bm-screen-title" style={{ margin: 0 }}>
-            Bio-Motion
-          </h1>
-        </div>
-        <button
-          type="button"
-          onClick={() => void ping()}
-          style={{
-            background: 'var(--bm-surface-elevated)',
-            border: '1px solid var(--bm-border)',
-            color: 'var(--bm-text-primary)',
-            padding: '8px 12px',
-            borderRadius: 8,
-            cursor: 'pointer',
-          }}
-        >
-          Comprobar backend
-        </button>
-      </div>
-      <p className="bm-hero-title" style={{ margin: '0 0 8px' }}>
-        BIO-MOTION
-      </p>
-      <p style={{ color: 'var(--bm-text-secondary)', marginBottom: 16 }}>
-        Evaluación biomecánica en tiempo real
-      </p>
       <div
         style={{
-          display: 'inline-block',
-          padding: '4px 10px',
-          borderRadius: 6,
-          border: '1px solid var(--bm-border)',
-          background: ok ? 'var(--bm-accent-muted)' : 'var(--bm-surface-elevated)',
-          color: ok ? 'var(--bm-accent)' : 'var(--bm-angle-warn)',
-          fontSize: '0.8rem',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: 'var(--bm-space-md)',
+          flexWrap: 'wrap',
+          gap: 'var(--bm-space-sm)',
         }}
       >
-        {loading ? 'Comprobando…' : ok ? 'Backend conectado' : 'Sin conexión al backend'}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--bm-space-md)' }}>
+          <LiveIndicatorDot active={ok && !loading} />
+          <h1 className="bm-screen-title">Bio-Motion</h1>
+        </div>
+        <BmButton variant="outline" onClick={() => void ping()}>
+          Comprobar backend
+        </BmButton>
       </div>
+      <p className="bm-hero-title" style={{ margin: '0 0 var(--bm-space-sm)' }}>
+        BIO-MOTION
+      </p>
+      <p className="bm-body" style={{ color: 'var(--bm-text-secondary)', marginBottom: 'var(--bm-space-md)' }}>
+        Evaluación biomecánica en tiempo real
+      </p>
+      <StatusBadge status={badgeStatus} />
       {!ok && !loading && (
-        <p className="bm-caption" style={{ marginTop: 12, color: 'var(--bm-angle-warn)' }}>
+        <p className="bm-caption" style={{ marginTop: 'var(--bm-space-md)', color: 'var(--bm-angle-warn)' }}>
           Verifica el servidor en {apiBase}.{' '}
-          <button type="button" style={{ color: 'var(--bm-accent)', background: 'none', border: 'none', cursor: 'pointer' }} onClick={() => navigate('/backend-status')}>
+          <button
+            type="button"
+            style={{ color: 'var(--bm-accent)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+            onClick={() => navigate('/backend-status')}
+          >
             Ir al diagnóstico
           </button>
         </p>
@@ -72,14 +64,15 @@ export default function HomePage() {
       <SectionHeader>Análisis</SectionHeader>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         <NavCard
+          primary
           title="Análisis en vivo"
-          subtitle="Cámara: pose y ángulos (WebSocket /ws/video)."
+          subtitle="Cámara: pose y ángulos en tiempo real."
           icon="📹"
           onClick={() => navigate('/live-analysis')}
         />
         <NavCard
           title="Análisis de video"
-          subtitle="Gold standard en servidor (WebSocket /ws/pose-stream)."
+          subtitle="Gold standard en servidor."
           icon="🎬"
           onClick={() => navigate('/video-analysis')}
         />
@@ -111,17 +104,15 @@ export default function HomePage() {
       <SectionHeader>Última sesión</SectionHeader>
       <div
         style={{
-          padding: 16,
+          padding: 'var(--bm-space-md)',
           background: 'var(--bm-surface)',
-          borderRadius: 10,
+          borderRadius: 'var(--bm-radius-md)',
           border: '1px solid var(--bm-border)',
-          fontSize: '0.85rem',
-          color: 'var(--bm-text-secondary)',
         }}
       >
-        {lastSession ?? 'Aún no hay resumen de sesión guardado.'}
+        <p className="bm-caption">{lastSession ?? 'Aún no hay resumen de sesión guardado.'}</p>
       </div>
-      <p className="bm-caption" style={{ textAlign: 'center', marginTop: 32 }}>
+      <p className="bm-caption" style={{ textAlign: 'center', marginTop: 'var(--bm-space-xl)' }}>
         Bio-Motion Evaluator · React (appWeb)
       </p>
     </div>

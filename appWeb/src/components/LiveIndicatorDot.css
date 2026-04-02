@@ -1,0 +1,26 @@
+.bm-live-dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--bm-text-disabled);
+  transition: background var(--bm-transition-normal);
+  flex-shrink: 0;
+}
+
+.bm-live-dot--active {
+  background: var(--bm-accent);
+  animation: bm-pulse 900ms ease-in-out infinite;
+}
+
+@keyframes bm-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(0.75);
+    opacity: 0.7;
+  }
+}

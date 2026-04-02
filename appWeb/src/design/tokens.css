@@ -1,73 +1,53 @@
-/**
- * Tokens Bio-Motion Evaluator — port de app_colors, app_spacing, app_typography (Flutter).
- * Fuentes: DM Sans + DM Mono (Google Fonts en index.html).
- */
-@import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&display=swap');
-
+/* ─── Bio-Motion Design Tokens v1.0 ─────────────────────────────── */
 :root {
-  /* Colors — app_colors.dart */
-  --bm-bg: #0d0f0e;
+  /* Fondos y superficies */
+  --bm-background: #0d0f0e;
   --bm-surface: #161a18;
   --bm-surface-elevated: #1e2421;
   --bm-border: #2a302d;
+
+  /* Texto */
   --bm-text-primary: #f0f4f2;
   --bm-text-secondary: #8a9b93;
   --bm-text-disabled: #4a5550;
+
+  /* Acento */
   --bm-accent: #00e676;
   --bm-accent-dim: #00b25a;
   --bm-accent-muted: #003d1e;
+
+  /* Semánticos de análisis — SOLO para métricas articulares */
   --bm-angle-good: #00e676;
   --bm-angle-warn: #ffb300;
   --bm-angle-bad: #ff5252;
+
+  /* Esqueleto (canvas 2D) */
   --bm-skeleton-line: #00e676;
   --bm-skeleton-joint: #ffffff;
   --bm-skeleton-joint-border: #00e676;
 
-  /* Spacing — app_spacing.dart */
+  /* Espaciado (múltiplos de 8) */
   --bm-space-xs: 4px;
   --bm-space-sm: 8px;
   --bm-space-md: 16px;
   --bm-space-lg: 24px;
   --bm-space-xl: 32px;
   --bm-space-xxl: 48px;
+
+  /* Radios */
   --bm-radius-sm: 6px;
   --bm-radius-md: 10px;
   --bm-radius-lg: 16px;
 
-  /* Typography */
-  --bm-font-sans: 'DM Sans', system-ui, sans-serif;
-  --bm-font-mono: 'DM Mono', ui-monospace, monospace;
-}
+  /* Tipografía */
+  --bm-font-body: 'DM Sans', system-ui, sans-serif;
+  --bm-font-mono: 'DM Mono', 'Fira Mono', ui-monospace, monospace;
 
-body {
-  font-family: var(--bm-font-sans);
-  background: var(--bm-bg);
-  color: var(--bm-text-primary);
-  line-height: 1.45;
-}
+  /* Transiciones */
+  --bm-transition-fast: 120ms ease-in-out;
+  --bm-transition-normal: 200ms ease-out;
 
-.bm-mono {
-  font-family: var(--bm-font-mono);
-}
-
-.bm-screen-title {
-  font-size: 1.125rem;
-  font-weight: 600;
-}
-
-.bm-hero-title {
-  font-size: 1.75rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-}
-
-.bm-caption {
-  font-size: 0.75rem;
-  color: var(--bm-text-secondary);
-}
-
-.bm-label-large {
-  font-size: 0.875rem;
-  font-weight: 600;
-  letter-spacing: 0.03em;
+  /* Compatibilidad con código previo */
+  --bm-bg: var(--bm-background);
+  --bm-font-sans: var(--bm-font-body);
 }

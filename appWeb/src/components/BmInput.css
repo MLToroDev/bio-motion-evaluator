@@ -1,0 +1,98 @@
+.bm-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bm-space-xs);
+  margin-bottom: var(--bm-space-sm);
+}
+
+.bm-field__label {
+  font-family: var(--bm-font-body);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--bm-text-secondary);
+}
+
+.bm-field__input {
+  font-family: var(--bm-font-body);
+  font-size: 0.875rem;
+  color: var(--bm-text-primary);
+  background: var(--bm-surface);
+  border: 1px solid var(--bm-border);
+  border-radius: var(--bm-radius-md);
+  padding: 0.5rem 0.75rem;
+  width: 100%;
+  box-sizing: border-box;
+  outline: none;
+  transition:
+    border-color var(--bm-transition-fast),
+    box-shadow var(--bm-transition-fast);
+}
+
+.bm-field__input::placeholder {
+  color: var(--bm-text-disabled);
+}
+
+.bm-field__input:focus {
+  border-color: var(--bm-accent);
+  box-shadow: 0 0 0 2px var(--bm-accent-muted);
+}
+
+.bm-field__input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.bm-field__input--error {
+  border-color: var(--bm-angle-bad);
+}
+
+.bm-field__input--error:focus {
+  box-shadow: 0 0 0 2px rgba(255, 82, 82, 0.15);
+}
+
+.bm-field__error {
+  font-size: 0.75rem;
+  color: var(--bm-angle-warn);
+  font-family: var(--bm-font-body);
+}
+
+.bm-field__hint {
+  font-size: 0.75rem;
+  color: var(--bm-text-disabled);
+  font-family: var(--bm-font-body);
+}
+
+.bm-select {
+  font-family: var(--bm-font-body);
+  font-size: 0.875rem;
+  color: var(--bm-text-primary);
+  background: var(--bm-surface);
+  border: 1px solid var(--bm-border);
+  border-radius: var(--bm-radius-md);
+  padding: 0.5rem 0.75rem;
+  width: 100%;
+  box-sizing: border-box;
+  outline: none;
+  cursor: pointer;
+  transition:
+    border-color var(--bm-transition-fast),
+    box-shadow var(--bm-transition-fast);
+}
+
+.bm-select:focus {
+  border-color: var(--bm-accent);
+  box-shadow: 0 0 0 2px var(--bm-accent-muted);
+}
+
+.bm-select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.bm-select.bm-field__input--error {
+  border-color: var(--bm-angle-bad);
+}
+
+.bm-select.bm-field__input--error:focus {
+  box-shadow: 0 0 0 2px rgba(255, 82, 82, 0.15);
+}

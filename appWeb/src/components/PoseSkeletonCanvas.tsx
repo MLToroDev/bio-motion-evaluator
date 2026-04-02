@@ -4,6 +4,22 @@ import type { LandmarkMap } from '../lib/poseWsPayload';
 
 const MIN_VIS = 0.4;
 
+function cssVar(name: string, fallback: string): string {
+  if (typeof document === 'undefined') return fallback;
+  const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  return v || fallback;
+}
+
+function hexToRgba(hex: string, alpha: number): string {
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
+  if (!m) return hex;
+  const n = parseInt(m[1], 16);
+  const r = (n >> 16) & 255;
+  const g = (n >> 8) & 255;
+  const b = n & 255;
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
 function landmarkPoint(
   lm: LandmarkMap,
   w: number,
@@ -63,7 +79,8 @@ export function PoseSkeletonCanvas({
         if (p) points.set(i, p);
       }
 
-      ctx.strokeStyle = 'rgba(0, 230, 180, 0.85)';
+      const lineRgb = cssVar('--bm-skeleton-line', '#00e676');
+      ctx.strokeStyle = lineRgb.startsWith('#') ? hexToRgba(lineRgb, 0.85) : lineRgb;
       ctx.lineWidth = 2;
       ctx.lineCap = 'round';
       for (const [a, b] of POSE_CONNECTIONS) {
@@ -76,8 +93,8 @@ export function PoseSkeletonCanvas({
         ctx.stroke();
       }
 
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
-      ctx.strokeStyle = 'rgba(0, 0, 0, 0.35)';
+      ctx.fillStyle = cssVar('--bm-skeleton-joint', '#ffffff');
+      ctx.strokeStyle = hexToRgba(cssVar('--bm-skeleton-joint-border', '#00e676'), 0.35);
       for (const p of points.values()) {
         ctx.beginPath();
         ctx.arc(p.x, p.y, 3.5, 0, Math.PI * 2);

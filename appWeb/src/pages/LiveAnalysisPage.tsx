@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { BmButton } from '../components/BmButton';
 import { DashboardPanel } from '../components/DashboardPanel';
 import { PoseSkeletonCanvas } from '../components/PoseSkeletonCanvas';
 import { useLiveAnalysisSession } from '../hooks/useLiveAnalysisSession';
@@ -20,49 +21,23 @@ export default function LiveAnalysisPage() {
   return (
     <div className="app">
       <header className="header">
-        <h1>Análisis en vivo</h1>
+        <h1 className="bm-screen-title">Análisis en vivo</h1>
         <p className="subtitle">
           Cámara + WebSocket <code>/ws/video</code> (JPEG binario). Usa <code>https</code> o{' '}
           <code>localhost</code> para permisos de cámara.
         </p>
-        <p className="bm-caption">
-          <Link to="/settings/connection" style={{ color: 'var(--bm-accent)' }}>
-            Configuración de conexión
-          </Link>
-        </p>
       </header>
 
-      {ui.error && <p className="error" style={{ marginBottom: 12 }}>{ui.error}</p>}
+      {ui.error && <p className="error">{ui.error}</p>}
 
       <div className="layout" style={{ gridTemplateColumns: '1fr' }}>
         <main className="main" style={{ maxWidth: 960 }}>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
-            {!ui.cameraOn ? (
-              <button type="button" className="primary" onClick={() => void startCamera()}>
-                Conectar cámara
-              </button>
-            ) : (
-              <>
-                <button type="button" onClick={stopCamera} disabled={ui.transmitting}>
-                  Apagar cámara
-                </button>
-                {!ui.transmitting ? (
-                  <button type="button" className="primary" onClick={() => void startTransmit()}>
-                    Iniciar transmisión
-                  </button>
-                ) : (
-                  <button type="button" onClick={stopTransmit}>
-                    Detener transmisión
-                  </button>
-                )}
-              </>
-            )}
-          </div>
+          <p className="bm-caption bm-mono" style={{ marginBottom: 'var(--bm-space-md)' }}>
+            RTT: {ui.serverRttMs != null ? `${ui.serverRttMs} ms` : '—'} · RX/s: {ui.displayRxPerSec} · Frame:{' '}
+            {ui.frameIndex >= 0 ? ui.frameIndex : '—'}
+          </p>
 
-          <div
-            className="preview-stack"
-            style={{ aspectRatio: '4/3', maxHeight: 420, marginBottom: 16 }}
-          >
+          <div className="preview-stack" style={{ aspectRatio: '4/3', maxHeight: 420, marginBottom: 'var(--bm-space-md)' }}>
             <video
               ref={videoRef}
               playsInline
@@ -75,18 +50,47 @@ export default function LiveAnalysisPage() {
                 display: ui.cameraOn ? 'block' : 'none',
               }}
             />
-            {ui.transmitting && (
-              <PoseSkeletonCanvas landmarks={ui.landmarks} mirrorHorizontal={true} />
-            )}
+            {ui.transmitting && <PoseSkeletonCanvas landmarks={ui.landmarks} mirrorHorizontal={true} />}
             {!ui.cameraOn && (
-              <div className="preview-placeholder">Conecta la cámara para ver la vista previa</div>
+              <div
+                className="bm-empty-state"
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  background: 'var(--bm-background)',
+                  minHeight: 'unset',
+                }}
+              >
+                <p className="bm-body" style={{ textAlign: 'center', color: 'var(--bm-text-secondary)' }}>
+                  Posiciónate a 2–3 metros de la cámara,
+                  <br />
+                  de cuerpo entero, y pulsa Iniciar.
+                </p>
+                <BmButton variant="primary" onClick={() => void startCamera()}>
+                  Conectar cámara
+                </BmButton>
+              </div>
             )}
           </div>
 
-          <p className="bm-caption bm-mono" style={{ marginBottom: 12 }}>
-            RTT: {ui.serverRttMs != null ? `${ui.serverRttMs} ms` : '—'} · RX/s: {ui.displayRxPerSec} · Frame:{' '}
-            {ui.frameIndex >= 0 ? ui.frameIndex : '—'}
-          </p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--bm-space-sm)', marginBottom: 'var(--bm-space-md)' }}>
+            {ui.cameraOn && (
+              <>
+                <BmButton variant="outline" onClick={stopCamera} disabled={ui.transmitting}>
+                  Apagar cámara
+                </BmButton>
+                {!ui.transmitting ? (
+                  <BmButton variant="primary" onClick={() => void startTransmit()}>
+                    Iniciar transmisión
+                  </BmButton>
+                ) : (
+                  <BmButton variant="outline" onClick={stopTransmit}>
+                    Detener transmisión
+                  </BmButton>
+                )}
+              </>
+            )}
+          </div>
 
           <DashboardPanel
             running={ui.transmitting}
@@ -107,6 +111,12 @@ export default function LiveAnalysisPage() {
             leftSeries={ui.leftSeries}
             rightSeries={ui.rightSeries}
           />
+
+          <p className="bm-caption" style={{ marginTop: 'var(--bm-space-lg)' }}>
+            <Link to="/settings/connection" style={{ color: 'var(--bm-accent)' }}>
+              Configuración de conexión
+            </Link>
+          </p>
         </main>
       </div>
     </div>

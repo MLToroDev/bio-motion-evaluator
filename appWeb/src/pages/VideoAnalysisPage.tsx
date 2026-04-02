@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AnalysisSummaryDialog } from '../components/AnalysisSummaryDialog';
+import { BmButton } from '../components/BmButton';
+import { BmInput, BmSelect } from '../components/BmInput';
 import { DashboardPanel } from '../components/DashboardPanel';
 import { PoseSkeletonCanvas } from '../components/PoseSkeletonCanvas';
 import { useVideoAnalysisSession } from '../hooks/useVideoAnalysisSession';
@@ -155,17 +157,18 @@ export default function VideoAnalysisPage() {
     <div className="app">
       {snack && (
         <div
+          className="bm-body"
           style={{
             position: 'fixed',
-            bottom: 24,
+            bottom: 'var(--bm-space-lg)',
             left: '50%',
             transform: 'translateX(-50%)',
             background: 'var(--bm-accent-muted)',
             color: 'var(--bm-accent)',
-            padding: '12px 20px',
-            borderRadius: 8,
+            padding: 'var(--bm-space-sm) var(--bm-space-md)',
+            borderRadius: 'var(--bm-radius-md)',
+            border: '1px solid rgba(0, 230, 118, 0.2)',
             zIndex: 900,
-            fontSize: '0.9rem',
           }}
         >
           {snack}
@@ -174,7 +177,7 @@ export default function VideoAnalysisPage() {
       <AnalysisSummaryDialog summary={summaryOpen} open={summaryOpen != null} onClose={() => setSummaryOpen(null)} />
 
       <header className="header">
-        <h1>Análisis de video</h1>
+        <h1 className="bm-screen-title">Análisis de video</h1>
         <p className="subtitle">
           Gold standard en servidor · REST + WebSocket <code>/ws/pose-stream</code>
         </p>
@@ -182,48 +185,46 @@ export default function VideoAnalysisPage() {
 
       <div className="layout">
         <aside className="panel">
-          <label className="field">
-            <span>URL base del API</span>
-            <input
-              value={apiBase}
-              onChange={(e) => setApiBase(e.target.value)}
-              onBlur={persistApi}
-              disabled={ui.running}
-              autoComplete="off"
-            />
-          </label>
+          <BmInput
+            label="URL base del API"
+            value={apiBase}
+            onChange={(e) => setApiBase(e.target.value)}
+            onBlur={persistApi}
+            disabled={ui.running}
+            autoComplete="off"
+          />
 
-          <div className="row">
-            <button type="button" onClick={() => void refreshVideos()} disabled={ui.running || listLoading}>
-              {listLoading ? 'Cargando…' : 'Actualizar lista de vídeos'}
-            </button>
+          <div style={{ marginBottom: 'var(--bm-space-sm)' }}>
+            <BmButton variant="outline" onClick={() => void refreshVideos()} disabled={ui.running} loading={listLoading}>
+              Actualizar lista de vídeos
+            </BmButton>
           </div>
           {listError && <p className="error">{listError}</p>}
 
-          <label className="field">
-            <span>Vídeo (servidor)</span>
-            <select
-              value={videoFilename}
-              onChange={(e) => setVideoFilename(e.target.value)}
-              disabled={ui.running || videoList.length === 0}
-            >
-              {videoList.length === 0 ? (
-                <option value="">— sin vídeos —</option>
-              ) : (
-                videoList.map((v) => (
-                  <option key={v} value={v}>
-                    {v}
-                  </option>
-                ))
-              )}
-            </select>
-          </label>
+          <BmSelect
+            label="Vídeo (servidor)"
+            value={videoFilename}
+            onChange={(e) => setVideoFilename(e.target.value)}
+            disabled={ui.running || videoList.length === 0}
+          >
+            {videoList.length === 0 ? (
+              <option value="">— sin vídeos —</option>
+            ) : (
+              videoList.map((v) => (
+                <option key={v} value={v}>
+                  {v}
+                </option>
+              ))
+            )}
+          </BmSelect>
 
-          <label className="field">
-            <span>Target FPS</span>
-            <input value={fpsText} onChange={(e) => setFpsText(e.target.value)} disabled={ui.running} />
-            {fpsParsed.error && <span className="hint err">{fpsParsed.error}</span>}
-          </label>
+          <BmInput
+            label="Target FPS"
+            value={fpsText}
+            onChange={(e) => setFpsText(e.target.value)}
+            error={fpsParsed.error}
+            disabled={ui.running}
+          />
 
           <label className="check">
             <input
@@ -262,44 +263,44 @@ export default function VideoAnalysisPage() {
             Vista solo esqueleto
           </label>
 
-          <label className="field">
-            <span>Preview FPS (8 / 10 / 12)</span>
-            <select
-              value={previewFps}
-              onChange={(e) => setPreviewFps(Number(e.target.value) as PreviewFpsAllowed)}
-              disabled={!includePreview}
-            >
-              {PREVIEW_FPS_ALLOWED.map((v) => (
-                <option key={v} value={v}>
-                  {v} FPS
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="field">
-            <span>
+          <BmSelect
+            label="Preview FPS (8 / 10 / 12)"
+            value={String(previewFps)}
+            onChange={(e) => setPreviewFps(Number(e.target.value) as PreviewFpsAllowed)}
+            disabled={!includePreview}
+          >
+            {PREVIEW_FPS_ALLOWED.map((v) => (
+              <option key={v} value={v}>
+                {v} FPS
+              </option>
+            ))}
+          </BmSelect>
+          <div className="bm-field">
+            <label className="bm-field__label" htmlFor="video-analysis-jpeg-quality">
               Calidad JPEG ({Math.round(previewQuality)}) {PREVIEW_JPEG_QUALITY_MIN}–{PREVIEW_JPEG_QUALITY_MAX}
-            </span>
+            </label>
             <input
+              id="video-analysis-jpeg-quality"
               type="range"
+              className="bm-field__input"
               min={PREVIEW_JPEG_QUALITY_MIN}
               max={PREVIEW_JPEG_QUALITY_MAX}
               value={previewQuality}
               onChange={(e) => setPreviewQuality(Number(e.target.value))}
               disabled={!includePreview}
             />
-          </label>
+          </div>
 
           <div className="actions">
-            <button type="button" className="primary" disabled={!formValid} onClick={() => void onStart()}>
+            <BmButton variant="primary" disabled={!formValid} onClick={() => void onStart()}>
               Iniciar análisis
-            </button>
-            <button type="button" disabled={!ui.running} onClick={() => stop(false)}>
+            </BmButton>
+            <BmButton variant="outline" disabled={!ui.running} onClick={() => stop(false)}>
               Detener
-            </button>
-            <button type="button" onClick={downloadCsv} disabled={ui.csvText.split('\n').length < 3}>
+            </BmButton>
+            <BmButton variant="outline" onClick={downloadCsv} disabled={ui.csvText.split('\n').length < 3}>
               Descargar CSV
-            </button>
+            </BmButton>
           </div>
 
           {ui.statusError && <p className="error">{ui.statusError}</p>}
@@ -307,18 +308,17 @@ export default function VideoAnalysisPage() {
 
         <main className="main">
           <div className="metrics">
-            <div>
-              <strong>Pipeline (servidor)</strong>{' '}
-              {ui.serverPipelineTotalMs != null ? `${ui.serverPipelineTotalMs} ms` : '—'}
-            </div>
-            <div>
-              <strong>Frame</strong> {ui.frameIndex >= 0 ? ui.frameIndex + 1 : '—'}
+            <p className="bm-caption bm-mono" style={{ margin: 0 }}>
+              Pipeline (servidor): {ui.serverPipelineTotalMs != null ? `${ui.serverPipelineTotalMs} ms` : '—'}
+            </p>
+            <p className="bm-caption bm-mono" style={{ margin: 0 }}>
+              Frame: {ui.frameIndex >= 0 ? ui.frameIndex + 1 : '—'}
               {ui.totalFrames != null ? ` / ${ui.totalFrames}` : ''}
-            </div>
+            </p>
             {ui.qualityFlags.length > 0 && (
-              <div className="flags">
-                <strong>Calidad</strong> {ui.qualityFlags.join(', ')}
-              </div>
+              <p className="bm-caption" style={{ margin: 0 }}>
+                Calidad: {ui.qualityFlags.join(', ')}
+              </p>
             )}
           </div>
 
