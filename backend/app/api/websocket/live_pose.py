@@ -8,6 +8,14 @@ Arquitectura producer-consumer (v2):
 - Sleep compensado: el consumer mide el tiempo real de cada iteración y duerme
   solo el tiempo restante del presupuesto por frame — evita acumulación de delay.
 
+Fix frames negros (v2.1):
+- _encode_preview_jpeg devuelve (b64, ok) en vez de str|None, para distinguir
+  "encode falló" de "no había JPEG este stride".
+- Cuando include_preview=True y el encode falla, se reenvía el último JPEG válido
+  (_last_valid_jpeg_b64) en lugar de omitir la clave — el cliente no pierde imagen.
+- El stride de preview sigue igual: frames entre previews no incluyen JPEG
+  (el cliente retiene el anterior). Solo ante fallo de encode se reenvía el último válido.
+
 Documentación sugerida — Cap. 6: requisito de trazabilidad en pruebas con vídeo inyectado;
 Cap. 7: conjunto gold standard bajo ``tests/assets/videos``.
 """
@@ -71,18 +79,24 @@ def _build_video_source(cfg: PoseStreamConfig) -> VideoSource:
     raise ValueError(f"Fuente no soportada: {cfg.source}")
 
 
-def _encode_preview_jpeg(frame: np.ndarray, quality: int) -> str | None:
-    """Resize + encode JPEG → base64. Corre en hilo de CPU (to_thread)."""
+def _encode_preview_jpeg(frame: np.ndarray, quality: int) -> tuple[str | None, bool]:
+    """
+    Resize + encode JPEG → base64. Corre en hilo de CPU (to_thread).
+
+    Returns:
+        (b64_string, success): si el encode falla, devuelve (None, False).
+        El caller distingue fallo de encode vs. stride sin preview.
+    """
     try:
         h, w = frame.shape[:2]
         scale = min(800 / max(w, 1), 600 / max(h, 1), 1.0)
         small = cv2.resize(frame, (int(w * scale), int(h * scale))) if scale < 1.0 else frame
         ok, buf = cv2.imencode(".jpg", small, [int(cv2.IMWRITE_JPEG_QUALITY), quality])
         if ok:
-            return base64.b64encode(buf.tobytes()).decode("ascii")
+            return base64.b64encode(buf.tobytes()).decode("ascii"), True
     except Exception:  # noqa: BLE001
         pass
-    return None
+    return None, False
 
 
 def _read_frames_blocking(source: VideoSource, queue: asyncio.Queue, loop: asyncio.AbstractEventLoop) -> None:
@@ -90,23 +104,20 @@ def _read_frames_blocking(source: VideoSource, queue: asyncio.Queue, loop: async
     Hilo productor (threading, no async).
 
     Lee frames de VideoSource y los deposita en la queue usando
-    ``call_soon_threadsafe`` para cruzar la frontera hilo→event loop de forma segura.
+    ``run_coroutine_threadsafe`` para cruzar la frontera hilo→event loop de forma segura.
     Deposita ``_STREAM_DONE`` al terminar para que el consumer pueda salir limpiamente.
     """
     try:
         while True:
             frame = source.get_frame()
-            # Bloqueamos aquí si la queue está llena — backpressure natural hacia el producer.
-            # Como la queue es asyncio pero estamos en un hilo, usamos run_coroutine_threadsafe.
             future = asyncio.run_coroutine_threadsafe(queue.put(frame), loop)
-            future.result()  # espera a que haya espacio en la queue
+            future.result()
             if frame is None:
-                break  # fin de archivo o fallo de cámara
+                break
     except Exception:  # noqa: BLE001
         log.exception("Error en hilo productor de frames")
         asyncio.run_coroutine_threadsafe(queue.put(None), loop)
     finally:
-        # Siempre depositar el sentinel para que el consumer no quede bloqueado.
         asyncio.run_coroutine_threadsafe(queue.put(_STREAM_DONE), loop)
 
 
@@ -147,12 +158,6 @@ async def pose_stream(ws: WebSocket) -> None:
         interval = 1.0 / cfg.target_fps
         frame_index = 0
 
-        # Resetear el landmarker VIDEO al inicio de cada sesión WS.
-        # MediaPipe exige timestamps estrictamente crecientes POR instancia — si se
-        # reutiliza el objeto de una sesión anterior los timestamps nuevos pueden ser
-        # menores y MediaPipe lanza un error interno silencioso (devuelve pose vacía).
-        # reset_pose_video_timestamp_anchor() cierra la instancia anterior y fuerza
-        # la creación de una nueva en el primer frame de esta sesión.
         reset_pose_video_timestamp_anchor()
 
         stream_start = time.perf_counter()
@@ -163,65 +168,85 @@ async def pose_stream(ws: WebSocket) -> None:
             stride=max(1, int(round(cfg.target_fps / cfg.preview_fps))),
         )
 
-        # ── Producer: lanza hilo dedicado a leer frames ──────────────────────
+        _last_valid_jpeg_b64: str | None = None
+
         loop = asyncio.get_running_loop()
         frame_queue = asyncio.Queue(maxsize=_QUEUE_MAXSIZE)
         producer_task = loop.run_in_executor(
-            None,  # ThreadPoolExecutor por defecto
+            None,
             _read_frames_blocking,
             source,
             frame_queue,
             loop,
         )
 
-        # ── Consumer: procesa frames de la queue ──────────────────────────────
         while True:
             t_frame_start = time.perf_counter()
 
-            # Tomar el siguiente frame — el producer ya lo tiene listo o está leyéndolo.
             item = await frame_queue.get()
             t_after_queue = time.perf_counter()
             queue_wait_ms = (t_after_queue - t_frame_start) * 1000.0
 
-            # Sentinel: el producer terminó.
             if item is _STREAM_DONE:
                 break
 
             frame: np.ndarray | None = item
 
             if frame is None:
-                # Fin de archivo o fallo de cámara sin sentinel (defensivo).
                 if cfg.source == "file":
                     break
-                # Cámara: no enviar JSON con `error` — el cliente cerraba el stream y perdía
-                # el último JPEG. Solo respetar el ritmo del consumer y seguir leyendo.
                 elapsed = time.perf_counter() - t_frame_start
+                t_sleep0 = time.perf_counter()
                 await asyncio.sleep(max(0.0, interval - elapsed))
+                sleep_wall_ms = (time.perf_counter() - t_sleep0) * 1000.0
+                err_payload: dict = {
+                    "schema_version": 1,
+                    "frame_index": frame_index,
+                    "error": "sin_frame",
+                    "knees": None,
+                    "total_frames": total_frames,
+                    "server_ts_ms": int(time.time() * 1000),
+                }
+                if cfg.include_preview and _last_valid_jpeg_b64 is not None:
+                    err_payload["preview_jpeg_base64"] = _last_valid_jpeg_b64
+                if cfg.diagnostics:
+                    iteration_wall_ms = (time.perf_counter() - t_frame_start) * 1000.0
+                    err_payload["consumer_timing_ms"] = {
+                        "queue_wait_ms": round(queue_wait_ms, 3),
+                        "process_bgr_ms": 0.0,
+                        "jpeg_encode_ms": 0.0,
+                        "sleep_wall_ms": round(sleep_wall_ms, 3),
+                        "iteration_wall_ms": round(iteration_wall_ms, 3),
+                        "frame_budget_ms": round(interval * 1000.0, 3),
+                    }
+                await ws.send_json(err_payload)
                 continue
 
-            # RunningMode.VIDEO exige timestamp_ms incremental para activar tracking temporal.
-            # Usamos tiempo monotónico desde el inicio del stream.
             ts_ms = int((time.perf_counter() - stream_start) * 1000.0)
             if ts_ms <= last_timestamp_ms:
                 ts_ms = last_timestamp_ms + 1
             last_timestamp_ms = ts_ms
 
-            # Proceso de pose en hilo de CPU (MediaPipe + features + classifier).
             t_before_process = time.perf_counter()
             payload: dict = await asyncio.to_thread(engine.process_bgr, frame, frame_index, ts_ms)
             process_bgr_ms = (time.perf_counter() - t_before_process) * 1000.0
             payload["total_frames"] = total_frames
 
-            # Codificación JPEG también en hilo para no bloquear el event loop.
             jpeg_encode_ms = 0.0
-            if cfg.include_preview and (frame_index % preview.stride == 0):
-                t_jpeg0 = time.perf_counter()
-                jpeg_b64 = await asyncio.to_thread(_encode_preview_jpeg, frame, preview.quality)
-                jpeg_encode_ms = (time.perf_counter() - t_jpeg0) * 1000.0
-                if jpeg_b64:
-                    payload["preview_jpeg_base64"] = jpeg_b64
+            if cfg.include_preview:
+                is_preview_frame = frame_index % preview.stride == 0
+                if is_preview_frame:
+                    t_jpeg0 = time.perf_counter()
+                    jpeg_b64, encode_ok = await asyncio.to_thread(
+                        _encode_preview_jpeg, frame, preview.quality
+                    )
+                    jpeg_encode_ms = (time.perf_counter() - t_jpeg0) * 1000.0
+                    if encode_ok and jpeg_b64:
+                        _last_valid_jpeg_b64 = jpeg_b64
+                        payload["preview_jpeg_base64"] = jpeg_b64
+                    elif _last_valid_jpeg_b64 is not None:
+                        payload["preview_jpeg_base64"] = _last_valid_jpeg_b64
 
-            # ── Ajustes en caliente antes de enviar (incluido en el presupuesto de sleep) ──
             try:
                 control_raw = await asyncio.wait_for(ws.receive_text(), timeout=0.0)
             except asyncio.TimeoutError:
@@ -272,7 +297,6 @@ async def pose_stream(ws: WebSocket) -> None:
 
             await asyncio.sleep(sleep_budget)
 
-        # ── Fin limpio de archivo ─────────────────────────────────────────────
         if cfg.source == "file":
             try:
                 await ws.send_json({
@@ -302,8 +326,6 @@ async def pose_stream(ws: WebSocket) -> None:
         finally:
             await ws.close(code=1011)
     finally:
-        # El producer puede estar bloqueado en queue.put esperando espacio.
-        # Drenar la queue desbloquea el hilo para que pueda terminar.
         if frame_queue is not None:
             while not frame_queue.empty():
                 try:
