@@ -10,9 +10,13 @@ interface PreviewCanvasProps {
   includePreview: boolean;
   skeletonOnly: boolean;
   running: boolean;
-  /** HUD sobre el vídeo (RX/s, modo, consejos) — solo mientras `running`. */
   overlayRxPerSec?: number | null;
   overlayQualityFlags?: string[];
+  /**
+   * `hero` — área principal: crece en altura, `object-fit: contain` en el JPEG.
+   * `aspect` — tamaño fijo según relación de aspecto del stream.
+   */
+  variant?: 'hero' | 'aspect';
 }
 
 export function PreviewCanvas({
@@ -25,6 +29,7 @@ export function PreviewCanvas({
   running,
   overlayRxPerSec = null,
   overlayQualityFlags = [],
+  variant = 'aspect',
 }: PreviewCanvasProps) {
   const showImage = previewDataUrl && includePreview && !skeletonOnly;
   const showPlaceholder = !previewDataUrl && !landmarks;
@@ -34,10 +39,22 @@ export function PreviewCanvas({
     ? 'Esperando fotogramas…'
     : 'Inicia un análisis para ver la vista previa';
 
-  return (
-    <div
-      style={{
-        position: 'relative',
+  const isHero = variant === 'hero';
+
+  const rootStyle = isHero
+    ? {
+        position: 'relative' as const,
+        width: '100%',
+        flex: '1 1 auto',
+        minHeight: 'clamp(280px, 52vh, 760px)',
+        maxHeight: 'min(78vh, 880px)',
+        background: '#000',
+        borderRadius: 'var(--bm-radius-md)',
+        overflow: 'hidden',
+        border: '1px solid var(--bm-border)',
+      }
+    : {
+        position: 'relative' as const,
         width: '100%',
         aspectRatio: String(previewAspect),
         background: '#000',
@@ -45,8 +62,12 @@ export function PreviewCanvas({
         overflow: 'hidden',
         border: '1px solid var(--bm-border)',
         marginTop: '0.5rem',
-      }}
-    >
+      };
+
+  const imgObjectFit = isHero ? 'contain' : 'fill';
+
+  return (
+    <div style={rootStyle}>
       {showImage && (
         <img
           key={previewKey}
@@ -57,7 +78,7 @@ export function PreviewCanvas({
             inset: 0,
             width: '100%',
             height: '100%',
-            objectFit: 'fill',
+            objectFit: imgObjectFit,
             display: 'block',
           }}
         />

@@ -27,6 +27,7 @@ export function DashboardPanel({
   logEntries,
   leftSeries,
   rightSeries,
+  className = '',
 }: {
   running: boolean;
   captureOnly: boolean;
@@ -45,13 +46,14 @@ export function DashboardPanel({
   logEntries: FrameLogEntry[];
   leftSeries: number[];
   rightSeries: number[];
+  className?: string;
 }) {
   const [tab, setTab] = useState<Tab>('metrics');
   const repProgress =
     targetRepGoal != null && targetRepGoal > 0 ? Math.min(1, repCount / targetRepGoal) : null;
 
   return (
-    <div className="dashboard-panel">
+    <div className={`dashboard-panel ${className}`.trim()}>
       <div className="dashboard-tabs" role="tablist">
         <button
           type="button"

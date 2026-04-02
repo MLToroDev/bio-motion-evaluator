@@ -5,6 +5,7 @@ import {
   PREVIEW_JPEG_QUALITY_MAX,
   PREVIEW_JPEG_QUALITY_MIN,
 } from '../../lib/previewStreamConfig';
+import { VideoAnalysisActions } from './VideoAnalysisActions';
 
 export interface ConfigValues {
   apiBase: string;
@@ -34,6 +35,8 @@ interface ConfigPanelProps {
   running: boolean;
   csvReady: boolean;
   statusError: string | null;
+  /** Oculta el panel lateral para ampliar el preview (mismo efecto que el toggle del encabezado). */
+  onCollapsePanel?: () => void;
 }
 
 function FieldLabel({ children }: { children: ReactNode }) {
@@ -51,40 +54,33 @@ function FieldLabel({ children }: { children: ReactNode }) {
   );
 }
 
-/** Bloque de formulario con título en mayúsculas y línea inferior como divisor entre secciones. */
-function PanelSection({
-  title,
-  divider,
-  children,
-}: {
-  title: string;
-  /** Línea bajo el bloque (progressive disclosure: secciones claramente separadas). */
-  divider?: boolean;
-  children: ReactNode;
-}) {
+/** Tarjeta autocontenida: agrupa campos relacionados (patrón de tarjetas en columna). */
+function ConfigCard({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div
+    <section
       style={{
-        marginBottom: divider ? '1rem' : 0,
-        paddingBottom: divider ? '1rem' : 0,
-        borderBottom: divider ? '1px solid var(--bm-border)' : undefined,
+        background: 'var(--bm-surface)',
+        border: '1px solid var(--bm-border)',
+        borderRadius: 'var(--bm-radius-md)',
+        padding: '0.75rem 0.85rem',
+        boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
       }}
     >
-      <p
+      <h3
         style={{
           fontSize: '0.6875rem',
           fontWeight: 700,
-          letterSpacing: '0.07em',
+          letterSpacing: '0.08em',
           textTransform: 'uppercase',
           color: 'var(--bm-text-disabled)',
-          margin: '0 0 0.625rem',
+          margin: '0 0 0.55rem',
           fontFamily: 'var(--bm-font-body)',
         }}
       >
         {title}
-      </p>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>{children}</div>
-    </div>
+      </h3>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>{children}</div>
+    </section>
   );
 }
 
@@ -179,21 +175,79 @@ export function ConfigPanel({
   running,
   csvReady,
   statusError,
+  onCollapsePanel,
 }: ConfigPanelProps) {
   return (
     <aside
       style={{
-        background: 'var(--bm-surface)',
-        borderRadius: 'var(--bm-radius-md)',
-        border: '1px solid var(--bm-border)',
-        padding: '1rem 1.1rem',
         display: 'flex',
         flexDirection: 'column',
-        minHeight: '100%',
+        gap: '0.75rem',
+        minHeight: 0,
+        maxHeight: 'calc(100vh - 9.5rem)',
+        overflow: 'hidden',
+        paddingRight: 0,
       }}
     >
-      <div style={{ flex: '1 1 auto', minHeight: 0, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-        <PanelSection title="Fuente" divider>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '0.5rem',
+          flexShrink: 0,
+        }}
+      >
+        <span
+          style={{
+            fontSize: '0.8125rem',
+            fontWeight: 700,
+            color: 'var(--bm-text-secondary)',
+            fontFamily: 'var(--bm-font-body)',
+          }}
+        >
+          Parámetros de análisis
+        </span>
+        {onCollapsePanel ? (
+          <button
+            type="button"
+            onClick={onCollapsePanel}
+            aria-label="Ocultar panel y ampliar vista de vídeo"
+            title="Ocultar panel"
+            style={{
+              flexShrink: 0,
+              width: '2rem',
+              height: '2rem',
+              padding: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              border: '1px solid var(--bm-border)',
+              borderRadius: 'var(--bm-radius-sm)',
+              background: 'var(--bm-surface)',
+              color: 'var(--bm-text-secondary)',
+              cursor: 'pointer',
+              fontSize: '0.9rem',
+              lineHeight: 1,
+            }}
+          >
+            ◀
+          </button>
+        ) : null}
+      </div>
+
+      <div
+        style={{
+          flex: '1 1 auto',
+          minHeight: 0,
+          overflowY: 'auto',
+          paddingRight: '0.15rem',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '0.75rem',
+        }}
+      >
+        <ConfigCard title="Fuente">
           <Field label="URL base del API">
             <input
               style={inputStyle}
@@ -258,9 +312,9 @@ export function ConfigPanel({
               disabled={running}
             />
           </Field>
-        </PanelSection>
+        </ConfigCard>
 
-        <PanelSection title="Opciones" divider>
+        <ConfigCard title="Opciones">
           <CheckRow
             label="Incluir vista previa JPEG"
             checked={values.includePreview}
@@ -285,9 +339,9 @@ export function ConfigPanel({
             onChange={(v) => onChange('skeletonOnly', v)}
             disabled={running}
           />
-        </PanelSection>
+        </ConfigCard>
 
-        <PanelSection title="Calidad de preview">
+        <ConfigCard title="Calidad de preview">
           <Field label="Preview FPS">
             <select
               style={inputStyle}
@@ -316,90 +370,57 @@ export function ConfigPanel({
               style={{ width: '100%', accentColor: 'var(--bm-accent)' } as CSSProperties}
             />
           </Field>
-        </PanelSection>
+        </ConfigCard>
       </div>
 
-      <div
-        style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: '0.5rem',
-          marginTop: 'auto',
-          paddingTop: '1rem',
-          borderTop: '1px solid var(--bm-border)',
-        }}
-      >
-        <button
-          type="button"
-          disabled={!formValid}
-          onClick={onStart}
-          style={{
-            fontFamily: 'var(--bm-font-body)',
-            fontSize: '0.875rem',
-            fontWeight: 700,
-            padding: '0.5rem 0.875rem',
-            borderRadius: 'var(--bm-radius-sm)',
-            border: '1px solid var(--bm-accent-dim)',
-            background: 'var(--bm-accent)',
-            color: '#000',
-            cursor: formValid ? 'pointer' : 'not-allowed',
-            opacity: formValid ? 1 : 0.42,
-            transition: 'opacity 120ms',
-          }}
-        >
-          Iniciar análisis
-        </button>
-
-        <button
-          type="button"
-          disabled={!running}
-          onClick={onStop}
-          style={{
-            fontFamily: 'var(--bm-font-body)',
-            fontSize: '0.875rem',
-            padding: '0.5rem 0.875rem',
-            borderRadius: 'var(--bm-radius-sm)',
-            border: '1px solid var(--bm-border)',
-            background: 'var(--bm-surface-elevated)',
-            color: 'var(--bm-text-primary)',
-            cursor: running ? 'pointer' : 'not-allowed',
-            opacity: running ? 1 : 0.42,
-          }}
-        >
-          Detener
-        </button>
-
-        <button
-          type="button"
-          disabled={!csvReady}
-          onClick={onDownloadCsv}
-          style={{
-            fontFamily: 'var(--bm-font-body)',
-            fontSize: '0.875rem',
-            padding: '0.5rem 0.875rem',
-            borderRadius: 'var(--bm-radius-sm)',
-            border: '1px solid var(--bm-border)',
-            background: 'transparent',
-            color: csvReady ? 'var(--bm-text-secondary)' : 'var(--bm-text-disabled)',
-            cursor: csvReady ? 'pointer' : 'not-allowed',
-          }}
-        >
-          Descargar CSV
-        </button>
-      </div>
-
-      {statusError && (
+      {statusError ? (
         <p
           style={{
-            margin: '0.5rem 0 0',
+            margin: 0,
+            flexShrink: 0,
             fontSize: '0.8125rem',
             color: 'var(--bm-angle-bad)',
             fontFamily: 'var(--bm-font-body)',
+            padding: '0.35rem 0.25rem 0',
           }}
         >
           {statusError}
         </p>
-      )}
+      ) : null}
+
+      <div
+        style={{
+          flexShrink: 0,
+          marginTop: 'auto',
+          paddingTop: '0.65rem',
+          borderTop: '1px solid var(--bm-border)',
+          background: 'linear-gradient(180deg, transparent 0%, var(--bm-background) 28%)',
+          boxShadow: '0 -8px 24px rgba(0,0,0,0.25)',
+        }}
+      >
+        <p
+          style={{
+            fontSize: '0.65rem',
+            fontWeight: 700,
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            color: 'var(--bm-text-disabled)',
+            margin: '0 0 0.45rem',
+            fontFamily: 'var(--bm-font-body)',
+          }}
+        >
+          Acciones
+        </p>
+        <VideoAnalysisActions
+          variant="panel-footer"
+          formValid={formValid}
+          running={running}
+          csvReady={csvReady}
+          onStart={onStart}
+          onStop={onStop}
+          onDownloadCsv={onDownloadCsv}
+        />
+      </div>
     </aside>
   );
 }

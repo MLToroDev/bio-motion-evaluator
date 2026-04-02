@@ -1,9 +1,19 @@
 /**
  * VideoAnalysisPage — orquestador: estado, derivaciones y composición de subcomponentes.
- * Presentación: VideoAnalysisShell, ConfigPanel, ServerHUD, DashboardPanel, FrameProgressBar, PreviewCanvas, SnackBar.
+ * Presentación: VideoAnalysisShell (config colapsable), ConfigPanel, ServerHUD, preview hero, Dashboard inferior, etc.
  */
 
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
+
+const VIDEO_ANALYSIS_CONFIG_OPEN_KEY = 'bm-video-analysis-config-open';
+
+function readVideoAnalysisConfigOpen(): boolean {
+  try {
+    return localStorage.getItem(VIDEO_ANALYSIS_CONFIG_OPEN_KEY) !== '0';
+  } catch {
+    return true;
+  }
+}
 import { AnalysisSummaryDialog } from '../../components/AnalysisSummaryDialog';
 import { DashboardPanel } from '../../components/DashboardPanel';
 import { useVideoAnalysisSession } from '../../hooks/useVideoAnalysisSession';
@@ -20,6 +30,7 @@ import { FrameProgressBar } from './FrameProgressBar';
 import { PreviewCanvas } from './PreviewCanvas';
 import { ServerHUD } from './ServerHUD';
 import { SnackBar } from './SnackBar';
+import { VideoAnalysisActions } from './VideoAnalysisActions';
 import { VideoAnalysisShell } from './VideoAnalysisShell';
 
 function parseFps(t: string): { ok: boolean; value: number; error?: string } {
@@ -75,6 +86,19 @@ export default function VideoAnalysisPage() {
   const [videoList, setVideoList] = useState<string[]>([]);
   const [listLoading, setListLoading] = useState(false);
   const [listError, setListError] = useState<string | null>(null);
+  const [configPanelOpen, setConfigPanelOpen] = useState(readVideoAnalysisConfigOpen);
+
+  const toggleConfigPanel = useCallback(() => {
+    setConfigPanelOpen((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem(VIDEO_ANALYSIS_CONFIG_OPEN_KEY, next ? '1' : '0');
+      } catch {
+        /* noop */
+      }
+      return next;
+    });
+  }, []);
 
   const fpsParsed = useMemo(() => parseFps(config.fpsText), [config.fpsText]);
   const formValid = fpsParsed.ok && config.videoFilename.trim().length > 0 && !ui.running;
@@ -178,6 +202,8 @@ export default function VideoAnalysisPage() {
 
   return (
     <VideoAnalysisShell
+      configOpen={configPanelOpen}
+      onToggleConfig={toggleConfigPanel}
       overlays={
         <Fragment>
           <SnackBar message={snack} />
@@ -205,6 +231,7 @@ export default function VideoAnalysisPage() {
           running={ui.running}
           csvReady={csvReady}
           statusError={ui.statusError}
+          onCollapsePanel={toggleConfigPanel}
         />
       }
       mainColumn={
@@ -215,41 +242,73 @@ export default function VideoAnalysisPage() {
             totalFrames={ui.totalFrames}
             qualityFlags={ui.qualityFlags}
           />
-          <DashboardPanel
-            running={ui.running}
-            captureOnly={config.captureOnly}
-            targetRepGoal={targetRepGoal}
-            exerciseLabel={ex}
-            exerciseConfidence={ui.exerciseConfidence}
-            repPhase={ui.repPhase}
-            repCount={ui.repCount}
-            leftDeg={ui.leftDeg}
-            rightDeg={ui.rightDeg}
-            leftStatus={leftStatus}
-            rightStatus={rightStatus}
-            leftSublabel={leftSublabel}
-            rightSublabel={rightSublabel}
-            displayRxPerSec={ui.displayRxPerSec}
-            logEntries={ui.logEntries}
-            leftSeries={ui.leftSeries}
-            rightSeries={ui.rightSeries}
-          />
-          <FrameProgressBar
-            progress={progress}
-            frameIndex={ui.frameIndex}
-            totalFrames={ui.totalFrames}
-          />
-          <PreviewCanvas
-            previewDataUrl={ui.previewDataUrl}
-            previewKey={ui.previewKey}
-            previewAspect={ui.previewAspect}
-            landmarks={ui.landmarks}
-            includePreview={config.includePreview}
-            skeletonOnly={config.skeletonOnly}
-            running={ui.running}
-            overlayRxPerSec={ui.running ? ui.displayRxPerSec : null}
-            overlayQualityFlags={ui.qualityFlags}
-          />
+          {!configPanelOpen ? (
+            <VideoAnalysisActions
+              variant="main-toolbar"
+              formValid={formValid}
+              running={ui.running}
+              csvReady={csvReady}
+              onStart={() => void handleStart()}
+              onStop={() => stop(false)}
+              onDownloadCsv={handleDownloadCsv}
+            />
+          ) : null}
+          <div
+            style={{
+              flex: '1 1 auto',
+              minHeight: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.5rem',
+            }}
+          >
+            <FrameProgressBar
+              progress={progress}
+              frameIndex={ui.frameIndex}
+              totalFrames={ui.totalFrames}
+            />
+            <PreviewCanvas
+              previewDataUrl={ui.previewDataUrl}
+              previewKey={ui.previewKey}
+              previewAspect={ui.previewAspect}
+              landmarks={ui.landmarks}
+              includePreview={config.includePreview}
+              skeletonOnly={config.skeletonOnly}
+              running={ui.running}
+              overlayRxPerSec={ui.running ? ui.displayRxPerSec : null}
+              overlayQualityFlags={ui.qualityFlags}
+              variant="hero"
+            />
+          </div>
+          <div
+            style={{
+              flexShrink: 0,
+              marginTop: 'auto',
+              paddingTop: '0.5rem',
+              borderTop: '1px solid var(--bm-border)',
+            }}
+          >
+            <DashboardPanel
+              className="dashboard-panel--dock-bottom"
+              running={ui.running}
+              captureOnly={config.captureOnly}
+              targetRepGoal={targetRepGoal}
+              exerciseLabel={ex}
+              exerciseConfidence={ui.exerciseConfidence}
+              repPhase={ui.repPhase}
+              repCount={ui.repCount}
+              leftDeg={ui.leftDeg}
+              rightDeg={ui.rightDeg}
+              leftStatus={leftStatus}
+              rightStatus={rightStatus}
+              leftSublabel={leftSublabel}
+              rightSublabel={rightSublabel}
+              displayRxPerSec={ui.displayRxPerSec}
+              logEntries={ui.logEntries}
+              leftSeries={ui.leftSeries}
+              rightSeries={ui.rightSeries}
+            />
+          </div>
         </Fragment>
       }
     />

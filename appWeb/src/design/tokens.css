@@ -47,6 +47,13 @@
   --bm-transition-fast: 120ms ease-in-out;
   --bm-transition-normal: 200ms ease-out;
 
+  /* Barras de desplazamiento (ver index.css) */
+  --bm-scrollbar-width: 10px;
+  --bm-scrollbar-track: #121614;
+  --bm-scrollbar-thumb: #3d4540;
+  --bm-scrollbar-thumb-hover: #4f5852;
+  --bm-scrollbar-thumb-active: var(--bm-accent-dim);
+
   /* Compatibilidad con código previo */
   --bm-bg: var(--bm-background);
   --bm-font-sans: var(--bm-font-body);

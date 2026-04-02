@@ -19,3 +19,40 @@ body {
   color: var(--bm-text-primary);
   line-height: 1.45;
 }
+
+/* ─── Scrollbars: Firefox ───────────────────────────────────────── */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--bm-scrollbar-thumb) var(--bm-scrollbar-track);
+}
+
+/* ─── Scrollbars: Chromium / Safari / Edge (WebKit/Blink) ───────── */
+*::-webkit-scrollbar {
+  width: var(--bm-scrollbar-width);
+  height: var(--bm-scrollbar-width);
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--bm-scrollbar-track);
+  border-radius: var(--bm-radius-sm);
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--bm-scrollbar-thumb);
+  border-radius: var(--bm-radius-sm);
+  border: 2px solid var(--bm-scrollbar-track);
+  background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--bm-scrollbar-thumb-hover);
+  border-color: var(--bm-scrollbar-track);
+}
+
+*::-webkit-scrollbar-thumb:active {
+  background: var(--bm-scrollbar-thumb-active);
+}
+
+*::-webkit-scrollbar-corner {
+  background: var(--bm-scrollbar-track);
+}
