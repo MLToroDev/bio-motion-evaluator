@@ -28,6 +28,7 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
 from app.config import settings
 from app.models.schemas import PoseStreamConfig
+from app.services.mediapipe_service import reset_pose_video_timestamp_anchor
 from vision.paths import resolve_gold_standard_video
 from vision.processor import VideoSource
 from vision.realtime_engine import RealtimeEngineSession
@@ -145,6 +146,15 @@ async def pose_stream(ws: WebSocket) -> None:
 
         interval = 1.0 / cfg.target_fps
         frame_index = 0
+
+        # Resetear el landmarker VIDEO al inicio de cada sesión WS.
+        # MediaPipe exige timestamps estrictamente crecientes POR instancia — si se
+        # reutiliza el objeto de una sesión anterior los timestamps nuevos pueden ser
+        # menores y MediaPipe lanza un error interno silencioso (devuelve pose vacía).
+        # reset_pose_video_timestamp_anchor() cierra la instancia anterior y fuerza
+        # la creación de una nueva en el primer frame de esta sesión.
+        reset_pose_video_timestamp_anchor()
+
         stream_start = time.perf_counter()
         last_timestamp_ms = -1
         preview = _PreviewParams(

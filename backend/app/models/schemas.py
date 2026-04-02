@@ -56,7 +56,6 @@ class UnifiedWsFrameV1(BaseModel):
     quality_flags: list[str] = Field(default_factory=list)
     pipeline_ms: dict[str, float] | None = None
     preview_jpeg_base64: str | None = None
-    consumer_timing_ms: dict[str, float] | None = None
     total_frames: int | None = None
     error: str | None = None
     stream_done: bool | None = None
@@ -140,10 +139,6 @@ class PoseStreamConfig(BaseModel):
         default=False,
         description="Si True, extrae pose (landmarks/knees) sin clasificador ni rep tracker.",
     )
-    diagnostics: bool = Field(
-        default=False,
-        description="Si True, cada mensaje incluye consumer_timing_ms (desglose de latencia en el consumer).",
-    )
 
     @field_validator("include_preview", mode="before")
     @classmethod
@@ -152,6 +147,15 @@ class PoseStreamConfig(BaseModel):
         if v is None:
             return True
         return bool(v)
+
+    diagnostics: bool = Field(
+        default=False,
+        description=(
+            "Si True, cada payload incluye consumer_timing_ms con desglose de latencia "
+            "por etapa del consumer (queue_wait, process_bgr, jpeg_encode, sleep). "
+            "Solo para desarrollo — añade overhead de serialización en producción."
+        ),
+    )
 
     @field_validator("capture_only", mode="before")
     @classmethod
@@ -166,4 +170,3 @@ class PoseStreamConfig(BaseModel):
         if v is None:
             return False
         return bool(v)
-

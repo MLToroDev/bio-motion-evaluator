@@ -1,4 +1,4 @@
-﻿"""Abstracción de captura de video: cámara local, archivo o URL/RTSP (OpenCV)."""
+"""Abstracción de captura de video: cámara local, archivo o URL/RTSP (OpenCV)."""
 
 from __future__ import annotations
 
@@ -35,6 +35,14 @@ class VideoSource:
 
         if source_type == "camera":
             self._cap = cv2.VideoCapture(device_index)
+            # Cola de captura mínima (donde el backend lo permite): evita acumular
+            # fotogramas viejos cuando el procesamiento va más lento que la cámara.
+            # No sube el FPS máximo de la webcam (suele ser ~30 a 1080p), pero mejora
+            # la sensación de "tiempo real" en /ws/pose-stream y similares.
+            try:
+                self._cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+            except Exception:  # noqa: BLE001 — propiedad opcional según driver
+                pass
             log.info("VideoSource: cámara índice %s", device_index)
         elif source_type == "file":
             if not file_path:
