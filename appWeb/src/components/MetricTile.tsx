@@ -21,7 +21,7 @@ export function MetricTile({
   status?: MetricStatus;
   compact?: boolean;
 }) {
-  const short = label.length > 12 ? `${label.slice(0, 12)}…` : label;
+  const short = label.length > 12 ? `${label.slice(0, 12)}...` : label;
   const mod = status === 'bad' ? 'bm-metric-tile--bad' : '';
   return (
     <div className={`bm-metric-tile ${mod} ${compact ? 'bm-metric-tile--compact' : ''}`}>

@@ -24,9 +24,7 @@ export function NavCard({ title, subtitle, icon, primary = false, onClick }: Nav
         <span className="bm-nav-card__title">{title}</span>
         <span className="bm-nav-card__subtitle bm-caption">{subtitle}</span>
       </div>
-      <span className="bm-nav-card__arrow" aria-hidden="true">
-        ›
-      </span>
+      <span className="bm-nav-card__arrow" aria-hidden="true" />
     </button>
   );
 }

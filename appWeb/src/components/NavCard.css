@@ -59,8 +59,13 @@
 }
 
 .bm-nav-card__arrow {
+  display: inline-block;
   font-size: 1.25rem;
   color: var(--bm-text-secondary);
   line-height: 1;
   flex-shrink: 0;
+}
+
+.bm-nav-card__arrow::before {
+  content: '\203a';
 }
