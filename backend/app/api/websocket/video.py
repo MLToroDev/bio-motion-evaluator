@@ -2,18 +2,18 @@ import asyncio
 import json
 import logging
 import time
-from pathlib import Path
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
 from app.config import settings
+from app.paths import backend_root
 from vision.realtime_engine import RealtimeEngineSession
 
 log = logging.getLogger(__name__)
 
 router = APIRouter(tags=["video"])
 
-BACKEND_ROOT = Path(__file__).resolve().parents[2]
+_BACKEND_ROOT = backend_root()
 
 
 def _process_jpeg_frame(engine: RealtimeEngineSession, chunk: bytes, frame_idx: int) -> dict:
@@ -65,7 +65,7 @@ async def video_stream(ws: WebSocket) -> None:
     **Protocolo legado (solo contadores):** primer mensaje ya es binario → no hay pose, solo estadísticas.
     """
     await ws.accept()
-    model_path = settings.resolve_model_path(BACKEND_ROOT)
+    model_path = settings.resolve_model_path(_BACKEND_ROOT)
     engine: RealtimeEngineSession | None = None
 
     analyze_pose = False
@@ -93,7 +93,7 @@ async def video_stream(ws: WebSocket) -> None:
             if analyze_pose:
                 if engine is None:
                     engine = RealtimeEngineSession(
-                        BACKEND_ROOT,
+                        _BACKEND_ROOT,
                         model_path,
                         settings.exercise_classifier_config(),
                         inference_stride=settings.pose_inference_stride,
@@ -118,7 +118,7 @@ async def video_stream(ws: WebSocket) -> None:
                 if analyze_pose:
                     if engine is None:
                         engine = RealtimeEngineSession(
-                            BACKEND_ROOT,
+                            _BACKEND_ROOT,
                             model_path,
                             settings.exercise_classifier_config(),
                             inference_stride=settings.pose_inference_stride,

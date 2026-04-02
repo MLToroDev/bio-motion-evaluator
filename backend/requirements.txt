@@ -15,3 +15,6 @@ psycopg2-binary>=2.9.9,<2.10
 alembic>=1.14.0,<1.16
 python-jose[cryptography]>=3.3.0,<4
 onnxruntime>=1.20.0,<1.22
+yt-dlp>=2024.0.0
+celery>=5.4.0,<6
+redis>=5.0.0,<6

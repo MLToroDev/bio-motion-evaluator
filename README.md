@@ -33,6 +33,7 @@ cd backend
 python -m venv .venv
 .venv\Scripts\activate
 pip install -r requirements.txt
+celery -A app.workers.celery_app worker --loglevel=info
 # Modelo MediaPipe Pose Landmarker (full por defecto; lite: python scripts/download_models.py lite)
 python scripts/download_models.py
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000

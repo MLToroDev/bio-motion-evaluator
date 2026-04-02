@@ -19,7 +19,6 @@ import base64
 import json
 import logging
 import time
-from pathlib import Path
 from typing import NamedTuple
 
 import cv2
@@ -28,7 +27,8 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
 from app.config import settings
 from app.models.schemas import PoseStreamConfig
-from app.services.mediapipe_service import reset_pose_video_timestamp_anchor
+from app.paths import backend_root
+from app.services.pose.mediapipe import reset_pose_video_timestamp_anchor
 from vision.paths import resolve_gold_standard_video
 from vision.processor import VideoSource
 from vision.realtime_engine import RealtimeEngineSession
@@ -37,7 +37,7 @@ log = logging.getLogger(__name__)
 
 router = APIRouter(tags=["pose-stream"])
 
-BACKEND_ROOT = Path(__file__).resolve().parents[2]
+_BACKEND_ROOT = backend_root()
 
 # Máximo de frames pre-leídos esperando proceso. 2 es suficiente para solapar
 # I/O con CPU sin consumir memoria innecesaria (cada frame ~1-3 MB BGR).
@@ -135,9 +135,9 @@ async def pose_stream(ws: WebSocket) -> None:
         cfg = PoseStreamConfig.model_validate_json(raw)
         source = _build_video_source(cfg)
         total_frames = source.total_frame_count
-        model_path = settings.resolve_model_path(BACKEND_ROOT)
+        model_path = settings.resolve_model_path(_BACKEND_ROOT)
         engine = RealtimeEngineSession(
-            BACKEND_ROOT,
+            _BACKEND_ROOT,
             model_path,
             settings.exercise_classifier_config(),
             inference_stride=settings.pose_inference_stride,
@@ -193,30 +193,10 @@ async def pose_stream(ws: WebSocket) -> None:
                 # Fin de archivo o fallo de cámara sin sentinel (defensivo).
                 if cfg.source == "file":
                     break
-                # Sleep compensado incluso en error; luego un único envío con timings coherentes.
+                # Cámara: no enviar JSON con `error` — el cliente cerraba el stream y perdía
+                # el último JPEG. Solo respetar el ritmo del consumer y seguir leyendo.
                 elapsed = time.perf_counter() - t_frame_start
-                t_sleep0 = time.perf_counter()
                 await asyncio.sleep(max(0.0, interval - elapsed))
-                sleep_wall_ms = (time.perf_counter() - t_sleep0) * 1000.0
-                err_payload: dict = {
-                    "schema_version": 1,
-                    "frame_index": frame_index,
-                    "error": "sin_frame",
-                    "knees": None,
-                    "total_frames": total_frames,
-                    "server_ts_ms": int(time.time() * 1000),
-                }
-                if cfg.diagnostics:
-                    iteration_wall_ms = (time.perf_counter() - t_frame_start) * 1000.0
-                    err_payload["consumer_timing_ms"] = {
-                        "queue_wait_ms": round(queue_wait_ms, 3),
-                        "process_bgr_ms": 0.0,
-                        "jpeg_encode_ms": 0.0,
-                        "sleep_wall_ms": round(sleep_wall_ms, 3),
-                        "iteration_wall_ms": round(iteration_wall_ms, 3),
-                        "frame_budget_ms": round(interval * 1000.0, 3),
-                    }
-                await ws.send_json(err_payload)
                 continue
 
             # RunningMode.VIDEO exige timestamp_ms incremental para activar tracking temporal.

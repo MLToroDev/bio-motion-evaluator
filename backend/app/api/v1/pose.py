@@ -1,15 +1,14 @@
-from pathlib import Path
-
 from fastapi import APIRouter, File, HTTPException, UploadFile
 
 from app.config import settings
 from app.models.schemas import LandmarkPoint, PoseAnalysisResponse
-from app.services import huggingface_service
+from app.paths import backend_root
+from app.services.inference.huggingface import run_optional_inference
 from vision.realtime_engine import RealtimeEngineSession
 
 router = APIRouter(tags=["pose"])
 
-_BACKEND_ROOT = Path(__file__).resolve().parents[2]
+_BACKEND_ROOT = backend_root()
 
 
 @router.post("/analyze/pose", response_model=PoseAnalysisResponse)
@@ -36,7 +35,7 @@ async def analyze_pose(file: UploadFile = File(...)) -> PoseAnalysisResponse:
     world_raw = payload.get("world_landmarks") or []
     world = [LandmarkPoint(**p) for p in world_raw]
 
-    hf_raw = await huggingface_service.run_optional_inference(
+    hf_raw = await run_optional_inference(
         {"landmarks": [lm.model_dump() for lm in landmarks], "note": payload.get("note")}
     )
 

@@ -1,0 +1,1 @@
+"""Servicios de detección y tracking de pose (MediaPipe, etc.)."""

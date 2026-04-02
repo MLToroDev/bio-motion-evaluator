@@ -1,13 +1,13 @@
-﻿import logging
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1.router import api_router
+from app.api.websocket import live_pose, video
 from app.config import settings
 from app.db.session import init_engine
-from app.routers import live_pose, video
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)

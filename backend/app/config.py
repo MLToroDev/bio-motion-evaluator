@@ -59,6 +59,11 @@ class Settings(BaseSettings):
     # Telemetría: log INFO por frame con pipeline_ms (extract/feature/classify/track/total) en /ws/video
     log_pose_pipeline_timing: bool = False
 
+    # Celery & Descargas
+    celery_broker_url: str = "redis://localhost:6379/0"
+    celery_result_backend: str = "redis://localhost:6379/0"
+    downloads_dir: str = "data/downloads"
+
     @property
     def cors_origins_list(self) -> list[str]:
         raw = self.cors_origins.strip()

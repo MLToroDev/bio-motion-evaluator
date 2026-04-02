@@ -1,5 +1,5 @@
 # ARCH-1: pose_extractor.py — Capa 1 del motor (ver docs/bio_motion_plan_v2.md §2.1)
-"""Extracción de pose: wrapper sobre mediapipe_service + ángulos de rodilla."""
+"""Extracción de pose: wrapper sobre ``app.services.pose.mediapipe`` + ángulos de rodilla."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ from pathlib import Path
 
 import numpy as np
 
-from app.services.mediapipe_service import (
+from app.services.pose.mediapipe import (
     analyze_frame_bgr,
     analyze_frame_bgr_video,
     analyze_image_bytes,

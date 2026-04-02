@@ -69,7 +69,7 @@ def export_gold_video_features_to_writer(
     Reinicia el ancla temporal de MediaPipe VIDEO al inicio (seguro entre clips en batch).
     Devuelve ``(filas_escritas, frames_leídos)``.
     """
-    from app.services.mediapipe_service import reset_pose_video_timestamp_anchor
+    from app.services.pose.mediapipe import reset_pose_video_timestamp_anchor
 
     video_path = resolve_gold_standard_video(video_filename, gold_dir)
     if not video_path.is_file():
