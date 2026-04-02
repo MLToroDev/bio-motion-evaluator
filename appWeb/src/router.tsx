@@ -7,7 +7,7 @@ import LiveAnalysisPage from './pages/LiveAnalysisPage';
 import LoginPage from './pages/LoginPage';
 import ProfilePage from './pages/ProfilePage';
 import SessionsHistoryPage from './pages/SessionsHistoryPage';
-import VideoAnalysisPage from './pages/VideoAnalysisPage';
+import VideoAnalysisPage from './pages/video-analysis/VideoAnalysisPage';
 import VideoDownloadPage from './pages/VideoDownloadPage';
 
 const router = createBrowserRouter([

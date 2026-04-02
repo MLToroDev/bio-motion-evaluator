@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { BmButton } from '../components/BmButton';
 import { DashboardPanel } from '../components/DashboardPanel';
 import { PoseSkeletonCanvas } from '../components/PoseSkeletonCanvas';
+import { LIVE_POSE_TIPS, VideoPreviewOverlays } from '../components/VideoPreviewOverlays';
 import { useLiveAnalysisSession } from '../hooks/useLiveAnalysisSession';
 import { kneeFlexionMetricSublabelInContext } from '../lib/angleFormatter';
 import { readApiBase, readTargetRepGoal } from '../lib/prefs';
@@ -37,13 +38,24 @@ export default function LiveAnalysisPage() {
             {ui.frameIndex >= 0 ? ui.frameIndex : '—'}
           </p>
 
-          <div className="preview-stack" style={{ aspectRatio: '4/3', maxHeight: 420, marginBottom: 'var(--bm-space-md)' }}>
+          <div
+            className="preview-stack"
+            style={{
+              aspectRatio: '4/3',
+              maxHeight: 420,
+              marginBottom: 'var(--bm-space-md)',
+              borderColor: ui.transmitting ? 'var(--bm-accent)' : undefined,
+              boxShadow: ui.transmitting ? '0 0 0 1px var(--bm-accent-muted)' : undefined,
+            }}
+          >
             <video
               ref={videoRef}
               playsInline
               muted
               autoPlay
               style={{
+                position: 'absolute',
+                inset: 0,
                 width: '100%',
                 height: '100%',
                 objectFit: 'cover',
@@ -51,6 +63,14 @@ export default function LiveAnalysisPage() {
               }}
             />
             {ui.transmitting && <PoseSkeletonCanvas landmarks={ui.landmarks} mirrorHorizontal={true} />}
+            <VideoPreviewOverlays
+              visible={ui.cameraOn}
+              modeLabel="WEB"
+              rxPerSec={ui.transmitting ? ui.displayRxPerSec : 0}
+              rateSuffix="RX/s"
+              bullets={LIVE_POSE_TIPS}
+              qualityFlags={ui.transmitting ? ui.qualityFlags : []}
+            />
             {!ui.cameraOn && (
               <div
                 className="bm-empty-state"
@@ -73,23 +93,26 @@ export default function LiveAnalysisPage() {
             )}
           </div>
 
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--bm-space-sm)', marginBottom: 'var(--bm-space-md)' }}>
-            {ui.cameraOn && (
-              <>
-                <BmButton variant="outline" onClick={stopCamera} disabled={ui.transmitting}>
-                  Apagar cámara
-                </BmButton>
-                {!ui.transmitting ? (
-                  <BmButton variant="primary" onClick={() => void startTransmit()}>
-                    Iniciar transmisión
-                  </BmButton>
-                ) : (
-                  <BmButton variant="outline" onClick={stopTransmit}>
-                    Detener transmisión
-                  </BmButton>
-                )}
-              </>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--bm-space-sm)', marginBottom: 'var(--bm-space-md)' }}>
+            {ui.cameraOn && ui.transmitting && (
+              <BmButton variant="outline" onClick={stopTransmit} style={{ width: '100%', fontWeight: 700, letterSpacing: '0.06em' }}>
+                DETENER
+              </BmButton>
             )}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--bm-space-sm)' }}>
+              {ui.cameraOn && (
+                <>
+                  <BmButton variant="outline" onClick={stopCamera} disabled={ui.transmitting}>
+                    Apagar cámara
+                  </BmButton>
+                  {!ui.transmitting ? (
+                    <BmButton variant="primary" onClick={() => void startTransmit()} style={{ flex: '1 1 160px' }}>
+                      Iniciar transmisión
+                    </BmButton>
+                  ) : null}
+                </>
+              )}
+            </div>
           </div>
 
           <DashboardPanel

@@ -1,0 +1,257 @@
+/**
+ * VideoAnalysisPage — orquestador: estado, derivaciones y composición de subcomponentes.
+ * Presentación: VideoAnalysisShell, ConfigPanel, ServerHUD, DashboardPanel, FrameProgressBar, PreviewCanvas, SnackBar.
+ */
+
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
+import { AnalysisSummaryDialog } from '../../components/AnalysisSummaryDialog';
+import { DashboardPanel } from '../../components/DashboardPanel';
+import { useVideoAnalysisSession } from '../../hooks/useVideoAnalysisSession';
+import {
+  kneeFlexionMetricSublabelInContext,
+  statusForKneeFlexionInContext,
+} from '../../lib/angleFormatter';
+import { persistApiBase, readApiBase, readTargetRepGoal } from '../../lib/prefs';
+import type { AnalysisSummary } from '../../lib/videoAnalysisAccumulator';
+import { buildGoldStandardVideosHttpUrl } from '../../lib/wsUri';
+
+import { ConfigPanel, type ConfigValues } from './ConfigPanel';
+import { FrameProgressBar } from './FrameProgressBar';
+import { PreviewCanvas } from './PreviewCanvas';
+import { ServerHUD } from './ServerHUD';
+import { SnackBar } from './SnackBar';
+import { VideoAnalysisShell } from './VideoAnalysisShell';
+
+function parseFps(t: string): { ok: boolean; value: number; error?: string } {
+  const s = t.trim();
+  if (!s) return { ok: false, value: 10, error: 'Requerido' };
+  const n = Number(s);
+  if (!Number.isFinite(n) || n < 0.5 || n > 60) {
+    return { ok: false, value: n, error: 'Entre 0.5 y 60 FPS' };
+  }
+  return { ok: true, value: n };
+}
+
+function downloadBlob(text: string, filename: string) {
+  const blob = new Blob([text], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+export default function VideoAnalysisPage() {
+  const [summaryOpen, setSummaryOpen] = useState<AnalysisSummary | null>(null);
+  const [snack, setSnack] = useState<string | null>(null);
+
+  const { ui, start, stop, sendPreviewTuning, resetCsv } = useVideoAnalysisSession({
+    onSessionEnded: (s, natural) => {
+      if (natural) setSnack('Análisis completado — puedes iniciar otro');
+      if (s && s.framesProcessed > 0) setSummaryOpen(s);
+    },
+  });
+
+  const [config, setConfig] = useState<ConfigValues>({
+    apiBase: readApiBase(),
+    videoFilename: '',
+    fpsText: '10',
+    includePreview: true,
+    captureOnly: true,
+    serverDiagnostics: false,
+    skeletonOnly: false,
+    previewFps: 10,
+    previewQuality: 84,
+  });
+
+  const handleConfigChange = useCallback(
+    <K extends keyof ConfigValues>(key: K, value: ConfigValues[K]) => {
+      setConfig((prev) => ({ ...prev, [key]: value }));
+    },
+    [],
+  );
+
+  const [targetRepGoal, setTargetRepGoal] = useState<number | null>(null);
+  const [videoList, setVideoList] = useState<string[]>([]);
+  const [listLoading, setListLoading] = useState(false);
+  const [listError, setListError] = useState<string | null>(null);
+
+  const fpsParsed = useMemo(() => parseFps(config.fpsText), [config.fpsText]);
+  const formValid = fpsParsed.ok && config.videoFilename.trim().length > 0 && !ui.running;
+  const csvReady = ui.csvText.split('\n').length >= 3;
+
+  const progress =
+    ui.running && ui.frameIndex >= 0 && ui.totalFrames != null && ui.totalFrames > 0
+      ? Math.min(1, (ui.frameIndex + 1) / ui.totalFrames)
+      : null;
+
+  const ex = ui.exerciseLabel;
+  const leftStatus =
+    ui.leftDeg != null
+      ? statusForKneeFlexionInContext(ui.leftDeg, true, ex, ui.rightDeg)
+      : 'neutral';
+  const rightStatus =
+    ui.rightDeg != null
+      ? statusForKneeFlexionInContext(ui.rightDeg, false, ex, ui.leftDeg)
+      : 'neutral';
+  const leftSublabel = kneeFlexionMetricSublabelInContext(ui.leftDeg, true, ex, ui.rightDeg);
+  const rightSublabel = kneeFlexionMetricSublabelInContext(ui.rightDeg, false, ex, ui.leftDeg);
+
+  const persistApi = useCallback(() => {
+    persistApiBase(config.apiBase);
+  }, [config.apiBase]);
+
+  const refreshVideos = useCallback(async () => {
+    setListLoading(true);
+    setListError(null);
+    persistApiBase(config.apiBase);
+    const url = buildGoldStandardVideosHttpUrl(config.apiBase);
+    const ac = new AbortController();
+    const tid = window.setTimeout(() => ac.abort(), 8000);
+    try {
+      const res = await fetch(url, { signal: ac.signal });
+      if (!res.ok) {
+        setListError(`HTTP ${res.status}`);
+        setVideoList([]);
+        return;
+      }
+      const decoded = (await res.json()) as { filenames?: unknown };
+      const raw = decoded.filenames;
+      const list: string[] = [];
+      if (Array.isArray(raw)) {
+        for (const e of raw) {
+          if (typeof e === 'string' && e.trim()) list.push(e.trim());
+        }
+      }
+      setVideoList(list);
+      setConfig((prev) => ({
+        ...prev,
+        videoFilename:
+          prev.videoFilename && list.includes(prev.videoFilename) ? prev.videoFilename : list[0] ?? '',
+      }));
+    } catch (e) {
+      setListError(String(e));
+      setVideoList([]);
+    } finally {
+      clearTimeout(tid);
+      setListLoading(false);
+    }
+  }, [config.apiBase]);
+
+  const handleStart = useCallback(async () => {
+    if (!formValid) return;
+    resetCsv();
+    const err = await start({
+      apiBaseUrl: config.apiBase,
+      videoFilename: config.videoFilename.trim(),
+      targetFps: fpsParsed.value,
+      includePreview: config.includePreview,
+      previewFps: config.previewFps,
+      previewJpegQuality: Math.round(config.previewQuality),
+      captureOnly: config.captureOnly,
+      serverDiagnostics: config.serverDiagnostics,
+    });
+    if (err) console.warn(err);
+  }, [formValid, resetCsv, start, config, fpsParsed.value]);
+
+  const handleDownloadCsv = useCallback(() => {
+    if (!csvReady) return;
+    downloadBlob(ui.csvText, 'bio_motion_frames.csv');
+  }, [csvReady, ui.csvText]);
+
+  useEffect(() => {
+    void refreshVideos();
+    setTargetRepGoal(readTargetRepGoal());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (!ui.running) return;
+    sendPreviewTuning(config.previewFps, Math.round(config.previewQuality));
+  }, [config.previewFps, config.previewQuality, ui.running, sendPreviewTuning]);
+
+  useEffect(() => {
+    if (!snack) return;
+    const t = setTimeout(() => setSnack(null), 4000);
+    return () => clearTimeout(t);
+  }, [snack]);
+
+  return (
+    <VideoAnalysisShell
+      overlays={
+        <Fragment>
+          <SnackBar message={snack} />
+          <AnalysisSummaryDialog
+            summary={summaryOpen}
+            open={summaryOpen != null}
+            onClose={() => setSummaryOpen(null)}
+          />
+        </Fragment>
+      }
+      sidebar={
+        <ConfigPanel
+          values={config}
+          onChange={handleConfigChange}
+          onPersistApi={persistApi}
+          onRefreshVideos={() => void refreshVideos()}
+          onStart={() => void handleStart()}
+          onStop={() => stop(false)}
+          onDownloadCsv={handleDownloadCsv}
+          videoList={videoList}
+          listLoading={listLoading}
+          listError={listError}
+          fpsParsedError={fpsParsed.error}
+          formValid={formValid}
+          running={ui.running}
+          csvReady={csvReady}
+          statusError={ui.statusError}
+        />
+      }
+      mainColumn={
+        <Fragment>
+          <ServerHUD
+            serverPipelineTotalMs={ui.serverPipelineTotalMs}
+            frameIndex={ui.frameIndex}
+            totalFrames={ui.totalFrames}
+            qualityFlags={ui.qualityFlags}
+          />
+          <DashboardPanel
+            running={ui.running}
+            captureOnly={config.captureOnly}
+            targetRepGoal={targetRepGoal}
+            exerciseLabel={ex}
+            exerciseConfidence={ui.exerciseConfidence}
+            repPhase={ui.repPhase}
+            repCount={ui.repCount}
+            leftDeg={ui.leftDeg}
+            rightDeg={ui.rightDeg}
+            leftStatus={leftStatus}
+            rightStatus={rightStatus}
+            leftSublabel={leftSublabel}
+            rightSublabel={rightSublabel}
+            displayRxPerSec={ui.displayRxPerSec}
+            logEntries={ui.logEntries}
+            leftSeries={ui.leftSeries}
+            rightSeries={ui.rightSeries}
+          />
+          <FrameProgressBar
+            progress={progress}
+            frameIndex={ui.frameIndex}
+            totalFrames={ui.totalFrames}
+          />
+          <PreviewCanvas
+            previewDataUrl={ui.previewDataUrl}
+            previewKey={ui.previewKey}
+            previewAspect={ui.previewAspect}
+            landmarks={ui.landmarks}
+            includePreview={config.includePreview}
+            skeletonOnly={config.skeletonOnly}
+            running={ui.running}
+            overlayRxPerSec={ui.running ? ui.displayRxPerSec : null}
+            overlayQualityFlags={ui.qualityFlags}
+          />
+        </Fragment>
+      }
+    />
+  );
+}
