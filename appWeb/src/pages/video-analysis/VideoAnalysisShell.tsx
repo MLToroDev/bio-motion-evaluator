@@ -10,7 +10,7 @@ interface VideoAnalysisShellProps {
 }
 
 /**
- * Chrome de la pantalla: cabecera con toggle de configuración y rejilla adaptable.
+ * Chrome de la pantalla: cabecera y rejilla adaptable (el panel se abre/cierra desde el lateral o el aviso en vista ampliada).
  */
 export function VideoAnalysisShell({
   overlays,
@@ -36,61 +36,23 @@ export function VideoAnalysisShell({
       {overlays}
 
       <header style={{ marginBottom: '1rem', flexShrink: 0 }}>
-        <div
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            alignItems: 'flex-start',
-            justifyContent: 'space-between',
-            gap: '0.75rem 1rem',
-          }}
-        >
-          <div style={{ minWidth: 0 }}>
-            <h1 className="bm-screen-title" style={{ marginBottom: '0.3rem' }}>
-              Análisis de video
-            </h1>
-            <p className="bm-caption" style={{ margin: 0 }}>
-              Gold standard en servidor · REST + WebSocket{' '}
-              <code
-                style={{
-                  fontFamily: 'var(--bm-font-mono)',
-                  fontSize: '0.75rem',
-                  background: 'var(--bm-surface)',
-                  padding: '0.1rem 0.35rem',
-                  borderRadius: 4,
-                }}
-              >
-                /ws/pose-stream
-              </code>
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={onToggleConfig}
-            aria-expanded={configOpen}
-            aria-controls="video-analysis-config-panel"
+        <h1 className="bm-screen-title" style={{ marginBottom: '0.3rem' }}>
+          Análisis de video
+        </h1>
+        <p className="bm-caption" style={{ margin: 0 }}>
+          Gold standard en servidor · REST + WebSocket{' '}
+          <code
             style={{
-              flexShrink: 0,
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.4rem',
-              padding: '0.45rem 0.85rem',
-              fontFamily: 'var(--bm-font-body)',
-              fontSize: '0.8125rem',
-              fontWeight: 600,
-              color: 'var(--bm-text-primary)',
+              fontFamily: 'var(--bm-font-mono)',
+              fontSize: '0.75rem',
               background: 'var(--bm-surface)',
-              border: '1px solid var(--bm-border)',
-              borderRadius: 'var(--bm-radius-sm)',
-              cursor: 'pointer',
+              padding: '0.1rem 0.35rem',
+              borderRadius: 4,
             }}
           >
-            <span aria-hidden style={{ fontSize: '1rem', lineHeight: 1 }}>
-              {configOpen ? '◀' : '▶'}
-            </span>
-            {configOpen ? 'Ocultar configuración' : 'Mostrar configuración'}
-          </button>
-        </div>
+            /ws/pose-stream
+          </code>
+        </p>
       </header>
 
       <div
@@ -124,8 +86,26 @@ export function VideoAnalysisShell({
         >
           {!configOpen ? (
             <p className="bm-caption" style={{ margin: 0, color: 'var(--bm-text-secondary)' }}>
-              Vista ampliada: solo preview y métricas inferiores. Usa «Mostrar configuración» para cambiar vídeo y
-              opciones.
+              Vista ampliada: preview y métricas inferiores.{' '}
+              <button
+                type="button"
+                onClick={onToggleConfig}
+                aria-expanded={false}
+                aria-controls="video-analysis-config-panel"
+                style={{
+                  padding: 0,
+                  border: 'none',
+                  background: 'none',
+                  cursor: 'pointer',
+                  font: 'inherit',
+                  color: 'var(--bm-accent)',
+                  textDecoration: 'underline',
+                  textUnderlineOffset: '2px',
+                }}
+              >
+                Mostrar parámetros
+              </button>{' '}
+              para elegir vídeo y opciones.
             </p>
           ) : null}
           {mainColumn}

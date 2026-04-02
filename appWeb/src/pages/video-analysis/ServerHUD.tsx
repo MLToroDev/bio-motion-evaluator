@@ -7,6 +7,8 @@ interface ServerHUDProps {
   frameIndex: number;
   totalFrames: number | null;
   qualityFlags: string[];
+  /** Sin margen inferior (p. ej. dentro de un modal). */
+  embedded?: boolean;
 }
 
 export function ServerHUD({
@@ -14,6 +16,7 @@ export function ServerHUD({
   frameIndex,
   totalFrames,
   qualityFlags,
+  embedded = false,
 }: ServerHUDProps) {
   const pipelineLabel = serverPipelineTotalMs != null ? `${serverPipelineTotalMs} ms` : '—';
   const frameLabel =
@@ -31,7 +34,7 @@ export function ServerHUD({
         background: 'var(--bm-surface)',
         borderRadius: 'var(--bm-radius-md)',
         border: '1px solid var(--bm-border)',
-        marginBottom: '0.875rem',
+        marginBottom: embedded ? 0 : '0.875rem',
         fontSize: '0.8rem',
       }}
     >

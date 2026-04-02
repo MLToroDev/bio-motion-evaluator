@@ -1,6 +1,6 @@
 /**
  * VideoAnalysisPage — orquestador: estado, derivaciones y composición de subcomponentes.
- * Presentación: VideoAnalysisShell (config colapsable), ConfigPanel, ServerHUD, preview hero, Dashboard inferior, etc.
+ * Presentación: VideoAnalysisShell, modal de estadísticas (HUD + progreso), preview hero, Dashboard inferior, etc.
  */
 
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
@@ -26,12 +26,11 @@ import type { AnalysisSummary } from '../../lib/videoAnalysisAccumulator';
 import { buildGoldStandardVideosHttpUrl } from '../../lib/wsUri';
 
 import { ConfigPanel, type ConfigValues } from './ConfigPanel';
-import { FrameProgressBar } from './FrameProgressBar';
 import { PreviewCanvas } from './PreviewCanvas';
-import { ServerHUD } from './ServerHUD';
 import { SnackBar } from './SnackBar';
 import { VideoAnalysisActions } from './VideoAnalysisActions';
 import { VideoAnalysisShell } from './VideoAnalysisShell';
+import { VideoAnalysisStatsModal } from './VideoAnalysisStatsModal';
 
 function parseFps(t: string): { ok: boolean; value: number; error?: string } {
   const s = t.trim();
@@ -87,6 +86,7 @@ export default function VideoAnalysisPage() {
   const [listLoading, setListLoading] = useState(false);
   const [listError, setListError] = useState<string | null>(null);
   const [configPanelOpen, setConfigPanelOpen] = useState(readVideoAnalysisConfigOpen);
+  const [statsModalOpen, setStatsModalOpen] = useState(false);
 
   const toggleConfigPanel = useCallback(() => {
     setConfigPanelOpen((prev) => {
@@ -212,6 +212,15 @@ export default function VideoAnalysisPage() {
             open={summaryOpen != null}
             onClose={() => setSummaryOpen(null)}
           />
+          <VideoAnalysisStatsModal
+            open={statsModalOpen}
+            onClose={() => setStatsModalOpen(false)}
+            serverPipelineTotalMs={ui.serverPipelineTotalMs}
+            frameIndex={ui.frameIndex}
+            totalFrames={ui.totalFrames}
+            qualityFlags={ui.qualityFlags}
+            progress={progress}
+          />
         </Fragment>
       }
       sidebar={
@@ -236,12 +245,45 @@ export default function VideoAnalysisPage() {
       }
       mainColumn={
         <Fragment>
-          <ServerHUD
-            serverPipelineTotalMs={ui.serverPipelineTotalMs}
-            frameIndex={ui.frameIndex}
-            totalFrames={ui.totalFrames}
-            qualityFlags={ui.qualityFlags}
-          />
+          <div
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              justifyContent: 'flex-end',
+              gap: '0.5rem',
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => setStatsModalOpen(true)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.45rem',
+                padding: '0.4rem 0.75rem',
+                fontFamily: 'var(--bm-font-body)',
+                fontSize: '0.8125rem',
+                fontWeight: 600,
+                color: 'var(--bm-text-secondary)',
+                background: 'var(--bm-surface)',
+                border: '1px solid var(--bm-border)',
+                borderRadius: 'var(--bm-radius-sm)',
+                cursor: 'pointer',
+              }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+                <path d="M18 20V10M12 20V4M6 20v-6" strokeLinecap="round" />
+              </svg>
+              Estadísticas
+              {ui.running && ui.frameIndex >= 0 ? (
+                <span className="bm-mono" style={{ fontSize: '0.72rem', color: 'var(--bm-accent)' }}>
+                  {ui.frameIndex + 1}
+                  {ui.totalFrames != null ? `/${ui.totalFrames}` : ''}
+                </span>
+              ) : null}
+            </button>
+          </div>
           {!configPanelOpen ? (
             <VideoAnalysisActions
               variant="main-toolbar"
@@ -262,11 +304,6 @@ export default function VideoAnalysisPage() {
               gap: '0.5rem',
             }}
           >
-            <FrameProgressBar
-              progress={progress}
-              frameIndex={ui.frameIndex}
-              totalFrames={ui.totalFrames}
-            />
             <PreviewCanvas
               previewDataUrl={ui.previewDataUrl}
               previewKey={ui.previewKey}

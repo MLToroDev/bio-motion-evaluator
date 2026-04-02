@@ -1,6 +1,5 @@
 import type { AnalysisSummary } from '../lib/videoAnalysisAccumulator';
 import { summaryQualityStatus } from '../lib/videoAnalysisAccumulator';
-import { BmButton } from './BmButton';
 import { MetricTile } from './MetricTile';
 import './ui.css';
 
@@ -52,7 +51,17 @@ export function AnalysisSummaryDialog({
   return (
     <div className="modal-backdrop" role="dialog" aria-modal onClick={onClose}>
       <div className="modal-dialog" onClick={(e) => e.stopPropagation()}>
-        <h2>Resumen del análisis</h2>
+        <button
+          type="button"
+          className="modal-close-x"
+          onClick={onClose}
+          aria-label="Cerrar"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
+        </button>
+        <h2 className="modal-dialog__title">Resumen del análisis</h2>
         <p className="bm-label-large" style={{ color: 'var(--bm-text-secondary)', marginBottom: 8 }}>
           Mejor ángulo logrado
         </p>
@@ -123,11 +132,6 @@ export function AnalysisSummaryDialog({
             </p>
           )}
         </details>
-        <div className="modal-actions">
-          <BmButton variant="ghost" onClick={onClose}>
-            Cerrar
-          </BmButton>
-        </div>
       </div>
     </div>
   );
