@@ -42,6 +42,8 @@ export interface VideoAnalysisUiState {
   previewKey: number;
   previewAspect: number;
   landmarks: LandmarkMap[] | null;
+  /** Landmarks en metros (MediaPipe world); el backend los envía como `world_landmarks` cuando existen. */
+  worldLandmarks: LandmarkMap[] | null;
   knees: Record<string, unknown> | null;
   qualityFlags: string[];
   frameIndex: number;
@@ -68,6 +70,7 @@ const initialUi = (): VideoAnalysisUiState => ({
   previewKey: 0,
   previewAspect: 16 / 9,
   landmarks: null,
+  worldLandmarks: null,
   knees: null,
   qualityFlags: [],
   frameIndex: -1,
@@ -200,6 +203,7 @@ export function useVideoAnalysisSession(opts?: UseVideoAnalysisSessionOptions) {
           previewDataUrl: null,
           previewAspect: 16 / 9,
           landmarks: null,
+          worldLandmarks: null,
           knees: null,
           qualityFlags: [],
           frameIndex: -1,
@@ -272,6 +276,7 @@ export function useVideoAnalysisSession(opts?: UseVideoAnalysisSessionOptions) {
       }
 
       const landmarks = parseLandmarksJson(map.landmarks);
+      const worldLandmarks = parseLandmarksJson(map.world_landmarks);
       const knees = parseKneesMap(map.knees);
       const frameIndex = parseFrameIndex(map.frame_index);
       const totalFrames = parseTotalFrames(map.total_frames);
@@ -377,6 +382,9 @@ export function useVideoAnalysisSession(opts?: UseVideoAnalysisSessionOptions) {
         patch.landmarks = landmarks;
         patch.knees = knees;
         patch.qualityFlags = qualityFlags;
+      }
+      if (worldLandmarks != null) {
+        patch.worldLandmarks = worldLandmarks;
       }
 
       if (previewDataUrl) {

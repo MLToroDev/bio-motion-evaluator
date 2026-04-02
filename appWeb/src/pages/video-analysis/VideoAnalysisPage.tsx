@@ -3,7 +3,7 @@
  * Presentación: VideoAnalysisShell, modal de estadísticas (HUD + progreso), preview hero, Dashboard inferior, etc.
  */
 
-import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
+import { Fragment, lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 
 const VIDEO_ANALYSIS_CONFIG_OPEN_KEY = 'bm-video-analysis-config-open';
 
@@ -16,6 +16,9 @@ function readVideoAnalysisConfigOpen(): boolean {
 }
 import { AnalysisSummaryDialog } from '../../components/AnalysisSummaryDialog';
 import { DashboardPanel } from '../../components/DashboardPanel';
+const PoseSkeleton3DPanel = lazy(() =>
+  import('../../components/pose3d/PoseSkeleton3DPanel').then((m) => ({ default: m.PoseSkeleton3DPanel })),
+);
 import { useVideoAnalysisSession } from '../../hooks/useVideoAnalysisSession';
 import {
   kneeFlexionMetricSublabelInContext,
@@ -316,6 +319,28 @@ export default function VideoAnalysisPage() {
               overlayQualityFlags={ui.qualityFlags}
               variant="hero"
             />
+            <Suspense
+              fallback={
+                <div
+                  className="bm-caption"
+                  style={{
+                    border: '1px solid var(--bm-border)',
+                    borderRadius: 'var(--bm-radius-md)',
+                    padding: '2rem',
+                    textAlign: 'center',
+                    color: 'var(--bm-text-secondary)',
+                  }}
+                >
+                  Cargando vista 3D…
+                </div>
+              }
+            >
+              <PoseSkeleton3DPanel
+                landmarks={ui.landmarks}
+                worldLandmarks={ui.worldLandmarks}
+                mirrorHorizontal={false}
+              />
+            </Suspense>
           </div>
           <div
             style={{
