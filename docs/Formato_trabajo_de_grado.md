@@ -1,4 +1,4 @@
-﻿**BIO-MOTION EVALUATOR: SISTEMA DE SOFTWARE PARA LA VALORACIÓN AUTOMÁTICA DE MOVILIDAD ARTICULAR Y DETECCIÓN DE ASIMETRÍAS MEDIANTE VISIÓN ARTIFICIAL**
+**BIO-MOTION EVALUATOR: SISTEMA DE SOFTWARE PARA LA VALORACIÓN AUTOMÁTICA DE MOVILIDAD ARTICULAR Y DETECCIÓN DE ASIMETRÍAS MEDIANTE VISIÓN ARTIFICIAL**
 
 Mateo Londoño Toro
 
@@ -129,6 +129,8 @@ Visión artificial, estimación de pose, MediaPipe BlazePose, movilidad articula
 [6.6.2. Diagrama de clases. 19](#_Toc174698995)
 
 [6.6.3. Diagrama entidad relación. 19](#_Toc174698996)
+
+[6.6.4. Evaluación del Frontend Flutter Web y Migración a React 19](#_TocFlutterReact)
 
 [6.7. PLAN DE PRUEBAS 19](#_Toc174698997)
 
@@ -713,6 +715,35 @@ _\[Por completar con el diagrama de clases completo del sistema una vez finaliza
 # Diagrama entidad relación
 
 _\[Por completar. En la versión actual el sistema no persiste datos en base de datos relacional; el historial de sesión se almacena en preferencias locales del dispositivo. Este diagrama se construirá cuando se implemente el módulo de historial de sesiones persistente.\]_
+
+<a id="_TocFlutterReact"></a>
+
+# Evaluación del Frontend Flutter Web y Migración a React
+
+## Contexto
+
+Los primeros sprints del proyecto construyeron el frontend en **Flutter** (móvil Android/iOS y **Flutter Web**) con soporte a **WebSocket**, superposición del esqueleto de pose sobre la imagen y paneles de métricas alineados con el backend **FastAPI**. El objetivo era una única base de código para todas las plataformas.
+
+## Hallazgo técnico en Flutter Web
+
+Al ejecutar la aplicación con `flutter run -d web-server` y un flujo de vista previa basado en **JPEG** a frecuencias superiores a aproximadamente **8 FPS**, el pipeline de renderizado de **Flutter Web** introdujo latencia de composición perceptible. En la práctica se observaron **fotogramas negros intercalados** y una **desincronización** entre la imagen JPEG y el overlay del esqueleto: Flutter Web emplea un lienzo **WebGL** propio (**CanvasKit**) que no comparte el mismo ciclo de eventos que el hilo que consume mensajes **WebSocket**, lo que dificulta el acoplamiento fotograma a fotograma entre textura y dibujo vectorial.
+
+## Decisión de arquitectura
+
+Para la capa **web** se desarrolló en paralelo un prototipo en **React 19 + Vite + TypeScript** (`appWeb/`) que reutiliza **el mismo backend** y los mismos contratos (**REST** y **WebSocket**). Al apoyarse en el **DOM nativo** (`<img>` para JPEG y **Canvas 2D** para el esqueleto), la sincronización visual mejoró de forma notable en pruebas internas, sin los fotogramas negros asociados al compositor de Flutter Web en ese escenario.
+
+## Comparativa técnica (resumen)
+
+| Aspecto | Flutter Web | React + Vite (`appWeb`) |
+|--------|-------------|-------------------------|
+| Modelo de render | Canvas WebGL (CanvasKit) + capas propias | DOM + Canvas 2D / `<img>` |
+| Bucle de eventos / composición | Desacoplado del consumo típico de WS en la práctica observada | Mismo hilo de UI del navegador para pintar imagen y canvas |
+| Latencia observable (vista previa JPEG alta frecuencia) | Fotogramas negros y saltos perceptibles (> ~8 FPS en el escenario probado) | Comportamiento estable en pruebas con el mismo backend |
+| Sincronización JPEG–esqueleto | Difícil de garantizar fotograma a fotograma | Alineación visual aceptable para demostración y validación |
+
+## Conclusión
+
+El **backend FastAPI**, el protocolo **WebSocket** y los contratos de mensajes validados en el proyecto **permanecen sin cambios**; la migración afecta únicamente la **capa de presentación web**. El código Flutter original se conserva en el directorio `app/` como referencia de la iteración **móvil nativa** y de la exploración previa en web; la interfaz web operativa del trabajo de grado se orienta a **`appWeb/`** para mitigar las limitaciones observadas en Flutter Web en el escenario de streaming descrito.
 
 # PLAN DE PRUEBAS
 

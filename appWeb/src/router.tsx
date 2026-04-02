@@ -1,0 +1,33 @@
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import AppLayout from './layouts/AppLayout';
+import BackendStatusPage from './pages/BackendStatusPage';
+import ConnectionConfigPage from './pages/ConnectionConfigPage';
+import HomePage from './pages/HomePage';
+import LiveAnalysisPage from './pages/LiveAnalysisPage';
+import LoginPage from './pages/LoginPage';
+import ProfilePage from './pages/ProfilePage';
+import SessionsHistoryPage from './pages/SessionsHistoryPage';
+import VideoAnalysisPage from './pages/VideoAnalysisPage';
+import VideoDownloadPage from './pages/VideoDownloadPage';
+
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <AppLayout />,
+    children: [
+      { index: true, element: <HomePage /> },
+      { path: 'login', element: <LoginPage /> },
+      { path: 'live-analysis', element: <LiveAnalysisPage /> },
+      { path: 'video-analysis', element: <VideoAnalysisPage /> },
+      { path: 'backend-status', element: <BackendStatusPage /> },
+      { path: 'sessions', element: <SessionsHistoryPage /> },
+      { path: 'profile', element: <ProfilePage /> },
+      { path: 'video-download', element: <VideoDownloadPage /> },
+      { path: 'settings/connection', element: <ConnectionConfigPage /> },
+    ],
+  },
+]);
+
+export default function App() {
+  return <RouterProvider router={router} />;
+}
