@@ -28,6 +28,10 @@ def reset_pose_video_timestamp_anchor() -> None:
 
     MediaPipe exige timestamps estrictamente crecientes **por instancia**; no basta con reiniciar
     el contador si se reutiliza el mismo objeto. En batch offline hay que llamar esto al cambiar de archivo.
+
+    El ``close()`` debe ejecutarse **dentro del mismo candado** que ``detect_for_video`` para que ningún
+    hilo de inferencia conserve un puntero a una instancia ya cerrada (p. ej. detener análisis e iniciar
+    otro en rápida sucesión, o dos clientes WebSocket).
     """
     global _LANDMARKER_VIDEO, _MODEL_PATH_VIDEO, _LAST_VIDEO_TIMESTAMP_MS
     with _VIDEO_LANDMARKER_LOCK:
@@ -35,11 +39,11 @@ def reset_pose_video_timestamp_anchor() -> None:
         _LANDMARKER_VIDEO = None
         _MODEL_PATH_VIDEO = None
         _LAST_VIDEO_TIMESTAMP_MS = -1
-    if lm is not None:
-        try:
-            lm.close()
-        except Exception:  # noqa: BLE001
-            log.exception("Error al cerrar PoseLandmarker VIDEO (sesión nueva)")
+        if lm is not None:
+            try:
+                lm.close()
+            except Exception:  # noqa: BLE001
+                log.exception("Error al cerrar PoseLandmarker VIDEO (sesión nueva)")
 
 # Reducción de resolución para acelerar MediaPipe sin perder demasiada precisión.
 _TARGET_MAX_DIM = 640
@@ -198,13 +202,13 @@ def analyze_frame_bgr_video(bgr: np.ndarray, model_path: Path, timestamp_ms: int
     try:
         import mediapipe as mp
 
-        landmarker = _get_landmarker(model_path, running_mode="video")
         mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)
-        # MediaPipe VIDEO exige monotonicidad estricta por instancia de landmarker.
-        # Como el landmarker VIDEO se reutiliza globalmente entre sesiones, aquí
-        # normalizamos y serializamos el acceso para evitar regresiones de timestamp.
+        # MediaPipe VIDEO: monotonicidad estricta y landmarker global. Obtener la instancia y
+        # ``detect_for_video`` deben ir bajo el mismo candado que ``reset_pose_video_timestamp_anchor``,
+        # si no otro hilo puede cerrar el landmarker entre ``_get_landmarker`` y ``detect``.
         global _LAST_VIDEO_TIMESTAMP_MS
         with _VIDEO_LANDMARKER_LOCK:
+            landmarker = _get_landmarker(model_path, running_mode="video")
             ts = int(timestamp_ms)
             if ts <= _LAST_VIDEO_TIMESTAMP_MS:
                 ts = _LAST_VIDEO_TIMESTAMP_MS + 1

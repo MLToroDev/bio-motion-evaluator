@@ -25,9 +25,28 @@ const hudPill: CSSProperties = {
   pointerEvents: 'none',
 };
 
+/** Qué bloques del HUD se dibujan encima del vídeo (cada uno se puede apagar por separado). */
+export type VideoPreviewHudSections = {
+  /** Pastilla RX/s o FPS (esquina superior izquierda). */
+  rate?: boolean;
+  /** Insignia «Modo: …» (esquina superior derecha). */
+  mode?: boolean;
+  /** Lista de consejos / bullets. */
+  tips?: boolean;
+  /** Líneas derivadas de `qualityFlags` del servidor. */
+  quality?: boolean;
+};
+
+function hudSectionOn(sections: VideoPreviewHudSections | undefined, key: keyof VideoPreviewHudSections): boolean {
+  if (sections == null || sections[key] === undefined) return true;
+  return Boolean(sections[key]);
+}
+
 export interface VideoPreviewOverlaysProps {
   /** Si es false no se pinta nada (p. ej. placeholder vacío). */
   visible: boolean;
+  /** Sub-bloques del HUD; por defecto todos visibles. */
+  hudSections?: VideoPreviewHudSections;
   /** Etiqueta corta del modo, p. ej. WEB o SERVIDOR. */
   modeLabel: string;
   /**
@@ -44,6 +63,7 @@ export interface VideoPreviewOverlaysProps {
 
 export function VideoPreviewOverlays({
   visible,
+  hudSections,
   modeLabel,
   rxPerSec,
   rateSuffix = 'RX/s',
@@ -52,11 +72,29 @@ export function VideoPreviewOverlays({
 }: VideoPreviewOverlaysProps) {
   if (!visible) return null;
 
+  const showRate = hudSectionOn(hudSections, 'rate');
+  const showMode = hudSectionOn(hudSections, 'mode');
+  const showTips = hudSectionOn(hudSections, 'tips');
+  const showQuality = hudSectionOn(hudSections, 'quality');
+
   const rateStr = rxPerSec != null ? rxPerSec.toFixed(1) : '—';
   const extra =
     qualityFlags.length > 0
       ? qualityFlags.slice(0, 4)
       : [];
+
+  const showBullets = showTips && bullets.length > 0;
+  const showQualityLines = showQuality && extra.length > 0;
+  const topRow = showRate || showMode;
+  const bottomCard = showBullets || showQualityLines;
+
+  if (!topRow && !bottomCard) return null;
+
+  const topJustify =
+    showRate && showMode ? 'space-between' : showMode && !showRate ? 'flex-end' : 'flex-start';
+
+  const columnJustify =
+    topRow && bottomCard ? 'space-between' : bottomCard && !topRow ? 'flex-end' : 'flex-start';
 
   return (
     <div
@@ -68,69 +106,118 @@ export function VideoPreviewOverlays({
         pointerEvents: 'none',
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'space-between',
+        justifyContent: columnJustify,
         padding: '0.65rem 0.75rem',
+        gap: topRow && bottomCard ? undefined : '0.5rem',
       }}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem' }}>
-        <div style={{ ...hudPill, display: 'flex', alignItems: 'center', gap: '0.45rem', padding: '0.35rem 0.65rem' }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden style={{ color: 'var(--bm-accent)' }}>
-            <path
-              d="M13 2L3 14h8l-1 8 10-12h-8l1-8z"
-              stroke="currentColor"
-              strokeWidth="1.6"
-              strokeLinejoin="round"
-            />
-          </svg>
-          <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.15 }}>
-            <span style={{ fontFamily: 'var(--bm-font-mono)', fontSize: '0.95rem', fontWeight: 600, color: 'var(--bm-text-primary)' }}>
-              {rateStr}
-            </span>
-            <span style={{ fontSize: '0.62rem', fontWeight: 600, letterSpacing: '0.06em', color: 'var(--bm-text-secondary)', textTransform: 'uppercase' }}>
-              {rateSuffix}
-            </span>
+      {topRow ? (
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: topJustify,
+            alignItems: 'flex-start',
+            gap: '0.5rem',
+            width: '100%',
+          }}
+        >
+          {showRate ? (
+            <div style={{ ...hudPill, display: 'flex', alignItems: 'center', gap: '0.45rem', padding: '0.35rem 0.65rem' }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden style={{ color: 'var(--bm-accent)' }}>
+                <path
+                  d="M13 2L3 14h8l-1 8 10-12h-8l1-8z"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.15 }}>
+                <span style={{ fontFamily: 'var(--bm-font-mono)', fontSize: '0.95rem', fontWeight: 600, color: 'var(--bm-text-primary)' }}>
+                  {rateStr}
+                </span>
+                <span style={{ fontSize: '0.62rem', fontWeight: 600, letterSpacing: '0.06em', color: 'var(--bm-text-secondary)', textTransform: 'uppercase' }}>
+                  {rateSuffix}
+                </span>
+              </div>
+            </div>
+          ) : null}
+          {showMode ? (
+            <div
+              style={{
+                ...hudPill,
+                padding: '0.4rem 0.7rem',
+                fontSize: '0.68rem',
+                fontWeight: 700,
+                letterSpacing: '0.08em',
+                color: 'var(--bm-text-secondary)',
+                textTransform: 'uppercase',
+              }}
+            >
+              Modo: <span style={{ color: 'var(--bm-accent)' }}>{modeLabel}</span>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+
+      {bottomCard ? (
+        <div style={{ alignSelf: 'flex-start', maxWidth: 'min(100%, 280px)' }}>
+          <div
+            style={{
+              ...hudPill,
+              padding: '0.55rem 0.7rem',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.45rem',
+            }}
+          >
+            {showBullets
+              ? bullets.map((line) => (
+                  <div
+                    key={line}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: '0.45rem',
+                      fontSize: '0.72rem',
+                      color: 'rgba(255,255,255,0.88)',
+                      lineHeight: 1.35,
+                    }}
+                  >
+                    <span
+                      style={{
+                        marginTop: '0.2rem',
+                        width: 5,
+                        height: 5,
+                        borderRadius: '50%',
+                        background: 'var(--bm-accent)',
+                        flexShrink: 0,
+                      }}
+                    />
+                    <span>{line}</span>
+                  </div>
+                ))
+              : null}
+            {showQualityLines
+              ? extra.map((line) => (
+                  <div
+                    key={line}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: '0.45rem',
+                      fontSize: '0.68rem',
+                      color: 'var(--bm-angle-warn)',
+                      lineHeight: 1.35,
+                    }}
+                  >
+                    <span style={{ marginTop: '0.15rem', flexShrink: 0 }}>⚠</span>
+                    <span>{line}</span>
+                  </div>
+                ))
+              : null}
           </div>
         </div>
-
-        <div
-          style={{
-            ...hudPill,
-            padding: '0.4rem 0.7rem',
-            fontSize: '0.68rem',
-            fontWeight: 700,
-            letterSpacing: '0.08em',
-            color: 'var(--bm-text-secondary)',
-            textTransform: 'uppercase',
-          }}
-        >
-          Modo: <span style={{ color: 'var(--bm-accent)' }}>{modeLabel}</span>
-        </div>
-      </div>
-
-      <div style={{ alignSelf: 'flex-start', maxWidth: 'min(100%, 280px)' }}>
-        <div
-          style={{
-            ...hudPill,
-            padding: '0.55rem 0.7rem',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '0.45rem',
-          }}
-        >
-          {bullets.map((line) => (
-            <div key={line} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.45rem', fontSize: '0.72rem', color: 'rgba(255,255,255,0.88)', lineHeight: 1.35 }}>
-              <span style={{ marginTop: '0.2rem', width: 5, height: 5, borderRadius: '50%', background: 'var(--bm-accent)', flexShrink: 0 }} />
-              <span>{line}</span>
-            </div>
-          ))}
-          {extra.map((line) => (
-            <div key={line} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.45rem', fontSize: '0.68rem', color: 'var(--bm-angle-warn)', lineHeight: 1.35 }}>
-              <span style={{ marginTop: '0.15rem', flexShrink: 0 }}>⚠</span>
-              <span>{line}</span>
-            </div>
-          ))}
-        </div>
-      </div>
+      ) : null}
     </div>
   );
 }

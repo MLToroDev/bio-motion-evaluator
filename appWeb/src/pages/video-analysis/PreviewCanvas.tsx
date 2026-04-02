@@ -1,5 +1,9 @@
 import { PoseSkeletonCanvas } from '../../components/PoseSkeletonCanvas';
-import { FILE_PREVIEW_TIPS, VideoPreviewOverlays } from '../../components/VideoPreviewOverlays';
+import {
+  FILE_PREVIEW_TIPS,
+  type VideoPreviewHudSections,
+  VideoPreviewOverlays,
+} from '../../components/VideoPreviewOverlays';
 import type { LandmarkMap } from '../../lib/poseWsPayload';
 
 interface PreviewCanvasProps {
@@ -10,8 +14,14 @@ interface PreviewCanvasProps {
   includePreview: boolean;
   skeletonOnly: boolean;
   running: boolean;
+  /** Sub-bloques del HUD (RX, modo, consejos, calidad). */
+  hudSections?: VideoPreviewHudSections;
+  /** Si false, no se dibuja el canvas de pose 2D sobre el vídeo. */
+  skeletonOverlay?: boolean;
   overlayRxPerSec?: number | null;
   overlayQualityFlags?: string[];
+  /** Pastilla esquina inferior derecha: FPS efectivos (mensajes/s desde el servidor). */
+  showServerFpsPill?: boolean;
   /**
    * `hero` — área principal: crece en altura, `object-fit: contain` en el JPEG.
    * `aspect` — tamaño fijo según relación de aspecto del stream.
@@ -27,13 +37,17 @@ export function PreviewCanvas({
   includePreview,
   skeletonOnly,
   running,
+  hudSections,
+  skeletonOverlay = true,
   overlayRxPerSec = null,
   overlayQualityFlags = [],
+  showServerFpsPill = true,
   variant = 'aspect',
 }: PreviewCanvasProps) {
   const showImage = previewDataUrl && includePreview && !skeletonOnly;
   const showPlaceholder = !previewDataUrl && !landmarks;
   const showHud = running;
+  const showSkeleton2d = skeletonOverlay;
 
   const placeholderText = running
     ? 'Esperando fotogramas…'
@@ -66,6 +80,11 @@ export function PreviewCanvas({
 
   const imgObjectFit = isHero ? 'contain' : 'fill';
 
+  const aspectNum =
+    typeof previewAspect === 'number' && Number.isFinite(previewAspect) && previewAspect > 0
+      ? previewAspect
+      : null;
+
   return (
     <div style={rootStyle}>
       {showImage && (
@@ -84,9 +103,44 @@ export function PreviewCanvas({
         />
       )}
 
-      <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
-        <PoseSkeletonCanvas landmarks={landmarks} mirrorHorizontal={false} />
-      </div>
+      {showSkeleton2d ? (
+        <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+          <PoseSkeletonCanvas
+            landmarks={landmarks}
+            mirrorHorizontal={false}
+            contentAspect={imgObjectFit === 'contain' ? aspectNum : null}
+          />
+        </div>
+      ) : null}
+
+      {showServerFpsPill && running && overlayRxPerSec != null ? (
+        <div
+          aria-live="polite"
+          style={{
+            position: 'absolute',
+            bottom: '0.55rem',
+            right: '0.55rem',
+            zIndex: 14,
+            pointerEvents: 'none',
+            background: 'rgba(12, 14, 18, 0.82)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+            border: '1px solid rgba(255, 255, 255, 0.12)',
+            borderRadius: 'var(--bm-radius-sm)',
+            padding: '0.35rem 0.6rem',
+            fontFamily: 'var(--bm-font-mono)',
+            fontSize: '0.8125rem',
+            fontWeight: 600,
+            color: 'var(--bm-text-primary)',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.35)',
+          }}
+        >
+          <span style={{ fontSize: '0.58rem', fontWeight: 700, letterSpacing: '0.06em', color: 'var(--bm-text-secondary)' }}>
+            SERVIDOR{' '}
+          </span>
+          {overlayRxPerSec.toFixed(1)} FPS
+        </div>
+      ) : null}
 
       {showPlaceholder && (
         <div
@@ -128,6 +182,7 @@ export function PreviewCanvas({
 
       <VideoPreviewOverlays
         visible={showHud}
+        hudSections={hudSections}
         modeLabel="SERVIDOR"
         rxPerSec={overlayRxPerSec}
         rateSuffix="RX/s"

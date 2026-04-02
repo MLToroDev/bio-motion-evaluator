@@ -2,6 +2,8 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field, field_validator
 
+StreamTuningMode = Literal["auto", "off"]
+
 
 class ExerciseClassifierConfig(BaseModel):
     """Parámetros centralizados del clasificador (umbral, ventana, histéresis, EMA/Kalman)."""
@@ -121,6 +123,22 @@ class PoseStreamConfig(BaseModel):
     device_index: int = 0
     stream_url: str | None = None
     target_fps: float = Field(default=15.0, ge=0.5, le=60.0)
+    max_throughput: bool = Field(
+        default=False,
+        description=(
+            "Si True, el servidor no duerme entre frames: procesa el vídeo tan rápido como "
+            "permita CPU/GPU. ``target_fps`` se ignora para el ritmo (sigue siendo útil como "
+            "referencia en clientes antiguos). La vista previa JPEG se limita por tiempo (~preview_fps)."
+        ),
+    )
+    stream_tuning: StreamTuningMode = Field(
+        default="auto",
+        description=(
+            "auto: el servidor ajusta downscale, stride de inferencia y techo de FPS según resolución "
+            "y FPS nativos del flujo (OpenCV). off: solo usa ``target_fps`` y ``pose_inference_stride`` "
+            "globales sin heurísticas de vídeo."
+        ),
+    )
     include_preview: bool = Field(
         default=True,
         description="Si True, cada mensaje incluye preview_jpeg_base64 (vista + marcas en cliente).",
@@ -170,3 +188,18 @@ class PoseStreamConfig(BaseModel):
         if v is None:
             return False
         return bool(v)
+
+    @field_validator("max_throughput", mode="before")
+    @classmethod
+    def max_throughput_coerce_none(cls, v: object) -> bool:
+        if v is None:
+            return False
+        return bool(v)
+
+    @field_validator("stream_tuning", mode="before")
+    @classmethod
+    def stream_tuning_coerce(cls, v: object) -> str:
+        if v is None:
+            return "auto"
+        s = str(v).strip().lower()
+        return s if s in ("auto", "off") else "auto"

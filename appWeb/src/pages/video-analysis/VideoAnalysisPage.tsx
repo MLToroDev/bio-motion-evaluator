@@ -24,12 +24,18 @@ import {
   kneeFlexionMetricSublabelInContext,
   statusForKneeFlexionInContext,
 } from '../../lib/angleFormatter';
+import {
+  loadPreviewLayerState,
+  persistPreviewLayerState,
+  type PreviewLayerToggleState,
+} from '../../lib/previewLayerPrefs';
 import { persistApiBase, readApiBase, readTargetRepGoal } from '../../lib/prefs';
 import type { AnalysisSummary } from '../../lib/videoAnalysisAccumulator';
 import { buildGoldStandardVideosHttpUrl } from '../../lib/wsUri';
 
 import { ConfigPanel, type ConfigValues } from './ConfigPanel';
 import { PreviewCanvas } from './PreviewCanvas';
+import { PreviewLayerToolbar } from './PreviewLayerToolbar';
 import { SnackBar } from './SnackBar';
 import { VideoAnalysisActions } from './VideoAnalysisActions';
 import { VideoAnalysisShell } from './VideoAnalysisShell';
@@ -69,9 +75,11 @@ export default function VideoAnalysisPage() {
     apiBase: readApiBase(),
     videoFilename: '',
     fpsText: '10',
+    maxThroughput: false,
     includePreview: true,
     captureOnly: true,
     serverDiagnostics: false,
+    streamTuningAuto: true,
     skeletonOnly: false,
     previewFps: 10,
     previewQuality: 84,
@@ -90,6 +98,15 @@ export default function VideoAnalysisPage() {
   const [listError, setListError] = useState<string | null>(null);
   const [configPanelOpen, setConfigPanelOpen] = useState(readVideoAnalysisConfigOpen);
   const [statsModalOpen, setStatsModalOpen] = useState(false);
+  const [previewLayers, setPreviewLayers] = useState<PreviewLayerToggleState>(loadPreviewLayerState);
+
+  const togglePreviewLayer = useCallback((key: keyof PreviewLayerToggleState) => {
+    setPreviewLayers((prev) => {
+      const next = { ...prev, [key]: !prev[key] };
+      persistPreviewLayerState(next);
+      return next;
+    });
+  }, []);
 
   const toggleConfigPanel = useCallback(() => {
     setConfigPanelOpen((prev) => {
@@ -104,7 +121,10 @@ export default function VideoAnalysisPage() {
   }, []);
 
   const fpsParsed = useMemo(() => parseFps(config.fpsText), [config.fpsText]);
-  const formValid = fpsParsed.ok && config.videoFilename.trim().length > 0 && !ui.running;
+  const formValid =
+    (config.maxThroughput || fpsParsed.ok) &&
+    config.videoFilename.trim().length > 0 &&
+    !ui.running;
   const csvReady = ui.csvText.split('\n').length >= 3;
 
   const progress =
@@ -171,12 +191,14 @@ export default function VideoAnalysisPage() {
     const err = await start({
       apiBaseUrl: config.apiBase,
       videoFilename: config.videoFilename.trim(),
-      targetFps: fpsParsed.value,
+      targetFps: config.maxThroughput ? 30 : fpsParsed.value,
+      maxThroughput: config.maxThroughput,
       includePreview: config.includePreview,
       previewFps: config.previewFps,
       previewJpegQuality: Math.round(config.previewQuality),
       captureOnly: config.captureOnly,
       serverDiagnostics: config.serverDiagnostics,
+      streamTuning: config.streamTuningAuto ? 'auto' : 'off',
     });
     if (err) console.warn(err);
   }, [formValid, resetCsv, start, config, fpsParsed.value]);
@@ -253,10 +275,11 @@ export default function VideoAnalysisPage() {
               display: 'flex',
               flexWrap: 'wrap',
               alignItems: 'center',
-              justifyContent: 'flex-end',
-              gap: '0.5rem',
+              justifyContent: 'space-between',
+              gap: '0.65rem',
             }}
           >
+            <PreviewLayerToolbar layers={previewLayers} onToggle={togglePreviewLayer} />
             <button
               type="button"
               onClick={() => setStatsModalOpen(true)}
@@ -273,6 +296,8 @@ export default function VideoAnalysisPage() {
                 border: '1px solid var(--bm-border)',
                 borderRadius: 'var(--bm-radius-sm)',
                 cursor: 'pointer',
+                flexShrink: 0,
+                marginLeft: 'auto',
               }}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
@@ -315,6 +340,13 @@ export default function VideoAnalysisPage() {
               includePreview={config.includePreview}
               skeletonOnly={config.skeletonOnly}
               running={ui.running}
+              hudSections={{
+                rate: previewLayers.rate,
+                mode: previewLayers.mode,
+                tips: previewLayers.tips,
+                quality: previewLayers.quality,
+              }}
+              skeletonOverlay={previewLayers.skeletonOverlay}
               overlayRxPerSec={ui.running ? ui.displayRxPerSec : null}
               overlayQualityFlags={ui.qualityFlags}
               variant="hero"

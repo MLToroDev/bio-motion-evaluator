@@ -11,9 +11,13 @@ export interface ConfigValues {
   apiBase: string;
   videoFilename: string;
   fpsText: string;
+  /** Sin limitar FPS en el servidor (máximo rendimiento posible). */
+  maxThroughput: boolean;
   includePreview: boolean;
   captureOnly: boolean;
   serverDiagnostics: boolean;
+  /** Perfil automático según resolución/FPS del clip (backend). */
+  streamTuningAuto: boolean;
   skeletonOnly: boolean;
   previewFps: PreviewFpsAllowed;
   previewQuality: number;
@@ -122,16 +126,30 @@ function CheckRow({
 function Field({
   label,
   error,
+  hint,
   children,
 }: {
   label: string;
   error?: string;
+  hint?: string;
   children: ReactNode;
 }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
       <FieldLabel>{label}</FieldLabel>
       {children}
+      {hint && (
+        <span
+          style={{
+            fontSize: '0.72rem',
+            color: 'var(--bm-text-secondary)',
+            fontFamily: 'var(--bm-font-body)',
+            lineHeight: 1.35,
+          }}
+        >
+          {hint}
+        </span>
+      )}
       {error && (
         <span
           style={{
@@ -304,12 +322,29 @@ export function ConfigPanel({
             </select>
           </Field>
 
-          <Field label="Target FPS" error={fpsParsedError}>
+          <CheckRow
+            label="Máximo rendimiento (sin limitar FPS en servidor)"
+            checked={values.maxThroughput}
+            onChange={(v) => onChange('maxThroughput', v)}
+            disabled={running}
+          />
+          <Field
+            label="Target FPS"
+            error={values.maxThroughput ? undefined : fpsParsedError}
+            hint={
+              values.maxThroughput
+                ? 'Opción desactivada: el backend procesa cada frame tan pronto como pueda.'
+                : undefined
+            }
+          >
             <input
-              style={inputStyle}
+              style={{
+                ...inputStyle,
+                opacity: values.maxThroughput ? 0.55 : 1,
+              }}
               value={values.fpsText}
               onChange={(e) => onChange('fpsText', e.target.value)}
-              disabled={running}
+              disabled={running || values.maxThroughput}
             />
           </Field>
         </ConfigCard>
@@ -331,6 +366,12 @@ export function ConfigPanel({
             label="Diagnósticos servidor"
             checked={values.serverDiagnostics}
             onChange={(v) => onChange('serverDiagnostics', v)}
+            disabled={running}
+          />
+          <CheckRow
+            label="Ajuste automático al vídeo (resolución / FPS)"
+            checked={values.streamTuningAuto}
+            onChange={(v) => onChange('streamTuningAuto', v)}
             disabled={running}
           />
           <CheckRow

@@ -94,11 +94,15 @@ export interface SessionStartParams {
   apiBaseUrl: string;
   videoFilename: string;
   targetFps: number;
+  /** Si true, el servidor no limita el ritmo entre frames (procesa lo más rápido posible). */
+  maxThroughput: boolean;
   includePreview: boolean;
   previewFps: number;
   previewJpegQuality: number;
   captureOnly: boolean;
   serverDiagnostics: boolean;
+  /** auto = servidor adapta downscale/FPS/stride al vídeo; off = solo parámetros explícitos. */
+  streamTuning: 'auto' | 'off';
 }
 
 async function wsPayloadToText(data: unknown): Promise<string | null> {
@@ -260,6 +264,10 @@ export function useVideoAnalysisSession(opts?: UseVideoAnalysisSessionOptions) {
       }
 
       if (map.stream_done === true) return;
+
+      if (map.stream_profile != null && typeof map.stream_profile === 'object') {
+        return;
+      }
 
       const poseOk = map.pose_ok === true;
       const b64 = typeof map.preview_jpeg_base64 === 'string' ? map.preview_jpeg_base64 : null;
@@ -468,11 +476,13 @@ export function useVideoAnalysisSession(opts?: UseVideoAnalysisSessionOptions) {
                 source: 'file',
                 video_filename: params.videoFilename,
                 target_fps: params.targetFps,
+                max_throughput: params.maxThroughput,
                 include_preview: params.includePreview,
                 preview_fps: sanitizePreviewFps(params.previewFps),
                 preview_jpeg_quality: sanitizePreviewJpegQuality(params.previewJpegQuality),
                 capture_only: params.captureOnly,
                 diagnostics: params.serverDiagnostics,
+                stream_tuning: params.streamTuning,
               }),
             );
           } catch (e) {
