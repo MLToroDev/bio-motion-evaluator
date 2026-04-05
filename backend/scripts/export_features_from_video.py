@@ -28,7 +28,10 @@ import csv
 import json
 import sys
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from app.models.schemas import ExerciseClassifierConfig
 
 # Ejecutar desde ``backend/`` (como el resto de scripts del proyecto).
 _BACKEND_ROOT = Path(__file__).resolve().parents[1]
@@ -56,6 +59,73 @@ except ModuleNotFoundError as exc:
         file=sys.stderr,
     )
     raise SystemExit(1) from exc
+
+
+def extract_features_from_file(
+    video_path: Path,
+    label: str,
+    classifier_cfg: "ExerciseClassifierConfig",
+    model_path: Path,
+    *,
+    only_window_full: bool = True,
+    require_pose_ok: bool = True,
+    emit_every: int = 3,
+    max_frames: int = 0,
+) -> tuple[list[list[float]], int]:
+    """
+    Extrae vectores 32D desde cualquier archivo de vídeo accesible en disco.
+
+    Función importable por la tarea Celery de ingesta; no requiere que el vídeo esté en el
+    directorio gold-standard.
+
+    Devuelve ``(list_of_32d_vectors, frames_read)``.
+    Lanza ``FileNotFoundError`` si ``video_path`` no existe.
+    """
+    from app.services.pose.mediapipe import reset_pose_video_timestamp_anchor
+
+    if not video_path.is_file():
+        raise FileNotFoundError(str(video_path))
+
+    reset_pose_video_timestamp_anchor()
+    engine = FeatureEngine(classifier_cfg)
+    vectors: list[list[float]] = []
+    frames_read = 0
+    emit_counter = 0
+
+    with VideoSource(source_type="file", file_path=str(video_path), loop_file=False) as src:
+        cap = src._cap
+        fps = float(cap.get(cv2.CAP_PROP_FPS)) if cap is not None else 0.0
+        if fps <= 1.0 or fps > 240.0:
+            fps = 30.0
+        dt_s = 1.0 / fps
+
+        while True:
+            if max_frames and frames_read >= max_frames:
+                break
+            bgr = src.get_frame()
+            if bgr is None:
+                break
+
+            ts_ms = int(round(frames_read * (1000.0 / fps)))
+            pose = extract_pose_bgr_video(bgr, model_path, ts_ms)
+            engine.push(pose, dt_s)
+            frames_read += 1
+
+            if require_pose_ok and not pose.ok:
+                continue
+            if only_window_full and not engine.window_full():
+                continue
+
+            emit_counter += 1
+            if emit_counter % emit_every != 0:
+                continue
+
+            vec = engine.build_feature_vector()
+            if vec.shape[0] != FEATURE_VECTOR_DIM:
+                continue
+            vectors.append([float(vec[i]) for i in range(FEATURE_VECTOR_DIM)])
+
+    return vectors, frames_read
 
 
 def _label_at_time_sec(t_sec: float, segments: list[dict[str, Any]] | None, fixed_label: str) -> str | None:

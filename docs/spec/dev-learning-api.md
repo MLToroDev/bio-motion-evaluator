@@ -74,6 +74,10 @@ Todas las rutas bajo prefijo **`/api/v1/dev`**.
 | Frontend | `appWeb/src/pages/dev/*.tsx`, `appWeb/src/lib/devLearningApi.ts` |
 | Config | `backend/app/config.py`, `backend/.env.example` |
 
+## Guía operativa (manual)
+
+Procedimiento paso a paso para desarrolladores: **[`docs/guias/manual_aprendizaje_continuo_y_entrenamiento.md`](../guias/manual_aprendizaje_continuo_y_entrenamiento.md)**.
+
 ## Pruebas manuales
 
 1. Configurar `DATABASE_URL`, ejecutar `alembic upgrade head`.

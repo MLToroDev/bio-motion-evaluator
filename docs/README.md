@@ -26,5 +26,6 @@
 | [guias/EstandarDiseño.md](guias/EstandarDiseño.md) | Estándar visual del proyecto |
 | [guias/reporte_latencia_frames_ws_pose_stream.md](guias/reporte_latencia_frames_ws_pose_stream.md) | Notas de latencia en streaming |
 | [guias/protocolo_captura_clasificacion_ejercicios.md](guias/protocolo_captura_clasificacion_ejercicios.md) | Protocolo de cámara y catálogo para clasificación de ejercicios |
+| [guias/manual_aprendizaje_continuo_y_entrenamiento.md](guias/manual_aprendizaje_continuo_y_entrenamiento.md) | Manual: entrenamiento ONNX (offline + Dev Tools), Celery, HF Hub, flujo operativo |
 
 Añade aquí el documento definitivo institucional (Word/LaTeX) o enlázalo según la política de la universidad.

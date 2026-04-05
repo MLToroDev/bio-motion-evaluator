@@ -11,6 +11,7 @@ import VideoAnalysisPage from './pages/video-analysis/VideoAnalysisPage';
 import VideoDownloadPage from './pages/VideoDownloadPage';
 import CatalogPage from './pages/dev/CatalogPage';
 import DatasetPage from './pages/dev/DatasetPage';
+import DataSourcesPage from './pages/dev/DataSourcesPage';
 import ModelsPage from './pages/dev/ModelsPage';
 import TrainingPage from './pages/dev/TrainingPage';
 
@@ -32,6 +33,7 @@ const router = createBrowserRouter([
       { path: 'dev/dataset', element: <DatasetPage /> },
       { path: 'dev/training', element: <TrainingPage /> },
       { path: 'dev/models', element: <ModelsPage /> },
+      { path: 'dev/sources', element: <DataSourcesPage /> },
     ],
   },
 ]);

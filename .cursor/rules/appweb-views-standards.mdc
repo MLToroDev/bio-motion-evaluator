@@ -1,0 +1,23 @@
+---
+description: Estándares de vistas React en appWeb (páginas pantalla completa y Dev Tools)
+globs: appWeb/src/pages/**/*.tsx
+alwaysApply: false
+---
+
+# Vistas en `appWeb` (estándar Bio-Motion)
+
+Al crear o editar una **página** bajo `appWeb/src/pages/`, seguir el patrón consolidado en **`appWeb/src/pages/dev/`**, el stylesheet compartido **`appWeb/src/pages/dev/devPages.css`** y los componentes **`BmButton`**, **`BmInput`**, **`BmSelect`** (`appWeb/src/components/`).
+
+## Checklist
+
+1. **Tipografía:** `bm-screen-title` para el H1; `bm-caption` para descripciones; `bm-section-title` para subsecciones; datos técnicos en `bm-mono` cuando aplique.
+2. **Layout:** Contenedor principal con clase `bm-dev-page` (o `bm-dev-page--wide` / `bm-dev-page--narrow` según ancho deseado). Reutilizar utilidades de `devPages.css` (`bm-dev-toolbar`, `bm-dev-panel`, `bm-dev-section`, `bm-dev-card`, `bm-dev-msg--error`, etc.) antes de inventar estilos inline.
+3. **Controles:** Botones con **`BmButton`** (`primary` / `outline` / `ghost`), no `<button>` crudos salvo excepción justificada. Campos de formulario con **`BmInput`** / **`BmSelect`** (estilos `bm-field` ya incluidos).
+4. **Tokens:** Espaciado, bordes y colores con variables de `appWeb/src/design/tokens.css` (`--bm-space-*`, `--bm-border`, `--bm-surface`, `--bm-accent`, `--bm-angle-bad`, …), no valores mágicos sueltos (`#222`, `rgba(255,255,255,0.08)`).
+5. **Referencia viva:** Para nuevas pantallas **Dev**, copiar estructura de `CatalogPage`, `DatasetPage`, `TrainingPage`, `ModelsPage` o `DataSourcesPage` y extender `devPages.css` si hace falta un bloque reutilizable.
+
+## Antipatrones
+
+- Formularios con `<input>` / `<select>` sin clases del sistema y bordes ad-hoc.
+- Títulos sin clases tipográficas del proyecto.
+- Mensajes de error sin `bm-caption` + `bm-dev-msg--error` (o equivalente semántico con tokens).

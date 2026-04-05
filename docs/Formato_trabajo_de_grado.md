@@ -941,6 +941,20 @@ Las entradas nuevas se añaden **al inicio** de la lista (más reciente arriba),
 
 ## Entradas
 
+### 2026-04-04 — Descubribilidad Dev Tools en Inicio y flujo por vistas en el manual
+
+- **Ámbito:** `appWeb/`, `docs/guias/`
+- **Tipo:** usabilidad / documentación
+- **Descripción:** La página de inicio enlaza las cuatro rutas `/dev/*` bajo «Desarrollo — aprendizaje del clasificador». El manual aclara que el entrenamiento no está en análisis de vídeo y describe el orden de clics (Configuración → Dataset → Entrenamiento → Modelos).
+- **Trazabilidad:** `appWeb/src/pages/HomePage.tsx`, `docs/guias/manual_aprendizaje_continuo_y_entrenamiento.md` §4.0
+
+### 2026-04-04 — Manual de operación: entrenamiento del clasificador y módulo Dev
+
+- **Ámbito:** `docs/guias/`, `docs/README.md`
+- **Tipo:** gobernanza documental
+- **Descripción:** Se añadió [`docs/guias/manual_aprendizaje_continuo_y_entrenamiento.md`](guias/manual_aprendizaje_continuo_y_entrenamiento.md) con el flujo offline (CSV/export), requisitos (`requirements-train`, Alembic, Celery, Redis), uso de las pantallas `/dev/*`, recolección automática, Hugging Face opcional y tabla de incidencias; enlazado desde [`docs/README.md`](README.md).
+- **Trazabilidad:** [`docs/spec/dev-learning-api.md`](spec/dev-learning-api.md), [`docs/guias/protocolo_captura_clasificacion_ejercicios.md`](guias/protocolo_captura_clasificacion_ejercicios.md)
+
 ### 2026-04-04 — Módulo de aprendizaje continuo: `/api/v1/dev`, Celery, UI Dev Tools
 
 - **Ámbito:** `backend/`, `appWeb/`, `docs/spec/`, `docs/arquitectura.md`

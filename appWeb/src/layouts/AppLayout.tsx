@@ -17,6 +17,7 @@ const links = [
 ];
 
 const devLinks = [
+  { to: '/dev/sources', label: 'Dev · Fuentes de datos' },
   { to: '/dev/catalog', label: 'Dev · Catálogo' },
   { to: '/dev/dataset', label: 'Dev · Dataset' },
   { to: '/dev/training', label: 'Dev · Entrenamiento' },

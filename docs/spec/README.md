@@ -24,7 +24,7 @@ Al cambiar protocolos o comportamiento visible, **actualizar el spec correspondi
 | [websocket-pose-stream.md](websocket-pose-stream.md) | `/ws/pose-stream`: config inicial, frames JSON, contrato unificado v1, `include_preview` |
 | [flutter-client-websocket.md](flutter-client-websocket.md) | Patrones Flutter/Web (null-safety, hot reload, WS) |
 | [api-v1-rest.md](api-v1-rest.md) | `/api/v1`: salud, `analyze/pose`, JWT stub, sesiones, métricas (PostgreSQL opcional) |
-| [dev-learning-api.md](dev-learning-api.md) | `/api/v1/dev/*`: dataset 32D, jobs de entrenamiento, manifest ONNX, auto-colección |
+| [dev-learning-api.md](dev-learning-api.md) | `/api/v1/dev/*`: dataset 32D, jobs de entrenamiento, manifest ONNX, auto-colección (manual operativo: [`../guias/manual_aprendizaje_continuo_y_entrenamiento.md`](../guias/manual_aprendizaje_continuo_y_entrenamiento.md)) |
 
 Referencias de arquitectura general: [../arquitectura.md](../arquitectura.md).
 

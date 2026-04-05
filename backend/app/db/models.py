@@ -87,6 +87,27 @@ class FeatureSampleORM(Base):
     recorded_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
+class IngestJobORM(Base):
+    """Job asíncrono de ingesta de vídeos desde YouTube → feature_samples."""
+
+    __tablename__ = "ingest_jobs"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    status: Mapped[str] = mapped_column(String(32), nullable=False, default="pending")
+    celery_task_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    exercise_label: Mapped[str] = mapped_column(String(64), nullable=False)
+    source_type: Mapped[str] = mapped_column(String(32), nullable=False, default="youtube_search")
+    query: Mapped[str] = mapped_column(Text, nullable=False)
+    max_videos: Mapped[int] = mapped_column(Integer, nullable=False, default=5)
+    auto_approve: Mapped[bool] = mapped_column(default=False, nullable=False)
+    videos_json: Mapped[list[Any] | None] = mapped_column(JSONB, nullable=True)
+    metrics_json: Mapped[dict[str, Any] | None] = mapped_column(JSONB, nullable=True)
+    params_json: Mapped[dict[str, Any] | None] = mapped_column(JSONB, nullable=True)
+    error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
 class TrainingJobORM(Base):
     """Job asíncrono de entrenamiento del clasificador ONNX."""
 
