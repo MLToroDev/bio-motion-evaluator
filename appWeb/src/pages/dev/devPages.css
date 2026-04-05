@@ -303,7 +303,56 @@
 .bm-dev-total {
   font-size: 0.8125rem;
   color: var(--bm-text-secondary);
+  margin-bottom: var(--bm-space-sm);
+}
+
+.bm-dev-dataset-select-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--bm-space-sm);
   margin-bottom: var(--bm-space-md);
+  padding: var(--bm-space-sm) 0;
+  border-bottom: 1px solid var(--bm-border);
+}
+
+.bm-dev-dataset-select-bar__sep {
+  color: var(--bm-text-secondary);
+  opacity: 0.5;
+  user-select: none;
+}
+
+.bm-dev-dataset-range {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.bm-dev-dataset-range__input {
+  width: 3.5rem;
+  padding: 0.2rem 0.35rem;
+  font-size: 0.8125rem;
+  border: 1px solid var(--bm-border);
+  border-radius: var(--bm-radius-sm);
+  background: var(--bm-surface);
+  color: var(--bm-text-primary);
+}
+
+.bm-dev-dataset-select-hint {
+  flex: 1 1 200px;
+  min-width: 0;
+  margin: 0;
+  opacity: 0.9;
+}
+
+.bm-dev-dataset-head-cb {
+  display: flex;
+  justify-content: center;
+}
+
+.bm-dev-dataset-head-cb input[type='checkbox'] {
+  accent-color: var(--bm-accent);
 }
 
 .bm-dev-list-plain {

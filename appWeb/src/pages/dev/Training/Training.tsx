@@ -30,7 +30,10 @@ export default function Training() {
       <h1 className="bm-screen-title">Entrenamiento (Celery)</h1>
       <p className="bm-caption" style={{ marginBottom: 'var(--bm-space-md)' }}>
         Usa muestras con review <span className="bm-dev-code-inline">approved</span>. Requiere worker Celery y dependencias de
-        entrenamiento (sklearn, skl2onnx).
+        entrenamiento (sklearn, skl2onnx). Si listas varias clases separadas por coma, hace falta al menos{' '}
+        <strong>una muestra aprobada por cada clase</strong> y, en la práctica,{' '}
+        <strong>al menos dos etiquetas distintas</strong> en el dataset; si solo tienes una clase (p. ej. solo squat),
+        deja solo esa etiqueta en el campo «Clases».
       </p>
       {error ? <p className="bm-caption bm-dev-msg--error">{error}</p> : null}
 
