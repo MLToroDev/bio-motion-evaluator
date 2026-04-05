@@ -101,13 +101,16 @@ Reinicia la API. Con `active` apuntando a tu clave y el archivo `.onnx` en la ru
 
 1. Abre el **menú lateral** (si está plegado, pulsa la flecha para mostrarlo).
 2. Baja hasta la etiqueta pequeña **«Dev Tools»** (debajo de «Configuración»).
-3. Ahí verás cuatro enlaces:
+3. Ahí verás estos enlaces:
    - **Dev · Catálogo** → panorama por ejercicio.
    - **Dev · Dataset** → tabla de muestras (aprobar / rechazar).
+   - **Dev · Fuentes de datos** → búsqueda YouTube, ingesta masiva a `feature_samples` (worker Celery + yt-dlp).
    - **Dev · Entrenamiento** → formulario **«Encolar entrenamiento»** (esto es el entrenamiento desde la web).
    - **Dev · Modelos** → activar qué ONNX usa el API.
 
-También puedes ir desde **Inicio**: sección **«Desarrollo — aprendizaje del clasificador»** (cuatro tarjetas equivalentes).
+También puedes ir desde **Inicio**: sección **«Desarrollo — aprendizaje del clasificador»**.
+
+Las **miniaturas** de los resultados de búsqueda se cargan vía **`GET /api/v1/dev/ingest/thumb?id=<youtube_id>`** (el backend hace de proxy frente a `img.youtube.com`). La app usa `fetch` con tu **X-Dev-API-Key** y un blob local, porque un `<img src="...">` directo no puede enviar esa cabecera.
 
 **URL directa:** `http://localhost:PUERTO/dev/training` (sustituye `PUERTO` por el de Vite, p. ej. 5173).
 
@@ -160,6 +163,7 @@ En el menú lateral:
 |------|---------|
 | **Dev · Catálogo** (`/dev/catalog`) | Vista por ejercicio del catálogo JSON + conteos de muestras y último F1 del último job completado (si existe). |
 | **Dev · Dataset** (`/dev/dataset`) | Listar, filtrar, aprobar/rechazar muestras; aprobación masiva. |
+| **Dev · Fuentes de datos** (`/dev/sources`) | Buscar en YouTube, elegir vídeos, encolar ingesta (descarga + extracción de features → DB). Historial y métricas por job. |
 | **Dev · Entrenamiento** (`/dev/training`) | Encolar job Celery: clases, fracción de validación, activar modelo al terminar, push HF. |
 | **Dev · Modelos** (`/dev/models`) | Listar entradas del `manifest.json` local y **activar** una versión. |
 
@@ -167,6 +171,7 @@ En el menú lateral:
 
 1. **Obtener datos**
    - *Automático:* con `AUTO_COLLECT_ENABLED=true`, durante análisis en vivo o por `/ws/pose-stream` y `/ws/video`, se insertan filas `label_source=auto_soft`, `review_status=pending`, solo si la ventana está llena, confianza ≥ umbral, etiqueta ≠ `unknown` y **no** hay `forced_exercise_label`.
+   - *YouTube (bulk):* en **Dev · Fuentes de datos**, búsqueda + ingesta encolada (`ingest_exercise_videos`): descarga temporal, extracción de features, inserción con la etiqueta elegida. Requiere worker Celery con `yt-dlp` (incluido en `requirements.txt`).
    - *Manual / API:* `POST /api/v1/dev/samples` con vector 32D y etiqueta.
    - *Offline import:* puedes cargar datos generados por scripts si los insertas vía API o herramientas SQL (el formato es JSONB de 32 floats).
 2. **Curar:** en **Dataset**, revisa `pending`, corrige etiqueta si hace falta y marca **approved** (o usa rechazar).

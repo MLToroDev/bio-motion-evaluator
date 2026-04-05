@@ -53,6 +53,16 @@ Todas las rutas bajo prefijo **`/api/v1/dev`**.
 | `GET` | `/models/{key}` | Metadatos de una clave. |
 | `POST` | `/models/{key}/activate` | Establece `active` en disco (`ModelRegistry.switch_version`). |
 
+### Ingesta YouTube (`ingest_jobs`)
+
+| Método | Ruta | Descripción |
+|--------|------|-------------|
+| `GET` | `/ingest/search` | Query: `q`, `limit`. Búsqueda con yt-dlp (metadatos, sin descarga). |
+| `POST` | `/ingest/jobs` | Encola Celery `ingest_exercise_videos`. |
+| `GET` | `/ingest/jobs` | Lista jobs. |
+| `GET` | `/ingest/jobs/{id}` | Detalle + `videos_json` / `metrics_json`. |
+| `GET` | `/ingest/thumb` | Query: **`id`** = ID del vídeo YouTube. Proxy de `https://img.youtube.com/vi/{id}/mqdefault.jpg` con `Referer` adecuado; evita bloqueos del navegador al mostrar previews. Misma autenticación que el resto de `/dev`. La UI obtiene la imagen con `fetch` + cabecera `X-Dev-API-Key` (no con `<img src>` directo si hay clave). |
+
 ## Recolección automática en inferencia
 
 - Variables: `AUTO_COLLECT_ENABLED` (bool), `AUTO_COLLECT_MIN_CONFIDENCE` (float, p. ej. 0.85).

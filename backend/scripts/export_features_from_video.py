@@ -71,12 +71,17 @@ def extract_features_from_file(
     require_pose_ok: bool = True,
     emit_every: int = 3,
     max_frames: int = 0,
+    segments: list[dict[str, Any]] | None = None,
 ) -> tuple[list[list[float]], int]:
     """
     Extrae vectores 32D desde cualquier archivo de vídeo accesible en disco.
 
     Función importable por la tarea Celery de ingesta; no requiere que el vídeo esté en el
     directorio gold-standard.
+
+    Si se proporciona ``segments`` (lista de ``{"start_sec": float, "end_sec": float}``),
+    solo se procesan los frames cuyo tiempo cae dentro de alguno de esos tramos.
+    Los segmentos sin ``label`` propio heredan la etiqueta fija ``label``.
 
     Devuelve ``(list_of_32d_vectors, frames_read)``.
     Lanza ``FileNotFoundError`` si ``video_path`` no existe.
@@ -110,6 +115,12 @@ def extract_features_from_file(
             pose = extract_pose_bgr_video(bgr, model_path, ts_ms)
             engine.push(pose, dt_s)
             frames_read += 1
+
+            # Filtrar por segmentos de tiempo si se proporcionaron
+            if segments:
+                t_sec = max(0.0, (frames_read - 1) / fps)
+                if _label_at_time_sec(t_sec, segments, label) is None:
+                    continue
 
             if require_pose_ok and not pose.ok:
                 continue

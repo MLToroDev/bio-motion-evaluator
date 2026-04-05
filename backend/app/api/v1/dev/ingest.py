@@ -4,10 +4,13 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import re
 import uuid
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException
+import httpx
+from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.responses import Response
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
@@ -19,6 +22,51 @@ from .deps import get_dev_db
 log = logging.getLogger(__name__)
 
 router = APIRouter()
+
+_YT_VIDEO_ID_RE = re.compile(r"^[A-Za-z0-9_-]{6,32}$")
+
+
+@router.get("/ingest/thumb")
+async def proxy_youtube_thumbnail(
+    video_id: str = Query(..., alias="id", description="Identificador del vídeo en YouTube (sin URL)."),
+) -> Response:
+    """
+    Proxy de miniatura ``mqdefault.jpg`` desde ``img.youtube.com``.
+
+    Evita bloqueos del navegador (CORS / Referer) al cargar previews en la UI de desarrollo.
+    Requiere las mismas reglas de autenticación que el resto de ``/dev`` (cabecera ``X-Dev-API-Key`` si está configurada).
+    Para usar en ``<img src>`` sin cabeceras, el cliente debe obtener el binario vía ``fetch`` con la clave y un blob URL.
+    """
+    vid = (video_id or "").strip()
+    if not _YT_VIDEO_ID_RE.match(vid):
+        raise HTTPException(status_code=400, detail="id de YouTube inválido")
+    url = f"https://img.youtube.com/vi/{vid}/mqdefault.jpg"
+    headers = {
+        "User-Agent": "Mozilla/5.0 (compatible; BioMotionEvaluator/1.0; +https://github.com/)",
+        "Accept": "image/avif,image/webp,image/apng,image/*,*/*;q=0.8",
+        "Referer": "https://www.youtube.com/",
+    }
+    try:
+        async with httpx.AsyncClient(timeout=15.0, follow_redirects=True) as client:
+            r = await client.get(url, headers=headers)
+    except httpx.RequestError as e:
+        log.warning("YouTube thumbnail fetch failed: %s", e)
+        raise HTTPException(status_code=502, detail="No se pudo contactar el servidor de miniaturas") from e
+
+    if r.status_code != 200:
+        raise HTTPException(status_code=502, detail=f"Miniatura no disponible (HTTP {r.status_code})")
+
+    ct = r.headers.get("content-type", "").split(";")[0].strip() or "image/jpeg"
+    if not ct.startswith("image/"):
+        ct = "image/jpeg"
+
+    return Response(
+        content=r.content,
+        media_type=ct,
+        headers={
+            "Cache-Control": "public, max-age=86400",
+        },
+    )
 
 
 def _yt_search(q: str, limit: int) -> list[dict[str, Any]]:
@@ -77,6 +125,13 @@ class IngestParams(BaseModel):
     require_pose_ok: bool = True
     emit_every: int = Field(3, ge=1, le=30)
     max_frames_per_video: int = Field(0, ge=0)
+    video_segments: dict[str, list[dict[str, float]]] = Field(
+        default_factory=dict,
+        description=(
+            "Mapa youtube_id → lista de tramos {start_sec, end_sec}. "
+            "Si el id no aparece o la lista está vacía, se procesa el vídeo completo."
+        ),
+    )
 
 
 class IngestJobCreate(BaseModel):

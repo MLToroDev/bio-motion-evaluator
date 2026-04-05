@@ -20,11 +20,11 @@ log = logging.getLogger(__name__)
 
 _BACKEND_ROOT = backend_root()
 
-# La función de extracción vive en scripts/ pero es importable cuando el worker
-# corre con el mismo entorno Python del backend.
-_SCRIPTS_DIR = str(_BACKEND_ROOT / "scripts")
-if _SCRIPTS_DIR not in sys.path:
-    sys.path.insert(0, _SCRIPTS_DIR)
+# ``from scripts.export_features_from_video`` exige que la raíz del backend esté en
+# sys.path (no el directorio ``scripts/`` solo; eso rompe el paquete ``scripts``).
+_br = str(_BACKEND_ROOT.resolve())
+if _br not in sys.path:
+    sys.path.insert(0, _br)
 
 
 def _search_youtube(query: str, max_results: int) -> list[dict[str, Any]]:
@@ -89,6 +89,7 @@ def _extract_and_insert(
     emit_every: int,
     max_frames: int,
     ingest_job_id: uuid.UUID,
+    segments: list[dict[str, Any]] | None = None,
 ) -> dict[str, int]:
     """Extrae features y las inserta en feature_samples. Devuelve métricas."""
     from scripts.export_features_from_video import extract_features_from_file  # type: ignore[import]
@@ -106,6 +107,7 @@ def _extract_and_insert(
             require_pose_ok=require_pose_ok,
             emit_every=emit_every,
             max_frames=max_frames,
+            segments=segments or None,
         )
     except Exception:
         log.exception("Error extrayendo features de %s", video_path)
@@ -173,6 +175,7 @@ def ingest_exercise_videos(self, job_id_str: str) -> dict[str, Any]:
         require_pose_ok = bool(params.get("require_pose_ok", True))
         emit_every = max(1, int(params.get("emit_every", 3)))
         max_frames = max(0, int(params.get("max_frames_per_video", 0)))
+        video_segments: dict[str, list[dict[str, Any]]] = params.get("video_segments") or {}
 
         label = (job.exercise_label or "").strip().lower()
         max_videos = max(1, int(job.max_videos or 5))
@@ -214,6 +217,10 @@ def ingest_exercise_videos(self, job_id_str: str) -> dict[str, Any]:
                     metrics["per_video"].append({"title": vid_title, "status": "download_failed"})
                     continue
 
+                # Segmentos específicos para este vídeo (si los hay)
+                vid_id = str(video_info.get("youtube_id") or "")
+                vid_segs: list[dict[str, Any]] | None = video_segments.get(vid_id) or None
+
                 vid_metrics = _extract_and_insert(
                     Path(filepath),
                     label,
@@ -224,6 +231,7 @@ def ingest_exercise_videos(self, job_id_str: str) -> dict[str, Any]:
                     emit_every=emit_every,
                     max_frames=max_frames,
                     ingest_job_id=job_uuid,
+                    segments=vid_segs,
                 )
                 vid_metrics["title"] = vid_title
                 vid_metrics["url"] = vid_url

@@ -87,6 +87,7 @@ export function useDevIngest() {
       only_window_full: boolean;
       require_pose_ok: boolean;
       emit_every: number;
+      video_segments?: Record<string, { start_sec: number; end_sec: number }[]>;
     }) => {
       setCreating(true);
       setCreateError(null);
@@ -103,6 +104,7 @@ export function useDevIngest() {
               only_window_full: params.only_window_full,
               require_pose_ok: params.require_pose_ok,
               emit_every: params.emit_every,
+              ...(params.video_segments ? { video_segments: params.video_segments } : {}),
             },
           }),
         });

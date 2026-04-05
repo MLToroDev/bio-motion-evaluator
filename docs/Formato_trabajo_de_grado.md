@@ -941,6 +941,13 @@ Las entradas nuevas se añaden **al inicio** de la lista (más reciente arriba),
 
 ## Entradas
 
+### 2026-04-04 — Proxy de miniaturas YouTube en API dev (`/ingest/thumb`)
+
+- **Ámbito:** `backend/`, `appWeb/`, `docs/spec/`, `docs/guias/`
+- **Tipo:** cambio funcional / calidad de datos en UI
+- **Descripción:** Se añadió `GET /api/v1/dev/ingest/thumb?id=<youtube_id>` para servir la imagen `mqdefault.jpg` desde el backend (httpx + `Referer` a YouTube), evitando bloqueos del navegador. La pantalla **Dev · Fuentes de datos** consume el proxy con `fetch` y blob URL para poder enviar `X-Dev-API-Key` cuando está configurada.
+- **Trazabilidad:** `backend/app/api/v1/dev/ingest.py`, `appWeb/src/pages/dev/DataSourcesPage.tsx`, `docs/spec/dev-learning-api.md`, `docs/guias/manual_aprendizaje_continuo_y_entrenamiento.md`
+
 ### 2026-04-04 — Descubribilidad Dev Tools en Inicio y flujo por vistas en el manual
 
 - **Ámbito:** `appWeb/`, `docs/guias/`
