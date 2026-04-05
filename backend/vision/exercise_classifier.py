@@ -95,11 +95,20 @@ def build_classifier(
     cfg: ExerciseClassifierConfig,
     registry: ModelRegistry,
 ) -> HysteresisClassifier:
-    """Construye clasificador según manifest; sin ONNX válido usa :class:`NopExerciseClassifier`."""
+    """
+    Por defecto: :class:`HeuristicExerciseClassifier` (Fase A, reglas sobre vector 32D).
+    Si hay manifest activo y archivo ONNX válido y ``enable_onnx_classifier`` es True,
+    se usa ONNX. Flag ``use_nop_classifier: true`` en feature_flags fuerza stub ``unknown``.
+    """
     from app.config import settings
 
-    inner: ExerciseClassifier = NopExerciseClassifier(cfg)
+    from vision.heuristic_exercise_classifier import HeuristicExerciseClassifier
+
     flags = settings.feature_flags()
+    if flags.get("use_nop_classifier", False):
+        inner: ExerciseClassifier = NopExerciseClassifier(cfg)
+    else:
+        inner: ExerciseClassifier = HeuristicExerciseClassifier(cfg)
     if flags.get("enable_onnx_classifier", True):
         try:
             manifest = registry.load_active_manifest()
@@ -108,7 +117,7 @@ def build_classifier(
                 if onnx is not None:
                     inner = onnx
         except Exception as exc:  # noqa: BLE001
-            log.warning("Clasificador ONNX no disponible, usando stub: %s", exc)
+            log.warning("Clasificador ONNX no disponible, usando heurístico: %s", exc)
     return HysteresisClassifier(inner, cfg)
 
 

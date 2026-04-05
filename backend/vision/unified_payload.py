@@ -6,6 +6,8 @@ from __future__ import annotations
 import time
 from typing import Any
 
+from app.config import settings
+from vision.landmark_filter import landmarks_for_api_response
 from vision.types import PoseFrame, RepState
 
 SCHEMA_VERSION = 1
@@ -19,13 +21,19 @@ def build_frame_payload_v1(
     rep: RepState,
     pipeline_ms: dict[str, float],
 ) -> dict[str, Any]:
+    min_vis = float(settings.pose_landmark_min_visibility_response)
+    lm_out, wl_out = landmarks_for_api_response(
+        pose.landmarks,
+        pose.world_landmarks,
+        min_vis,
+    )
     out: dict[str, Any] = {
         "schema_version": SCHEMA_VERSION,
         "frame_index": frame_index,
         "server_ts_ms": int(time.time() * 1000),
         "pose_ok": pose.ok,
         "note": pose.note,
-        "landmarks": pose.landmarks,
+        "landmarks": lm_out,
         "knees": pose.knees,
         "exercise_label": exercise_label,
         "exercise_confidence": float(exercise_confidence),
@@ -35,6 +43,6 @@ def build_frame_payload_v1(
         "pipeline_ms": pipeline_ms,
     }
     if pose.world_landmarks:
-        out["world_landmarks"] = pose.world_landmarks
+        out["world_landmarks"] = wl_out if wl_out is not None else []
     return out
 

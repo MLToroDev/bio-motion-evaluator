@@ -55,7 +55,8 @@ Campos habituales:
 | `frame_index` | number | Índice entero del frame |
 | `pose_ok` | bool | Resultado de detección (ver `PoseResult` en servicio MediaPipe) |
 | `note` | string \| null | Nota humana (p. ej. sin pose) |
-| `landmarks` | array \| null | Lista de puntos `{ index, x, y, z, visibility? }` |
+| `landmarks` | array \| null | **Subconjunto** de puntos detectados con `visibility` suficiente: `{ index, x, y, z, visibility? }`. No se garantizan 33 entradas; el cliente debe usar `index` (p. ej. `PoseSkeletonCanvas` en `appWeb`). Umbral servidor: `pose_landmark_min_visibility_response` / env `POSE_LANDMARK_MIN_VISIBILITY_RESPONSE` (0 = sin filtro, comportamiento anterior). |
+| `world_landmarks` | array \| null | Misma política: solo índices presentes en `landmarks` filtrados. |
 | `knees` | object \| null | Ángulos; p. ej. `left_knee_flexion_angle_deg`, `right_knee_flexion_angle_deg` (grados) |
 | `exercise_label` | string | Clasificación actual (`unknown` en Fase 1 sin ONNX) |
 | `exercise_confidence` | number | Confianza 0–1 (suavizada EMA en servidor) |
@@ -81,6 +82,7 @@ Puede incluir **`error`** (string), p. ej. `sin_frame`, o cierre con código HTT
 
 | Pieza | Ruta |
 |-------|------|
+| Filtro visibility → JSON | `backend/vision/landmark_filter.py`, `backend/vision/unified_payload.py` |
 | Router WS | `backend/app/routers/live_pose.py` |
 | Motor tiempo real | `backend/vision/realtime_engine.py` — `RealtimeEngineSession` |
 | Contrato documentado | `backend/app/models/schemas.py` — `UnifiedWsFrameV1`, `ExerciseClassifierConfig` |

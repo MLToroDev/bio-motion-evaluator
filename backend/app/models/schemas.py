@@ -49,7 +49,11 @@ class UnifiedWsFrameV1(BaseModel):
     server_ts_ms: int = 0
     pose_ok: bool = False
     note: str | None = None
-    landmarks: list[dict[str, Any]] | None = None
+    landmarks: list[dict[str, Any]] | None = Field(
+        default=None,
+        description="Puntos visibles para el cliente: subconjunto filtrado por visibility "
+        "(ver ``pose_landmark_min_visibility_response``); cada elemento incluye ``index`` MediaPipe.",
+    )
     knees: dict[str, Any] | None = None
     exercise_label: str = "unknown"
     exercise_confidence: float = Field(default=0.0, ge=0.0, le=1.0)
@@ -157,6 +161,13 @@ class PoseStreamConfig(BaseModel):
         default=False,
         description="Si True, extrae pose (landmarks/knees) sin clasificador ni rep tracker.",
     )
+    forced_exercise_label: str | None = Field(
+        default=None,
+        description=(
+            "Si se indica (p. ej. squat, idle, lunge), omite el clasificador y usa esta etiqueta "
+            "con confianza 1.0 para pruebas y demostración."
+        ),
+    )
 
     @field_validator("include_preview", mode="before")
     @classmethod
@@ -174,6 +185,14 @@ class PoseStreamConfig(BaseModel):
             "Solo para desarrollo — añade overhead de serialización en producción."
         ),
     )
+
+    @field_validator("forced_exercise_label", mode="before")
+    @classmethod
+    def forced_exercise_label_coerce(cls, v: object) -> str | None:
+        if v is None:
+            return None
+        s = str(v).strip()
+        return s if s else None
 
     @field_validator("capture_only", mode="before")
     @classmethod

@@ -4,15 +4,16 @@ Eres un experto en Ingeniería de Software, IA y Biomecánica. Estás ayudando a
 
 ## Stack Tecnológico Obligatorio
 
-- Frontend: Flutter (Web/Mobile) — Clean Architecture.
+- **Frontend (activo):** React + TypeScript en **`appWeb/`** (Vite). Toda nueva UI, análisis en vivo, análisis por vídeo y configuración de conexión se implementan aquí.
+- **Frontend (legado / no mantener):** La carpeta **`app/`** (Flutter) está **descartada para el desarrollo continuo**: no añadir features ni refactors ahí salvo que el usuario lo ordene explícitamente por motivo excepcional (p. ej. archivo histórico).
 - Backend: Python con FastAPI (REST & WebSockets).
-- IA: MediaPipe (Pose Estimation) y Hugging Face (Clasificación).
+- IA: MediaPipe (Pose Estimation) en servidor y Hugging Face opcional (clasificación u otros servicios).
 - IoT: Protocolos RTSP/WebSockets para cámaras externas.
 - Calidad de software: criterios alineados con ISO/IEC 25010 (mantenibilidad, seguridad, fiabilidad, rendimiento, usabilidad donde aplique).
 
 ## Reglas de Desarrollo
 
-1. **Código académico:** Respetar principios SOLID. En Python usar docstrings útiles en módulos públicos y funciones no triviales. En Dart, documentar APIs públicas cuando aporten claridad (evitar ruido en getters obvios).
+1. **Código académico:** Respetar principios SOLID. En Python usar docstrings útiles en módulos públicos y funciones no triviales. En **TypeScript/React (`appWeb/`)**, mantener componentes y hooks cohesionados; no tocar Dart/Flutter en `app/` salvo instrucción explícita del usuario.
 2. **Modularidad:** El núcleo de cálculo biomecánico debe estar separado de la capa HTTP/WebSocket (FastAPI). La lógica reproducible vive en paquetes tipo `vision/` o servicios dedicados, no en los routers.
 3. **Tratamiento de datos:** Trabajar con landmarks de MediaPipe en coordenadas normalizadas de imagen (x, y, z) o con `world_landmarks` cuando se requiera consistencia 3D. Los ángulos articulares en documentación y payloads deben expresarse en **grados** (típicamente 0–180° según la definición anatómica acordada para cada articulación).
 4. **Nombramiento:** Preferir términos biomecánicos explícitos en clave e inglés técnico (`knee_flexion_angle_deg`, `valgus_knee_indicator`, `scapular_rhythm_score`, etc.) y documentar la convención en docstrings.
@@ -24,7 +25,8 @@ Eres un experto en Ingeniería de Software, IA y Biomecánica. Estás ayudando a
 
 ## Alcance del Monorepo
 
-- `app/`: Flutter.
+- **`appWeb/`:** frontend React (único objetivo de trabajo UI salvo orden contraria del usuario).
+- **`app/`:** código Flutter **legado**; **no actualizar** por defecto (proyecto descartado para el rumbo actual de la tesis).
 - `backend/`: FastAPI, MediaPipe, Hugging Face opcional.
 - `iot/`: firmware/scripts de cámara.
 - `docs/`: arquitectura y material de grado.
@@ -43,7 +45,7 @@ Reglas persistentes adicionales del proyecto: **`.cursor/rules/bio-motion-docume
 
 - Las especificaciones técnicas viven en **`docs/spec/`** (archivos `.md`): contratos WebSocket/REST, coerciones de tipos, mitigaciones de bugs y rutas de código.
 - Convención y plantilla de secciones: ver **[`docs/spec/README.md`](docs/spec/README.md)**.
-- Cuando implementes o corrijas un flujo documentado (p. ej. `/ws/pose-stream`, flags `include_preview`, cliente Flutter Web o **React `appWeb/`**), **actualiza el `.md` correspondiente** en el mismo cambio lógico, o crea un spec nuevo si el área no tenía documento.
+- Cuando implementes o corrijas un flujo documentado (p. ej. `/ws/pose-stream`, flags `include_preview`, cliente **React `appWeb/`**), **actualiza el `.md` correspondiente** en el mismo cambio lógico, o crea un spec nuevo si el área no tenía documento. No usar `app/` (Flutter) como referencia de implementación activa.
 - Mantén **Meta, Resumen, Contrato, Implementación, Incidencias/decisiones** alineados con el código real; evita duplicar tutorial largo: prioriza contrato y trazabilidad para tesis.
 
 ## Bitácora del trabajo de grado (obligatorio ante cambios importantes)
@@ -55,6 +57,6 @@ Reglas persistentes adicionales del proyecto: **`.cursor/rules/bio-motion-docume
 
 ## Reglas de Codificación y Formato
 
-5. **Encoding UTF-8 estricto:** Todo archivo generado debe guardarse y transmitirse en UTF-8. Nunca uses caracteres Latin-1/ISO-8859-1 ni secuencias de escape mal codificadas (â€, Ã, Â, â€¢, etc.). Si necesitas un carácter especial en un string de Dart/Python, escríbelo directamente en UTF-8 o usa su escape Unicode explícito (`\u00e9` para é, `\u2022` para •, etc.).
+5. **Encoding UTF-8 estricto:** Todo archivo generado debe guardarse y transmitirse en UTF-8. Nunca uses caracteres Latin-1/ISO-8859-1 ni secuencias de escape mal codificadas (â€, Ã, Â, â€¢, etc.). En Python/TypeScript, escribe caracteres especiales en UTF-8 limpio o usa escapes Unicode cuando sea necesario.
 
 6. **Sin caracteres corruptos en strings:** Antes de generar cualquier fragmento de código, verifica que los literales de string no contengan secuencias tipo `â€¢`, `Ã¡`, `Â«`, `â€"` u otras resultantes de doble-encoding. Si el texto original tiene tildes, eñes o comillas tipográficas, mantenlas en UTF-8 limpio o sustitúyelas por ASCII equivalente (`->` en lugar de `→`, `-` en lugar de `—`, etc.).

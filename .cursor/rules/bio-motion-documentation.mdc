@@ -20,7 +20,7 @@ alwaysApply: true
 En el **mismo conjunto lógico de cambios** (misma sesión de implementación), el asistente debe:
 
 1. **Specs:** actualizar o crear el `.md` correspondiente en `docs/spec/` si el cambio toca contratos, tipos de mensaje, rutas HTTP/WS o comportamiento documentado. Seguir [`docs/spec/README.md`](docs/spec/README.md).
-2. **Arquitectura:** actualizar [`docs/arquitectura.md`](docs/arquitectura.md) si cambian capas, dependencias principales o flujos entre `app` / `appWeb` / `backend` / `iot`.
+2. **Arquitectura:** actualizar [`docs/arquitectura.md`](docs/arquitectura.md) si cambian capas, dependencias principales o flujos entre **`appWeb`** (frontend activo), `backend` e `iot`. **`app/`** (Flutter) es legado: no documentar ahí nuevas features salvo petición explícita del usuario.
 3. **Bitácora de tesis:** añadir una entrada nueva bajo **# BITÁCORA DE DESARROLLO Y DECISIONES** en [`docs/Formato_trabajo_de_grado.md`](docs/Formato_trabajo_de_grado.md), **arriba de la lista** de entradas (más reciente primero). Usar el formato definido en ese apartado (fecha, ámbito, tipo, descripción, trazabilidad).
 
 **Se considera “importante”:** cambio en API o payload WS/REST; nueva dependencia o módulo transversal; decisión que afecta ISO 25010 (seguridad, rendimiento, usabilidad); migración de stack o cliente (p. ej. Flutter Web vs React); mitigación de un bug sistemático; cambio de modelo IA o pipeline de visión.

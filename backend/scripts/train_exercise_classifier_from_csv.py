@@ -43,17 +43,26 @@ Uso (desde la carpeta ``backend``)::
       --out models/mi_clf.onnx ^
       --classes unknown,squat
 
+Multiclase + manifest (fusiona ``vision/models/manifest.json``; opcional ``--set-manifest-active``)::
+
+    python scripts/train_exercise_classifier_from_csv.py ^
+      --csv scripts/examples/exercise_features_multiclass.csv ^
+      --out vision/models/exercise_rf_v1.onnx ^
+      --classes idle,squat,lunge ^
+      --write-manifest vision/models/manifest.json ^
+      --manifest-model-key exercise_rf_v1
+
 Sustituye ``--csv`` por la ruta a **tu** dataset real (no uses el nombre literal ``tu_dataset.csv`` del README si ese archivo no existe).
 
-Luego registra ``path`` y ``classes`` en ``vision/models/manifest.json`` y
-asegúrate de que ``window_size`` del manifest coincida con la ventana usada
-al generar datos (p. ej. 45).
+Con ``--write-manifest`` se actualiza ``path``/``classes``/``window_size``; sin ``--set-manifest-active``
+la clave ``active`` del JSON no cambia (sigue el heurístico si ``active`` es null).
 """
 
 from __future__ import annotations
 
 import argparse
 import csv
+import datetime as _dt
 import json
 import sys
 from pathlib import Path
@@ -61,6 +70,41 @@ from pathlib import Path
 import numpy as np
 
 FEATURE_DIM = 32
+
+
+def _merge_manifest(
+    manifest_path: Path,
+    backend_root: Path,
+    model_key: str,
+    onnx_rel_posix: str,
+    class_list: list[str],
+    window_size: int,
+    *,
+    set_active: bool,
+) -> None:
+    manifest_path = manifest_path.expanduser()
+    if not manifest_path.is_absolute():
+        manifest_path = (backend_root / manifest_path).resolve()
+    data: dict = {}
+    if manifest_path.is_file():
+        with manifest_path.open(encoding="utf-8") as f:
+            data = json.load(f)
+    models = dict(data.get("models") or {})
+    models[model_key] = {
+        "path": onnx_rel_posix,
+        "classes": class_list,
+        "window_size": window_size,
+        "feature_vector_dim": FEATURE_DIM,
+        "created_at": _dt.date.today().isoformat(),
+        "note": "RandomForest desde train_exercise_classifier_from_csv.py (--write-manifest)",
+    }
+    data["models"] = models
+    if set_active:
+        data["active"] = model_key
+    manifest_path.parent.mkdir(parents=True, exist_ok=True)
+    with manifest_path.open("w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2)
+        f.write("\n")
 
 
 def _require_existing_file(path: Path, kind: str) -> Path:
@@ -164,6 +208,28 @@ def main() -> None:
     p.add_argument("--test-size", type=float, default=0.2, help="Fracción holdout estratificado")
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--n-estimators", type=int, default=200)
+    p.add_argument(
+        "--write-manifest",
+        type=Path,
+        default=None,
+        help="Escribir o fusionar vision/models/manifest.json (ruta típica desde backend: vision/models/manifest.json)",
+    )
+    p.add_argument(
+        "--manifest-model-key",
+        default="exercise_rf_active",
+        help="Nombre del modelo dentro de manifest['models']",
+    )
+    p.add_argument(
+        "--manifest-window-size",
+        type=int,
+        default=45,
+        help="Ventana FeatureEngine (debe coincidir con la usada al exportar CSV)",
+    )
+    p.add_argument(
+        "--set-manifest-active",
+        action="store_true",
+        help="Poner manifest['active'] = --manifest-model-key (si no, solo se registra el bloque en models)",
+    )
     args = p.parse_args()
 
     try:
@@ -238,14 +304,35 @@ def main() -> None:
         f.write(onnx_model.SerializeToString())
 
     print(f"\nONNX escrito: {out_path.resolve()}")
-    print("\n--- Fragmento para vision/models/manifest.json (ajusta nombre y path) ---")
-    rel = out_path.as_posix()
-    if not Path(rel).is_absolute():
-        rel = str(Path(rel).as_posix())
+
+    backend_root = Path(__file__).resolve().parent.parent
+    out_abs = out_path.resolve()
+    try:
+        onnx_rel = out_abs.relative_to(backend_root).as_posix()
+    except ValueError:
+        onnx_rel = out_abs.as_posix()
+
+    if args.write_manifest is not None:
+        mp = Path(args.write_manifest)
+        _merge_manifest(
+            mp,
+            backend_root,
+            args.manifest_model_key,
+            onnx_rel,
+            class_list,
+            args.manifest_window_size,
+            set_active=args.set_manifest_active,
+        )
+        dest = mp if mp.is_absolute() else (backend_root / mp).resolve()
+        print(f"Manifest fusionado: {dest}")
+        if not args.set_manifest_active:
+            print("(active no modificado; usa --set-manifest-active para activar este modelo)")
+
+    print("\n--- Fragmento manual vision/models/manifest.json (si no usas --write-manifest) ---")
     classes_json = ", ".join(json.dumps(c) for c in class_list)
-    print(f'  "path": "{rel}",')
+    print(f'  "path": "{onnx_rel}",')
     print(f'  "classes": [{classes_json}],')
-    print(f'  "window_size": 45,')
+    print(f'  "window_size": {args.manifest_window_size},')
     print(f'  "feature_vector_dim": {FEATURE_DIM},')
     print("---")
 

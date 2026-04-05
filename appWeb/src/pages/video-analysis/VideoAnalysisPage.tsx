@@ -33,7 +33,7 @@ import { persistApiBase, readApiBase, readTargetRepGoal } from '../../lib/prefs'
 import type { AnalysisSummary } from '../../lib/videoAnalysisAccumulator';
 import { buildGoldStandardVideosHttpUrl } from '../../lib/wsUri';
 
-import { ConfigPanel, type AnalysisInputSource, type ConfigValues } from './ConfigPanel';
+import { ConfigPanel, type AnalysisInputSource, type ConfigValues, type VideoExerciseMode } from './ConfigPanel';
 import { PreviewCanvas } from './PreviewCanvas';
 import { PreviewLayerToolbar } from './PreviewLayerToolbar';
 import { SnackBar } from './SnackBar';
@@ -81,6 +81,7 @@ export default function VideoAnalysisPage() {
     maxThroughput: false,
     includePreview: true,
     captureOnly: true,
+    exerciseMode: 'auto' satisfies VideoExerciseMode,
     serverDiagnostics: false,
     streamTuningAuto: true,
     skeletonOnly: false,
@@ -212,6 +213,7 @@ export default function VideoAnalysisPage() {
           ? 30
           : fpsParsed.value;
 
+    const forcedExerciseLabel = !config.captureOnly && config.exerciseMode !== 'auto' ? config.exerciseMode : null;
     let err: string | null = null;
     if (config.inputSource === 'file') {
       err = await start({
@@ -226,6 +228,7 @@ export default function VideoAnalysisPage() {
         captureOnly: config.captureOnly,
         serverDiagnostics: config.serverDiagnostics,
         streamTuning: config.streamTuningAuto ? 'auto' : 'off',
+        forcedExerciseLabel,
       });
     } else if (config.inputSource === 'server_camera') {
       err = await start({
@@ -240,6 +243,7 @@ export default function VideoAnalysisPage() {
         captureOnly: config.captureOnly,
         serverDiagnostics: config.serverDiagnostics,
         streamTuning: config.streamTuningAuto ? 'auto' : 'off',
+        forcedExerciseLabel,
       });
     } else {
       err = await start({
@@ -250,6 +254,7 @@ export default function VideoAnalysisPage() {
         includePreview: config.includePreview,
         previewJpegQuality: previewQ,
         captureOnly: config.captureOnly,
+        forcedExerciseLabel,
       });
     }
     if (err) console.warn(err);

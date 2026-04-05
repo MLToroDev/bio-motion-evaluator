@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { BmButton } from '../components/BmButton';
 import { DashboardPanel } from '../components/DashboardPanel';
@@ -9,11 +9,15 @@ import { kneeFlexionMetricSublabelInContext } from '../lib/angleFormatter';
 import { readApiBase, readTargetRepGoal } from '../lib/prefs';
 import '../App.css';
 
+export type LiveExerciseMode = 'auto' | 'idle' | 'squat' | 'lunge';
+
 export default function LiveAnalysisPage() {
   const apiBase = useMemo(() => readApiBase(), []);
   const targetRepGoal = useMemo(() => readTargetRepGoal(), []);
+  const [exerciseMode, setExerciseMode] = useState<LiveExerciseMode>('auto');
+  const forcedLabel = exerciseMode === 'auto' ? null : exerciseMode;
   const { ui, videoRef, startCamera, stopCamera, startTransmit, stopTransmit, statusForLeft, statusForRight } =
-    useLiveAnalysisSession(apiBase, false);
+    useLiveAnalysisSession(apiBase, false, forcedLabel);
 
   const ex = ui.exerciseLabel;
   const leftSublabel = kneeFlexionMetricSublabelInContext(ui.leftDeg, true, ex, ui.rightDeg);
@@ -94,6 +98,37 @@ export default function LiveAnalysisPage() {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--bm-space-sm)', marginBottom: 'var(--bm-space-md)' }}>
+            <label className="bm-caption" style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+              <span style={{ color: 'var(--bm-text-secondary)' }}>Ejercicio (clasificador)</span>
+              <select
+                value={exerciseMode}
+                onChange={(e) => setExerciseMode(e.target.value as LiveExerciseMode)}
+                disabled={ui.transmitting}
+                style={{
+                  maxWidth: 280,
+                  padding: '0.45rem 0.6rem',
+                  borderRadius: 'var(--bm-radius-sm)',
+                  border: '1px solid var(--bm-border)',
+                  background: 'var(--bm-surface)',
+                  color: 'var(--bm-text-primary)',
+                  fontFamily: 'var(--bm-font-body)',
+                }}
+              >
+                <option value="auto">Automático</option>
+                <option value="idle">idle</option>
+                <option value="squat">squat</option>
+                <option value="lunge">lunge</option>
+              </select>
+              {ui.transmitting ? (
+                <span style={{ color: 'var(--bm-text-disabled)', fontSize: '0.75rem' }}>
+                  Detén la transmisión para cambiar el modo.
+                </span>
+              ) : (
+                <span style={{ color: 'var(--bm-text-disabled)', fontSize: '0.75rem' }}>
+                  «Automático» usa el motor del servidor; otras opciones fijan la etiqueta (confianza 1,0).
+                </span>
+              )}
+            </label>
             {ui.cameraOn && ui.transmitting && (
               <BmButton variant="outline" onClick={stopTransmit} style={{ width: '100%', fontWeight: 700, letterSpacing: '0.06em' }}>
                 DETENER

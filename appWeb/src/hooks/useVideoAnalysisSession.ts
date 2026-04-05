@@ -95,6 +95,11 @@ const initialUi = (): VideoAnalysisUiState => ({
   logEntries: [],
 });
 
+function wsForcedExercise(forced: string | null | undefined): Record<string, string> {
+  const s = (forced ?? '').trim().toLowerCase();
+  return s ? { forced_exercise_label: s } : {};
+}
+
 export type SessionStartParams =
   | {
       mode: 'file';
@@ -108,6 +113,7 @@ export type SessionStartParams =
       captureOnly: boolean;
       serverDiagnostics: boolean;
       streamTuning: 'auto' | 'off';
+      forcedExerciseLabel?: string | null;
     }
   | {
       mode: 'server_camera';
@@ -121,6 +127,7 @@ export type SessionStartParams =
       captureOnly: boolean;
       serverDiagnostics: boolean;
       streamTuning: 'auto' | 'off';
+      forcedExerciseLabel?: string | null;
     }
   | {
       mode: 'browser_camera';
@@ -130,6 +137,7 @@ export type SessionStartParams =
       includePreview: boolean;
       previewJpegQuality: number;
       captureOnly: boolean;
+      forcedExerciseLabel?: string | null;
     };
 
 async function wsPayloadToText(data: unknown): Promise<string | null> {
@@ -622,7 +630,13 @@ export function useVideoAnalysisSession(opts?: UseVideoAnalysisSessionOptions) {
             if (connectTimeoutId !== undefined) clearTimeout(connectTimeoutId);
             ws.binaryType = 'arraybuffer';
             try {
-              ws.send(JSON.stringify({ analyze_pose: true, capture_only: params.captureOnly }));
+              ws.send(
+                JSON.stringify({
+                  analyze_pose: true,
+                  capture_only: params.captureOnly,
+                  ...wsForcedExercise(params.forcedExerciseLabel),
+                }),
+              );
             } catch (e) {
               fail(`No se pudo enviar config: ${e}`);
               try {
@@ -691,6 +705,7 @@ export function useVideoAnalysisSession(opts?: UseVideoAnalysisSessionOptions) {
               capture_only: params.captureOnly,
               diagnostics: params.serverDiagnostics,
               stream_tuning: params.streamTuning,
+              ...wsForcedExercise(params.forcedExerciseLabel),
             }
           : {
               source: 'camera' as const,
@@ -703,6 +718,7 @@ export function useVideoAnalysisSession(opts?: UseVideoAnalysisSessionOptions) {
               capture_only: params.captureOnly,
               diagnostics: params.serverDiagnostics,
               stream_tuning: params.streamTuning,
+              ...wsForcedExercise(params.forcedExerciseLabel),
             };
 
       const url = buildPoseStreamWebSocketUri(params.apiBaseUrl);

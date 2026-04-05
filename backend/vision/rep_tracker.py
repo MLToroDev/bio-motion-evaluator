@@ -22,7 +22,9 @@ class RepTrackerRouter:
         self._last_effective: str | None = None
         self._trackers: dict[str, RepTracker] = {
             unknown_label: UnknownRepTracker(),
+            "idle": UnknownRepTracker(),
             "squat": SquatRepTracker(),
+            "lunge": UnknownRepTracker(),
         }
 
     def reset_all(self) -> None:

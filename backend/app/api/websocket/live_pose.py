@@ -208,6 +208,7 @@ async def pose_stream(ws: WebSocket) -> None:
                 settings.exercise_classifier_config(),
                 inference_stride=plan.inference_stride,
                 analysis_enabled=not cfg.capture_only,
+                forced_exercise_label=cfg.forced_exercise_label,
             )
 
             max_tp = bool(cfg.max_throughput)

@@ -57,7 +57,11 @@ const initialLive = (): Omit<LiveAnalysisUiState, 'cameraOn'> => ({
   serverPipelineTotalMs: null,
 });
 
-export function useLiveAnalysisSession(apiBase: string, captureOnly = true) {
+export function useLiveAnalysisSession(
+  apiBase: string,
+  captureOnly = true,
+  forcedExerciseLabel: string | null = null,
+) {
   const [ui, setUi] = useState<LiveAnalysisUiState>(() => ({
     cameraOn: false,
     ...initialLive(),
@@ -205,7 +209,10 @@ export function useLiveAnalysisSession(apiBase: string, captureOnly = true) {
     }
 
     ws.binaryType = 'arraybuffer';
-    ws.send(JSON.stringify({ analyze_pose: true, capture_only: captureOnly }));
+    const init: Record<string, unknown> = { analyze_pose: true, capture_only: captureOnly };
+    const forced = (forcedExerciseLabel ?? '').trim().toLowerCase();
+    if (forced) init.forced_exercise_label = forced;
+    ws.send(JSON.stringify(init));
     wsRef.current = ws;
 
     setUi((p) => ({
@@ -307,7 +314,7 @@ export function useLiveAnalysisSession(apiBase: string, captureOnly = true) {
         cameraOn: p.cameraOn,
       }));
     };
-  }, [apiBase, captureOnly, sendOneFrame, stopTimers, stopTransmit]);
+  }, [apiBase, captureOnly, forcedExerciseLabel, sendOneFrame, stopTimers, stopTransmit]);
 
   useEffect(() => {
     return () => {

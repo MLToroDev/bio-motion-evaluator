@@ -14,7 +14,7 @@ from vision.model_registry import ModelRegistry
 from vision.pipeline_timer import StageTimer
 from vision.pose_extractor import extract_pose_bgr, extract_pose_bgr_video, extract_pose_jpeg
 from vision.rep_tracker import RepTrackerRouter
-from vision.types import PoseFrame, RepState
+from vision.types import ClassificationResult, PoseFrame, RepState
 from vision.unified_payload import build_frame_payload_v1
 
 
@@ -27,11 +27,14 @@ class RealtimeEngineSession:
         *,
         inference_stride: int = 1,
         analysis_enabled: bool = True,
+        forced_exercise_label: str | None = None,
     ) -> None:
         self._model_path = model_path
         self._cfg = classifier_cfg or ExerciseClassifierConfig()
         self._inference_stride = max(1, int(inference_stride))
         self._analysis_enabled = bool(analysis_enabled)
+        raw_forced = (forced_exercise_label or "").strip()
+        self._forced_exercise_label: str | None = raw_forced.lower() if raw_forced else None
         self._last_pose: PoseFrame | None = None
         if self._analysis_enabled:
             self._features = FeatureEngine(self._cfg)
@@ -104,7 +107,14 @@ class RealtimeEngineSession:
         self._features.push(pose)
         vec = self._features.build_feature_vector()
         st.mark_feature()
-        c = self._classifier.classify(vec, self._features.window_full())
+        if self._forced_exercise_label:
+            c = ClassificationResult(
+                label=self._forced_exercise_label,
+                confidence=1.0,
+                raw_scores={"forced": 1.0},
+            )
+        else:
+            c = self._classifier.classify(vec, self._features.window_full())
         st.mark_classify()
         ff = self._features.build_feature_frame(pose, frame_index, c.label, c.confidence)
         r = self._router.update(ff)

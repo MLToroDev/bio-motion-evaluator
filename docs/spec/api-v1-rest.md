@@ -23,7 +23,7 @@ Rutas versionadas para **identidad mínima** y **sesiones** cuando `DATABASE_URL
 
 ### `PoseAnalysisResponse` (alineado semánticamente al WS v1)
 
-Campos opcionales además de pose clásica: `schema_version`, `exercise_label`, `exercise_confidence`, `rep_phase`, `rep_count`, `quality_flags`, `pipeline_ms`. El análisis usa la misma sesión de motor que el stream (`RealtimeEngineSession` por petición).
+Campos opcionales además de pose clásica: `schema_version`, `exercise_label`, `exercise_confidence`, `rep_phase`, `rep_count`, `quality_flags`, `pipeline_ms`. El análisis usa la misma sesión de motor que el stream (`RealtimeEngineSession` por petición). **`landmarks` / `world_landmarks`** siguen la misma regla que el WebSocket: subconjunto filtrado por `visibility` (ver `POSE_LANDMARK_MIN_VISIBILITY_RESPONSE` en `docs/spec/websocket-pose-stream.md`).
 
 ### `session_metrics`
 

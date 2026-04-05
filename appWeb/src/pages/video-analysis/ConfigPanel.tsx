@@ -9,6 +9,9 @@ import { VideoAnalysisActions } from './VideoAnalysisActions';
 
 export type AnalysisInputSource = 'file' | 'server_camera' | 'browser_camera';
 
+/** Modo de etiqueta de ejercicio enviado al backend (`forced_exercise_label` si no es auto). */
+export type VideoExerciseMode = 'auto' | 'idle' | 'squat' | 'lunge';
+
 export interface ConfigValues {
   apiBase: string;
   videoFilename: string;
@@ -22,6 +25,7 @@ export interface ConfigValues {
   maxThroughput: boolean;
   includePreview: boolean;
   captureOnly: boolean;
+  exerciseMode: VideoExerciseMode;
   serverDiagnostics: boolean;
   /** Perfil automático según resolución/FPS del clip (backend). */
   streamTuningAuto: boolean;
@@ -527,6 +531,26 @@ export function ConfigPanel({
             onChange={(v) => onChange('captureOnly', v)}
             disabled={running}
           />
+          <Field
+            label="Ejercicio"
+            hint={
+              values.captureOnly
+                ? 'Desactiva «Solo captura» para usar clasificación o forzar etiqueta.'
+                : 'Automático: clasificador del servidor. Otras opciones fijan la etiqueta (confianza 1,0).'
+            }
+          >
+            <select
+              style={inputStyle}
+              value={values.exerciseMode}
+              onChange={(e) => onChange('exerciseMode', e.target.value as VideoExerciseMode)}
+              disabled={running || values.captureOnly}
+            >
+              <option value="auto">Automático</option>
+              <option value="idle">idle</option>
+              <option value="squat">squat</option>
+              <option value="lunge">lunge</option>
+            </select>
+          </Field>
           <CheckRow
             label="Diagnósticos servidor"
             checked={values.serverDiagnostics}

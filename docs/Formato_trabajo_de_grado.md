@@ -941,6 +941,27 @@ Las entradas nuevas se añaden **al inicio** de la lista (más reciente arriba),
 
 ## Entradas
 
+### 2026-04-04 — Payload WS/REST: landmarks filtrados por `visibility` (sin puntos de baja confianza en JSON)
+
+- **Ámbito:** `backend/`, `docs/spec/`
+- **Tipo:** cambio de contrato / calidad de datos
+- **Descripción:** El motor interno sigue usando los 33 landmarks de MediaPipe para features y rodillas; en la **respuesta al cliente** (`landmarks` / `world_landmarks`) solo se incluyen puntos con **`visibility`** mayor o igual al umbral configurable (**`POSE_LANDMARK_MIN_VISIBILITY_RESPONSE`**, defecto 0,5; **0** desactiva el filtro). Documentado en `docs/spec/websocket-pose-stream.md` y `.env.example`.
+- **Trazabilidad:** `backend/vision/landmark_filter.py`, `backend/vision/unified_payload.py`, `backend/app/config.py`, `tests/test_unified_payload_landmarks.py`, `docs/spec/websocket-pose-stream.md`
+
+### 2026-04-04 — Reglas de repo: frontend solo `appWeb/`; `app/` (Flutter) descartado para desarrollo
+
+- **Ámbito:** `infra` (Cursor/reglas), `docs/`
+- **Tipo:** gobernanza / decisión de alcance
+- **Descripción:** Se fijó en **`.cursorrules`**, **`.cursor/rules/bio-motion-documentation.mdc`** y la skill de tesis que **no se debe actualizar el proyecto Flutter en `app/`** por defecto (proyecto descartado para el rumbo actual); el **frontend activo** es **`appWeb/`** (React). Se actualizó **`docs/arquitectura.md`** (visión, diagrama y nota sobre panel legado).
+- **Trazabilidad:** `.cursorrules`, `.cursor/rules/bio-motion-documentation.mdc`, `.cursor/skills/bio-motion-thesis-doc/SKILL.md`, `docs/arquitectura.md`
+
+### 2026-04-04 — Clasificación de ejercicios (catálogo, heurístico, ONNX, confianza en cliente)
+
+- **Ámbito:** `backend/`, `appWeb/`, `app/`, `docs/`
+- **Tipo:** cambio funcional / decisión arquitectónica
+- **Descripción:** Se implementó la **Fase A** con `HeuristicExerciseClassifier` y catálogo en JSON; **Fase B** con script de entrenamiento que puede **fusionar** `vision/models/manifest.json` (`--write-manifest`); export de CSV con **segmentos** por tiempo; **`active: null`** en el manifest por defecto para usar el heurístico sin ONNX obligatorio. En **React** y **Flutter** se expone selector **Automático / idle / squat / lunge** que envía `forced_exercise_label` cuando aplica; análisis en vivo Flutter pasa `capture_only: false` para recibir etiqueta y confianza reales del motor.
+- **Trazabilidad:** `backend/vision/heuristic_exercise_classifier.py`, `backend/scripts/train_exercise_classifier_from_csv.py`, `backend/scripts/export_features_from_video.py`, `backend/scripts/examples/`, `appWeb/src/hooks/useLiveAnalysisSession.ts`, `appWeb/src/pages/video-analysis/`, `app/lib/views/analysis/live/live_analysis_screen.dart`, `docs/guias/protocolo_captura_clasificacion_ejercicios.md`, `docs/README.md`
+
 ### 2026-04-04 — Argumento académico: Flutter Web, MediaPipe en cliente y migración a React
 
 - **Ámbito:** docs (Capítulo 6), `appWeb/`, `app/`

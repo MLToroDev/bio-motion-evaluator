@@ -11,7 +11,7 @@ Dejar constancia en el repo de lo que la memoria debe reflejar (Capítulo 6 y de
 
 ## Checklist tras implementación relevante
 
-1. **Inventario:** listar archivos tocados y si el cambio afecta REST, WebSocket, modelos Pydantic, contrato TS en `appWeb`, o flujo de usuario.
+1. **Inventario:** listar archivos tocados y si el cambio afecta REST, WebSocket, modelos Pydantic, contrato TS en **`appWeb/`** (frontend operativo), o flujo de usuario. No usar **`app/`** (Flutter) como superficie de cambio salvo que el usuario lo pida.
 2. **Spec:** si aplica, editar o crear el archivo en `docs/spec/` (ver `docs/spec/README.md`).
 3. **Arquitectura:** si cambia el mapa mental del sistema, actualizar `docs/arquitectura.md`.
 4. **Bitácora:** en `docs/Formato_trabajo_de_grado.md`, sección **BITÁCORA DE DESARROLLO Y DECISIONES**, añadir una entrada **nueva encima** de las existentes con fecha (AAAA-MM-DD), ámbito, tipo, descripción breve y trazabilidad (paths, spec).

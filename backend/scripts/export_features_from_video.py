@@ -1,13 +1,18 @@
 #!/usr/bin/env python3
 """
 Exporta vectores de 32 features (mismo formato que ``FeatureEngine.build_feature_vector()``)
-desde un vídeo **gold standard** bajo ``tests/assets/videos/``, con etiqueta fija por CLI.
+desde un vídeo **gold standard** bajo ``tests/assets/videos/``, con etiqueta fija por CLI
+o por **tramos temporales** (`--segments` JSON).
 
 Salida CSV compatible con ``scripts/train_exercise_classifier_from_csv.py`` (columnas ``f0``…``f31`` + ``label``).
 
-Ejemplo (desde la carpeta ``backend``, **usa el Python del venv**)::
+Ejemplo etiqueta única::
 
-    .venv\\Scripts\\python scripts/export_features_from_video.py --video RunningParcial.mp4 --label squat --out data/squat_rows.csv
+    .venv\\Scripts\\python scripts/export_features_from_video.py --video clip.mp4 --label squat --out data/squat_rows.csv
+
+Tramos (``start_sec`` / ``end_sec`` / ``label`` en segundos de vídeo)::
+
+    .venv\\Scripts\\python scripts/export_features_from_video.py --video clip.mp4 --segments segments.json --out data/mixed.csv --only-window-full
 
 Acumular en el mismo CSV::
 
@@ -20,8 +25,10 @@ from __future__ import annotations
 
 import argparse
 import csv
+import json
 import sys
 from pathlib import Path
+from typing import Any
 
 # Ejecutar desde ``backend/`` (como el resto de scripts del proyecto).
 _BACKEND_ROOT = Path(__file__).resolve().parents[1]
@@ -51,6 +58,19 @@ except ModuleNotFoundError as exc:
     raise SystemExit(1) from exc
 
 
+def _label_at_time_sec(t_sec: float, segments: list[dict[str, Any]] | None, fixed_label: str) -> str | None:
+    """Etiqueta por tiempo; ``segments`` con ``start_sec``, ``end_sec``, ``label``. Fuera de tramos → None."""
+    if not segments:
+        return fixed_label.strip() if fixed_label.strip() else None
+    for seg in segments:
+        lo = float(seg["start_sec"])
+        hi = float(seg["end_sec"])
+        if lo <= t_sec <= hi:
+            lab = str(seg.get("label", "")).strip()
+            return lab if lab else None
+    return None
+
+
 def export_gold_video_features_to_writer(
     *,
     video_filename: str,
@@ -63,6 +83,7 @@ def export_gold_video_features_to_writer(
     require_pose_ok: bool,
     emit_every: int,
     max_frames: int,
+    segments: list[dict[str, Any]] | None = None,
 ) -> tuple[int, int]:
     """
     Procesa un vídeo gold-standard y escribe filas ``f0..f31,label`` en ``writer``.
@@ -112,7 +133,11 @@ def export_gold_video_features_to_writer(
             vec = engine.build_feature_vector()
             if vec.shape[0] != FEATURE_VECTOR_DIM:
                 raise RuntimeError(f"vector dim {vec.shape[0]} != {FEATURE_VECTOR_DIM}")
-            row = [f"{float(vec[i]):.10g}" for i in range(FEATURE_VECTOR_DIM)] + [label.strip()]
+            t_sec = max(0.0, (frames_read - 1) / fps)
+            row_label = _label_at_time_sec(t_sec, segments, label)
+            if row_label is None:
+                continue
+            row = [f"{float(vec[i]):.10g}" for i in range(FEATURE_VECTOR_DIM)] + [row_label]
             writer.writerow(row)
             rows_out += 1
 
@@ -144,7 +169,17 @@ def main() -> None:
         required=True,
         help="Nombre del archivo solo (p. ej. squat_test.mp4) bajo tests/assets/videos/",
     )
-    p.add_argument("--label", required=True, help="Etiqueta fija para todas las filas (p. ej. squat, lunge)")
+    p.add_argument(
+        "--label",
+        default="",
+        help="Etiqueta fija por filas (si no se usa --segments). Obligatoria sin --segments.",
+    )
+    p.add_argument(
+        "--segments",
+        type=Path,
+        default=None,
+        help='JSON lista de tramos: [{"start_sec":0,"end_sec":5,"label":"idle"},...]',
+    )
     p.add_argument("--out", type=Path, required=True, help="CSV de salida (f0..f31,label)")
     p.add_argument("--append", action="store_true", help="Añade filas sin reescribir cabecera si el archivo ya existe")
     p.add_argument(
@@ -180,6 +215,19 @@ def main() -> None:
     if args.emit_every < 1:
         p.error("--emit-every debe ser >= 1")
 
+    segments_list: list[dict[str, Any]] | None = None
+    if args.segments is not None:
+        if not args.segments.is_file():
+            raise SystemExit(f"No existe --segments: {args.segments}")
+        raw_seg = json.loads(args.segments.read_text(encoding="utf-8"))
+        if not isinstance(raw_seg, list):
+            raise SystemExit("--segments debe ser una lista JSON")
+        segments_list = [x for x in raw_seg if isinstance(x, dict)]
+        if not segments_list:
+            raise SystemExit("--segments está vacío")
+    elif not (args.label or "").strip():
+        p.error("Indica --label o bien --segments con JSON de tramos")
+
     gold = Settings.gold_standard_videos_dir()
     video_path = resolve_gold_standard_video(args.video, gold)
     if not video_path.is_file():
@@ -198,7 +246,7 @@ def main() -> None:
         rows_out, frames_read = export_gold_video_features_to_writer(
             video_filename=args.video,
             gold_dir=gold,
-            label=args.label,
+            label=args.label or "",
             writer=writer,
             classifier_cfg=cfg,
             model_path=model_path,
@@ -206,13 +254,15 @@ def main() -> None:
             require_pose_ok=args.require_pose_ok,
             emit_every=args.emit_every,
             max_frames=args.max_frames,
+            segments=segments_list,
         )
     finally:
         fh.close()
 
+    lab_info = "segments" if segments_list else repr(args.label)
     print(
         f"Listo: {rows_out} filas → {args.out.resolve()} "
-        f"(frames leídos={frames_read}, vídeo={video_path.name}, label={args.label!r})"
+        f"(frames leídos={frames_read}, vídeo={video_path.name}, label={lab_info})"
     )
 
 

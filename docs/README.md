@@ -15,13 +15,16 @@
 | [**planificacion/**](planificacion/) | Plan del motor / roadmap y notas de apoyo al escrito. |
 | [**literatura/**](literatura/apoyos/) | Resúmenes o notas de papers de referencia. |
 
+**Código:** el frontend operativo de la tesis está en **`appWeb/`** (React). La carpeta **`app/`** (Flutter) es **legado** y no se mantiene como destino de nuevas funcionalidades salvo decisión explícita del equipo.
+
 ## Guías rápidas
 
 | Recurso | Descripción |
 |---------|-------------|
-| [guias/SETUP.md](guias/SETUP.md) | Instalación de Flutter, `gh`, Python, modelos MediaPipe |
+| [guias/SETUP.md](guias/SETUP.md) | Instalación (`gh`, Python, MediaPipe); Flutter solo si trabajas el legado en `app/` |
 | [guias/ui_patterns.md](guias/ui_patterns.md) | Catálogo de patrones de UI de referencia |
 | [guias/EstandarDiseño.md](guias/EstandarDiseño.md) | Estándar visual del proyecto |
 | [guias/reporte_latencia_frames_ws_pose_stream.md](guias/reporte_latencia_frames_ws_pose_stream.md) | Notas de latencia en streaming |
+| [guias/protocolo_captura_clasificacion_ejercicios.md](guias/protocolo_captura_clasificacion_ejercicios.md) | Protocolo de cámara y catálogo para clasificación de ejercicios |
 
 Añade aquí el documento definitivo institucional (Word/LaTeX) o enlázalo según la política de la universidad.
