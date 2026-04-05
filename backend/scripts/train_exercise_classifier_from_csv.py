@@ -62,49 +62,13 @@ from __future__ import annotations
 
 import argparse
 import csv
-import datetime as _dt
 import json
 import sys
 from pathlib import Path
 
 import numpy as np
 
-FEATURE_DIM = 32
-
-
-def _merge_manifest(
-    manifest_path: Path,
-    backend_root: Path,
-    model_key: str,
-    onnx_rel_posix: str,
-    class_list: list[str],
-    window_size: int,
-    *,
-    set_active: bool,
-) -> None:
-    manifest_path = manifest_path.expanduser()
-    if not manifest_path.is_absolute():
-        manifest_path = (backend_root / manifest_path).resolve()
-    data: dict = {}
-    if manifest_path.is_file():
-        with manifest_path.open(encoding="utf-8") as f:
-            data = json.load(f)
-    models = dict(data.get("models") or {})
-    models[model_key] = {
-        "path": onnx_rel_posix,
-        "classes": class_list,
-        "window_size": window_size,
-        "feature_vector_dim": FEATURE_DIM,
-        "created_at": _dt.date.today().isoformat(),
-        "note": "RandomForest desde train_exercise_classifier_from_csv.py (--write-manifest)",
-    }
-    data["models"] = models
-    if set_active:
-        data["active"] = model_key
-    manifest_path.parent.mkdir(parents=True, exist_ok=True)
-    with manifest_path.open("w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2)
-        f.write("\n")
+from vision.exercise_rf_train import FEATURE_DIM, merge_manifest, train_rf_export_onnx
 
 
 def _require_existing_file(path: Path, kind: str) -> Path:
@@ -233,11 +197,7 @@ def main() -> None:
     args = p.parse_args()
 
     try:
-        from sklearn.ensemble import RandomForestClassifier
-        from sklearn.metrics import classification_report
-        from sklearn.model_selection import train_test_split
-        from skl2onnx import convert_sklearn
-        from skl2onnx.common.data_types import FloatTensorType
+        import sklearn  # noqa: F401
     except ImportError as exc:
         print(
             "Faltan dependencias. Instala:\n  pip install -r requirements-train.txt\n",
@@ -248,7 +208,6 @@ def main() -> None:
     class_list = [c.strip() for c in args.classes.split(",") if c.strip()]
     if len(set(class_list)) != len(class_list):
         raise SystemExit("--classes contiene duplicados")
-    label_to_idx = {c: i for i, c in enumerate(class_list)}
 
     if args.csv is not None:
         csv_path = _require_existing_file(args.csv, "CSV")
@@ -257,52 +216,24 @@ def main() -> None:
         jsonl_path = _require_existing_file(args.jsonl, "JSONL")
         X, y_str = load_jsonl(jsonl_path)
 
-    unknown_labels = sorted(set(y_str.tolist()) - set(label_to_idx))
+    unknown_labels = sorted(set(y_str.tolist()) - set(class_list))
     if unknown_labels:
         raise SystemExit(f"Etiquetas en datos no listadas en --classes: {unknown_labels}")
 
-    y = np.array([label_to_idx[s] for s in y_str], dtype=np.int64)
     if X.shape[1] != FEATURE_DIM:
         raise SystemExit(f"Se esperaban {FEATURE_DIM} columnas, hay {X.shape[1]}")
 
-    try:
-        X_train, X_test, y_train, y_test = train_test_split(
-            X,
-            y,
-            test_size=args.test_size,
-            random_state=args.seed,
-            stratify=y,
-        )
-    except ValueError:
-        X_train, X_test, y_train, y_test = train_test_split(
-            X,
-            y,
-            test_size=args.test_size,
-            random_state=args.seed,
-        )
-
-    clf = RandomForestClassifier(
-        n_estimators=args.n_estimators,
-        random_state=args.seed,
-        class_weight="balanced_subsample",
-        n_jobs=-1,
-    )
-    clf.fit(X_train, y_train)
-    y_pred = clf.predict(X_test)
-    print(classification_report(y_test, y_pred, target_names=class_list))
-
-    initial_types = [("float_input", FloatTensorType([None, FEATURE_DIM]))]
-    onnx_model = convert_sklearn(
-        clf,
-        initial_types=initial_types,
-        options={id(clf): {"zipmap": False}},
-    )
-
     out_path = args.out
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    with out_path.open("wb") as f:
-        f.write(onnx_model.SerializeToString())
-
+    metrics = train_rf_export_onnx(
+        X,
+        y_str,
+        class_list,
+        out_path,
+        test_size=args.test_size,
+        seed=args.seed,
+        n_estimators=args.n_estimators,
+    )
+    print(json.dumps({k: v for k, v in metrics.items() if k != "classification_report"}, indent=2))
     print(f"\nONNX escrito: {out_path.resolve()}")
 
     backend_root = Path(__file__).resolve().parent.parent
@@ -314,7 +245,7 @@ def main() -> None:
 
     if args.write_manifest is not None:
         mp = Path(args.write_manifest)
-        _merge_manifest(
+        merge_manifest(
             mp,
             backend_root,
             args.manifest_model_key,
@@ -322,6 +253,7 @@ def main() -> None:
             class_list,
             args.manifest_window_size,
             set_active=args.set_manifest_active,
+            note="RandomForest desde train_exercise_classifier_from_csv.py (--write-manifest)",
         )
         dest = mp if mp.is_absolute() else (backend_root / mp).resolve()
         print(f"Manifest fusionado: {dest}")

@@ -40,6 +40,13 @@ flowchart TD
 3. **Inferencia**: MediaPipe Pose Landmarker en el backend; modelos HF opcionales para tareas de clasificación.
 4. **Presentación**: **`appWeb/`** (React) muestra resultados y métricas al usuario.
 
+### Aprendizaje continuo (administración)
+
+- **PostgreSQL** almacena `feature_samples` (vectores 32D curados) y `training_jobs` (métricas de entrenamiento).
+- Recolección opcional durante inferencia WebSocket/REST cuando `AUTO_COLLECT_ENABLED` y umbral de confianza.
+- **Celery** ejecuta `train_exercise_classifier`: RandomForest → ONNX, fusiona `vision/models/manifest.json`, opcional **push** a Hugging Face Hub.
+- **React** expone rutas **`/dev/*`** (catálogo, dataset, entrenamiento, modelos) para desarrolladores; contrato en `docs/spec/dev-learning-api.md`.
+
 ---
 
 ## Arquitectura del panel de análisis en vivo

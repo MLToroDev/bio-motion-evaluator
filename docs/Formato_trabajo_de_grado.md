@@ -941,6 +941,13 @@ Las entradas nuevas se añaden **al inicio** de la lista (más reciente arriba),
 
 ## Entradas
 
+### 2026-04-04 — Módulo de aprendizaje continuo: `/api/v1/dev`, Celery, UI Dev Tools
+
+- **Ámbito:** `backend/`, `appWeb/`, `docs/spec/`, `docs/arquitectura.md`
+- **Tipo:** decisión arquitectónica / cambio funcional
+- **Descripción:** Se añadió recolección opcional de ventanas 32D (`feature_samples`), API de curación y jobs de entrenamiento ONNX vía **Celery** (`train_exercise_classifier`), integración opcional **Hugging Face Hub** para artefactos, y páginas **Dev Tools** en React (`/dev/catalog`, `/dev/dataset`, `/dev/training`, `/dev/models`). Autenticación opcional con `DEV_API_KEY` / cabecera `X-Dev-API-Key`.
+- **Trazabilidad:** `backend/app/api/v1/dev/`, `backend/vision/feature_collector.py`, `backend/vision/exercise_rf_train.py`, `backend/app/workers/training_tasks.py`, `appWeb/src/pages/dev/`, `docs/spec/dev-learning-api.md`
+
 ### 2026-04-04 — Payload WS/REST: landmarks filtrados por `visibility` (sin puntos de baja confianza en JSON)
 
 - **Ámbito:** `backend/`, `docs/spec/`

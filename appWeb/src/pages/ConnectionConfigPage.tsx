@@ -1,23 +1,33 @@
 import { useEffect, useState } from 'react';
 import { BmButton } from '../components/BmButton';
 import { BmInput } from '../components/BmInput';
-import { persistApiBase, persistTargetRepGoal, readApiBase, readTargetRepGoal } from '../lib/prefs';
+import {
+  persistApiBase,
+  persistDevApiKey,
+  persistTargetRepGoal,
+  readApiBase,
+  readDevApiKey,
+  readTargetRepGoal,
+} from '../lib/prefs';
 
 export default function ConnectionConfigPage() {
   const [base, setBase] = useState('');
   const [goal, setGoal] = useState('');
+  const [devKey, setDevKey] = useState('');
 
   useEffect(() => {
     setBase(readApiBase());
     const g = readTargetRepGoal();
     setGoal(g != null ? String(g) : '');
+    setDevKey(readDevApiKey() || '');
   }, []);
 
   const save = () => {
     persistApiBase(base);
     const n = parseInt(goal, 10);
     persistTargetRepGoal(Number.isFinite(n) && n > 0 ? n : null);
-    alert('Guardado en localStorage (mismas claves que Flutter).');
+    persistDevApiKey(devKey);
+    alert('Guardado en localStorage (mismas claves que Flutter + Dev API key).');
   };
 
   return (
@@ -33,6 +43,13 @@ export default function ConnectionConfigPage() {
         value={goal}
         onChange={(e) => setGoal(e.target.value)}
         inputMode="numeric"
+      />
+      <BmInput
+        label="X-Dev-API-Key (opcional)"
+        hint="Solo si el backend tiene DEV_API_KEY para /api/v1/dev/*"
+        value={devKey}
+        onChange={(e) => setDevKey(e.target.value)}
+        autoComplete="off"
       />
       <BmButton variant="primary" onClick={save}>
         Guardar

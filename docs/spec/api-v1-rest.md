@@ -20,6 +20,7 @@ Rutas versionadas para **identidad mínima** y **sesiones** cuando `DATABASE_URL
 | GET | `/api/v1/sessions` | Bearer | Lista últimas 50 sesiones del usuario |
 | POST | `/api/v1/sessions/{id}/metrics` | Bearer | Inserta `session_metrics` (body puede incluir `frame_index` opcional) |
 | POST | `/api/v1/sessions/{id}/end` | Bearer | Marca `ended_at` |
+| * | `/api/v1/dev/*` | Opcional (`X-Dev-API-Key` si `DEV_API_KEY`) | Aprendizaje continuo: dataset 32D, jobs Celery, manifest ONNX — ver [dev-learning-api.md](dev-learning-api.md) |
 
 ### `PoseAnalysisResponse` (alineado semánticamente al WS v1)
 

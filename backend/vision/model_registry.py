@@ -85,3 +85,12 @@ class ModelRegistry:
             json.dump(data, f, indent=2)
             f.write("\n")
 
+    def active_key(self) -> str | None:
+        data = self._load_raw()
+        a = data.get("active")
+        return str(a) if a else None
+
+    def manifest_blob(self) -> dict[str, Any]:
+        """Copia del JSON del manifest (``active`` + ``models``)."""
+        return dict(self._load_raw())
+

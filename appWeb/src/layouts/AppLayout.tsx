@@ -16,6 +16,13 @@ const links = [
   { to: '/settings/connection', label: 'Configuración' },
 ];
 
+const devLinks = [
+  { to: '/dev/catalog', label: 'Dev · Catálogo' },
+  { to: '/dev/dataset', label: 'Dev · Dataset' },
+  { to: '/dev/training', label: 'Dev · Entrenamiento' },
+  { to: '/dev/models', label: 'Dev · Modelos' },
+];
+
 function readSidebarCollapsed(): boolean {
   try {
     return localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === '1';
@@ -57,6 +64,22 @@ export default function AppLayout() {
         </div>
         {links.map(({ to, label, end }) => (
           <NavLink key={to} to={to} end={end} className={({ isActive }) => (isActive ? 'active' : '')}>
+            {label}
+          </NavLink>
+        ))}
+        <div
+          style={{
+            margin: '0.75rem 0.6rem',
+            fontSize: '0.65rem',
+            textTransform: 'uppercase',
+            letterSpacing: '0.06em',
+            opacity: 0.45,
+          }}
+        >
+          Dev Tools
+        </div>
+        {devLinks.map(({ to, label }) => (
+          <NavLink key={to} to={to} className={({ isActive }) => (isActive ? 'active' : '')}>
             {label}
           </NavLink>
         ))}

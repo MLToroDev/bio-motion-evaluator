@@ -10,6 +10,14 @@
   margin: 0;
 }
 
+.bm-section-title {
+  font-family: var(--bm-font-body);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--bm-text-primary);
+  margin: var(--bm-space-lg) 0 var(--bm-space-sm);
+}
+
 .bm-hero-title {
   font-family: var(--bm-font-body);
   font-size: 1.5rem;

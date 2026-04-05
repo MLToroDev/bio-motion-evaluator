@@ -1,13 +1,19 @@
 {
-  "active": null,
+  "active": "exercise_classifier_stub",
   "models": {
     "exercise_classifier_stub": {
       "path": "models/exercise_classifier_stub.onnx",
-      "classes": ["unknown", "squat", "shoulder_press", "bench_press", "triceps_extension"],
+      "classes": [
+        "unknown",
+        "squat",
+        "shoulder_press",
+        "bench_press",
+        "triceps_extension"
+      ],
       "window_size": 45,
       "feature_vector_dim": 32,
       "created_at": "2025-01-01",
-      "note": "Stub de referencia. Sin active o Nop activo, el runtime usa el clasificador heurístico Fase A."
+      "note": "Stub de referencia. Sin active o Nop activo, el runtime usa el clasificador heur\u00edstico Fase A."
     }
   }
 }

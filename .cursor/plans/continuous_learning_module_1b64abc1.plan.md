@@ -4,37 +4,37 @@ overview: "Diseñar e implementar un módulo de aprendizaje continuo para el cla
 todos:
   - id: db-schema
     content: Añadir ORM classes FeatureSampleORM y TrainingJobORM en models.py y crear migración Alembic
-    status: pending
+    status: completed
   - id: feature-collector
     content: Crear vision/feature_collector.py e inyectarlo en RealtimeEngineSession con hook post-clasificación
-    status: pending
+    status: completed
   - id: training-script-refactor
     content: Refactorizar train_exercise_classifier_from_csv.py para exponer train_and_export_onnx() como función importable
-    status: pending
+    status: completed
   - id: celery-training-task
     content: Crear app/workers/training_tasks.py con tarea train_classifier_task (carga muestras, entrena, evalúa, actualiza manifest)
-    status: pending
+    status: completed
   - id: hf-hub-service
     content: Crear app/services/hf_hub.py con HfHubService.push_model() y list_versions() usando huggingface_hub SDK
-    status: pending
+    status: completed
   - id: backend-dev-api
     content: Crear router /api/v1/dev con samples.py, training.py, models.py y registrarlo en main.py
-    status: pending
+    status: completed
   - id: frontend-routes
     content: Añadir rutas /dev/* en router.tsx y sección Dev Tools en AppLayout sidebar
-    status: pending
+    status: completed
   - id: frontend-catalog
     content: Implementar CatalogPage con grid de cards por ejercicio mostrando stats de muestras y último F1
-    status: pending
+    status: completed
   - id: frontend-dataset
     content: Implementar DatasetPage con tabla filtrable, acciones de revisión inline y bulk-approve
-    status: pending
+    status: completed
   - id: frontend-training
     content: Implementar TrainingPage con formulario de disparo, polling de progreso y confusion matrix visual
-    status: pending
+    status: completed
   - id: frontend-models
     content: Implementar ModelsPage con lista de versiones manifest y acción de activar modelo
-    status: pending
+    status: completed
 isProject: false
 ---
 

@@ -5,6 +5,8 @@ export const Prefs = {
   targetRepGoal: 'bio_target_rep_goal',
   accessToken: 'bio_access_token',
   userEmail: 'bio_user_email',
+  /** Cabecera opcional X-Dev-API-Key para rutas `/api/v1/dev/*`. */
+  devApiKey: 'bm_dev_api_key',
 } as const;
 
 function safeGet(key: string): string | null {
@@ -81,4 +83,13 @@ export function persistAuthTokenAndEmail(token: string, email: string): void {
 export function clearAuthPrefs(): void {
   safeSet(Prefs.accessToken, '');
   safeSet(Prefs.userEmail, '');
+}
+
+export function readDevApiKey(): string | null {
+  const s = safeGet(Prefs.devApiKey)?.trim();
+  return s || null;
+}
+
+export function persistDevApiKey(key: string): void {
+  safeSet(Prefs.devApiKey, key.trim());
 }
