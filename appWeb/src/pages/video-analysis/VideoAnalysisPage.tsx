@@ -406,12 +406,15 @@ export default function VideoAnalysisPage() {
               hudSections={{
                 rate: previewLayers.rate,
                 mode: previewLayers.mode,
+                exercise: previewLayers.exercise && !config.captureOnly,
                 tips: previewLayers.tips,
                 quality: previewLayers.quality,
               }}
               skeletonOverlay={previewLayers.skeletonOverlay}
               overlayRxPerSec={ui.running ? ui.displayRxPerSec : null}
               overlayQualityFlags={ui.qualityFlags}
+              exerciseLabel={ex}
+              exerciseConfidence={ui.exerciseConfidence}
               variant="hero"
             />
             <Suspense

@@ -31,7 +31,8 @@ const CSV_HEADER = 'frame,left_knee_flexion_deg,right_knee_flexion_deg,pose_ok\n
 const MAX_SERIES = 30;
 const MAX_LOG = 80;
 const MAX_SPARK = 5;
-const BROWSER_RTT_MAX_PENDING = 2;
+/** Frames JPEG en vuelo (hasta recibir JSON). Con 2, la tasa efectiva ≈ 2 / latencia_servidor (~15 fps si tarda ~130 ms). */
+const BROWSER_RTT_MAX_PENDING = 6;
 
 function sessionSummaryLine(frameIndex: number, knees: Record<string, unknown> | null): string {
   const l = parseDeg(knees?.left_knee_flexion_angle_deg);
@@ -541,11 +542,16 @@ export function useVideoAnalysisSession(opts?: UseVideoAnalysisSessionOptions) {
         };
 
         try {
+          const videoTrack: MediaTrackConstraints = {
+            frameRate: { ideal: 30, max: 60 },
+            width: { ideal: 640 },
+            height: { ideal: 480 },
+          };
           const constraints: MediaStreamConstraints = {
             audio: false,
             video: params.browserDeviceId.trim()
-              ? { deviceId: { exact: params.browserDeviceId.trim() } }
-              : { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
+              ? { ...videoTrack, deviceId: { exact: params.browserDeviceId.trim() } }
+              : { ...videoTrack, facingMode: 'user' },
           };
           const stream = await navigator.mediaDevices.getUserMedia(constraints);
           browserStreamRef.current = stream;

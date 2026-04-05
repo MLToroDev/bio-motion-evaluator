@@ -69,11 +69,14 @@ export default function LiveAnalysisPage() {
             {ui.transmitting && <PoseSkeletonCanvas landmarks={ui.landmarks} mirrorHorizontal={true} />}
             <VideoPreviewOverlays
               visible={ui.cameraOn}
+              hudSections={{ exercise: ui.transmitting }}
               modeLabel="WEB"
               rxPerSec={ui.transmitting ? ui.displayRxPerSec : 0}
               rateSuffix="RX/s"
               bullets={LIVE_POSE_TIPS}
               qualityFlags={ui.transmitting ? ui.qualityFlags : []}
+              exerciseLabel={ex}
+              exerciseConfidence={ui.exerciseConfidence}
             />
             {!ui.cameraOn && (
               <div

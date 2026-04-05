@@ -10,6 +10,7 @@ export type VideoAnalysisPreviewLayerToggles = VideoPreviewHudSections & {
 export type PreviewLayerToggleState = {
   rate: boolean;
   mode: boolean;
+  exercise: boolean;
   tips: boolean;
   quality: boolean;
   skeletonOverlay: boolean;
@@ -18,6 +19,7 @@ export type PreviewLayerToggleState = {
 export const defaultPreviewLayerState: PreviewLayerToggleState = {
   rate: true,
   mode: true,
+  exercise: true,
   tips: true,
   quality: true,
   skeletonOverlay: true,
@@ -32,6 +34,7 @@ export function loadPreviewLayerState(): PreviewLayerToggleState {
     return {
       rate: b('rate', defaultPreviewLayerState.rate),
       mode: b('mode', defaultPreviewLayerState.mode),
+      exercise: b('exercise', defaultPreviewLayerState.exercise),
       tips: b('tips', defaultPreviewLayerState.tips),
       quality: b('quality', defaultPreviewLayerState.quality),
       skeletonOverlay: b('skeletonOverlay', defaultPreviewLayerState.skeletonOverlay),

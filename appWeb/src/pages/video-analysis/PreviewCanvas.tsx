@@ -20,6 +20,9 @@ interface PreviewCanvasProps {
   skeletonOverlay?: boolean;
   overlayRxPerSec?: number | null;
   overlayQualityFlags?: string[];
+  /** Clasificación del motor (visible si `hudSections.exercise` es true). */
+  exerciseLabel?: string;
+  exerciseConfidence?: number;
   /** Pastilla esquina inferior derecha: FPS efectivos (mensajes/s desde el servidor). */
   showServerFpsPill?: boolean;
   /**
@@ -41,6 +44,8 @@ export function PreviewCanvas({
   skeletonOverlay = true,
   overlayRxPerSec = null,
   overlayQualityFlags = [],
+  exerciseLabel = 'unknown',
+  exerciseConfidence = 0,
   showServerFpsPill = true,
   variant = 'aspect',
 }: PreviewCanvasProps) {
@@ -188,6 +193,8 @@ export function PreviewCanvas({
         rateSuffix="RX/s"
         bullets={FILE_PREVIEW_TIPS}
         qualityFlags={overlayQualityFlags}
+        exerciseLabel={exerciseLabel}
+        exerciseConfidence={exerciseConfidence}
       />
     </div>
   );

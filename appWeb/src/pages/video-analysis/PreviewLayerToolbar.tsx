@@ -64,6 +64,7 @@ export function PreviewLayerToolbar({ layers, onToggle }: PreviewLayerToolbarPro
       </span>
       {chip('rate', 'RX/s', 'Mostrar u ocultar la pastilla de tasa RX/s')}
       {chip('mode', 'Modo', 'Mostrar u ocultar la insignia de modo (servidor)')}
+      {chip('exercise', 'Ejercicio', 'Clasificación de ejercicio y confianza sobre el vídeo')}
       {chip('tips', 'Consejos', 'Mostrar u ocultar la lista de consejos sobre el vídeo')}
       {chip('quality', 'Calidad', 'Mostrar u ocultar avisos de calidad del servidor')}
       {chip('skeletonOverlay', 'Esqueleto 2D', 'Superponer el esqueleto vectorial sobre el fotograma')}

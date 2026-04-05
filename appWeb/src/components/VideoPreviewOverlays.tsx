@@ -31,6 +31,8 @@ export type VideoPreviewHudSections = {
   rate?: boolean;
   /** Insignia «Modo: …» (esquina superior derecha). */
   mode?: boolean;
+  /** Clasificación de ejercicio + confianza (fila superior). */
+  exercise?: boolean;
   /** Lista de consejos / bullets. */
   tips?: boolean;
   /** Líneas derivadas de `qualityFlags` del servidor. */
@@ -59,6 +61,10 @@ export interface VideoPreviewOverlaysProps {
   bullets?: readonly string[];
   /** Añade líneas derivadas de flags del servidor (calidad, etc.). */
   qualityFlags?: string[];
+  /** Etiqueta estable del clasificador (p. ej. squat). Solo se muestra si `hudSections.exercise`. */
+  exerciseLabel?: string;
+  /** Confianza 0–1 del servidor. */
+  exerciseConfidence?: number;
 }
 
 export function VideoPreviewOverlays({
@@ -69,15 +75,19 @@ export function VideoPreviewOverlays({
   rateSuffix = 'RX/s',
   bullets = LIVE_POSE_TIPS,
   qualityFlags = [],
+  exerciseLabel = 'unknown',
+  exerciseConfidence = 0,
 }: VideoPreviewOverlaysProps) {
   if (!visible) return null;
 
   const showRate = hudSectionOn(hudSections, 'rate');
   const showMode = hudSectionOn(hudSections, 'mode');
+  const showExercise = hudSectionOn(hudSections, 'exercise');
   const showTips = hudSectionOn(hudSections, 'tips');
   const showQuality = hudSectionOn(hudSections, 'quality');
 
   const rateStr = rxPerSec != null ? rxPerSec.toFixed(1) : '—';
+  const confPct = Math.min(100, Math.max(0, Math.round(exerciseConfidence * 100)));
   const extra =
     qualityFlags.length > 0
       ? qualityFlags.slice(0, 4)
@@ -85,13 +95,17 @@ export function VideoPreviewOverlays({
 
   const showBullets = showTips && bullets.length > 0;
   const showQualityLines = showQuality && extra.length > 0;
-  const topRow = showRate || showMode;
+  const topRow = showRate || showMode || showExercise;
   const bottomCard = showBullets || showQualityLines;
 
   if (!topRow && !bottomCard) return null;
 
   const topJustify =
-    showRate && showMode ? 'space-between' : showMode && !showRate ? 'flex-end' : 'flex-start';
+    showRate && showMode && !showExercise
+      ? 'space-between'
+      : showMode && !showRate && !showExercise
+        ? 'flex-end'
+        : 'flex-start';
 
   const columnJustify =
     topRow && bottomCard ? 'space-between' : bottomCard && !topRow ? 'flex-end' : 'flex-start';
@@ -119,6 +133,7 @@ export function VideoPreviewOverlays({
             alignItems: 'flex-start',
             gap: '0.5rem',
             width: '100%',
+            flexWrap: 'wrap',
           }}
         >
           {showRate ? (
@@ -139,6 +154,26 @@ export function VideoPreviewOverlays({
                   {rateSuffix}
                 </span>
               </div>
+            </div>
+          ) : null}
+          {showExercise ? (
+            <div
+              style={{
+                ...hudPill,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.08rem',
+                padding: '0.35rem 0.65rem',
+                minWidth: '7.5rem',
+              }}
+            >
+              <span style={{ fontSize: '0.58rem', fontWeight: 700, letterSpacing: '0.07em', color: 'var(--bm-text-secondary)', textTransform: 'uppercase' }}>
+                Ejercicio
+              </span>
+              <span style={{ fontFamily: 'var(--bm-font-mono)', fontSize: '0.88rem', fontWeight: 700, color: 'var(--bm-text-primary)', letterSpacing: '0.02em' }}>
+                {(exerciseLabel || 'unknown').toUpperCase()}
+              </span>
+              <span style={{ fontSize: '0.68rem', fontWeight: 600, color: 'var(--bm-accent)' }}>Confianza {confPct}%</span>
             </div>
           ) : null}
           {showMode ? (
