@@ -1,4 +1,4 @@
-# ARCH-5: realtime_engine.py — Orquestador < 80 líneas (ver docs/bio_motion_plan_v2.md §2.2)
+# ARCH-5: realtime_engine.py — Orquestador < 80 líneas (ver docs/planificacion/bio_motion_plan_v2.md §2.2)
 """Sesión stateful: extractor → features → clasificador → rep tracker → payload unificado."""
 
 from __future__ import annotations

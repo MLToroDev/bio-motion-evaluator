@@ -21,12 +21,17 @@ import {
   VideoAnalysisAccumulator,
   type AnalysisSummary,
 } from '../lib/videoAnalysisAccumulator';
-import { buildPoseStreamWebSocketUri } from '../lib/wsUri';
+import {
+  buildPoseStreamWebSocketUri,
+  buildVideoWebSocketUri,
+  normalizeApiBaseUrl,
+} from '../lib/wsUri';
 
 const CSV_HEADER = 'frame,left_knee_flexion_deg,right_knee_flexion_deg,pose_ok\n';
 const MAX_SERIES = 30;
 const MAX_LOG = 80;
 const MAX_SPARK = 5;
+const BROWSER_RTT_MAX_PENDING = 2;
 
 function sessionSummaryLine(frameIndex: number, knees: Record<string, unknown> | null): string {
   const l = parseDeg(knees?.left_knee_flexion_angle_deg);
@@ -90,20 +95,42 @@ const initialUi = (): VideoAnalysisUiState => ({
   logEntries: [],
 });
 
-export interface SessionStartParams {
-  apiBaseUrl: string;
-  videoFilename: string;
-  targetFps: number;
-  /** Si true, el servidor no limita el ritmo entre frames (procesa lo más rápido posible). */
-  maxThroughput: boolean;
-  includePreview: boolean;
-  previewFps: number;
-  previewJpegQuality: number;
-  captureOnly: boolean;
-  serverDiagnostics: boolean;
-  /** auto = servidor adapta downscale/FPS/stride al vídeo; off = solo parámetros explícitos. */
-  streamTuning: 'auto' | 'off';
-}
+export type SessionStartParams =
+  | {
+      mode: 'file';
+      apiBaseUrl: string;
+      videoFilename: string;
+      targetFps: number;
+      maxThroughput: boolean;
+      includePreview: boolean;
+      previewFps: number;
+      previewJpegQuality: number;
+      captureOnly: boolean;
+      serverDiagnostics: boolean;
+      streamTuning: 'auto' | 'off';
+    }
+  | {
+      mode: 'server_camera';
+      apiBaseUrl: string;
+      deviceIndex: number;
+      targetFps: number;
+      maxThroughput: boolean;
+      includePreview: boolean;
+      previewFps: number;
+      previewJpegQuality: number;
+      captureOnly: boolean;
+      serverDiagnostics: boolean;
+      streamTuning: 'auto' | 'off';
+    }
+  | {
+      mode: 'browser_camera';
+      apiBaseUrl: string;
+      browserDeviceId: string;
+      targetFps: number;
+      includePreview: boolean;
+      previewJpegQuality: number;
+      captureOnly: boolean;
+    };
 
 async function wsPayloadToText(data: unknown): Promise<string | null> {
   if (typeof data === 'string') return data;
@@ -144,6 +171,16 @@ export function useVideoAnalysisSession(opts?: UseVideoAnalysisSessionOptions) {
   const leftSeriesRef = useRef<number[]>([]);
   const rightSeriesRef = useRef<number[]>([]);
 
+  /** `pose` = `/ws/pose-stream`; `browser` = `/ws/video` (solo ahí aplica vista previa local). */
+  const activeTransportRef = useRef<'pose' | 'browser' | null>(null);
+  const browserStreamRef = useRef<MediaStream | null>(null);
+  const browserVideoRef = useRef<HTMLVideoElement | null>(null);
+  const browserCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const browserFrameTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const browserRttQueueRef = useRef<number[]>([]);
+  const browserIncludePreviewRef = useRef(false);
+  const browserJpegQualityRef = useRef(0.85);
+
   const pendingRef = useRef<Partial<VideoAnalysisUiState> | null>(null);
   const microRef = useRef(false);
 
@@ -168,6 +205,18 @@ export function useVideoAnalysisSession(opts?: UseVideoAnalysisSessionOptions) {
     setUi((p) => ({ ...p, displayRxPerSec: 0 }));
   }, []);
 
+  const cleanupBrowserTransport = useCallback(() => {
+    if (browserFrameTimerRef.current) {
+      clearInterval(browserFrameTimerRef.current);
+      browserFrameTimerRef.current = null;
+    }
+    browserRttQueueRef.current = [];
+    browserStreamRef.current?.getTracks().forEach((t) => t.stop());
+    browserStreamRef.current = null;
+    const v = browserVideoRef.current;
+    if (v) v.srcObject = null;
+  }, []);
+
   const persistSnapshot = useCallback(() => {
     const fi = frameIndexRef.current;
     if (fi < 0) return;
@@ -186,6 +235,8 @@ export function useVideoAnalysisSession(opts?: UseVideoAnalysisSessionOptions) {
       accRef.current.reset();
 
       stopFpsTimer();
+      cleanupBrowserTransport();
+      activeTransportRef.current = null;
       connectingRef.current = false;
       const ws = wsRef.current;
       wsRef.current = null;
@@ -236,7 +287,7 @@ export function useVideoAnalysisSession(opts?: UseVideoAnalysisSessionOptions) {
       frameIndexRef.current = -1;
       kneesRef.current = null;
     },
-    [persistSnapshot, stopFpsTimer],
+    [cleanupBrowserTransport, persistSnapshot, stopFpsTimer],
   );
 
   const processEvent = useCallback(
@@ -254,13 +305,25 @@ export function useVideoAnalysisSession(opts?: UseVideoAnalysisSessionOptions) {
       const err = poseWsErrorMessage(map);
       if (err) {
         stopFpsTimer();
+        cleanupBrowserTransport();
+        activeTransportRef.current = null;
+        const w = wsRef.current;
         wsRef.current = null;
+        try {
+          w?.close();
+        } catch {
+          /* noop */
+        }
         setUi((p) => ({
           ...p,
           running: false,
           statusError: err,
         }));
         return;
+      }
+
+      if (activeTransportRef.current === 'browser' && browserRttQueueRef.current.length > 0) {
+        browserRttQueueRef.current.shift();
       }
 
       if (map.stream_done === true) return;
@@ -403,7 +466,7 @@ export function useVideoAnalysisSession(opts?: UseVideoAnalysisSessionOptions) {
 
       scheduleCoalesced(patch);
     },
-    [scheduleCoalesced, stopFpsTimer],
+    [cleanupBrowserTransport, scheduleCoalesced, stopFpsTimer],
   );
 
   const processEventStable = useRef(processEvent);
@@ -413,6 +476,7 @@ export function useVideoAnalysisSession(opts?: UseVideoAnalysisSessionOptions) {
     async (params: SessionStartParams): Promise<string | null> => {
       if (wsRef.current || connectingRef.current) return 'Ya hay una sesión activa';
       connectingRef.current = true;
+      activeTransportRef.current = null;
 
       persistApiRef.current = params.apiBaseUrl.trim();
       csvRef.current = CSV_HEADER;
@@ -447,6 +511,200 @@ export function useVideoAnalysisSession(opts?: UseVideoAnalysisSessionOptions) {
         setUi((p) => (p.running ? { ...p, displayRxPerSec: n } : p));
       }, 1000);
 
+      if (params.mode === 'browser_camera') {
+        const api = normalizeApiBaseUrl(params.apiBaseUrl);
+        const jpegQ = Math.max(0.5, Math.min(1, params.previewJpegQuality / 100));
+        browserJpegQualityRef.current = jpegQ;
+        browserIncludePreviewRef.current = params.includePreview;
+        const intervalMs = Math.max(16, Math.round(1000 / Math.max(0.5, params.targetFps)));
+
+        const failBrowser = (msg: string) => {
+          connectingRef.current = false;
+          stopFpsTimer();
+          cleanupBrowserTransport();
+          activeTransportRef.current = null;
+          wsRef.current = null;
+          setUi((p) => ({
+            ...p,
+            running: false,
+            statusError: msg,
+          }));
+          return msg;
+        };
+
+        try {
+          const constraints: MediaStreamConstraints = {
+            audio: false,
+            video: params.browserDeviceId.trim()
+              ? { deviceId: { exact: params.browserDeviceId.trim() } }
+              : { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
+          };
+          const stream = await navigator.mediaDevices.getUserMedia(constraints);
+          browserStreamRef.current = stream;
+          if (!browserVideoRef.current) {
+            browserVideoRef.current = document.createElement('video');
+            browserVideoRef.current.playsInline = true;
+            browserVideoRef.current.muted = true;
+          }
+          const video = browserVideoRef.current;
+          video.srcObject = stream;
+          await video.play();
+        } catch (e) {
+          return failBrowser(`Cámara: ${e}`);
+        }
+
+        if (!browserCanvasRef.current) {
+          browserCanvasRef.current = document.createElement('canvas');
+        }
+
+        const wsUrl = buildVideoWebSocketUri(api);
+        const ws = new WebSocket(wsUrl);
+        let openResolved = false;
+
+        return new Promise((resolve) => {
+          let connectTimeoutId: ReturnType<typeof setTimeout> | undefined;
+          const fail = (msg: string) => {
+            if (openResolved) return;
+            openResolved = true;
+            if (connectTimeoutId !== undefined) clearTimeout(connectTimeoutId);
+            resolve(failBrowser(msg));
+          };
+          connectTimeoutId = window.setTimeout(() => fail('timeout conexión WebSocket'), 8000);
+
+          const sendOneFrame = () => {
+            const w = wsRef.current;
+            const v = browserVideoRef.current;
+            const canvas = browserCanvasRef.current;
+            if (!w || w.readyState !== WebSocket.OPEN || !v || !canvas || v.readyState < 2) return;
+            if (browserRttQueueRef.current.length >= BROWSER_RTT_MAX_PENDING) return;
+
+            const vw = v.videoWidth;
+            const vh = v.videoHeight;
+            if (vw < 2 || vh < 2) return;
+
+            canvas.width = vw;
+            canvas.height = vh;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return;
+            ctx.drawImage(v, 0, 0);
+
+            if (browserIncludePreviewRef.current) {
+              try {
+                const dataUrl = canvas.toDataURL('image/jpeg', browserJpegQualityRef.current);
+                previewKeyRef.current += 1;
+                previewSnapshotRef.current = dataUrl;
+                scheduleCoalesced({
+                  previewDataUrl: dataUrl,
+                  previewKey: previewKeyRef.current,
+                  previewAspect: vw / Math.max(vh, 1),
+                });
+              } catch {
+                /* noop */
+              }
+            }
+
+            canvas.toBlob(
+              (blob) => {
+                if (!blob || !wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) return;
+                browserRttQueueRef.current.push(performance.now());
+                wsRef.current.send(blob);
+              },
+              'image/jpeg',
+              browserJpegQualityRef.current,
+            );
+          };
+
+          ws.onerror = () => {
+            fail('No se pudo conectar (WebSocket /ws/video)');
+          };
+
+          ws.onopen = () => {
+            if (connectTimeoutId !== undefined) clearTimeout(connectTimeoutId);
+            ws.binaryType = 'arraybuffer';
+            try {
+              ws.send(JSON.stringify({ analyze_pose: true, capture_only: params.captureOnly }));
+            } catch (e) {
+              fail(`No se pudo enviar config: ${e}`);
+              try {
+                ws.close();
+              } catch {
+                /* noop */
+              }
+              return;
+            }
+
+            ws.onmessage = (ev) => {
+              chainRef.current = chainRef.current
+                .then(() => processEventStable.current(ev.data))
+                .catch((err) => console.error('WS cadena /ws/video:', err));
+            };
+
+            ws.onclose = () => {
+              cleanupBrowserTransport();
+              if (ignoreNextDoneRef.current) {
+                ignoreNextDoneRef.current = false;
+                connectingRef.current = false;
+                wsRef.current = null;
+                activeTransportRef.current = null;
+                return;
+              }
+              wsRef.current = null;
+              connectingRef.current = false;
+              activeTransportRef.current = null;
+              if (!openResolved) {
+                fail('Conexión cerrada antes de abrir');
+                return;
+              }
+              persistSnapshot();
+              const summary =
+                accRef.current.framesProcessed > 0 ? accRef.current.buildSummary() : null;
+              accRef.current.reset();
+              stopFpsTimer();
+              onSessionEndedRef.current?.(summary, true);
+              setUi((p) => ({
+                ...p,
+                running: false,
+              }));
+            };
+
+            connectingRef.current = false;
+            wsRef.current = ws;
+            activeTransportRef.current = 'browser';
+            openResolved = true;
+            resolve(null);
+
+            browserFrameTimerRef.current = setInterval(sendOneFrame, intervalMs);
+          };
+        });
+      }
+
+      const posePayload =
+        params.mode === 'file'
+          ? {
+              source: 'file' as const,
+              video_filename: params.videoFilename,
+              target_fps: params.targetFps,
+              max_throughput: params.maxThroughput,
+              include_preview: params.includePreview,
+              preview_fps: sanitizePreviewFps(params.previewFps),
+              preview_jpeg_quality: sanitizePreviewJpegQuality(params.previewJpegQuality),
+              capture_only: params.captureOnly,
+              diagnostics: params.serverDiagnostics,
+              stream_tuning: params.streamTuning,
+            }
+          : {
+              source: 'camera' as const,
+              device_index: params.deviceIndex,
+              target_fps: params.targetFps,
+              max_throughput: params.maxThroughput,
+              include_preview: params.includePreview,
+              preview_fps: sanitizePreviewFps(params.previewFps),
+              preview_jpeg_quality: sanitizePreviewJpegQuality(params.previewJpegQuality),
+              capture_only: params.captureOnly,
+              diagnostics: params.serverDiagnostics,
+              stream_tuning: params.streamTuning,
+            };
+
       const url = buildPoseStreamWebSocketUri(params.apiBaseUrl);
       const ws = new WebSocket(url);
 
@@ -459,6 +717,7 @@ export function useVideoAnalysisSession(opts?: UseVideoAnalysisSessionOptions) {
           connectingRef.current = false;
           stopFpsTimer();
           wsRef.current = null;
+          activeTransportRef.current = null;
           setUi((p) => ({
             ...p,
             running: false,
@@ -470,21 +729,9 @@ export function useVideoAnalysisSession(opts?: UseVideoAnalysisSessionOptions) {
         ws.onopen = () => {
           connectingRef.current = false;
           wsRef.current = ws;
+          activeTransportRef.current = 'pose';
           try {
-            ws.send(
-              JSON.stringify({
-                source: 'file',
-                video_filename: params.videoFilename,
-                target_fps: params.targetFps,
-                max_throughput: params.maxThroughput,
-                include_preview: params.includePreview,
-                preview_fps: sanitizePreviewFps(params.previewFps),
-                preview_jpeg_quality: sanitizePreviewJpegQuality(params.previewJpegQuality),
-                capture_only: params.captureOnly,
-                diagnostics: params.serverDiagnostics,
-                stream_tuning: params.streamTuning,
-              }),
-            );
+            ws.send(JSON.stringify(posePayload));
           } catch (e) {
             fail(`No se pudo enviar config: ${e}`);
             try {
@@ -503,14 +750,17 @@ export function useVideoAnalysisSession(opts?: UseVideoAnalysisSessionOptions) {
         };
 
         ws.onclose = () => {
+          cleanupBrowserTransport();
           if (ignoreNextDoneRef.current) {
             ignoreNextDoneRef.current = false;
             connectingRef.current = false;
             wsRef.current = null;
+            activeTransportRef.current = null;
             return;
           }
           wsRef.current = null;
           connectingRef.current = false;
+          activeTransportRef.current = null;
           if (!openResolved) {
             fail('Conexión cerrada antes de abrir');
             return;
@@ -534,10 +784,11 @@ export function useVideoAnalysisSession(opts?: UseVideoAnalysisSessionOptions) {
         };
       });
     },
-    [persistSnapshot, stopFpsTimer],
+    [cleanupBrowserTransport, persistSnapshot, scheduleCoalesced, stopFpsTimer],
   );
 
   const sendPreviewTuning = useCallback((previewFps: number, previewJpegQuality: number) => {
+    if (activeTransportRef.current !== 'pose') return;
     const ws = wsRef.current;
     if (!ws || ws.readyState !== WebSocket.OPEN) return;
     try {
@@ -562,11 +813,13 @@ export function useVideoAnalysisSession(opts?: UseVideoAnalysisSessionOptions) {
     return () => {
       ignoreNextDoneRef.current = true;
       stopFpsTimer();
+      cleanupBrowserTransport();
+      activeTransportRef.current = null;
       const w = wsRef.current;
       wsRef.current = null;
       w?.close();
     };
-  }, [stopFpsTimer]);
+  }, [cleanupBrowserTransport, stopFpsTimer]);
 
   return { ui, start, stop, sendPreviewTuning, resetCsv };
 }

@@ -22,7 +22,7 @@ Contexto para asistentes de código en Cursor: [`.cursorrules`](.cursorrules) (s
 - **Python** 3.10+ (recomendado 3.11).
 - **Git** y, para publicar en GitHub, **GitHub CLI** (`gh`) autenticado.
 
-Instrucciones de instalación: [`docs/SETUP.md`](docs/SETUP.md).
+Instrucciones de instalación: [`docs/guias/SETUP.md`](docs/guias/SETUP.md).
 
 ## Inicio rápido
 

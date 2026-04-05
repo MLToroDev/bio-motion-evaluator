@@ -1,4 +1,4 @@
-﻿# ARCH-4: rep_tracker.py — Interfaz base RepTracker (ver docs/bio_motion_plan_v2.md §2.3)
+﻿# ARCH-4: rep_tracker.py — Interfaz base RepTracker (ver docs/planificacion/bio_motion_plan_v2.md §2.3)
 """Router de trackers por etiqueta de ejercicio; la ABC vive en ``rep_tracker_abc``."""
 
 from __future__ import annotations

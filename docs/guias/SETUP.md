@@ -30,7 +30,7 @@
 
 Desde la raíz del monorepo (donde está `README.md`):
 
-**PowerShell (Windows):** tras `gh auth login`, puedes ejecutar [`scripts/publish-github.ps1`](../scripts/publish-github.ps1).
+**PowerShell (Windows):** tras `gh auth login`, puedes ejecutar [`scripts/publish-github.ps1`](../../scripts/publish-github.ps1).
 
 ```bash
 git add .
@@ -62,7 +62,7 @@ La ruta del modelo se puede configurar con `MEDIAPIPE_POSE_MODEL_PATH` en `.env`
 
 ## Desarrollo con recarga activa
 
-- **FastAPI:** usa siempre `uvicorn ... --reload`, que reinicia el servidor al guardar cambios en `.py`. Script: [`scripts/start-dev-backend.ps1`](../scripts/start-dev-backend.ps1) desde la raíz.
-- **Flutter:** el comando `flutter run` se queda en ejecución; en la misma terminal **r** = hot reload, **R** = hot restart. Script: [`scripts/start-dev-flutter.ps1`](../scripts/start-dev-flutter.ps1).
+- **FastAPI:** usa siempre `uvicorn ... --reload`, que reinicia el servidor al guardar cambios en `.py`. Script: [`scripts/start-dev-backend.ps1`](../../scripts/start-dev-backend.ps1) desde la raíz.
+- **Flutter:** el comando `flutter run` se queda en ejecución; en la misma terminal **r** = hot reload, **R** = hot restart. Script: [`scripts/start-dev-flutter.ps1`](../../scripts/start-dev-flutter.ps1).
 - Mantén **dos procesos** en paralelo (dos terminales o dos tareas): API + app.
 

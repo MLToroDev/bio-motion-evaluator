@@ -30,12 +30,27 @@ Eres un experto en Ingeniería de Software, IA y Biomecánica. Estás ayudando a
 - `docs/`: arquitectura y material de grado.
 - `tests/`: pruebas y activos de regresión (p. ej. vídeos de referencia).
 
+## Estructura de `docs/` (orden del repositorio)
+
+- **`docs/guias/`** — instalación (`SETUP.md`), patrones UI, estándares, reportes técnicos.
+- **`docs/planificacion/`** — plan del motor (`bio_motion_plan_v2.md`) y notas de apoyo.
+- **`docs/literatura/apoyos/`** — material bibliográfico auxiliar en Markdown.
+- **`docs/spec/`**, **`docs/UX-UI/`**, **`docs/diagramas/`**, **`docs/arquitectura.md`**, **`docs/Formato_trabajo_de_grado.md`** — ver índice en **[`docs/README.md`](docs/README.md)**.
+
+Reglas persistentes adicionales del proyecto: **`.cursor/rules/bio-motion-documentation.mdc`** (bitácora + specs). Skill opcional explícita: **`.cursor/skills/bio-motion-thesis-doc/`**.
+
 ## Documentación en formato spec (obligatorio para el asistente)
 
 - Las especificaciones técnicas viven en **`docs/spec/`** (archivos `.md`): contratos WebSocket/REST, coerciones de tipos, mitigaciones de bugs y rutas de código.
 - Convención y plantilla de secciones: ver **[`docs/spec/README.md`](docs/spec/README.md)**.
-- Cuando implementes o corrijas un flujo documentado (p. ej. `/ws/pose-stream`, flags `include_preview`, cliente Flutter Web), **actualiza el `.md` correspondiente** en el mismo cambio lógico, o crea un spec nuevo si el área no tenía documento.
+- Cuando implementes o corrijas un flujo documentado (p. ej. `/ws/pose-stream`, flags `include_preview`, cliente Flutter Web o **React `appWeb/`**), **actualiza el `.md` correspondiente** en el mismo cambio lógico, o crea un spec nuevo si el área no tenía documento.
 - Mantén **Meta, Resumen, Contrato, Implementación, Incidencias/decisiones** alineados con el código real; evita duplicar tutorial largo: prioriza contrato y trazabilidad para tesis.
+
+## Bitácora del trabajo de grado (obligatorio ante cambios importantes)
+
+- El borrador de la memoria es **[`docs/Formato_trabajo_de_grado.md`](docs/Formato_trabajo_de_grado.md)**.
+- Tras una **decisión arquitectónica**, **cambio de contrato** (REST/WebSocket/payload), **mitigación relevante** o **cambio de stack** en frontend/backend, añade una entrada en la sección **BITÁCORA DE DESARROLLO Y DECISIONES** (más reciente arriba), con trazabilidad a archivos y specs. No sustituir esta bitácora solo con comentarios en código.
+- Si el cambio es menor (typos, refactors locales sin impacto en contrato ni narrativa de tesis), no es obligatorio ampliar la bitácora.
 
 
 ## Reglas de Codificación y Formato

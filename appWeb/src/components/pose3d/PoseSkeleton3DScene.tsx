@@ -1,6 +1,10 @@
 import { useMemo } from 'react';
 import * as THREE from 'three';
-import { POSE_CONNECTIONS } from '../../lib/poseTopology';
+import {
+  POSE_CONNECTIONS,
+  POSE_LEFT_HIP,
+  POSE_RIGHT_HIP,
+} from '../../lib/poseTopology';
 
 function Bone({
   from,
@@ -38,8 +42,17 @@ function Joint({ position }: { position: THREE.Vector3 }) {
   );
 }
 
+function offsetForPose3d(points: Map<number, THREE.Vector3>): THREE.Vector3 {
+  const l = points.get(POSE_LEFT_HIP);
+  const r = points.get(POSE_RIGHT_HIP);
+  if (l && r) {
+    return l.clone().add(r).multiplyScalar(0.5);
+  }
+  return centroidFromMap(points);
+}
+
 export function PoseSkeleton3DScene({ points }: { points: Map<number, THREE.Vector3> }) {
-  const center = useMemo(() => centroidFromMap(points), [points]);
+  const center = useMemo(() => offsetForPose3d(points), [points]);
 
   const bones = useMemo(() => {
     const out: [THREE.Vector3, THREE.Vector3][] = [];

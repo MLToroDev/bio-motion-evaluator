@@ -1,0 +1,32 @@
+---
+description: Bitácora en Formato_trabajo_de_grado.md, specs y estructura de docs/ del monorepo Bio-Motion
+alwaysApply: true
+---
+
+# Documentación Bio-Motion (tesis + repo)
+
+## Estructura de `docs/`
+
+- **`docs/guias/`** — SETUP, patrones UI, estándares, reportes técnicos puntuales.
+- **`docs/planificacion/`** — roadmap del motor (`bio_motion_plan_v2.md`) y notas de apoyo.
+- **`docs/literatura/apoyos/`** — notas o resúmenes de papers externos.
+- **`docs/spec/`** — contratos REST/WebSocket, decisiones técnicas con trazabilidad al código.
+- **`docs/UX-UI/`**, **`docs/diagramas/`**, **`arquitectura.md`**, **`Formato_trabajo_de_grado.md`** — en la raíz de `docs/` salvo las subcarpetas anteriores.
+
+Índice general: [`docs/README.md`](docs/README.md).
+
+## Tras un cambio o decisión importante
+
+En el **mismo conjunto lógico de cambios** (misma sesión de implementación), el asistente debe:
+
+1. **Specs:** actualizar o crear el `.md` correspondiente en `docs/spec/` si el cambio toca contratos, tipos de mensaje, rutas HTTP/WS o comportamiento documentado. Seguir [`docs/spec/README.md`](docs/spec/README.md).
+2. **Arquitectura:** actualizar [`docs/arquitectura.md`](docs/arquitectura.md) si cambian capas, dependencias principales o flujos entre `app` / `appWeb` / `backend` / `iot`.
+3. **Bitácora de tesis:** añadir una entrada nueva bajo **# BITÁCORA DE DESARROLLO Y DECISIONES** en [`docs/Formato_trabajo_de_grado.md`](docs/Formato_trabajo_de_grado.md), **arriba de la lista** de entradas (más reciente primero). Usar el formato definido en ese apartado (fecha, ámbito, tipo, descripción, trazabilidad).
+
+**Se considera “importante”:** cambio en API o payload WS/REST; nueva dependencia o módulo transversal; decisión que afecta ISO 25010 (seguridad, rendimiento, usabilidad); migración de stack o cliente (p. ej. Flutter Web vs React); mitigación de un bug sistemático; cambio de modelo IA o pipeline de visión.
+
+**No hace falta** bitácora por refactors menores, renombres locales o ajustes de estilo sin impacto en contrato ni en la narrativa de la tesis.
+
+## Codificación
+
+Todo Markdown y texto generado en **`UTF-8`**; evitar doble codificación en caracteres acentuados.

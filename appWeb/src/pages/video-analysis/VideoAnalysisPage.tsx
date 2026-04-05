@@ -33,7 +33,7 @@ import { persistApiBase, readApiBase, readTargetRepGoal } from '../../lib/prefs'
 import type { AnalysisSummary } from '../../lib/videoAnalysisAccumulator';
 import { buildGoldStandardVideosHttpUrl } from '../../lib/wsUri';
 
-import { ConfigPanel, type ConfigValues } from './ConfigPanel';
+import { ConfigPanel, type AnalysisInputSource, type ConfigValues } from './ConfigPanel';
 import { PreviewCanvas } from './PreviewCanvas';
 import { PreviewLayerToolbar } from './PreviewLayerToolbar';
 import { SnackBar } from './SnackBar';
@@ -74,6 +74,9 @@ export default function VideoAnalysisPage() {
   const [config, setConfig] = useState<ConfigValues>({
     apiBase: readApiBase(),
     videoFilename: '',
+    serverCameraDeviceIndex: 0,
+    browserCameraDeviceId: '',
+    inputSource: 'file',
     fpsText: '10',
     maxThroughput: false,
     includePreview: true,
@@ -87,7 +90,16 @@ export default function VideoAnalysisPage() {
 
   const handleConfigChange = useCallback(
     <K extends keyof ConfigValues>(key: K, value: ConfigValues[K]) => {
-      setConfig((prev) => ({ ...prev, [key]: value }));
+      setConfig((prev) => {
+        const next = { ...prev, [key]: value };
+        if (key === 'inputSource') {
+          const src = value as AnalysisInputSource;
+          if (src === 'browser_camera') {
+            next.maxThroughput = false;
+          }
+        }
+        return next;
+      });
     },
     [],
   );
@@ -121,10 +133,14 @@ export default function VideoAnalysisPage() {
   }, []);
 
   const fpsParsed = useMemo(() => parseFps(config.fpsText), [config.fpsText]);
+  const fpsOk =
+    config.inputSource === 'browser_camera'
+      ? fpsParsed.ok
+      : config.maxThroughput || fpsParsed.ok;
   const formValid =
-    (config.maxThroughput || fpsParsed.ok) &&
-    config.videoFilename.trim().length > 0 &&
-    !ui.running;
+    !ui.running &&
+    fpsOk &&
+    (config.inputSource !== 'file' || config.videoFilename.trim().length > 0);
   const csvReady = ui.csvText.split('\n').length >= 3;
 
   const progress =
@@ -188,18 +204,54 @@ export default function VideoAnalysisPage() {
   const handleStart = useCallback(async () => {
     if (!formValid) return;
     resetCsv();
-    const err = await start({
-      apiBaseUrl: config.apiBase,
-      videoFilename: config.videoFilename.trim(),
-      targetFps: config.maxThroughput ? 30 : fpsParsed.value,
-      maxThroughput: config.maxThroughput,
-      includePreview: config.includePreview,
-      previewFps: config.previewFps,
-      previewJpegQuality: Math.round(config.previewQuality),
-      captureOnly: config.captureOnly,
-      serverDiagnostics: config.serverDiagnostics,
-      streamTuning: config.streamTuningAuto ? 'auto' : 'off',
-    });
+    const previewQ = Math.round(config.previewQuality);
+    const targetFps =
+      config.inputSource === 'browser_camera'
+        ? fpsParsed.value
+        : config.maxThroughput
+          ? 30
+          : fpsParsed.value;
+
+    let err: string | null = null;
+    if (config.inputSource === 'file') {
+      err = await start({
+        mode: 'file',
+        apiBaseUrl: config.apiBase,
+        videoFilename: config.videoFilename.trim(),
+        targetFps,
+        maxThroughput: config.maxThroughput,
+        includePreview: config.includePreview,
+        previewFps: config.previewFps,
+        previewJpegQuality: previewQ,
+        captureOnly: config.captureOnly,
+        serverDiagnostics: config.serverDiagnostics,
+        streamTuning: config.streamTuningAuto ? 'auto' : 'off',
+      });
+    } else if (config.inputSource === 'server_camera') {
+      err = await start({
+        mode: 'server_camera',
+        apiBaseUrl: config.apiBase,
+        deviceIndex: config.serverCameraDeviceIndex,
+        targetFps,
+        maxThroughput: config.maxThroughput,
+        includePreview: config.includePreview,
+        previewFps: config.previewFps,
+        previewJpegQuality: previewQ,
+        captureOnly: config.captureOnly,
+        serverDiagnostics: config.serverDiagnostics,
+        streamTuning: config.streamTuningAuto ? 'auto' : 'off',
+      });
+    } else {
+      err = await start({
+        mode: 'browser_camera',
+        apiBaseUrl: config.apiBase,
+        browserDeviceId: config.browserCameraDeviceId.trim(),
+        targetFps,
+        includePreview: config.includePreview,
+        previewJpegQuality: previewQ,
+        captureOnly: config.captureOnly,
+      });
+    }
     if (err) console.warn(err);
   }, [formValid, resetCsv, start, config, fpsParsed.value]);
 
@@ -215,9 +267,15 @@ export default function VideoAnalysisPage() {
   }, []);
 
   useEffect(() => {
-    if (!ui.running) return;
+    if (!ui.running || config.inputSource === 'browser_camera') return;
     sendPreviewTuning(config.previewFps, Math.round(config.previewQuality));
-  }, [config.previewFps, config.previewQuality, ui.running, sendPreviewTuning]);
+  }, [
+    config.inputSource,
+    config.previewFps,
+    config.previewQuality,
+    ui.running,
+    sendPreviewTuning,
+  ]);
 
   useEffect(() => {
     if (!snack) return;

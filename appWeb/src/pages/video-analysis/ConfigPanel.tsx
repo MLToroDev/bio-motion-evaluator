@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import type { PreviewFpsAllowed } from '../../lib/previewStreamConfig';
 import {
   PREVIEW_FPS_ALLOWED,
@@ -7,9 +7,16 @@ import {
 } from '../../lib/previewStreamConfig';
 import { VideoAnalysisActions } from './VideoAnalysisActions';
 
+export type AnalysisInputSource = 'file' | 'server_camera' | 'browser_camera';
+
 export interface ConfigValues {
   apiBase: string;
   videoFilename: string;
+  /** Índice OpenCV en el host del API (solo modo cámara servidor). */
+  serverCameraDeviceIndex: number;
+  /** deviceId vacío = cámara por defecto del navegador. */
+  browserCameraDeviceId: string;
+  inputSource: AnalysisInputSource;
   fpsText: string;
   /** Sin limitar FPS en el servidor (máximo rendimiento posible). */
   maxThroughput: boolean;
@@ -177,6 +184,94 @@ const inputStyle: CSSProperties = {
   outline: 'none',
 };
 
+function BrowserCameraFields({
+  running,
+  selectedDeviceId,
+  onDeviceChange,
+}: {
+  running: boolean;
+  selectedDeviceId: string;
+  onDeviceChange: (deviceId: string) => void;
+}) {
+  const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
+  const [listBusy, setListBusy] = useState(false);
+  const [listErr, setListErr] = useState<string | null>(null);
+
+  const listCameras = useCallback(async () => {
+    setListErr(null);
+    setListBusy(true);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      stream.getTracks().forEach((t) => t.stop());
+      const all = await navigator.mediaDevices.enumerateDevices();
+      const vids = all.filter((d) => d.kind === 'videoinput');
+      setDevices(vids);
+    } catch (e) {
+      setListErr(`Permisos o cámara: ${e}. Usa https o localhost.`);
+      setDevices([]);
+    } finally {
+      setListBusy(false);
+    }
+  }, []);
+
+  const onPickRef = useRef(onDeviceChange);
+  onPickRef.current = onDeviceChange;
+
+  useEffect(() => {
+    if (devices.length === 0 || running) return;
+    const ok = devices.some((d) => d.deviceId === selectedDeviceId);
+    if (!ok && devices[0]) {
+      onPickRef.current(devices[0].deviceId);
+    }
+  }, [devices, selectedDeviceId, running]);
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+      <div>
+        <button
+          type="button"
+          onClick={() => void listCameras()}
+          disabled={running || listBusy}
+          style={{
+            fontFamily: 'var(--bm-font-body)',
+            fontSize: '0.8125rem',
+            padding: '0.4rem 0.7rem',
+            borderRadius: 'var(--bm-radius-sm)',
+            border: '1px solid var(--bm-border)',
+            background: 'var(--bm-surface-elevated)',
+            color: 'var(--bm-text-primary)',
+            cursor: running || listBusy ? 'not-allowed' : 'pointer',
+            opacity: running || listBusy ? 0.5 : 1,
+          }}
+        >
+          {listBusy ? 'Solicitando…' : 'Permitir y listar cámaras'}
+        </button>
+        {listErr ? (
+          <p style={{ margin: '0.4rem 0 0', fontSize: '0.8rem', color: 'var(--bm-angle-bad)' }}>{listErr}</p>
+        ) : null}
+      </div>
+      <Field label="Cámara del navegador">
+        <select
+          style={inputStyle}
+          value={selectedDeviceId}
+          onChange={(e) => onDeviceChange(e.target.value)}
+          disabled={running || devices.length === 0}
+        >
+          {devices.length === 0 ? (
+            <option value="">— lista primero las cámaras —</option>
+          ) : (
+            devices.map((d) => (
+              <option key={d.deviceId} value={d.deviceId}>
+                {d.label || `Cámara ${d.deviceId.slice(0, 8)}…`}
+              </option>
+            ))
+          )}
+        </select>
+      </Field>
+    </div>
+  );
+}
+
 export function ConfigPanel({
   values,
   onChange,
@@ -277,64 +372,134 @@ export function ConfigPanel({
             />
           </Field>
 
-          <div>
-            <button
-              type="button"
-              onClick={onRefreshVideos}
-              disabled={running || listLoading}
-              style={{
-                fontFamily: 'var(--bm-font-body)',
-                fontSize: '0.8125rem',
-                padding: '0.4rem 0.7rem',
-                borderRadius: 'var(--bm-radius-sm)',
-                border: '1px solid var(--bm-border)',
-                background: 'var(--bm-surface-elevated)',
-                color: 'var(--bm-text-primary)',
-                cursor: running || listLoading ? 'not-allowed' : 'pointer',
-                opacity: running || listLoading ? 0.5 : 1,
-              }}
-            >
-              {listLoading ? 'Cargando…' : 'Actualizar lista de vídeos'}
-            </button>
-            {listError && (
-              <p style={{ margin: '0.4rem 0 0', fontSize: '0.8rem', color: 'var(--bm-angle-bad)' }}>
-                {listError}
-              </p>
-            )}
-          </div>
-
-          <Field label="Vídeo en servidor">
+          <Field label="Tipo de fuente">
             <select
               style={inputStyle}
-              value={values.videoFilename}
-              onChange={(e) => onChange('videoFilename', e.target.value)}
-              disabled={running || videoList.length === 0}
+              value={values.inputSource}
+              onChange={(e) => onChange('inputSource', e.target.value as AnalysisInputSource)}
+              disabled={running}
             >
-              {videoList.length === 0 ? (
-                <option value="">— sin vídeos —</option>
-              ) : (
-                videoList.map((v) => (
-                  <option key={v} value={v}>
-                    {v}
-                  </option>
-                ))
-              )}
+              <option value="file">Vídeo en servidor (gold standard)</option>
+              <option value="server_camera">Webcam del servidor (OpenCV en el API)</option>
+              <option value="browser_camera">Webcam de este equipo (navegador)</option>
             </select>
+            <span
+              style={{
+                fontSize: '0.72rem',
+                color: 'var(--bm-text-secondary)',
+                fontFamily: 'var(--bm-font-body)',
+                lineHeight: 1.35,
+                display: 'block',
+                marginTop: '0.35rem',
+              }}
+            >
+              {values.inputSource === 'server_camera'
+                ? 'El API debe ejecutarse en el PC donde está la webcam; no sirve si el backend está en la nube sin cámara.'
+                : values.inputSource === 'browser_camera'
+                  ? 'El vídeo se captura en tu navegador y se envía al API (válido con servidor local o remoto).'
+                  : 'Lista de archivos bajo la ruta de vídeos gold standard del backend.'}
+            </span>
           </Field>
+
+          {values.inputSource === 'file' ? (
+            <>
+              <div>
+                <button
+                  type="button"
+                  onClick={onRefreshVideos}
+                  disabled={running || listLoading}
+                  style={{
+                    fontFamily: 'var(--bm-font-body)',
+                    fontSize: '0.8125rem',
+                    padding: '0.4rem 0.7rem',
+                    borderRadius: 'var(--bm-radius-sm)',
+                    border: '1px solid var(--bm-border)',
+                    background: 'var(--bm-surface-elevated)',
+                    color: 'var(--bm-text-primary)',
+                    cursor: running || listLoading ? 'not-allowed' : 'pointer',
+                    opacity: running || listLoading ? 0.5 : 1,
+                  }}
+                >
+                  {listLoading ? 'Cargando…' : 'Actualizar lista de vídeos'}
+                </button>
+                {listError && (
+                  <p style={{ margin: '0.4rem 0 0', fontSize: '0.8rem', color: 'var(--bm-angle-bad)' }}>
+                    {listError}
+                  </p>
+                )}
+              </div>
+
+              <Field label="Vídeo en servidor">
+                <select
+                  style={inputStyle}
+                  value={values.videoFilename}
+                  onChange={(e) => onChange('videoFilename', e.target.value)}
+                  disabled={running || videoList.length === 0}
+                >
+                  {videoList.length === 0 ? (
+                    <option value="">— sin vídeos —</option>
+                  ) : (
+                    videoList.map((v) => (
+                      <option key={v} value={v}>
+                        {v}
+                      </option>
+                    ))
+                  )}
+                </select>
+              </Field>
+            </>
+          ) : null}
+
+          {values.inputSource === 'server_camera' ? (
+            <Field
+              label="Índice de dispositivo OpenCV"
+              hint="0 suele ser la webcam principal en el equipo del API."
+            >
+              <input
+                type="number"
+                min={0}
+                max={15}
+                step={1}
+                style={inputStyle}
+                value={values.serverCameraDeviceIndex}
+                onChange={(e) => {
+                  const n = Number(e.target.value);
+                  onChange('serverCameraDeviceIndex', Number.isFinite(n) ? Math.max(0, Math.min(15, n)) : 0);
+                }}
+                disabled={running}
+              />
+            </Field>
+          ) : null}
+
+          {values.inputSource === 'browser_camera' ? (
+            <BrowserCameraFields
+              running={running}
+              selectedDeviceId={values.browserCameraDeviceId}
+              onDeviceChange={(id) => onChange('browserCameraDeviceId', id)}
+            />
+          ) : null}
 
           <CheckRow
             label="Máximo rendimiento (sin limitar FPS en servidor)"
             checked={values.maxThroughput}
             onChange={(v) => onChange('maxThroughput', v)}
-            disabled={running}
+            disabled={running || values.inputSource === 'browser_camera'}
           />
           <Field
-            label="Target FPS"
+            label={
+              values.inputSource === 'browser_camera'
+                ? 'FPS de envío (navegador → API)'
+                : 'Target FPS'
+            }
             error={values.maxThroughput ? undefined : fpsParsedError}
             hint={
               values.maxThroughput
-                ? 'Opción desactivada: el backend procesa cada frame tan pronto como pueda.'
-                : undefined
+                ? values.inputSource === 'browser_camera'
+                  ? undefined
+                  : 'Opción desactivada: el backend procesa cada frame tan pronto como pueda.'
+                : values.inputSource === 'browser_camera'
+                  ? 'Intervalo entre JPEG enviados por WebSocket (también limitado por la latencia de red).'
+                  : undefined
             }
           >
             <input
@@ -372,7 +537,7 @@ export function ConfigPanel({
             label="Ajuste automático al vídeo (resolución / FPS)"
             checked={values.streamTuningAuto}
             onChange={(v) => onChange('streamTuningAuto', v)}
-            disabled={running}
+            disabled={running || values.inputSource === 'browser_camera'}
           />
           <CheckRow
             label="Vista solo esqueleto"
@@ -383,12 +548,19 @@ export function ConfigPanel({
         </ConfigCard>
 
         <ConfigCard title="Calidad de preview">
-          <Field label="Preview FPS">
+          <Field
+            label="Preview FPS"
+            hint={
+              values.inputSource === 'browser_camera'
+                ? 'Solo aplica al flujo pose-stream (archivo / cámara servidor). En modo navegador usa «FPS de envío».'
+                : undefined
+            }
+          >
             <select
               style={inputStyle}
               value={values.previewFps}
               onChange={(e) => onChange('previewFps', Number(e.target.value) as PreviewFpsAllowed)}
-              disabled={!values.includePreview}
+              disabled={!values.includePreview || values.inputSource === 'browser_camera'}
             >
               {PREVIEW_FPS_ALLOWED.map((v) => (
                 <option key={v} value={v}>
@@ -400,6 +572,11 @@ export function ConfigPanel({
 
           <Field
             label={`Calidad JPEG — ${Math.round(values.previewQuality)} (${PREVIEW_JPEG_QUALITY_MIN}–${PREVIEW_JPEG_QUALITY_MAX})`}
+            hint={
+              values.inputSource === 'browser_camera'
+                ? 'Calidad del JPEG que envías al API y de la vista previa local.'
+                : undefined
+            }
           >
             <input
               type="range"

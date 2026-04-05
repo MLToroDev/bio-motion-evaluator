@@ -1,5 +1,5 @@
 ﻿#!/usr/bin/env python3
-# ARCH-T11 — Placeholder: entrenar/exportar ONNX para exercise_classifier (ver docs/bio_motion_plan_v2.md).
+# ARCH-T11 — Placeholder: entrenar/exportar ONNX para exercise_classifier (ver docs/planificacion/bio_motion_plan_v2.md).
 """
 Punto de partida para el dataset propio y el entrenamiento en Hugging Face.
 

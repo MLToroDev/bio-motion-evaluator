@@ -20,10 +20,36 @@ function hexToRgba(hex: string, alpha: number): string {
   return `rgba(${r},${g},${b},${alpha})`;
 }
 
+/** Rectángulo donde vive el vídeo con ``object-fit: contain`` (width/height del contenido). */
+function videoContentRect(
+  cw: number,
+  ch: number,
+  aspectWidthOverHeight: number | null | undefined,
+): { ox: number; oy: number; dw: number; dh: number } {
+  if (
+    aspectWidthOverHeight == null ||
+    !Number.isFinite(aspectWidthOverHeight) ||
+    aspectWidthOverHeight <= 0
+  ) {
+    return { ox: 0, oy: 0, dw: cw, dh: ch };
+  }
+  const ar = aspectWidthOverHeight;
+  if (cw / ch > ar) {
+    const dh = ch;
+    const dw = dh * ar;
+    return { ox: (cw - dw) / 2, oy: 0, dw, dh };
+  }
+  const dw = cw;
+  const dh = dw / ar;
+  return { ox: 0, oy: (ch - dh) / 2, dw, dh };
+}
+
 function landmarkPoint(
   lm: LandmarkMap,
-  w: number,
-  h: number,
+  ox: number,
+  oy: number,
+  dw: number,
+  dh: number,
   mirror: boolean,
 ): { x: number; y: number } | null {
   const i = lm.index;
@@ -34,15 +60,18 @@ function landmarkPoint(
   const y = lm.y;
   if (typeof x !== 'number' || typeof y !== 'number') return null;
   const nx = mirror ? 1 - x : x;
-  return { x: nx * w, y: y * h };
+  return { x: ox + nx * dw, y: oy + y * dh };
 }
 
 export function PoseSkeletonCanvas({
   landmarks,
   mirrorHorizontal = false,
+  /** Relación ancho/alto del fotograma (p. ej. del JPEG de preview) para alinear con ``object-fit: contain``. */
+  contentAspect,
 }: {
   landmarks: LandmarkMap[] | null;
   mirrorHorizontal?: boolean;
+  contentAspect?: number | null;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -71,11 +100,13 @@ export function PoseSkeletonCanvas({
       const mirror = mirrorHorizontal;
       if (!lm || lm.length === 0) return;
 
+      const { ox, oy, dw, dh } = videoContentRect(cw, ch, contentAspect);
+
       const points = new Map<number, { x: number; y: number }>();
       for (const m of lm) {
         const i = m.index;
         if (typeof i !== 'number') continue;
-        const p = landmarkPoint(m, cw, ch, mirror);
+        const p = landmarkPoint(m, ox, oy, dw, dh, mirror);
         if (p) points.set(i, p);
       }
 
@@ -107,7 +138,7 @@ export function PoseSkeletonCanvas({
     const ro = new ResizeObserver(() => draw());
     ro.observe(wrap);
     return () => ro.disconnect();
-  }, [landmarks, mirrorHorizontal]);
+  }, [landmarks, mirrorHorizontal, contentAspect]);
 
   return (
     <div ref={wrapRef} className="pose-canvas-wrap">

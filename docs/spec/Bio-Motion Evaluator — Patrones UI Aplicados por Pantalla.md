@@ -1,6 +1,6 @@
 ﻿# Bio-Motion Evaluator — Patrones UI Aplicados por Pantalla
 
-> **Fuente de patrones:** `ui_patterns.md` (ui-patterns.com)  
+> **Fuente de patrones:** [`../guias/ui_patterns.md`](../guias/ui_patterns.md) (ui-patterns.com)  
 > **Basado en código:** vistas actuales entregadas en Sprint  
 > **Versión:** 2.0.0  
 > **Última actualización:** 2026-03-30  

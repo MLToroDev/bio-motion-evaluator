@@ -1,4 +1,4 @@
-﻿# ARCH-2: feature_engine.py — Capa 2, ventana temporal (ver docs/bio_motion_plan_v2.md §2.1)
+﻿# ARCH-2: feature_engine.py — Capa 2, ventana temporal (ver docs/planificacion/bio_motion_plan_v2.md §2.1)
 """Buffer deslizante, vector fijo 32 floats, FeatureFrame para RepTracker (plan v2)."""
 
 from __future__ import annotations

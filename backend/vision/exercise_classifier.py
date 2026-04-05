@@ -1,4 +1,4 @@
-﻿# ARCH-3: exercise_classifier.py — Capa 3 + ExerciseClassifierConfig (ver docs/bio_motion_plan_v2.md §2.4)
+﻿# ARCH-3: exercise_classifier.py — Capa 3 + ExerciseClassifierConfig (ver docs/planificacion/bio_motion_plan_v2.md §2.4)
 """Clasificación de ejercicio con umbral, histéresis y suavizado EMA (Fase 3 / ARCH-T14)."""
 
 from __future__ import annotations

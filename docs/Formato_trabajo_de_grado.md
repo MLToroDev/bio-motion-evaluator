@@ -267,7 +267,7 @@ El proyecto adopta la metodología ágil **Scrum** como marco de trabajo, dado q
 **Herramientas metodológicas:**
 - **Gestión del backlog y sprints:** Historias de usuario con criterios de aceptación, estimadas en puntos de historia.
 - **Control de versiones:** Git con repositorio en GitHub (monorepo con carpetas `app/`, `backend/`, `iot/`, `docs/`, `tests/`).
-- **Documentación continua:** Archivos Markdown bajo `docs/spec/` para especificaciones técnicas (contratos de API, decisiones de arquitectura, incidencias resueltas), generados en paralelo al código para garantizar trazabilidad con el Capítulo 6.
+- **Documentación continua:** Especificaciones técnicas en `docs/spec/` (contratos de API, decisiones, incidencias); guías operativas en `docs/guias/`; planificación en `docs/planificacion/`; bitácora de decisiones en este documento (**BITÁCORA DE DESARROLLO Y DECISIONES**). Todo ello en paralelo al código para trazabilidad con el Capítulo 6.
 - **Pruebas:** Vídeos de referencia (*gold standard*) almacenados en `tests/assets/videos/`, usados para validación reproducible del pipeline de análisis.
 
 # DEFINICIÓN DEL ALCANCE
@@ -776,7 +776,7 @@ _\[Según formato institucional, adjuntar como anexo: arquitectura, escalabilida
 | **SEGURIDAD** — Garantiza autenticidad, confidencialidad e integridad de la información incorporando niveles de acceso que permiten el uso de los datos acorde a los perfiles definidos. | El backend configura **CORS** con lista blanca de orígenes (`allow_origin_regex` para localhost en desarrollo; orígenes explícitos en producción). La comunicación WebSocket se realiza sobre la misma capa de red que la API REST, con soporte para TLS/WSS en despliegue productivo. En la versión actual el sistema no gestiona datos personales sensibles ni autenticación de usuarios (fuera del alcance del presente trabajo de grado; contemplado para versiones futuras). |
 | **USABILIDAD** — El software es fácil de ejecutar, brindando accesibilidad, navegabilidad y comprensión para la operatividad de la herramienta. | La interfaz implementa el **sistema de diseño Bio-Motion**: paleta oscura biomédica con contraste WCAG AA, tipografía DM Sans para etiquetas y DM Mono para valores numéricos (legibilidad en entornos de gimnasio con luz variable), indicadores semánticos de color (verde/amarillo/rojo) para estados biomecánicos legibles de un vistazo. La navegación es lineal y de máximo 2 niveles de profundidad desde la pantalla principal. El indicador de conexión al backend en la barra superior informa permanentemente el estado del servidor. Los errores de conectividad se presentan con guías de resolución expandibles. |
 | **MANTENIBILIDAD** — Fácil de modificar para corregir errores y mejorar el rendimiento. Requiere un patrón de diseño que garantice la modularidad de los componentes. | El código fuente sigue la convención de separación por responsabilidad: `Screen` (estado y lógica de negocio) → `Panel` (orquestación de tabs) → `Widget` (presentación atómica). Los **specs técnicos** bajo `docs/spec/` documentan los contratos de API, decisiones de arquitectura e incidencias resueltas, garantizando trazabilidad para mantenimiento futuro. El backend agrupa REST versionado bajo `/api/v1` (salud, análisis de pose, auth y sesiones) y mantiene WebSockets en `/ws/video`, `/ws/pose-stream`, con servicios (`mediapipe_service`, `huggingface_service`) y módulos de visión (`vision/biomechanics`, `vision/feature_engine`, etc.) en archivos independientes con responsabilidad acotada. |
-| **DOCUMENTACIÓN** — Debe contar con: descripción del negocio (BPMN), historias de usuario, manual de instalación, manual de usuario, diagramas de arquitectura/clases/ER, plan de pruebas funcionales. | ✅ Descripción del negocio: sección 6.1 (proceso de valoración funcional). ✅ Arquitectura: sección 6.6.1 y `docs/arquitectura.md`. ✅ Contratos de API: `docs/spec/websocket-pose-stream.md` y `docs/spec/flutter-client-websocket.md`. ✅ Sistema de diseño UI/UX: `docs/UX-UI/` con tokens, tipografía y patrones por pantalla. ⏳ Historias de usuario: en construcción (secciones 6.3–6.5). ⏳ Diagrama de clases: pendiente al cierre de módulos. ⏳ Plan de pruebas: pendiente (sección 6.7). ⏳ Manual de usuario e instalación: pendientes (sección 6.8). |
+| **DOCUMENTACIÓN** — Debe contar con: descripción del negocio (BPMN), historias de usuario, manual de instalación, manual de usuario, diagramas de arquitectura/clases/ER, plan de pruebas funcionales. | ✅ Descripción del negocio: sección 6.1 (proceso de valoración funcional). ✅ Arquitectura: sección 6.6.1 y `docs/arquitectura.md`. ✅ Contratos de API: `docs/spec/websocket-pose-stream.md` y `docs/spec/flutter-client-websocket.md`. ✅ Sistema de diseño UI/UX: `docs/UX-UI/` con tokens, tipografía y patrones por pantalla. ✅ Manual de instalación (borrador): `docs/guias/SETUP.md`. ⏳ Historias de usuario: en construcción (secciones 6.3–6.5). ⏳ Diagrama de clases: pendiente al cierre de módulos. ⏳ Plan de pruebas: pendiente (sección 6.7). ⏳ Manual de usuario: pendiente (sección 6.8). |
 
 _\]_
 
@@ -830,5 +830,28 @@ Flutter. (2024). *Flutter Documentation*. Google LLC. Recuperado de https://docs
 MediaPipe. (2024). *MediaPipe Solutions Guide — Pose Landmarker*. Google LLC. Recuperado de https://ai.google.dev/edge/mediapipe/solutions/vision/pose_landmarker
 
 OpenCV Team. (2024). *OpenCV Documentation*. Recuperado de https://docs.opencv.org/
+
+# BITÁCORA DE DESARROLLO Y DECISIONES
+
+Esta sección se amplía de forma incremental durante el proyecto. Sirve como registro auditable para el **Capítulo 6** (decisiones de implementación, incidencias relevantes y trazabilidad hacia código o specs).
+
+## Convención de cada entrada
+
+- **Fecha:** AAAA-MM-DD (hora opcional si aplica).
+- **Ámbito:** `backend` \| `appWeb` \| `app` (Flutter) \| `docs` \| `iot` \| `infra`.
+- **Tipo:** decisión arquitectónica \| cambio funcional \| incidencia / mitigación \| gobernanza documental \| otro.
+- **Descripción:** qué cambió, por qué, alternativas descartadas en una frase si fue decisión.
+- **Trazabilidad:** rutas de archivos tocados, enlace a `docs/spec/...`, PR o commit si existe.
+
+Las entradas nuevas se añaden **al inicio** de la lista (más reciente arriba), salvo que se indique orden cronológico inverso para un apéndice institucional.
+
+## Entradas
+
+### 2026-04-04 — Orden en `docs/` y gobernanza con Cursor
+
+- **Ámbito:** docs, infra (herramientas)
+- **Tipo:** gobernanza documental
+- **Descripción:** Se reorganizó la carpeta `docs/` en `guias/`, `planificacion/` y `literatura/apoyos/` para separar guías operativas, planificación técnica y material bibliográfico. Se configuraron reglas y una skill del proyecto para que, ante cambios o decisiones importantes, se actualicen los specs en `docs/spec/`, la arquitectura cuando corresponda y **esta bitácora** dentro de `Formato_trabajo_de_grado.md`.
+- **Trazabilidad:** `docs/README.md`, `.cursor/rules/`, `.cursor/skills/bio-motion-thesis-doc/SKILL.md`, `.cursorrules`
 
 # ANEXOS

@@ -1,4 +1,9 @@
 /** Conexiones MediaPipe Pose (33 landmarks), alineado con `pose_topology.dart`. */
+
+/** Índices BlazePose para centrar el esqueleto 3D en el origen anatómico (caderas). */
+export const POSE_LEFT_HIP = 23;
+export const POSE_RIGHT_HIP = 24;
+
 export const POSE_CONNECTIONS: ReadonlyArray<readonly [number, number]> = [
   [0, 1],
   [1, 2],
