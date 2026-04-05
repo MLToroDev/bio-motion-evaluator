@@ -28,15 +28,15 @@ AÑO
 
 El presente trabajo de grado describe el diseño y desarrollo de **Bio-Motion Evaluator**, un sistema de software multiplataforma que automatiza la valoración de la movilidad articular y la detección de asimetrías físicas en usuarios de entrenamiento de fuerza. El problema central radica en que las evaluaciones biomecánicas de calidad —como el Functional Movement Screen (FMS)— son costosas, subjetivas y dependen de profesionales especializados, lo que las hace inaccesibles para el deportista promedio.
 
-La solución propuesta integra tres capas tecnológicas: un frontend desarrollado en **Flutter** (con soporte para web, Android e iOS), un backend asíncrono basado en **FastAPI** (Python) que concentra la lógica de inferencia, y la integración opcional de dispositivos IoT (ESP32-CAM / Raspberry Pi) como fuente de video. El núcleo del sistema utiliza **MediaPipe BlazePose**, un modelo de estimación de pose que detecta 33 puntos clave del cuerpo humano en tiempo real a través de redes neuronales, permitiendo el cálculo de ángulos articulares (goniometría digital) sin sensores físicos.
+La solución propuesta integra tres capas tecnológicas: un frontend **multiplataforma** inicialmente unificado en **Flutter** (Android e iOS, y exploración en web), complementado en la capa **web operativa** por **React** tras constatarse **limitaciones técnicas de Flutter Web** que afectaron la visualización estable de la captura y la retroalimentación de movimiento; un backend asíncrono basado en **FastAPI** (Python) que concentra la **inferencia con MediaPipe BlazePose**; y la integración opcional de dispositivos IoT como fuente de video. El modelo detecta 33 puntos clave del cuerpo humano y permite la goniometría digital sin sensores físicos, **ejecutándose de forma fiable en el servidor** mientras los clientes se encargan de captura, transmisión de fotogramas y renderizado del esqueleto.
 
 La comunicación entre el frontend y el backend se realiza mediante el protocolo **WebSocket**, lo que posibilita el streaming bidireccional de métricas biomecánicas (ángulos de rodilla, estado de detección de pose, marcas de tiempo) con una latencia mínima. El sistema implementa la arquitectura cliente-servidor con separación clara de responsabilidades: el backend realiza la inferencia con MediaPipe y expone los resultados como mensajes JSON por fotograma, mientras que el frontend renderiza la superposición del esqueleto de pose y el panel de métricas en tiempo real.
 
-Los primeros sprints de desarrollo validaron la viabilidad técnica del sistema, logrando el análisis en vivo desde cámara, el análisis de videos previamente grabados (gold standard), y la visualización de ángulos de flexión de rodilla con indicadores semánticos de estado (dentro de rango, límite, compensación). El producto se evalúa bajo los atributos de calidad definidos por la norma **ISO/IEC 25010**, con énfasis en usabilidad, mantenibilidad y escalabilidad.
+Los primeros sprints de desarrollo validaron la viabilidad técnica del sistema, logrando el análisis en vivo desde cámara, el análisis de videos previamente grabados (gold standard), y la visualización de ángulos de flexión de rodilla con indicadores semánticos de estado (dentro de rango, límite, compensación). En **Flutter Web** se observaron **limitaciones** que incluyeron **pantallazos negros** en la vista previa y **ausencia de compatibilidad práctica** con un despliegue estable de **MediaPipe** en el cliente comparable al del servidor, lo que motivó adoptar **React** para la web manteniendo **MediaPipe** en **FastAPI**. El producto se evalúa bajo los atributos de calidad definidos por la norma **ISO/IEC 25010**, con énfasis en usabilidad, mantenibilidad y escalabilidad.
 
 # PALABRAS CLAVE
 
-Visión artificial, estimación de pose, MediaPipe BlazePose, movilidad articular, goniometría digital, Flutter, FastAPI, WebSocket, biomecánica, análisis en tiempo real, ISO/IEC 25010, Functional Movement Screen (FMS), entrenamiento de fuerza, detección de asimetrías.
+Visión artificial, estimación de pose, MediaPipe BlazePose, movilidad articular, goniometría digital, Flutter, React, migración de frontend, FastAPI, WebSocket, biomecánica, análisis en tiempo real, ISO/IEC 25010, Functional Movement Screen (FMS), entrenamiento de fuerza, detección de asimetrías.
 
 # TABLA DE CONTENIDO
 
@@ -172,7 +172,7 @@ El crecimiento sostenido de la industria del fitness y el entrenamiento de fuerz
 
 La irrupción de la inteligencia artificial en el campo de la visión por computador, y en particular el desarrollo de arquitecturas de estimación de pose como **MediaPipe BlazePose** (Google, 2020), ha abierto una ventana de oportunidad para democratizar el acceso a este tipo de valoraciones. Estos modelos permiten detectar con precisión los puntos clave del cuerpo humano directamente desde la cámara de un dispositivo móvil, sin necesidad de sensores físicos ni equipamiento especializado, habilitando la goniometría digital en tiempo real.
 
-**Bio-Motion Evaluator** nace como respuesta a esta brecha tecnológica. Este proyecto de grado de Ingeniería en Software propone el diseño y desarrollo de un sistema de software multiplataforma que automatiza la valoración de la movilidad articular mediante visión artificial, entregando al usuario un diagnóstico biomecánico personalizado previo al entrenamiento. La solución se articula en tres componentes: una aplicación móvil y web desarrollada en **Flutter**, un servidor de análisis construido con **FastAPI** (Python) que ejecuta el modelo de estimación de pose en tiempo real, y la integración opcional de dispositivos IoT como fuentes de video externas.
+**Bio-Motion Evaluator** nace como respuesta a esta brecha tecnológica. Este proyecto de grado de Ingeniería en Software propone el diseño y desarrollo de un sistema de software multiplataforma que automatiza la valoración de la movilidad articular mediante visión artificial, entregando al usuario un diagnóstico biomecánico personalizado previo al entrenamiento. La solución se articula en: clientes **Flutter** (móvil) y **React** (web operativa), un servidor de análisis **FastAPI** (Python) que ejecuta **MediaPipe** y expone **REST** y **WebSocket**, persistencia y trabajos en cola según la versión del sistema, y la integración opcional de **IoT** como fuente de video externa.
 
 La arquitectura del sistema prioriza la comunicación en tiempo real mediante el protocolo **WebSocket**, lo que permite transmitir métricas de ángulos articulares fotograma a fotograma con latencia mínima. El backend extrae los landmarks del cuerpo del usuario, calcula los rangos de movimiento (ROM) de las articulaciones de interés —comenzando por la rodilla como articulación pivote en el squat— y los envía al frontend, donde se visualizan sobre la imagen del usuario junto con indicadores semánticos de calidad del movimiento.
 
@@ -275,23 +275,24 @@ El proyecto adopta la metodología ágil **Scrum** como marco de trabajo, dado q
 El sistema **Bio-Motion Evaluator** abarca, dentro del presente trabajo de grado, las siguientes funcionalidades:
 
 **Dentro del alcance:**
-- Aplicación cliente multiplataforma (Flutter) con soporte para **web** (navegador), **Android** e **iOS** desde un único código base.
-- Módulo de **análisis en vivo** desde la cámara del dispositivo: captura de video en tiempo real, estimación de pose con MediaPipe BlazePose y visualización de ángulos articulares sobre la imagen.
-- Módulo de **análisis de video pregrabado**: carga de archivos de video en el servidor (*gold standard*) para análisis diferido con métricas por fotograma y resumen de sesión.
-- Cálculo de **ángulos de flexión de rodilla** (bilateral: izquierda y derecha) como métrica biomecánica principal de la primera fase.
-- **Superposición de esqueleto de pose** (*pose overlay*) sobre la vista previa en tiempo real.
-- Panel de **métricas en tiempo real** con indicadores semánticos: `BUENO` (dentro de rango), `ADVERTENCIA` (límite), `CRÍTICO` (compensación detectada).
-- Comunicación frontend-backend mediante **WebSocket** con protocolo definido y documentado.
-- Backend **FastAPI** con soporte para múltiples fuentes de video: cámara del servidor, archivo local, URL de stream (RTSP/HTTP) y dispositivos IoT.
-- Integración opcional de **ESP32-CAM / Raspberry Pi Zero 2W** como fuente de video externa inalámbrica.
-- Pantalla de **diagnóstico de conexión** al servidor con indicador de estado en tiempo real.
+- **Clientes de presentación:** aplicación **Flutter** (`app/`) para **Android**, **iOS** y exploración web; aplicación **React 19 + Vite + TypeScript** (`appWeb/`) como **cliente web principal** para análisis en vivo y por archivo (mitigación de limitaciones de Flutter Web con vista previa JPEG de alta frecuencia, documentada en el Capítulo 6).
+- Módulo de **análisis en vivo** desde la cámara del navegador o del dispositivo: envío de fotogramas al backend, estimación de pose con **MediaPipe BlazePose** y visualización de ángulos y esqueleto sobre la imagen.
+- Módulo de **análisis de video pregrabado** (*gold standard*): listado de videos en servidor, reproducción/análisis por fotograma, resumen de sesión, registro de frames y herramientas de inspección (incl. vistas **2D/3D** del esqueleto en el cliente web).
+- Cálculo de **ángulos de flexión de rodilla** (bilateral) como métrica principal de la primera fase; comparación bilateral para **asimetría** en tiempo real.
+- **Superposición de esqueleto** y panel de **métricas** con estados semánticos (bueno / advertencia / crítico).
+- Comunicación mediante **WebSocket** (`/ws/pose-stream`, `/ws/video` según flujo) y **REST** versionada (`/api/v1/...`), con especificación en `docs/spec/`.
+- Backend **FastAPI** con fuentes de video: cámara del servidor, archivo, URL (RTSP/HTTP) y envío cliente; vista previa **JPEG** opcional (`include_preview`).
+- **Persistencia experimental:** **PostgreSQL** + **SQLAlchemy** + **Alembic** para usuarios, sesiones con métricas muestreadas y jobs de descarga; **JWT** para autenticación (modo desarrollo con usuario anónimo configurable).
+- **Cola de trabajos:** **Celery** + **Redis** para descarga asíncrona de videos hacia biblioteca local.
+- Módulo de **descarga de video** desde URL y **historial de sesiones** en cliente.
+- **Prototipos IoT** en repositorio (**ESP32-CAM**, **Raspberry Pi**) como fuentes de video externas (integración en campo objeto de sprint actual).
+- Pantalla de **diagnóstico de conexión** y configuración de URL del backend.
+- **Motor de visión avanzado (en evolución):** capas para extracción de características, clasificador de ejercicio (Hugging Face / ONNX según configuración), seguimiento de repeticiones — habilitación progresiva según flags y planes en `docs/planificacion/bio_motion_plan_v2.md`.
 
-**Fuera del alcance (versión actual):**
-- Evaluación de articulaciones distintas a la rodilla (tobillo, cadera, hombro) — contempladas para fases futuras.
-- Motor de prescripción automática de ejercicios correctivos (lógica de inferencia de recomendaciones).
-- Módulo de historial de sesiones persistente con base de datos.
-- Autenticación de usuarios y perfiles múltiples.
-- Despliegue en producción en la nube.
+**Fuera del alcance (versión actual del trabajo de grado):**
+- Evaluación automática de articulaciones más allá del enfoque rodilla/sentadilla en producción (otras articulaciones y batería FMS completa quedan como **extensión** o trabajo futuro).
+- **Motor de prescripción** automática de rutinas correctivas (recomendaciones clínicas cerradas).
+- **Despliegue productivo** en nube con hardening de seguridad y escalado (el alcance académico privilegia demostración, reproducibilidad y validación técnica).
 
 # RECURSOS
 
@@ -324,23 +325,28 @@ El sistema **Bio-Motion Evaluator** abarca, dentro del presente trabajo de grado
 | Uvicorn | 0.x | Servidor ASGI para FastAPI |
 | Git / GitHub | — | Control de versiones y colaboración |
 | pytest | 7.x+ | Pruebas automatizadas del backend |
+| React | 19.x | Cliente web (`appWeb/`) |
+| TypeScript / Vite | 5.x / 6.x | Tooling del cliente web |
+| PostgreSQL | 15+ (recomendado) | Persistencia de sesiones y métricas |
+| SQLAlchemy / Alembic | 2.x | ORM y migraciones |
+| Redis | 7.x | Broker y backend de resultados Celery |
+| Celery | 5.x | Tareas asíncronas (descarga de video) |
 
 **Recursos Bibliográficos:** Acceso a bases de datos académicas (Google Scholar, IEEE Xplore, ScienceDirect), repositorio institucional del Tecnológico de Antioquia, documentación oficial de MediaPipe, Flutter y FastAPI.
 
 # CRONOGRAMA DE ACTIVIDADES
 
-_\[Completar con las fechas reales de inicio y cierre de cada sprint una vez finalizados. La siguiente tabla refleja la planificación general de actividades por fase.\]_
+La siguiente tabla relaciona **fases**, **sprints** y **estado** respecto al desarrollo del repositorio a la fecha de actualización de este documento (abril de 2026). Las fechas de inicio/cierre por sprint pueden completarse con el calendario académico oficial.
 
-| Fase | Actividades principales | Sprint(s) asociado(s) |
-|------|------------------------|----------------------|
-| **Análisis y diseño** | Levantamiento de requerimientos, definición de arquitectura, diseño del sistema de diseño UI/UX | Sprint 1 |
-| **Infraestructura base** | Setup del monorepo, configuración backend FastAPI, primera conexión WebSocket Flutter–backend | Sprint 1 |
-| **Módulo de estimación de pose** | Integración MediaPipe BlazePose, cálculo de ángulos de rodilla, streaming por fotograma | Sprint 2 |
-| **Módulo análisis en vivo** | Pantalla de análisis en vivo con cámara, overlay de pose, panel de métricas en tiempo real | Sprint 2 |
-| **Módulo análisis de video** | Análisis de archivos gold standard, resumen de sesión, log de frames | Sprint 3 |
-| **IoT** | Integración ESP32-CAM como fuente de video, pruebas de latencia y estabilidad | Sprint 3 – Sprint 4 |
-| **Pruebas y validación** | Plan de pruebas funcionales, pruebas de usabilidad, comparación con goniometría manual | Sprint 4 |
-| **Documentación y cierre** | Documentación técnica final, manual de usuario, manual de instalación, evaluación ISO/IEC 25010 | Sprint 4 – Sprint 5 |
+| Fase | Actividades principales | Sprint(s) | Estado |
+|------|------------------------|-----------|--------|
+| **Análisis y diseño** | Requerimientos, arquitectura lógica, sistema UI/UX, specs iniciales | 1 | Completado |
+| **Infraestructura base** | Monorepo, FastAPI, salud REST, WebSocket pose-stream, cliente Flutter navegación y config | 1 | Completado |
+| **Pipeline de pose y análisis en vivo** | MediaPipe, ángulos de rodilla, streaming, overlay y métricas (Flutter y luego React web) | 2 | Completado |
+| **Análisis por archivo y cliente web** | Gold standard, `stream_done`, UI análisis de video; **React `appWeb/`** por decisión técnica Flutter Web | 3 | Completado |
+| **Plataforma, datos y colas** | Auth JWT, PostgreSQL/Alembic, sesiones y métricas, descargas Celery+Redis, paridad funcional appWeb | 4 | **En curso** |
+| **IoT y validación en campo** | Pruebas ESP32-CAM / RPi, latencia, estabilidad con backend real | 5 | Planificado |
+| **Cierre académico** | Pruebas funcionales/usabilidad, contraste con goniometría, memoria final, ISO | 6 | Planificado |
 
 # MARCO CONCEPTUAL
 
@@ -374,13 +380,15 @@ Este capítulo presenta los conceptos y tecnologías fundamentales sobre los que
 
 ## 5.3 Ingeniería de Software y Tecnologías del Stack
 
-**Flutter:** Framework de desarrollo de interfaces de usuario multiplataforma creado por Google, basado en el lenguaje **Dart**. Permite compilar una única base de código para web (navegador), Android, iOS, desktop (Windows, macOS, Linux) y dispositivos embebidos, con rendimiento nativo gracias a su motor de renderizado propio (Impeller/Skia). En este proyecto se utiliza como capa de presentación para todas las plataformas objetivo.
+**Flutter:** Framework de desarrollo de interfaces de usuario multiplataforma creado por Google, basado en el lenguaje **Dart**. Permite compilar una única base de código para web (navegador), Android, iOS, desktop (Windows, macOS, Linux) y dispositivos embebidos, con rendimiento nativo gracias a su motor de renderizado propio (Impeller/Skia). En este proyecto se utiliza como cliente **móvil/nativo** principal; la variante **Flutter Web** se mantuvo para experimentación, pero la **interfaz web** de demostración prioriza **React** (`appWeb/`) por las razones descritas en el Capítulo 6.
+
+**React (cliente web):** Biblioteca para UI en el navegador; en combinación con **Vite** y **TypeScript** sustenta `appWeb/`, alineada con los mismos contratos **REST** y **WebSocket** que Flutter, optimizando sincronización entre vista previa (**<img>** / canvas) y overlay en escenarios de streaming de alta frecuencia.
 
 **FastAPI:** Framework web moderno para Python, basado en los estándares **OpenAPI** y **JSON Schema**, diseñado para construir APIs REST y WebSocket con alto rendimiento. Utiliza `async/await` para operaciones de I/O concurrentes y **Pydantic** para la validación automática de datos de entrada y salida. Su servidor ASGI de referencia es **Uvicorn**.
 
 **WebSocket:** Protocolo de comunicación full-duplex sobre TCP, estandarizado en RFC 6455, que permite una conexión persistente y bidireccional entre cliente y servidor. A diferencia de HTTP, no requiere que el cliente realice peticiones periódicas (polling): el servidor puede enviar datos en el momento en que están disponibles. Es el protocolo elegido para el streaming de métricas biomecánicas en tiempo real entre el backend y el frontend.
 
-**Arquitectura Cliente-Servidor:** Patrón de diseño en el que las responsabilidades del sistema se distribuyen entre un componente que solicita servicios (cliente — Flutter) y uno que los provee (servidor — FastAPI). El servidor concentra la lógica de inferencia computacionalmente costosa (MediaPipe) y expone los resultados a través de una API documentada, mientras que el cliente se ocupa de la captura de video y la presentación de resultados.
+**Arquitectura Cliente-Servidor:** Patrón de diseño en el que las responsabilidades del sistema se distribuyen entre componentes que solicitan servicios (cliente — **Flutter** y/o **React** en `appWeb/`) y el servidor (**FastAPI**). El servidor concentra la inferencia (MediaPipe) y expone **REST** y **WebSocket** documentados; los clientes capturan o envían video y presentan métricas y overlays.
 
 **Pydantic:** Librería de Python para la validación y serialización de datos mediante anotaciones de tipo. Se usa en este proyecto para definir los contratos de datos del WebSocket (`PoseStreamConfig`, `PoseResult`) con validación automática, incluyendo reglas de coerción para valores opcionales (ej. `include_preview: null → true`).
 
@@ -441,8 +449,9 @@ Las **áreas específicas intervenidas** son:
 | Actor | Tipo | Responsabilidades principales |
 |-------|------|------------------------------|
 | **Usuario final (Deportista)** | Humano | Ejecuta los movimientos de evaluación frente a la cámara. Interpreta los indicadores biomecánicos mostrados en la app. Toma decisiones sobre su calentamiento basado en los resultados. |
-| **App Bio-Motion (Cliente Flutter)** | Sistema software | Gestiona la interfaz de usuario. Captura video desde la cámara del dispositivo. Establece la conexión WebSocket con el backend. Renderiza el overlay de pose y el panel de métricas en tiempo real. |
-| **Backend FastAPI (Servidor)** | Sistema software | Recibe los frames de video. Ejecuta el modelo MediaPipe BlazePose. Calcula los ángulos articulares. Transmite los resultados fotograma a fotograma al cliente vía WebSocket. |
+| **App Bio-Motion (Flutter — `app/`)** | Sistema software | Cliente multiplataforma: cámara, WebSocket, overlay 2D/3D según pantalla, métricas, sesiones, login y descargas alineados con el backend. |
+| **App Bio-Motion Web (React — `appWeb/`)** | Sistema software | Cliente web principal: mismos contratos REST/WebSocket; análisis en vivo y por video; esqueleto 2D/3D, paneles y preferencias de capas. |
+| **Backend FastAPI (Servidor)** | Sistema software | Inferencia MediaPipe, biomecánica, rutas REST v1, WebSockets de pose/video, persistencia, auth y trabajos en cola. |
 | **Dispositivo IoT (Opcional)** | Hardware | ESP32-CAM o Raspberry Pi Zero 2W. Actúa como cámara externa independiente. Transmite frames al backend vía WebSocket desde una posición óptima para la captura del movimiento (ej. plano sagital lateral). |
 | **Director / Evaluador** | Humano | Rol académico/clínico. Puede revisar los reportes de sesión para validar la precisión del sistema frente a métodos tradicionales de goniometría manual. |
 
@@ -458,16 +467,13 @@ Las **áreas específicas intervenidas** son:
 
 La arquitectura de la solución se organiza en **tres capas independientes** que se comunican mediante protocolos estándar:
 
-**1. Capa de presentación — Flutter (Cliente)**
-Aplicación multiplataforma desarrollada en Flutter/Dart que opera en navegador web, Android e iOS desde un único código base. Sus módulos principales son:
-- **Pantalla de análisis en vivo:** Captura video desde la cámara del dispositivo, lo transmite al backend y superpone el esqueleto de pose detectado sobre la imagen en tiempo real. Muestra el panel de métricas con los ángulos calculados y su estado semántico.
-- **Pantalla de análisis de video:** Permite seleccionar un archivo de video almacenado en el servidor para su análisis diferido, con visualización del progreso y resumen final de la sesión.
-- **Pantalla de diagnóstico:** Comprueba la conectividad con el backend, muestra latencia y estado del servidor.
-- **Sistema de diseño consistente:** Paleta oscura biomédica, tipografía DM Sans + DM Mono, tokens de color semánticos para estados biomecánicos (verde/amarillo/rojo).
+**1. Capa de presentación — Flutter (`app/`) y React (`appWeb/`)**
+- **Flutter/Dart:** cliente **Android, iOS** y exploración web; pantallas de **análisis en vivo**, **análisis de video**, **diagnóstico de backend**, **configuración**, **login/perfil**, **historial** y **descarga** de video según la versión del código.
+- **React 19 + TypeScript (`appWeb/`):** cliente **web** priorizado para demostración; mismas capacidades núcleo de análisis en vivo y por archivo, con overlay **2D/3D** y paneles alineados al sistema de diseño (paleta oscura biomédica, DM Sans / Mono, estados semánticos).
 
 **2. Capa de lógica e inferencia — FastAPI (Backend)**
 Servidor asíncrono Python que centraliza la inteligencia del sistema:
-- Expone un endpoint WebSocket (`/ws/pose-stream`) que acepta configuración de fuente de video y transmite resultados por fotograma.
+- Expone WebSockets (`/ws/pose-stream`, y **`/ws/video`** según el flujo de procesamiento avanzado) y **REST** bajo `/api/v1/` (salud, pose, videos *gold standard*, autenticación, sesiones, descargas).
 - Ejecuta **MediaPipe BlazePose** para la detección de 33 landmarks del cuerpo humano.
 - Calcula los **ángulos de flexión de rodilla** (bilateral) usando álgebra vectorial sobre las coordenadas de los landmarks de cadera, rodilla y tobillo.
 - Soporta múltiples fuentes de entrada: cámara local (`camera`), archivo de video (`file`) y URL de stream (`url`), seleccionables mediante el campo `source` de la configuración inicial.
@@ -486,84 +492,161 @@ Dispositivos de bajo costo que actúan como fuentes de video externas, transmiti
     → Cálculo ángulos articulares (vectores)
     → Payload JSON por frame
         ↓ WebSocket (JSON / frame)
-[App Flutter]
-    → Pose Overlay (CustomPaint)
-    → Panel de métricas (LiveMetric list)
-    → Log de eventos
+[Cliente Flutter y/o React]
+    → Overlay de pose (Canvas / CustomPaint / capas 2D-3D)
+    → Panel de métricas (lista tipo LiveMetric)
+    → Log de eventos / progreso de archivo
     → Gráfica histórica de ángulos
 ```
 
 # Product backlog
 
-_\[La pila de productos priorizada o product backlog contiene la lista de historias de usuario priorizada para la planificación de los sprints. La estimación de prioridades se debe realizar empleando la escala alta, media y baja y el formato que se debe seguir es el siguiente:\]_
+Tabla x. *Product backlog priorizado (sincronizado con el monorepo; abril 2026).*
 
-Tabla x. _Product backlog: xxxxxx._
+| **Id HU** | **Nombre HU** | **Sprint** | **Prioridad** | **Estado** | **Notas / Trazabilidad** |
+| --- | --- | --- | --- | --- | --- |
+| HU-01 | Como deportista quiero ver si el backend está disponible antes de analizar | 1 | Alta | Hecho | `BackendStatusPage`; `GET /api/v1/health` |
+| HU-02 | Como usuario quiero configurar la URL base del servidor | 1 | Alta | Hecho | `ConnectionConfigPage` / Flutter `connection_config_screen` |
+| HU-03 | Como usuario quiero analizar mi movimiento en vivo con retroalimentación de rodillas | 2 | Alta | Hecho | `LiveAnalysisPage`; WebSocket `/ws/pose-stream` |
+| HU-04 | Como investigador quiero analizar un video *gold standard* con resumen por sesión | 3 | Alta | Hecho | `VideoAnalysisPage`; API `gold_standard_videos`; fin `stream_done` |
+| HU-05 | Como usuario web quiero una interfaz estable para streaming JPEG y esqueleto | 3 | Alta | Hecho | `appWeb/` React; decisión § 6.6.4 |
+| HU-06 | Como usuario quiero guardar y revisar sesiones anteriores | 4 | Media | En curso | `sessions` + PostgreSQL; `SessionsHistoryPage` |
+| HU-07 | Como usuario quiero iniciar sesión para asociar mis datos | 4 | Media | En curso | `auth` JWT; `LoginPage` |
+| HU-08 | Como operador quiero descargar video desde URL hacia la biblioteca local | 4 | Media | En curso | Celery + Redis; `download` API; `VideoDownloadPage` |
+| HU-09 | Como investigador quiero inspeccionar pose en 2D y 3D en análisis de video | 4 | Media | En curso | `PoseSkeleton3DScene`, `poseTopology.ts` |
+| HU-10 | Como laboratorio quiero usar cámara IoT frente al backend | 5 | Media | Pendiente | `iot/esp32-cam`, `iot/raspberry-pi/stream.py` |
+| HU-11 | Como evaluador quiero validar ángulos frente a goniometría manual | 6 | Alta | Pendiente | Protocolo de medición y anexo |
+| HU-12 | Como autor quiero cerrar manuales y evaluación ISO 25010 | 6 | Alta | Pendiente | § 6.7–6.8 |
 
-| **Historias de Usuario** | | **Estimación** | | | | | | **Ejecución** | | |
-| --- | | --- | | | | | | --- | | | --- | --- | --- | --- | --- | --- | --- | --- |
-| **Id HU** | **Nombre HU** | **Sprint** | **Prioridad** | **Hrs Definición** | **Hrs**<br><br>**Desarrollo** | **Hrs**<br><br>**Pruebas** | **Hras**<br><br>**totales** | **Fecha Inicio** | **Fecha**<br><br>**puesta en producción** | **Observación** |
-| | | | | | | | | | | |
-| | | | | | | | | | | |
-| | | | | | | | | | | |
-| | | | | | | | | | | |
-| | | | | | | | | | | |
-| | | | | | | | | | | |
-| | | | | | | | | | | |
-| | | | | | | | | | | |
-| | | | | | | | | | | |
-| | | | | | | | | | | |
-| | | | | | | | | | | |
-| | | | | | | | | | | |
-| | | | | | | | | | | |
-| | | | | | | | | | | |
-| | | | | | | | | | | |
-
-Fuente: Elaboración propia (año).
+Fuente: Elaboración propia (2026).
 
 # PLANIFICACIÓN DEL SPRINT 1
 
-# Historias de usuario
+## Objetivo del sprint
 
-_\[Las historias de usuario son descripciones cortas de una funcionalidad redactadas desde la perspectiva del cliente. El modelo de las historias de usuario debe seguir la siguiente estructura: Yo_ **_como_** _(rol),_ **_necesito-quiero_** _(descripción de la funcionalidad) con la finalidad de_ **_(para)_** _(descripción del objetivo). Las historias de usuario deben incluir la lista de criterios de aceptación_ **_(Cuando, espero)_**_.\]_
+Establecer el **monorepo** funcional y la **primera comunicación cliente-servidor** verificable, con el entorno de desarrollo documentado en `docs/guias/SETUP.md`.
 
-Tabla x. _Historia de usuario: xxxxxx._
+## Historias de usuario incluidas
 
-| **NOMBRE DE LA HISTORIA** | | |
-| --- | | --- |
-| **ID HISTORIA** | | |
-| **PUNTOS DE LA HISTORIA** | | |
-| **Como:** | | |
-| **Quiero:** | | |
-| **Para:** | | |
-| **CRITERIOS DE ACEPTACIÓN:** | | |
-| **Cuando:** | | |
-| **Espero:** | | |
-| **Cuando:** | | |
-| **Espero:** | | |
+**HU-01, HU-02** (tabla de backlog).
 
-Fuente: Elaboración propia (año).
+## Revisión del sprint (resultados)
 
-# Revisión
+- **Backend:** proyecto **FastAPI** con endpoint de salud, estructura `app/api`, configuración por entorno, dependencias Python y script de descarga de modelos MediaPipe.
+- **Contrato:** primera versión estable del WebSocket **`/ws/pose-stream`** con mensaje de configuración JSON (`PoseStreamConfig` en evolución).
+- **Cliente Flutter:** navegación (`home_screen`, rutas), **URL** del API/WebSocket, pantalla de **estado del backend**.
+- **Documentación:** inicio de `docs/spec/` y `docs/arquitectura.md`.
 
-# Tareas asociadas y ejecutadas
+## Tareas asociadas y ejecutadas (extracto)
 
-_\[Se debe incluir las pantallas realizadas con la realización de las HU, incluir los casos de prueba realizados para la aprobación de las HU y sus respectivos criterios de aceptación, mostrar la base de datos resultado de la ejecución de cada sprint\]_
+| Área | Entregable |
+|------|------------|
+| Repositorio | Estructura `app/`, `backend/`, `docs/`, `tests/`, `iot/` |
+| Backend | `GET /api/v1/health`, CORS, `main.py` |
+| Flutter | `connection_config_screen`, `backend_status_screen`, `home_screen` |
+| Docs | SETUP, README raíz |
 
 # PLANIFICACIÓN DEL SPRINT 2
 
-# Historias de usuario
+## Objetivo del sprint
 
-# Revisión
+Cerrar el **pipeline mínimo de valor**: **MediaPipe BlazePose**, **goniometría** de rodillas bilateral, **streaming** por fotograma y **UI** de análisis en vivo en **Flutter**.
 
-# Tareas asociadas y ejecutadas
+## Historias de usuario incluidas
 
-# PLANIFICACIÓN DEL SPRINT N
+**HU-03**.
 
-# Historias de usuario
+## Revisión del sprint (resultados)
 
-# Revisión
+- **Visión:** servicio MediaPipe, **ángulos de rodilla** (`vision/biomechanics.py`), landmarks coherentes con la memoria.
+- **Tiempo real:** payload JSON con `knees.*_flexion_angle_deg`, `pose_ok`, `landmarks`.
+- **Flutter:** `live_analysis_screen`, **WebSocket**, **overlay**, panel **`LiveMetric`**, HUD y gráfica/histórico de ángulos.
+- **Specs:** consolidación de `docs/spec/websocket-pose-stream.md` y cliente en specs.
 
-# Tareas asociadas y ejecutadas
+## Tareas asociadas y ejecutadas (extracto)
+
+| Área | Entregable |
+|------|------------|
+| Backend | `live_pose.py`, captura OpenCV + inferencia por frame |
+| Flutter | Flujo análisis en vivo end-to-end |
+| Manual | Prueba en vivo contra backend local |
+
+# PLANIFICACIÓN DEL SPRINT 3
+
+## Objetivo del sprint
+
+**Análisis por archivo** (*gold standard*) y **cliente web React** (`appWeb/`) con los mismos contratos de backend.
+
+## Historias de usuario incluidas
+
+**HU-04, HU-05**.
+
+## Revisión del sprint (resultados)
+
+- **Backend:** listado/selección de videos de referencia; `source=file`; mensaje **`stream_done`**; preview JPEG opcional.
+- **Flutter:** `video_analysis_screen`, log por frame, resumen de sesión.
+- **React:** rutas `live-analysis`, `video-analysis`, hooks `useLiveAnalysisSession` / `useVideoAnalysisSession`.
+- **Decisión:** limitaciones de **Flutter Web** documentadas en § **6.6.4**; demostración web centrada en **`appWeb/`** (React + Vite).
+
+## Tareas asociadas y ejecutadas (extracto)
+
+| Área | Entregable |
+|------|------------|
+| API | `gold_standard_videos` |
+| appWeb | Router, layout, paneles de análisis |
+| Docs | Reporte de latencia en `docs/guias/reporte_latencia_frames_ws_pose_stream.md` |
+
+# PLANIFICACIÓN DEL SPRINT 4 (en curso)
+
+## Objetivo del sprint
+
+**Plataforma integrada:** autenticación **JWT**, **PostgreSQL** (sesiones y métricas), **Celery + Redis** (descargas), refinamiento **2D/3D** y paridad razonable Flutter / React.
+
+## Historias de usuario incluidas
+
+**HU-06 a HU-09** (cierre según hitos).
+
+## Estado a abril de 2026
+
+- **ORM:** `UserORM`, `SessionORM`, `SessionMetricORM`, `VideoDownloadJobORM`; migraciones **Alembic**; routers **`auth`**, **`sessions`**, **`download`**.
+- **Clientes:** login, perfil, historial, descarga de video; en web, toolbar de capas, estadísticas, **`PoseSkeleton3DScene`** y topología **`poseTopology`**.
+- **Motor (paralelo):** paquete `backend/vision/` (extractor, *features*, clasificador, *rep trackers*) según `docs/planificacion/bio_motion_plan_v2.md`.
+
+## Criterios para cerrar el sprint
+
+- Login y **sesiones** persistidas de forma coherente en ambos clientes.
+- **Job** de descarga observable desde UI y alineado con biblioteca de videos.
+- Estabilidad del análisis de video en **React** sin regresiones mayores.
+- Specs y `docs/arquitectura.md` al día con REST v1 y colas.
+
+# PLANIFICACIÓN DEL SPRINT 5 (planificado)
+
+## Objetivo del sprint
+
+**IoT en campo:** ESP32-CAM y/o Raspberry Pi, medición de **latencia** y documentación de limitaciones.
+
+## Historias de usuario incluidas
+
+**HU-10**.
+
+## Entregas previstas
+
+- Evidencias (logs o capturas) de streaming IoT al backend.
+- Anexo o tabla de latencia en § **7**; actualización de `docs/spec/` pertinente.
+
+# PLANIFICACIÓN DEL SPRINT 6 (planificado)
+
+## Objetivo del sprint
+
+**Cierre académico:** pruebas § 6.7, contraste con **goniometría**, manuales § 6.8, argumentario **ISO/IEC 25010**.
+
+## Historias de usuario incluidas
+
+**HU-11, HU-12**.
+
+## Entregas previstas
+
+- Matriz de pruebas con resultados; manuales alineados con `docs/guias/SETUP.md` y flujos de `appWeb/`; conclusiones y recomendaciones.
 
 # DISEÑO DEL SISTEMA
 
@@ -722,28 +805,39 @@ _\[Por completar. En la versión actual el sistema no persiste datos en base de 
 
 ## Contexto
 
-Los primeros sprints del proyecto construyeron el frontend en **Flutter** (móvil Android/iOS y **Flutter Web**) con soporte a **WebSocket**, superposición del esqueleto de pose sobre la imagen y paneles de métricas alineados con el backend **FastAPI**. El objetivo era una única base de código para todas las plataformas.
+Los primeros sprints del proyecto construyeron el frontend en **Flutter** (móvil Android/iOS y **Flutter Web**) con soporte a **WebSocket**, superposición del esqueleto de pose sobre la imagen y paneles de métricas alineados con el backend **FastAPI**. La meta inicial fue **un único código base cross-platform** (*write once, run anywhere*) para simplificar mantenimiento y trazabilidad frente al pipeline de **detección de movimiento** (estimación de pose y métricas derivadas).
 
-## Hallazgo técnico en Flutter Web
+## Interferencias técnicas del desarrollo cross-platform en Flutter
 
-Al ejecutar la aplicación con `flutter run -d web-server` y un flujo de vista previa basado en **JPEG** a frecuencias superiores a aproximadamente **8 FPS**, el pipeline de renderizado de **Flutter Web** introdujo latencia de composición perceptible. En la práctica se observaron **fotogramas negros intercalados** y una **desincronización** entre la imagen JPEG y el overlay del esqueleto: Flutter Web emplea un lienzo **WebGL** propio (**CanvasKit**) que no comparte el mismo ciclo de eventos que el hilo que consume mensajes **WebSocket**, lo que dificulta el acoplamiento fotograma a fotograma entre textura y dibujo vectorial.
+La arquitectura adoptada concentra la **inferencia MediaPipe BlazePose** en el **backend Python** (MediaPipe **Tasks**, modelo `.task`, integración con OpenCV), por rendimiento, reproducibilidad y madurez del ecosistema. Aun así, el producto exige en el cliente una **captura fluida** y una **sincronización visual** entre el flujo de video (cámara o *preview* JPEG del servidor) y el **overlay** que refleja esa detección de movimiento.
 
-## Decisión de arquitectura
+En **Flutter Web** este encaje se vio **interferido** por dos frentes que erosionaron la viabilidad del mismo stack único para navegador:
 
-Para la capa **web** se desarrolló en paralelo un prototipo en **React 19 + Vite + TypeScript** (`appWeb/`) que reutiliza **el mismo backend** y los mismos contratos (**REST** y **WebSocket**). Al apoyarse en el **DOM nativo** (`<img>` para JPEG y **Canvas 2D** para el esqueleto), la sincronización visual mejoró de forma notable en pruebas internas, sin los fotogramas negros asociados al compositor de Flutter Web en ese escenario.
+1. **Ecología MediaPipe en cliente Flutter:** No se dispuso de una integración **estable y equivalente** a MediaPipe Tasks en **Dart / Flutter Web** que permitiera ejecutar sobre el propio navegador el mismo pipeline de *motion detection* validado en Python con la calidad requerida para el trabajo. Las APIs y *toolkits* de MediaPipe no ofrecen, en la práctica del proyecto, **compatibilidad** con un despliegue **fiable de BlazePose** dentro del runtime web de Flutter comparable al del servidor; la **detección de movimiento acoplada a MediaPipe** quedó **centralizada en FastAPI**, mientras el cliente web debía apoyarse en el **streaming** de resultados y/o vistas previas. Esa dependencia hizo crítico el comportamiento del **compositor** y del **bucle de UI** en el navegador.
+
+2. **Visualización y captura en Flutter Web:** Al ejecutar con `flutter run -d web-server` y flujos de vista previa basados en **JPEG** a frecuencias típicas de análisis (por encima de ~**8 FPS** en pruebas internas), el *pipeline* de **Flutter Web** exhibió **fotogramas negros intercalados** (**pantallazos negros**) durante la captura o la visualización, junto con **desincronización** entre la imagen y el overlay del esqueleto. El motor **CanvasKit** (**WebGL**) no comparte el mismo ciclo de eventos que el consumo de mensajes **WebSocket**, lo que impide en la práctica **acoplar fotograma a fotograma** la textura de video y el dibujo vectorial sin artefactos perceptibles.
+
+En conjunto, la **estrategia cross-platform centrada en Flutter Web** chocó con **limitaciones tecnológicas** que impedían una experiencia de **captura y retroalimentación de movimiento** acorde con los objetivos del sistema, aun cuando **Android/iOS nativos** siguieron siendo viables con Flutter.
+
+## Decisión de migración a React (capa web)
+
+Ante lo anterior, se decidió la **migración de la interfaz web** a **React 19 + Vite + TypeScript** (`appWeb/`), **reutilizando el mismo backend FastAPI** y los contratos **REST** y **WebSocket**. React utiliza el **DOM nativo** del navegador (`<img>` para JPEG, **Canvas 2D** para el esqueleto), lo que en pruebas internas **redujo los pantallazos negros** ligados al compositor de Flutter Web y mejoró la **alineación visual** entre *preview* y overlay, **sin cambiar** dónde se ejecuta **MediaPipe** (servidor).
+
+**Alcance:** solo la **presentación web**; **Flutter** permanece como cliente **móvil** en `app/`. La decisión **corrige** el uso de Flutter Web como vehículo único para el escenario de **streaming + overlay**, no invalida Flutter en nativo.
 
 ## Comparativa técnica (resumen)
 
 | Aspecto | Flutter Web | React + Vite (`appWeb`) |
 |--------|-------------|-------------------------|
 | Modelo de render | Canvas WebGL (CanvasKit) + capas propias | DOM + Canvas 2D / `<img>` |
-| Bucle de eventos / composición | Desacoplado del consumo típico de WS en la práctica observada | Mismo hilo de UI del navegador para pintar imagen y canvas |
-| Latencia observable (vista previa JPEG alta frecuencia) | Fotogramas negros y saltos perceptibles (> ~8 FPS en el escenario probado) | Comportamiento estable en pruebas con el mismo backend |
-| Sincronización JPEG–esqueleto | Difícil de garantizar fotograma a fotograma | Alineación visual aceptable para demostración y validación |
+| MediaPipe / *motion* en cliente | Sin paridad práctica con Tasks Python en el navegador; inferencia en servidor | Mismo backend; cliente orientado a pintar resultados de forma estable |
+| Captura / *preview* en vivo | Pantallazos negros y saltos perceptibles en pruebas a alta frecuencia de JPEG | Comportamiento estable con el mismo backend |
+| Bucle de eventos / composición | Desacoplado del consumo típico de WS en la práctica observada | Hilo de UI del navegador alineado con imagen y canvas |
+| Sincronización *preview*–esqueleto | Difícil de garantizar fotograma a fotograma | Alineación aceptable para demostración y validación |
 
 ## Conclusión
 
-El **backend FastAPI**, el protocolo **WebSocket** y los contratos de mensajes validados en el proyecto **permanecen sin cambios**; la migración afecta únicamente la **capa de presentación web**. El código Flutter original se conserva en el directorio `app/` como referencia de la iteración **móvil nativa** y de la exploración previa en web; la interfaz web operativa del trabajo de grado se orienta a **`appWeb/`** para mitigar las limitaciones observadas en Flutter Web en el escenario de streaming descrito.
+El **backend FastAPI**, **MediaPipe** en Python y los **contratos** de mensajes **permanecen** como núcleo del sistema; la **migración** incorpora **React** como **cliente web** para superar las **limitaciones técnicas de Flutter Web** en captura/visualización y la **falta de compatibilidad práctica** con un pipeline de **MediaPipe** equivalente al del servidor dentro del stack Dart en navegador. El código Flutter en `app/` se conserva para **móvil** y como registro de la iteración previa en web; la interfaz web operativa del trabajo de grado se orienta a **`appWeb/`**.
 
 # PLAN DE PRUEBAS
 
@@ -776,7 +870,7 @@ _\[Según formato institucional, adjuntar como anexo: arquitectura, escalabilida
 | **SEGURIDAD** — Garantiza autenticidad, confidencialidad e integridad de la información incorporando niveles de acceso que permiten el uso de los datos acorde a los perfiles definidos. | El backend configura **CORS** con lista blanca de orígenes (`allow_origin_regex` para localhost en desarrollo; orígenes explícitos en producción). La comunicación WebSocket se realiza sobre la misma capa de red que la API REST, con soporte para TLS/WSS en despliegue productivo. En la versión actual el sistema no gestiona datos personales sensibles ni autenticación de usuarios (fuera del alcance del presente trabajo de grado; contemplado para versiones futuras). |
 | **USABILIDAD** — El software es fácil de ejecutar, brindando accesibilidad, navegabilidad y comprensión para la operatividad de la herramienta. | La interfaz implementa el **sistema de diseño Bio-Motion**: paleta oscura biomédica con contraste WCAG AA, tipografía DM Sans para etiquetas y DM Mono para valores numéricos (legibilidad en entornos de gimnasio con luz variable), indicadores semánticos de color (verde/amarillo/rojo) para estados biomecánicos legibles de un vistazo. La navegación es lineal y de máximo 2 niveles de profundidad desde la pantalla principal. El indicador de conexión al backend en la barra superior informa permanentemente el estado del servidor. Los errores de conectividad se presentan con guías de resolución expandibles. |
 | **MANTENIBILIDAD** — Fácil de modificar para corregir errores y mejorar el rendimiento. Requiere un patrón de diseño que garantice la modularidad de los componentes. | El código fuente sigue la convención de separación por responsabilidad: `Screen` (estado y lógica de negocio) → `Panel` (orquestación de tabs) → `Widget` (presentación atómica). Los **specs técnicos** bajo `docs/spec/` documentan los contratos de API, decisiones de arquitectura e incidencias resueltas, garantizando trazabilidad para mantenimiento futuro. El backend agrupa REST versionado bajo `/api/v1` (salud, análisis de pose, auth y sesiones) y mantiene WebSockets en `/ws/video`, `/ws/pose-stream`, con servicios (`mediapipe_service`, `huggingface_service`) y módulos de visión (`vision/biomechanics`, `vision/feature_engine`, etc.) en archivos independientes con responsabilidad acotada. |
-| **DOCUMENTACIÓN** — Debe contar con: descripción del negocio (BPMN), historias de usuario, manual de instalación, manual de usuario, diagramas de arquitectura/clases/ER, plan de pruebas funcionales. | ✅ Descripción del negocio: sección 6.1 (proceso de valoración funcional). ✅ Arquitectura: sección 6.6.1 y `docs/arquitectura.md`. ✅ Contratos de API: `docs/spec/websocket-pose-stream.md` y `docs/spec/flutter-client-websocket.md`. ✅ Sistema de diseño UI/UX: `docs/UX-UI/` con tokens, tipografía y patrones por pantalla. ✅ Manual de instalación (borrador): `docs/guias/SETUP.md`. ⏳ Historias de usuario: en construcción (secciones 6.3–6.5). ⏳ Diagrama de clases: pendiente al cierre de módulos. ⏳ Plan de pruebas: pendiente (sección 6.7). ⏳ Manual de usuario: pendiente (sección 6.8). |
+| **DOCUMENTACIÓN** — Debe contar con: descripción del negocio (BPMN), historias de usuario, manual de instalación, manual de usuario, diagramas de arquitectura/clases/ER, plan de pruebas funcionales. | ✅ Descripción del negocio: sección 6.1 (proceso de valoración funcional). ✅ Arquitectura: sección 6.6.1 y `docs/arquitectura.md`. ✅ Contratos de API: `docs/spec/websocket-pose-stream.md` y `docs/spec/flutter-client-websocket.md`. ✅ Sistema de diseño UI/UX: `docs/UX-UI/` con tokens, tipografía y patrones por pantalla. ✅ Manual de instalación (borrador): `docs/guias/SETUP.md`. ✅ Backlog e historia de sprints: sección 6.2 y planificación Sprint 1–6 (detalle narrativo por sprint). ⏳ Diagrama de clases: pendiente al cierre de módulos. ⏳ Plan de pruebas: pendiente (sección 6.7). ⏳ Manual de usuario: pendiente (sección 6.8). |
 
 _\]_
 
@@ -846,6 +940,20 @@ Esta sección se amplía de forma incremental durante el proyecto. Sirve como re
 Las entradas nuevas se añaden **al inicio** de la lista (más reciente arriba), salvo que se indique orden cronológico inverso para un apéndice institucional.
 
 ## Entradas
+
+### 2026-04-04 — Argumento académico: Flutter Web, MediaPipe en cliente y migración a React
+
+- **Ámbito:** docs (Capítulo 6), `appWeb/`, `app/`
+- **Tipo:** decisión arquitectónica / narrativa de tesis
+- **Descripción:** Se amplió § **6.6.4** y el **RESUMEN** para explicitar que la estrategia **cross-platform con Flutter Web** fue **interferida** por limitaciones del compositor (pantallazos negros, desincronización con WebSocket) y por la **falta de paridad** con **MediaPipe Tasks** en el stack Dart/navegador frente al pipeline Python del backend, lo que fundamenta la **migración de la capa web a React** sin mover la inferencia del servidor.
+- **Trazabilidad:** `docs/Formato_trabajo_de_grado.md` (RESUMEN, § 6.6.4, palabras clave)
+
+### 2026-04-04 — Actualización de backlog y sprints (estado real del monorepo)
+
+- **Ámbito:** docs (Capítulo 6)
+- **Tipo:** gobernanza documental / planificación
+- **Descripción:** Se reescribió el **product backlog** (HU-01–HU-12), el **cronograma por fases** con estado (completado / en curso / planificado), y las secciones **Sprint 1–6** alineadas al código: Sprints 1–3 cerrados (fundación, pipeline pose Flutter, análisis por archivo + `appWeb/`); **Sprint 4 en curso** (auth, PostgreSQL, Celery, UX 2D/3D); **Sprints 5–6** IoT y cierre académico. Se ajustaron **definición del alcance**, **actores**, **marco conceptual** (Flutter + React), **propuesta de solución** y tabla de **recursos** (React, PostgreSQL, Redis, Celery).
+- **Trazabilidad:** `docs/Formato_trabajo_de_grado.md` § 6.2–6.3–6.4 y siguientes; carpetas `app/`, `appWeb/`, `backend/`
 
 ### 2026-04-04 — Orden en `docs/` y gobernanza con Cursor
 
