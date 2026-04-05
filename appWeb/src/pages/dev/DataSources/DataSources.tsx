@@ -1,8 +1,8 @@
 import { BmButton } from '../../../components/BmButton';
 import { BmInput, BmSelect } from '../../../components/BmInput';
 import '../devPages.css';
+import { IngestJobCard } from './components/IngestJobCard';
 import { JobDetailPanel } from './components/JobDetailPanel';
-import { StatusPill } from './components/StatusPill';
 import { VideoCard } from './components/VideoCard';
 import { VideoPreviewModal } from './components/VideoPreviewModal';
 import { useDataSources } from './hooks/useDataSources';
@@ -43,6 +43,9 @@ export default function DataSources() {
     handleSelectAll,
     handleIngest,
     toggleJobDetail,
+    videoUsageById,
+    usageLoading,
+    usageError,
   } = useDataSources();
 
   return (
@@ -118,12 +121,14 @@ export default function DataSources() {
           </BmButton>
         </div>
         {searchError ? <p className="bm-caption bm-dev-msg--error">{searchError}</p> : null}
+        {usageError ? <p className="bm-caption bm-dev-msg--error">Historial de uso: {usageError}</p> : null}
 
         {searchResults.length > 0 && (
           <div>
             <div className="bm-dev-results-bar">
               <span className="bm-caption">
                 {searchResults.length} resultados — {selected.size} seleccionados
+                {usageLoading ? ' — comprobando si ya se usaron en ingestas…' : ''}
               </span>
               <BmButton type="button" variant="ghost" onClick={handleSelectAll}>
                 {selected.size === searchResults.length ? 'Deseleccionar todo' : 'Seleccionar todo'}
@@ -136,6 +141,8 @@ export default function DataSources() {
                   video={v}
                   selected={selected.has(i)}
                   segCount={(videoSegments[v.youtube_id] ?? []).length}
+                  priorUsage={videoUsageById[v.youtube_id] ?? null}
+                  usageLoading={usageLoading}
                   onToggle={() => {
                     const n = new Set(selected);
                     if (n.has(i)) n.delete(i);
@@ -161,32 +168,14 @@ export default function DataSources() {
         </div>
         {jobsError ? <p className="bm-caption bm-dev-msg--error">{jobsError}</p> : null}
         {jobs.length === 0 ? <p className="bm-caption">Sin jobs de ingesta aún.</p> : null}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--bm-space-sm)' }}>
+        <div className="bm-dev-ingest-job-list">
           {jobs.map((job) => (
             <div key={job.id} className="bm-dev-job-shell">
-              <BmButton type="button" variant="ghost" className="bm-dev-job-expand" onClick={() => void toggleJobDetail(job.id)}>
-                <div style={{ display: 'flex', gap: 'var(--bm-space-md)', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-                  <div className="bm-body" style={{ margin: 0 }}>
-                    <span className="bm-mono">{job.id.slice(0, 8)}</span>
-                    <span style={{ margin: '0 var(--bm-space-sm)', opacity: 0.5 }}>·</span>
-                    <strong>{job.exercise_label}</strong>
-                    <span style={{ margin: '0 var(--bm-space-sm)', opacity: 0.5 }}>·</span>
-                    <span style={{ color: 'var(--bm-text-secondary)' }}>{job.query}</span>
-                  </div>
-                  <div style={{ display: 'flex', gap: 'var(--bm-space-md)', alignItems: 'center', flexWrap: 'wrap', fontSize: '0.8125rem' }}>
-                    <StatusPill status={job.status} />
-                    {job.samples_inserted != null && (
-                      <span style={{ color: 'var(--bm-accent)' }}>{job.samples_inserted} muestras</span>
-                    )}
-                    {job.videos_processed != null && <span>{job.videos_processed} vídeos</span>}
-                    {job.error_message && (
-                      <span className="bm-caption" style={{ color: 'var(--bm-angle-bad)', maxWidth: 300 }}>
-                        {job.error_message.slice(0, 80)}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </BmButton>
+              <IngestJobCard
+                job={job}
+                expanded={expandedJobId === job.id}
+                onToggle={() => void toggleJobDetail(job.id)}
+              />
               {expandedJobId === job.id && (
                 <div className="bm-dev-job-detail">
                   {expandedDetail ? (

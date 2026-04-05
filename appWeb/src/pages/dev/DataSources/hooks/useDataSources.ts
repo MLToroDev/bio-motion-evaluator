@@ -1,5 +1,11 @@
-import { useState } from 'react';
-import { useDevIngest, type IngestJobDetail, type VideoSearchResult } from '../../../../hooks/useDevIngest';
+import { useCallback, useEffect, useState } from 'react';
+import {
+  fetchIngestVideoUsage,
+  useDevIngest,
+  type IngestJobDetail,
+  type IngestVideoUsage,
+  type VideoSearchResult,
+} from '../../../../hooks/useDevIngest';
 import type { VideoSegment } from '../components/SegmentEditor';
 
 export function useDataSources() {
@@ -29,6 +35,36 @@ export function useDataSources() {
   const [expandedDetail, setExpandedDetail] = useState<IngestJobDetail | null>(null);
   const [videoSegments, setVideoSegments] = useState<Record<string, VideoSegment[]>>({});
   const [previewVideo, setPreviewVideo] = useState<VideoSearchResult | null>(null);
+  const [videoUsageById, setVideoUsageById] = useState<Record<string, IngestVideoUsage>>({});
+  const [usageLoading, setUsageLoading] = useState(false);
+  const [usageError, setUsageError] = useState<string | null>(null);
+
+  const refreshVideoUsageForResults = useCallback(async (results: VideoSearchResult[]) => {
+    const ids = results.map((v) => v.youtube_id).filter(Boolean);
+    if (ids.length === 0) {
+      setVideoUsageById({});
+      return;
+    }
+    setUsageLoading(true);
+    setUsageError(null);
+    try {
+      setVideoUsageById(await fetchIngestVideoUsage(ids));
+    } catch (e) {
+      setUsageError(e instanceof Error ? e.message : String(e));
+      setVideoUsageById({});
+    } finally {
+      setUsageLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (searchResults.length === 0) {
+      setVideoUsageById({});
+      setUsageError(null);
+      return;
+    }
+    void refreshVideoUsageForResults(searchResults);
+  }, [searchResults, refreshVideoUsageForResults]);
 
   const handleSearch = () => {
     const q = searchQ.trim();
@@ -65,9 +101,13 @@ export function useDataSources() {
       only_window_full: onlyWindowFull,
       require_pose_ok: requirePoseOk,
       emit_every: emitEvery,
+      videos,
       video_segments: Object.keys(videoSegmentsPayload).length > 0 ? videoSegmentsPayload : undefined,
     });
-    if (ok) setSelected(new Set());
+    if (ok) {
+      setSelected(new Set());
+      void refreshVideoUsageForResults(searchResults);
+    }
   };
 
   const toggleJobDetail = async (id: string) => {
@@ -115,5 +155,8 @@ export function useDataSources() {
     handleSelectAll,
     handleIngest,
     toggleJobDetail,
+    videoUsageById,
+    usageLoading,
+    usageError,
   };
 }

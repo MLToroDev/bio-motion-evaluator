@@ -1,9 +1,17 @@
+import { useState } from 'react';
 import { BmButton } from '../../../components/BmButton';
 import { BmInput, BmSelect } from '../../../components/BmInput';
 import '../devPages.css';
+import { SamplePreviewModal } from './components/SamplePreviewModal';
 import { useDevDataset } from './hooks/useDevDataset';
 
+function fmtVecPreview(preview: number[] | undefined): string {
+  if (!preview?.length) return '—';
+  return preview.map((x) => Number(x).toFixed(3)).join(', ');
+}
+
 export default function Dataset() {
+  const [previewId, setPreviewId] = useState<string | null>(null);
   const {
     statusFilter,
     labelDraft,
@@ -59,6 +67,7 @@ export default function Dataset() {
         <span>Estado</span>
         <span>Origen</span>
         <span>Conf.</span>
+        <span>Vector (preview)</span>
         <span>Acciones</span>
       </div>
       {items.map((row) => (
@@ -80,7 +89,13 @@ export default function Dataset() {
           <span>{row.review_status}</span>
           <span>{row.label_source}</span>
           <span>{row.confidence_at_collection != null ? row.confidence_at_collection.toFixed(2) : '—'}</span>
+          <span className="bm-mono bm-dev-dataset-vec-preview" title="Primeros componentes; abre Ver para el vector completo">
+            {fmtVecPreview(row.feature_vector_preview)}
+          </span>
           <span style={{ display: 'flex', gap: 'var(--bm-space-xs)', flexWrap: 'wrap' }}>
+            <BmButton variant="outline" type="button" disabled={busy} onClick={() => setPreviewId(row.id)}>
+              Ver
+            </BmButton>
             <BmButton variant="outline" type="button" disabled={busy} onClick={() => void patch(row.id, { review_status: 'approved' })}>
               OK
             </BmButton>
@@ -90,6 +105,7 @@ export default function Dataset() {
           </span>
         </div>
       ))}
+      {previewId ? <SamplePreviewModal sampleId={previewId} onClose={() => setPreviewId(null)} /> : null}
     </div>
   );
 }

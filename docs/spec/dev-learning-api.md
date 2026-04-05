@@ -58,9 +58,10 @@ Todas las rutas bajo prefijo **`/api/v1/dev`**.
 | Método | Ruta | Descripción |
 |--------|------|-------------|
 | `GET` | `/ingest/search` | Query: `q`, `limit`. Búsqueda con yt-dlp (metadatos, sin descarga). |
-| `POST` | `/ingest/jobs` | Encola Celery `ingest_exercise_videos`. |
-| `GET` | `/ingest/jobs` | Lista jobs. |
+| `POST` | `/ingest/jobs` | Encola Celery `ingest_exercise_videos`. Body opcional: **`videos`**, lista de objetos con la misma forma que resultados de `/ingest/search` (`title`, `url`, `youtube_id`, etc.). Si `videos` no está vacía, se guarda en `ingest_jobs.videos_json` y el worker **no** vuelve a lanzar ytsearch, de modo que el lote coincide con la selección en la UI. Si se omite, el worker obtiene el lote con ytsearch como antes. |
+| `GET` | `/ingest/jobs` | Lista jobs. Cada ítem incluye campos derivados de `metrics_json` agregado (`videos_processed`, `videos_failed`, `frames_read`, `features_extracted`, `samples_inserted`, etc.) para la UI. |
 | `GET` | `/ingest/jobs/{id}` | Detalle + `videos_json` / `metrics_json`. |
+| `GET` | `/ingest/video-usage` | Query: **`ids`** = lista de `youtube_id` separados por coma. Recorre los jobs más recientes (hasta `limit_jobs`, por defecto 150) y, para cada id solicitado, devuelve el **último** job en que ese vídeo apareció en `videos_json`, con campos `job_id`, `job_status`, `exercise_label`, `query`, fechas y métricas por vídeo si existen (`frames_read`, `features_extracted`, `samples_inserted`, `video_status`, `title`). Respuesta: `{ "items": { "<youtube_id>": { ... }, ... } }`. Pensado para marcar en la búsqueda si un resultado ya se ingestó. |
 | `GET` | `/ingest/thumb` | Query: **`id`** = ID del vídeo YouTube. Proxy de `https://img.youtube.com/vi/{id}/mqdefault.jpg` con `Referer` adecuado; evita bloqueos del navegador al mostrar previews. Misma autenticación que el resto de `/dev`. La UI obtiene la imagen con `fetch` + cabecera `X-Dev-API-Key` (no con `<img src>` directo si hay clave). |
 
 ## Recolección automática en inferencia

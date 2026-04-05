@@ -941,6 +941,13 @@ Las entradas nuevas se añaden **al inicio** de la lista (más reciente arriba),
 
 ## Entradas
 
+### 2026-04-05 — Trazabilidad de vídeos en ingesta y uso en búsqueda YouTube (dev)
+
+- **Ámbito:** `backend/`, `appWeb/`, `docs/spec/`
+- **Tipo:** cambio funcional / trazabilidad de datos
+- **Descripción:** Cada fila de `metrics_json.per_video` incluye `youtube_id` (incluido en fallos de descarga). Nueva ruta `GET /api/v1/dev/ingest/video-usage?ids=…` para consultar el último job que incluyó cada id y sus métricas por vídeo. En **Dev · Fuentes de datos**, las tarjetas de resultados muestran si el vídeo ya se usó y un resumen numérico; el panel expandido del job lista los vídeos del lote y la tabla «por vídeo» incluye columna YouTube. **`POST /ingest/jobs`** acepta `videos` (lote explícito): el worker deja de repetir ytsearch en Celery para que `videos_json`, el procesamiento y los logs coincidan con la selección en la UI.
+- **Trazabilidad:** `backend/app/api/v1/dev/ingest.py`, `backend/app/workers/ingest_tasks.py`, `appWeb/src/pages/dev/DataSources/`, `appWeb/src/hooks/useDevIngest.ts`, `docs/spec/dev-learning-api.md`
+
 ### 2026-04-04 — Proxy de miniaturas YouTube en API dev (`/ingest/thumb`)
 
 - **Ámbito:** `backend/`, `appWeb/`, `docs/spec/`, `docs/guias/`

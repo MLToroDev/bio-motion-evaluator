@@ -134,6 +134,18 @@ class IngestParams(BaseModel):
     )
 
 
+class IngestVideoItem(BaseModel):
+    """Metadato de un vídeo (misma forma que ``/ingest/search``)."""
+
+    title: str = ""
+    url: str = ""
+    youtube_id: str = ""
+    duration_s: int = 0
+    channel: str = ""
+    thumbnail_url: str = ""
+    view_count: int = 0
+
+
 class IngestJobCreate(BaseModel):
     label: str
     query: str
@@ -141,6 +153,13 @@ class IngestJobCreate(BaseModel):
     max_videos: int = Field(5, ge=1, le=20)
     auto_approve: bool = False
     params: IngestParams = Field(default_factory=IngestParams)
+    videos: list[IngestVideoItem] | None = Field(
+        None,
+        description=(
+            "Si se envía una lista no vacía, el worker usa exactamente estos vídeos y **no** "
+            "vuelve a ejecutar ytsearch (evita desalinear UI vs procesamiento)."
+        ),
+    )
 
 
 @router.post("/ingest/jobs")
@@ -154,13 +173,21 @@ def create_ingest_job(
     if not body.query.strip():
         raise HTTPException(status_code=400, detail="query vacío")
 
+    chosen: list[dict[str, Any]] | None = None
+    max_v = int(body.max_videos)
+    if body.videos and len(body.videos) > 0:
+        cap = min(20, len(body.videos))
+        chosen = [body.videos[i].model_dump() for i in range(cap)]
+        max_v = len(chosen)
+
     job = IngestJobORM(
         status="pending",
         exercise_label=label,
         source_type=body.source_type[:32],
         query=body.query.strip(),
-        max_videos=int(body.max_videos),
+        max_videos=max_v,
         auto_approve=bool(body.auto_approve),
+        videos_json=chosen,
         params_json=body.params.model_dump(),
     )
     db.add(job)
@@ -206,12 +233,85 @@ def list_ingest_jobs(
                 "samples_inserted": m.get("samples_inserted"),
                 "features_extracted": m.get("features_extracted"),
                 "videos_failed": m.get("videos_failed"),
+                "frames_read": m.get("frames_read"),
                 "created_at": r.created_at.isoformat() if r.created_at else None,
                 "completed_at": r.completed_at.isoformat() if r.completed_at else None,
                 "error_message": r.error_message,
             }
         )
     return {"total": total, "items": items, "skip": skip, "limit": limit}
+
+
+@router.get("/ingest/video-usage")
+def get_ingest_video_usage(
+    ids: str = Query("", description="IDs de YouTube separados por coma"),
+    db: Session = Depends(get_dev_db),
+    limit_jobs: int = Query(150, ge=1, le=500),
+) -> dict[str, Any]:
+    """
+    Para cada ``youtube_id`` solicitado, devuelve el **último** job de ingesta (más reciente por ``created_at``)
+    en el que ese vídeo apareció en ``videos_json``, con métricas por vídeo si existen en ``metrics_json.per_video``.
+    """
+    want_set = {x.strip() for x in ids.split(",") if x.strip()}
+    if not want_set:
+        return {"items": {}}
+
+    rows = (
+        db.query(IngestJobORM)
+        .order_by(IngestJobORM.created_at.desc())
+        .limit(limit_jobs)
+        .all()
+    )
+    out: dict[str, dict[str, Any]] = {}
+
+    for r in rows:
+        if len(out) >= len(want_set):
+            break
+        pending = want_set - set(out.keys())
+        if not pending:
+            break
+
+        m = r.metrics_json or {}
+        per_raw = m.get("per_video")
+        per: list[Any] = per_raw if isinstance(per_raw, list) else []
+        vj_raw = r.videos_json
+        vj: list[Any] = vj_raw if isinstance(vj_raw, list) else []
+
+        by_id: dict[str, dict[str, Any]] = {}
+        for pv in per:
+            if not isinstance(pv, dict):
+                continue
+            y = str(pv.get("youtube_id") or "")
+            if y:
+                by_id[y] = pv
+        for i, vid in enumerate(vj):
+            if not isinstance(vid, dict):
+                continue
+            y = str(vid.get("youtube_id") or "")
+            if y and y not in by_id and i < len(per) and isinstance(per[i], dict):
+                by_id[y] = per[i]  # type: ignore[assignment]
+
+        for yid in pending:
+            pv = by_id.get(yid)
+            in_batch = any(isinstance(v, dict) and str(v.get("youtube_id") or "") == yid for v in vj)
+            if pv is None and not in_batch:
+                continue
+            row = pv if isinstance(pv, dict) else {}
+            out[yid] = {
+                "job_id": str(r.id),
+                "job_status": r.status,
+                "exercise_label": r.exercise_label,
+                "query": r.query,
+                "completed_at": r.completed_at.isoformat() if r.completed_at else None,
+                "created_at": r.created_at.isoformat() if r.created_at else None,
+                "frames_read": row.get("frames_read"),
+                "features_extracted": row.get("features_extracted"),
+                "samples_inserted": row.get("samples_inserted"),
+                "video_status": row.get("status"),
+                "title": row.get("title"),
+            }
+
+    return {"items": out}
 
 
 @router.get("/ingest/jobs/{job_id}")

@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import logging
-import sys
 import tempfile
 import uuid
 from datetime import datetime, timezone
@@ -19,12 +18,6 @@ from app.workers.celery_app import celery_app
 log = logging.getLogger(__name__)
 
 _BACKEND_ROOT = backend_root()
-
-# ``from scripts.export_features_from_video`` exige que la raíz del backend esté en
-# sys.path (no el directorio ``scripts/`` solo; eso rompe el paquete ``scripts``).
-_br = str(_BACKEND_ROOT.resolve())
-if _br not in sys.path:
-    sys.path.insert(0, _br)
 
 
 def _search_youtube(query: str, max_results: int) -> list[dict[str, Any]]:
@@ -92,7 +85,15 @@ def _extract_and_insert(
     segments: list[dict[str, Any]] | None = None,
 ) -> dict[str, int]:
     """Extrae features y las inserta en feature_samples. Devuelve métricas."""
-    from scripts.export_features_from_video import extract_features_from_file  # type: ignore[import]
+    import importlib.util as _ilu
+
+    _script_path = _BACKEND_ROOT / "scripts" / "export_features_from_video.py"
+    _spec = _ilu.spec_from_file_location("export_features_from_video", _script_path)
+    if _spec is None or _spec.loader is None:
+        raise ImportError(f"No se pudo cargar el script de extracción desde {_script_path}")
+    _mod = _ilu.module_from_spec(_spec)
+    _spec.loader.exec_module(_mod)  # type: ignore[union-attr]
+    extract_features_from_file = _mod.extract_features_from_file
 
     model_path = settings.resolve_model_path(_BACKEND_ROOT)
     cfg = settings.exercise_classifier_config()
@@ -180,18 +181,22 @@ def ingest_exercise_videos(self, job_id_str: str) -> dict[str, Any]:
         label = (job.exercise_label or "").strip().lower()
         max_videos = max(1, int(job.max_videos or 5))
 
-        # Búsqueda de vídeos
-        try:
-            video_list = _search_youtube(job.query, max_videos)
-        except Exception as e:
-            job.status = "failed"
-            job.error_message = f"Búsqueda YouTube falló: {e}"
-            job.completed_at = datetime.now(timezone.utc)
-            db.commit()
-            return {"status": "failed", "error": str(e)}
+        # Lote: ya fijado en el POST (vídeos elegidos en la UI) o nueva búsqueda con ytsearch.
+        pre = job.videos_json
+        if isinstance(pre, list) and len(pre) > 0:
+            video_list = pre
+        else:
+            try:
+                video_list = _search_youtube(job.query, max_videos)
+            except Exception as e:
+                job.status = "failed"
+                job.error_message = f"Búsqueda YouTube falló: {e}"
+                job.completed_at = datetime.now(timezone.utc)
+                db.commit()
+                return {"status": "failed", "error": str(e)}
 
-        job.videos_json = video_list
-        db.commit()
+            job.videos_json = video_list
+            db.commit()
 
         metrics: dict[str, Any] = {
             "frames_read": 0,
@@ -210,15 +215,30 @@ def ingest_exercise_videos(self, job_id_str: str) -> dict[str, Any]:
                     continue
 
                 log.info("Ingestando: %s", vid_title)
+                vid_id = str(video_info.get("youtube_id") or "")
+                if not vid_url:
+                    log.warning("Sin URL para vídeo (id=%s): %s", vid_id, vid_title)
+                    metrics["videos_failed"] += 1
+                    metrics["per_video"].append(
+                        {
+                            "youtube_id": vid_id,
+                            "title": vid_title,
+                            "url": "",
+                            "status": "missing_url",
+                        },
+                    )
+                    continue
+
                 filepath = _download_video_temp(vid_url, tmpdir)
                 if not filepath or not Path(filepath).is_file():
                     log.warning("Descarga fallida: %s", vid_url)
                     metrics["videos_failed"] += 1
-                    metrics["per_video"].append({"title": vid_title, "status": "download_failed"})
+                    metrics["per_video"].append(
+                        {"youtube_id": vid_id, "title": vid_title, "url": vid_url, "status": "download_failed"},
+                    )
                     continue
 
                 # Segmentos específicos para este vídeo (si los hay)
-                vid_id = str(video_info.get("youtube_id") or "")
                 vid_segs: list[dict[str, Any]] | None = video_segments.get(vid_id) or None
 
                 vid_metrics = _extract_and_insert(
@@ -235,6 +255,7 @@ def ingest_exercise_videos(self, job_id_str: str) -> dict[str, Any]:
                 )
                 vid_metrics["title"] = vid_title
                 vid_metrics["url"] = vid_url
+                vid_metrics["youtube_id"] = vid_id
                 vid_metrics["status"] = "ok"
                 metrics["per_video"].append(vid_metrics)
                 metrics["frames_read"] += vid_metrics["frames_read"]

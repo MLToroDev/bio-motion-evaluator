@@ -12,6 +12,8 @@ export type SampleRow = {
   split: string;
   notes: string | null;
   recorded_at: string | null;
+  /** Primeros componentes del vector (listado compacto en tabla). */
+  feature_vector_preview?: number[];
 };
 
 export function useDevDataset() {

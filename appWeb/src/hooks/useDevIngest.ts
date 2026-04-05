@@ -23,6 +23,8 @@ export type IngestJobItem = {
   samples_inserted: number | null;
   features_extracted: number | null;
   videos_failed: number | null;
+  /** Fotogramas leídos acumulados (metrics_json del job). */
+  frames_read?: number | null;
   created_at: string | null;
   completed_at: string | null;
   error_message: string | null;
@@ -40,6 +42,30 @@ export type IngestJobDetail = IngestJobItem & {
     per_video?: Array<Record<string, unknown>>;
   } | null;
 };
+
+/** Último job de ingesta que incluyó este ``youtube_id`` (véase ``GET /ingest/video-usage``). */
+export type IngestVideoUsage = {
+  job_id: string;
+  job_status: string;
+  exercise_label: string;
+  query: string;
+  completed_at: string | null;
+  created_at: string | null;
+  frames_read?: number | null;
+  features_extracted?: number | null;
+  samples_inserted?: number | null;
+  video_status?: string | null;
+  title?: string | null;
+};
+
+export async function fetchIngestVideoUsage(ids: string[]): Promise<Record<string, IngestVideoUsage>> {
+  const clean = [...new Set(ids.map((x) => x.trim()).filter(Boolean))];
+  if (clean.length === 0) return {};
+  const res = await devApiFetch(`/ingest/video-usage?ids=${encodeURIComponent(clean.join(','))}`);
+  if (!res.ok) throw new Error(await res.text());
+  const data = (await res.json()) as { items?: Record<string, IngestVideoUsage> };
+  return data.items ?? {};
+}
 
 export function useDevIngest() {
   const [searching, setSearching] = useState(false);
@@ -87,6 +113,8 @@ export function useDevIngest() {
       only_window_full: boolean;
       require_pose_ok: boolean;
       emit_every: number;
+      /** Si se envía, el backend procesa exactamente esta lista (no repite ytsearch en Celery). */
+      videos?: VideoSearchResult[];
       video_segments?: Record<string, { start_sec: number; end_sec: number }[]>;
     }) => {
       setCreating(true);
@@ -100,6 +128,7 @@ export function useDevIngest() {
             source_type: 'youtube_search',
             max_videos: params.max_videos,
             auto_approve: params.auto_approve,
+            ...(params.videos && params.videos.length > 0 ? { videos: params.videos } : {}),
             params: {
               only_window_full: params.only_window_full,
               require_pose_ok: params.require_pose_ok,
