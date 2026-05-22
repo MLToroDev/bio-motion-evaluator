@@ -4,13 +4,13 @@ Mateo Londoño Toro
 
 **DIRECTOR:**
 
-**NOMBRE DEL DIRECTOR DEL TRABAJO DE GRADO**
+Director asignado por facultad (pendiente actualización institucional)
 
 **CODIRECTOR:**
 
-**NOMBRE DEL CODIRECTOR DEL TRABAJO DE GRADO**
+Codirector asignado por facultad (pendiente actualización institucional)
 
-![](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZgAAABpCAIAAACI4KIKAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAZdEVYdFNvZnR3YXJlAEFkb2JlIEltYWdlUmVhZHlxyWU8AAADZmlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS4zLWMwMTEgNjYuMTQ1NjYxLCAyMDEyLzAyLzA2LTE0OjU2OjI3ICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtbG5zOnhtcD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wLyIgeG1wTU06T3JpZ2luYWxEb2N1bWVudElEPSJ4bXAuZGlkOjY5Njg5MjMzNzIwNkU3MTFCRkUwRTYxMUYzRjI0RTMwIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjNCQzY0M0RBMDY3MjExRTdBMEVCQUJCODRDNUU3MzkzIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjNCQzY0M0Q5MDY3MjExRTdBMEVCQUJCODRDNUU3MzkzIiB4bXA6Q3JlYXRvclRvb2w9IkFkb2JlIFBob3Rvc2hvcCBDUzYgKFdpbmRvd3MpIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6NkE2ODkyMzM3MjA2RTcxMUJGRTBFNjExRjNGMjRFMzAiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6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)
+
 
 Tecnológico de Antioquia - Institución Universitaria
 
@@ -18,7 +18,7 @@ Ingeniería en Software
 
 Medellín, Colombia.
 
-AÑO
+2026
 
 # DEDICATORIA
 
@@ -56,9 +56,9 @@ Visión artificial, estimación de pose, MediaPipe BlazePose, movilidad articula
 
 [ABREVIATURAS 10](#_Toc174698959)
 
-[1\. INTRODUCCIÓN 11](#_Toc174698960)
+[1 INTRODUCCIÓN 11](#_Toc174698960)
 
-[2\. MARCO DEL PROYECTO 12](#_Toc174698961)
+[2 MARCO DEL PROYECTO 12](#_Toc174698961)
 
 [2.1. DEFINICIÓN DEL PROBLEMA 12](#_Toc174698962)
 
@@ -66,13 +66,13 @@ Visión artificial, estimación de pose, MediaPipe BlazePose, movilidad articula
 
 [2.3. ANTECEDENTES 12](#_Toc174698964)
 
-[3\. OBJETIVOS 13](#_Toc174698965)
+[3 OBJETIVOS 13](#_Toc174698965)
 
 [3.1. OBJETIVO GENERAL 13](#_Toc174698966)
 
 [3.2. OBJETIVOS ESPECÍFICOS 13](#_Toc174698967)
 
-[4\. MARCO METODOLÓGICO 14](#_Toc174698968)
+[4 MARCO METODOLÓGICO 14](#_Toc174698968)
 
 [4.1. DEFINICIÓN DE LA METODOLOGÍA 14](#_Toc174698969)
 
@@ -82,9 +82,9 @@ Visión artificial, estimación de pose, MediaPipe BlazePose, movilidad articula
 
 [4.4. CRONOGRAMA DE ACTIVIDADES 14](#_Toc174698972)
 
-[5\. MARCO CONCEPTUAL 15](#_Toc174698973)
+[5 MARCO CONCEPTUAL 15](#_Toc174698973)
 
-[6\. DESARROLLO DEL PROYECTO 16](#_Toc174698974)
+[6 DESARROLLO DEL PROYECTO 16](#_Toc174698974)
 
 [6.1. CONTEXTO DEL SOFTWARE 16](#_Toc174698975)
 
@@ -94,65 +94,67 @@ Visión artificial, estimación de pose, MediaPipe BlazePose, movilidad articula
 
 [6.1.3. Actores y sus Roles 16](#_Toc174698978)
 
-[6.2. PROPUESTA DE SOLUCIÓN 16](#_Toc174698979)
+[6.2. Propuesta de solución 16](#_Toc174698979)
 
 [6.2.1. Product backlog 16](#_Toc174698980)
 
-[6.3. PLANIFICACIÓN DEL SPRINT 1 18](#_Toc174698981)
+[6.3. Planificación del sprint 1 18](#_Toc174698981)
 
-[6.3.1. Historias de usuario 18](#_Toc174698982)
+[6.3.1. Historias de usuario y backlog técnico 18](#_Toc174698982)
 
-[6.3.2. Revisión 18](#_Toc174698983)
+[6.3.2. Revisión del sprint 18](#_Toc174698983)
 
-[6.3.3. Tareas asociadas y ejecutadas. 18](#_Toc174698984)
+[6.3.3. Tareas asociadas y ejecutadas 18](#_Toc174698984)
 
-[6.4. PLANIFICACIÓN DEL SPRINT 2 19](#_Toc174698985)
+[6.4. Planificación del sprint 2 19](#_Toc174698985)
 
-[6.4.1. Historias de usuario 19](#_Toc174698986)
+[6.4.1. Historia de usuario HU-03 19](#_Toc174698986)
 
-[6.4.2. Revisión 19](#_Toc174698987)
+[6.4.2. Revisión del sprint 19](#_Toc174698987)
 
-[6.4.3. Tareas asociadas y ejecutadas. 19](#_Toc174698988)
+[6.4.3. Tareas asociadas y ejecutadas 19](#_Toc174698988)
 
-[6.5. PLANIFICACIÓN DEL SPRINT N 19](#_Toc174698989)
+[6.5. Planificación del sprint 3 19](#_Toc174698989)
 
 [6.5.1. Historias de usuario 19](#_Toc174698990)
 
-[6.5.2. Revisión 19](#_Toc174698991)
+[6.5.2. Revisión del sprint 19](#_Toc174698991)
 
-[6.5.3. Tareas asociadas y ejecutadas. 19](#_Toc174698992)
+[6.5.3. Tareas asociadas y ejecutadas 19](#_Toc174698992)
 
-[6.6. DISEÑO DEL SISTEMA 19](#_Toc174698993)
+[6.6. Planificación de los sprints 4 a 6 19](#_Toc174698993)
 
-[6.6.1. Especificación de la arquitectura. 19](#_Toc174698994)
+[6.7. Diseño del sistema 19](#_Toc174698994)
 
-[6.6.2. Diagrama de clases. 19](#_Toc174698995)
+[6.7.1. Especificación de la arquitectura 19](#_Toc174698995)
 
-[6.6.3. Diagrama entidad relación. 19](#_Toc174698996)
+[6.7.2. Diagrama de clases 19](#_Toc174698996)
 
-[6.6.4. Evaluación del Frontend Flutter Web y Migración a React 19](#_TocFlutterReact)
+[6.7.3. Diagrama entidad-relación 19](#_Toc174698997)
 
-[6.7. PLAN DE PRUEBAS 19](#_Toc174698997)
+[6.7.4. Evaluación del frontend Flutter Web y migración a React 19](#_TocFlutterReact)
 
-[6.7.1. Plan de pruebas funcionales 19](#_Toc174698998)
+[6.8. Plan de pruebas 19](#_Toc174698998)
 
-[6.7.2. Pruebas de usabilidad 19](#_Toc174698999)
+[6.8.1. Plan de pruebas funcionales 19](#_Toc174698999)
 
-[6.8. DESPLIEGUE DEL SISTEMA 19](#_Toc174699000)
+[6.8.2. Pruebas de usabilidad 19](#_Toc174700000)
 
-[6.8.1. Manual de Usuario 20](#_Toc174699001)
+[6.9. Despliegue del sistema 19](#_Toc174699000)
 
-[6.8.2. Manual de Instalación 20](#_Toc174699002)
+[6.9.1. Manual de usuario 20](#_Toc174699001)
 
-[6.8.3. Resumen técnico del software 20](#_Toc174699003)
+[6.9.2. Manual de instalación 20](#_Toc174699002)
 
-[7\. RESULTADOS Y DISCUSIÓN 22](#_Toc174699004)
+[6.9.3. Resumen técnico del software 20](#_Toc174699003)
 
-[8\. IMPACTO ESPERADO 23](#_Toc174699005)
+[7 RESULTADOS Y DISCUSIÓN 22](#_Toc174699004)
 
-[9\. CONCLUSIONES 24](#_Toc174699006)
+[8 IMPACTO ESPERADO 23](#_Toc174699005)
 
-[10\. RECOMENDACIONES FUTURAS 25](#_Toc174699007)
+[9 CONCLUSIONES 24](#_Toc174699006)
+
+[10 RECOMENDACIONES FUTURAS 25](#_Toc174699007)
 
 [REFERENCIAS 26](#_Toc174699008)
 
@@ -162,9 +164,33 @@ Visión artificial, estimación de pose, MediaPipe BlazePose, movilidad articula
 
 # ÍNDICE DE TABLAS
 
+**Tabla 1.** Product backlog institucional (historias de usuario HU-01–HU-07, estimación y ejecución). Ver § *Product backlog*.
+
+**Tabla 2.** Backlog técnico (ítems BH-01–BH-02, sin formato de historia de usuario). Ver § *Product backlog*.
+
 # ABREVIATURAS
 
-_\[Una abreviatura es una convención ortográfica que acorta la escritura de cierto término o expresión. Ejemplo: UML: Unified Modeling Language\]_
+
+| Abreviatura | Significado                           |
+| ----------- | ------------------------------------- |
+| API         | Application Programming Interface     |
+| ASGI        | Asynchronous Server Gateway Interface |
+| BPMN        | Business Process Model and Notation   |
+| CORS        | Cross-Origin Resource Sharing         |
+| ER          | Entidad-Relación                      |
+| FMS         | Functional Movement Screen            |
+| FPS         | Frames Per Second                     |
+| HU          | Historia de usuario                   |
+| IoT         | Internet of Things                    |
+| JSON        | JavaScript Object Notation            |
+| JWT         | JSON Web Token                        |
+| ONNX        | Open Neural Network Exchange          |
+| ORM         | Object Relational Mapping             |
+| REST        | Representational State Transfer       |
+| ROM         | Range of Motion                       |
+| UI/UX       | User Interface / User Experience      |
+| WS          | WebSocket                             |
+
 
 # INTRODUCCIÓN
 
@@ -201,15 +227,15 @@ Desde la perspectiva de la Ingeniería de Software, el problema radica en la aus
 
 La realización de este proyecto se justifica desde tres dimensiones fundamentales:
 
-1\. Relevancia Social y en Salud:
+1 Relevancia Social y en Salud:
 
 La prevención de lesiones es un tema de salud pública en el ámbito deportivo. Al democratizar el acceso a valoraciones biomecánicas a través de un smartphone, se empodera al usuario para que conozca sus limitaciones antes de cargar peso, reduciendo el riesgo de lesiones crónicas y mejorando la longevidad en la práctica física.
 
-2\. Innovación Tecnológica (Ingeniería de Software):
+2 Innovación Tecnológica (Ingeniería de Software):
 
 Este proyecto aplica el estado del arte en Inteligencia Artificial, específicamente en la estimación de pose (Pose Estimation). El uso de librerías como MediaPipe o OpenCV para el cálculo de ángulos articulares representa un reto técnico en términos de optimización de algoritmos, procesamiento en tiempo real y precisión de datos. Además, la integración de estos modelos de IA bajo la norma ISO/IEC 25010 garantiza un producto de software con altos estándares de calidad, mantenibilidad y usabilidad.
 
-3\. Impacto en la Productividad y el Rendimiento:
+3 Impacto en la Productividad y el Rendimiento:
 
 Para el sector fitness, esta herramienta permite optimizar el tiempo de entrenamiento. En lugar de realizar rutinas de movilidad de 20 minutos "a ciegas", el software permite una "activación dirigida" basada en las necesidades reales del día. Esto aporta un valor agregado diferenciador: la hiper-personalización basada en evidencia biométrica.
 
@@ -221,14 +247,14 @@ Para el desarrollo de esta propuesta, se han analizado referentes en tres nivele
 
 **2.3.1. Referentes Internacionales y Tecnológicos**
 
-El marco de referencia para la evaluación funcional es el sistema FMS (Functional Movement Screen) propuesto por Cook et al. (2006), el cual establece los protocolos de movimiento que este software busca automatizar. En la dimensión tecnológica, el hito más relevante es el desarrollo de MediaPipe BlazePose (Google, 2020), una arquitectura de red neuronal capaz de detectar 33 puntos clave del cuerpo humano en tiempo real, superando las limitaciones de modelos previos que solo detectaban puntos gruesos, permitiendo ahora una goniometría digital precisa en dispositivos móviles.
+El marco de referencia para la evaluación funcional es el sistema FMS (Functional Movement Screen) propuesto por Cook et al. (2006), el cual establece los protocolos de movimiento que este software busca automatizar. En la dimensión tecnológica, el hito más relevante es el desarrollo de MediaPipe BlazePose (Google, 2020), una arquitectura de red neuronal capaz de detectar 33 puntos clave del cuerpo humano en tiempo real, superando las limitaciones de modelos previos que solo detectaban puntos gruesos, permitiendo ahora una goniometría digital precisa en dispositivos móviles. Estudios recientes comparan estimación de ángulos articulares por visión (p. ej. sensores de profundidad o bibliotecas de pose) frente al goniómetro manual, reportando correlaciones altas y acuerdo tipo Bland–Altman en varias articulaciones (Örücü et al., 2025; Sabo et al., 2023, con MediaPipe entre las bibliotecas evaluadas), lo que fundamenta la **HU-06** de validación metrológica de este proyecto.
 
 **2.3.2. Antecedentes Nacionales y Regionales (Colombia y Medellín)**
 
 En el contexto colombiano, se identifican esfuerzos significativos por objetivizar el análisis del movimiento:
 
 - Perspectiva Académica**:** Un antecedente crítico es el trabajo de Salazar**,** Castrillón y Prieto (2008), presentado en el III Congreso Colombiano de Computación en Medellín. Su investigación sobre una herramienta de asistencia para el diagnóstico de movilidad articular en 3D sentó las bases locales para el uso de visión artificial como alternativa a los costosos sistemas de sensores físicos. Este estudio es pionero al argumentar que la visión por computador es la vía más viable para democratizar la evaluación biomecánica en el país.
-- Perspectiva Empresarial**:** En el ámbito industrial, la empresa Biomec Limitada (con presencia activa en Medellín) representa el estado del arte en Colombia. Su sistema BioFree utiliza inteligencia artificial y redes neuronales para la captura de movimiento sin marcadores (_markerless_). La existencia de este producto comercial valida la demanda del mercado local por soluciones que eliminen la fricción de los sensores físicos, aunque su enfoque actual es primordialmente clínico y de alto costo.
+- Perspectiva Empresarial**:** En el ámbito industrial, la empresa Biomec Limitada (con presencia activa en Medellín) representa el estado del arte en Colombia. Su sistema BioFree utiliza inteligencia artificial y redes neuronales para la captura de movimiento sin marcadores (*markerless*). La existencia de este producto comercial valida la demanda del mercado local por soluciones que eliminen la fricción de los sensores físicos, aunque su enfoque actual es primordialmente clínico y de alto costo.
 - Capacidad Investigativa Local**:** Medellín cuenta con una robusta capacidad técnica instalada. Instituciones como el ITM, a través de su Laboratorio de Visión Artificial y Fotónica, y la Universidad EAFIT, con su Grupo de Bioingeniería (GIB), han desarrollado modelos matemáticos y de procesamiento de imágenes para entender la biomecánica humana. Estos grupos confirman que el ecosistema de I+D de la ciudad posee el conocimiento necesario para soportar desarrollos de computación visual aplicada a la salud.
 
 **2.3.3. Contexto Institucional (Tecnológico de Antioquia)**
@@ -260,12 +286,14 @@ El proyecto adopta la metodología ágil **Scrum** como marco de trabajo, dado q
 **Lugar de investigación:** El desarrollo se realiza en el entorno académico del Tecnológico de Antioquia – Institución Universitaria, Facultad de Ingeniería, con validaciones en contextos de entrenamiento físico real.
 
 **Enfoque:** Aplicado-tecnológico, con componentes de investigación en biomecánica computacional e ingeniería de software. El proyecto combina:
+
 - Investigación bibliográfica sobre protocolos de evaluación funcional (FMS, goniometría) y state-of-the-art en estimación de pose.
 - Desarrollo iterativo de software mediante sprints Scrum.
 - Validación técnica de la precisión del sistema comparada con métodos de referencia.
 
 **Herramientas metodológicas:**
-- **Gestión del backlog y sprints:** Historias de usuario con criterios de aceptación, estimadas en puntos de historia.
+
+- **Gestión del backlog y sprints:** **Historias de usuario (HU)** —funcionalidades con valor para el usuario final— con criterios de aceptación **binarios** (pasa / no pasa), flujos alternativos y manejo de errores; más **ítems de backlog técnico (BH)** para tareas de ingeniería (monorepo, pruebas de regresión) que **no** se redactan como HU. Registro de **estimación en horas** y **fechas de ejecución** según la plantilla institucional del product backlog (Tabla 1).
 - **Control de versiones:** Git con repositorio en GitHub (monorepo con carpetas `app/`, `backend/`, `iot/`, `docs/`, `tests/`).
 - **Documentación continua:** Especificaciones técnicas en `docs/spec/` (contratos de API, decisiones, incidencias); guías operativas en `docs/guias/`; planificación en `docs/planificacion/`; bitácora de decisiones en este documento (**BITÁCORA DE DESARROLLO Y DECISIONES**). Todo ello en paralelo al código para trazabilidad con el Capítulo 6.
 - **Pruebas:** Vídeos de referencia (*gold standard*) almacenados en `tests/assets/videos/`, usados para validación reproducible del pipeline de análisis.
@@ -275,6 +303,7 @@ El proyecto adopta la metodología ágil **Scrum** como marco de trabajo, dado q
 El sistema **Bio-Motion Evaluator** abarca, dentro del presente trabajo de grado, las siguientes funcionalidades:
 
 **Dentro del alcance:**
+
 - **Clientes de presentación:** aplicación **Flutter** (`app/`) para **Android**, **iOS** y exploración web; aplicación **React 19 + Vite + TypeScript** (`appWeb/`) como **cliente web principal** para análisis en vivo y por archivo (mitigación de limitaciones de Flutter Web con vista previa JPEG de alta frecuencia, documentada en el Capítulo 6).
 - Módulo de **análisis en vivo** desde la cámara del navegador o del dispositivo: envío de fotogramas al backend, estimación de pose con **MediaPipe BlazePose** y visualización de ángulos y esqueleto sobre la imagen.
 - Módulo de **análisis de video pregrabado** (*gold standard*): listado de videos en servidor, reproducción/análisis por fotograma, resumen de sesión, registro de frames y herramientas de inspección (incl. vistas **2D/3D** del esqueleto en el cliente web).
@@ -290,6 +319,7 @@ El sistema **Bio-Motion Evaluator** abarca, dentro del presente trabajo de grado
 - **Motor de visión avanzado (en evolución):** capas para extracción de características, clasificador de ejercicio (Hugging Face / ONNX según configuración), seguimiento de repeticiones — habilitación progresiva según flags y planes en `docs/planificacion/bio_motion_plan_v2.md`.
 
 **Fuera del alcance (versión actual del trabajo de grado):**
+
 - Evaluación automática de articulaciones más allá del enfoque rodilla/sentadilla en producción (otras articulaciones y batería FMS completa quedan como **extensión** o trabajo futuro).
 - **Motor de prescripción** automática de rutinas correctivas (recomendaciones clínicas cerradas).
 - **Despliegue productivo** en nube con hardening de seguridad y escalado (el alcance académico privilegia demostración, reproducibilidad y validación técnica).
@@ -298,39 +328,45 @@ El sistema **Bio-Motion Evaluator** abarca, dentro del presente trabajo de grado
 
 **Recursos Humanos:**
 
-| Rol | Nombre | Dedicación |
-|-----|--------|-----------|
+
+| Rol                                    | Nombre             | Dedicación                         |
+| -------------------------------------- | ------------------ | ---------------------------------- |
 | Desarrollador principal / Investigador | Mateo Londoño Toro | Tiempo completo (trabajo de grado) |
-| Director de trabajo de grado | Por definir | Asesoría periódica |
+| Director de trabajo de grado           | Por definir        | Asesoría periódica                 |
+
 
 **Recursos Tecnológicos (Hardware):**
 
-| Recurso | Especificación | Uso |
-|---------|---------------|-----|
-| Computador de desarrollo | Windows 10, CPU moderno, GPU opcional | Backend, frontend, pruebas |
-| Dispositivo Android | Android 10+, cámara trasera ≥ 8 MP | Pruebas de la app móvil |
-| ESP32-CAM | Módulo con OV2640, WiFi 802.11b/g/n | Fuente de video IoT (opcional) |
-| Raspberry Pi Zero 2W | ARM Cortex-A53, cámara Pi | Fuente de video IoT alternativa (opcional) |
+
+| Recurso                  | Especificación                        | Uso                                        |
+| ------------------------ | ------------------------------------- | ------------------------------------------ |
+| Computador de desarrollo | Windows 10, CPU moderno, GPU opcional | Backend, frontend, pruebas                 |
+| Dispositivo Android      | Android 10+, cámara trasera ≥ 8 MP    | Pruebas de la app móvil                    |
+| ESP32-CAM                | Módulo con OV2640, WiFi 802.11b/g/n   | Fuente de video IoT (opcional)             |
+| Raspberry Pi Zero 2W     | ARM Cortex-A53, cámara Pi             | Fuente de video IoT alternativa (opcional) |
+
 
 **Recursos Tecnológicos (Software):**
 
-| Tecnología | Versión | Rol |
-|-----------|---------|-----|
-| Flutter SDK | Stable (3.x) | Framework frontend multiplataforma |
-| Dart | 3.x | Lenguaje del frontend |
-| Python | 3.11 | Lenguaje del backend |
-| FastAPI | 0.11x | Framework del servidor REST/WebSocket |
-| MediaPipe | 0.10.x | Librería de estimación de pose |
-| OpenCV (cv2) | 4.x | Procesamiento de video |
-| Uvicorn | 0.x | Servidor ASGI para FastAPI |
-| Git / GitHub | — | Control de versiones y colaboración |
-| pytest | 7.x+ | Pruebas automatizadas del backend |
-| React | 19.x | Cliente web (`appWeb/`) |
-| TypeScript / Vite | 5.x / 6.x | Tooling del cliente web |
-| PostgreSQL | 15+ (recomendado) | Persistencia de sesiones y métricas |
-| SQLAlchemy / Alembic | 2.x | ORM y migraciones |
-| Redis | 7.x | Broker y backend de resultados Celery |
-| Celery | 5.x | Tareas asíncronas (descarga de video) |
+
+| Tecnología           | Versión           | Rol                                   |
+| -------------------- | ----------------- | ------------------------------------- |
+| Flutter SDK          | Stable (3.x)      | Framework frontend multiplataforma    |
+| Dart                 | 3.x               | Lenguaje del frontend                 |
+| Python               | 3.11              | Lenguaje del backend                  |
+| FastAPI              | 0.11x             | Framework del servidor REST/WebSocket |
+| MediaPipe            | 0.10.x            | Librería de estimación de pose        |
+| OpenCV (cv2)         | 4.x               | Procesamiento de video                |
+| Uvicorn              | 0.x               | Servidor ASGI para FastAPI            |
+| Git / GitHub         | —                 | Control de versiones y colaboración   |
+| pytest               | 7.x+              | Pruebas automatizadas del backend     |
+| React                | 19.x              | Cliente web (`appWeb/`)               |
+| TypeScript / Vite    | 5.x / 6.x         | Tooling del cliente web               |
+| PostgreSQL           | 15+ (recomendado) | Persistencia de sesiones y métricas   |
+| SQLAlchemy / Alembic | 2.x               | ORM y migraciones                     |
+| Redis                | 7.x               | Broker y backend de resultados Celery |
+| Celery               | 5.x               | Tareas asíncronas (descarga de video) |
+
 
 **Recursos Bibliográficos:** Acceso a bases de datos académicas (Google Scholar, IEEE Xplore, ScienceDirect), repositorio institucional del Tecnológico de Antioquia, documentación oficial de MediaPipe, Flutter y FastAPI.
 
@@ -338,15 +374,17 @@ El sistema **Bio-Motion Evaluator** abarca, dentro del presente trabajo de grado
 
 La siguiente tabla relaciona **fases**, **sprints** y **estado** respecto al desarrollo del repositorio a la fecha de actualización de este documento (abril de 2026). Las fechas de inicio/cierre por sprint pueden completarse con el calendario académico oficial.
 
-| Fase | Actividades principales | Sprint(s) | Estado |
-|------|------------------------|-----------|--------|
-| **Análisis y diseño** | Requerimientos, arquitectura lógica, sistema UI/UX, specs iniciales | 1 | Completado |
-| **Infraestructura base** | Monorepo, FastAPI, salud REST, WebSocket pose-stream, cliente Flutter navegación y config | 1 | Completado |
-| **Pipeline de pose y análisis en vivo** | MediaPipe, ángulos de rodilla, streaming, overlay y métricas (Flutter y luego React web) | 2 | Completado |
-| **Análisis por archivo y cliente web** | Gold standard, `stream_done`, UI análisis de video; **React `appWeb/`** por decisión técnica Flutter Web | 3 | Completado |
-| **Plataforma, datos y colas** | Auth JWT, PostgreSQL/Alembic, sesiones y métricas, descargas Celery+Redis, paridad funcional appWeb | 4 | **En curso** |
-| **IoT y validación en campo** | Pruebas ESP32-CAM / RPi, latencia, estabilidad con backend real | 5 | Planificado |
-| **Cierre académico** | Pruebas funcionales/usabilidad, contraste con goniometría, memoria final, ISO | 6 | Planificado |
+
+| Fase                                    | Actividades principales                                                                                  | Sprint(s) | Estado       |
+| --------------------------------------- | -------------------------------------------------------------------------------------------------------- | --------- | ------------ |
+| **Análisis y diseño**                   | Requerimientos, arquitectura lógica, sistema UI/UX, specs iniciales                                      | 1         | Completado   |
+| **Infraestructura base**                | Monorepo, FastAPI, salud REST, WebSocket pose-stream, cliente Flutter navegación y config                | 1         | Completado   |
+| **Pipeline de pose y análisis en vivo** | MediaPipe, ángulos de rodilla, streaming, overlay y métricas (Flutter y luego React web)                 | 2         | Completado   |
+| **Análisis por archivo y cliente web**  | Gold standard, `stream_done`, UI análisis de video; **React `appWeb/`** por decisión técnica Flutter Web | 3         | Completado   |
+| **Plataforma, datos y colas**           | Auth JWT, PostgreSQL/Alembic, sesiones y métricas, descargas Celery+Redis, paridad funcional appWeb      | 4         | **En curso** |
+| **IoT y validación en campo**           | Pruebas ESP32-CAM / RPi, latencia, estabilidad con backend real                                          | 5         | Planificado  |
+| **Cierre académico**                    | Pruebas funcionales/usabilidad, contraste con goniometría, memoria final, ISO                            | 6         | Planificado  |
+
 
 # MARCO CONCEPTUAL
 
@@ -382,7 +420,7 @@ Este capítulo presenta los conceptos y tecnologías fundamentales sobre los que
 
 **Flutter:** Framework de desarrollo de interfaces de usuario multiplataforma creado por Google, basado en el lenguaje **Dart**. Permite compilar una única base de código para web (navegador), Android, iOS, desktop (Windows, macOS, Linux) y dispositivos embebidos, con rendimiento nativo gracias a su motor de renderizado propio (Impeller/Skia). En este proyecto se utiliza como cliente **móvil/nativo** principal; la variante **Flutter Web** se mantuvo para experimentación, pero la **interfaz web** de demostración prioriza **React** (`appWeb/`) por las razones descritas en el Capítulo 6.
 
-**React (cliente web):** Biblioteca para UI en el navegador; en combinación con **Vite** y **TypeScript** sustenta `appWeb/`, alineada con los mismos contratos **REST** y **WebSocket** que Flutter, optimizando sincronización entre vista previa (**<img>** / canvas) y overlay en escenarios de streaming de alta frecuencia.
+**React (cliente web):** Biblioteca para UI en el navegador; en combinación con **Vite** y **TypeScript** sustenta `appWeb/`, alineada con los mismos contratos **REST** y **WebSocket** que Flutter, optimizando sincronización entre vista previa ( / canvas) y overlay en escenarios de streaming de alta frecuencia.
 
 **FastAPI:** Framework web moderno para Python, basado en los estándares **OpenAPI** y **JSON Schema**, diseñado para construir APIs REST y WebSocket con alto rendimiento. Utiliza `async/await` para operaciones de I/O concurrentes y **Pydantic** para la validación automática de datos de entrada y salida. Su servidor ASGI de referencia es **Uvicorn**.
 
@@ -439,6 +477,7 @@ El sistema interviene en el siguiente proceso de negocio:
 ```
 
 Las **áreas específicas intervenidas** son:
+
 - **Valoración del rango de movimiento (ROM):** Medición automatizada de los ángulos de flexión de articulaciones clave, comenzando con la rodilla bilateral durante el squat.
 - **Detección de asimetrías:** Comparación en tiempo real entre el hemicuerpo derecho e izquierdo.
 - **Retroalimentación visual inmediata:** Superposición del esqueleto de pose sobre la imagen del usuario con indicadores de color por estado (verde: bueno, amarillo: advertencia, rojo: crítico).
@@ -446,34 +485,40 @@ Las **áreas específicas intervenidas** son:
 
 # Actores y sus Roles
 
-| Actor | Tipo | Responsabilidades principales |
-|-------|------|------------------------------|
-| **Usuario final (Deportista)** | Humano | Ejecuta los movimientos de evaluación frente a la cámara. Interpreta los indicadores biomecánicos mostrados en la app. Toma decisiones sobre su calentamiento basado en los resultados. |
-| **App Bio-Motion (Flutter — `app/`)** | Sistema software | Cliente multiplataforma: cámara, WebSocket, overlay 2D/3D según pantalla, métricas, sesiones, login y descargas alineados con el backend. |
-| **App Bio-Motion Web (React — `appWeb/`)** | Sistema software | Cliente web principal: mismos contratos REST/WebSocket; análisis en vivo y por video; esqueleto 2D/3D, paneles y preferencias de capas. |
-| **Backend FastAPI (Servidor)** | Sistema software | Inferencia MediaPipe, biomecánica, rutas REST v1, WebSockets de pose/video, persistencia, auth y trabajos en cola. |
-| **Dispositivo IoT (Opcional)** | Hardware | ESP32-CAM o Raspberry Pi Zero 2W. Actúa como cámara externa independiente. Transmite frames al backend vía WebSocket desde una posición óptima para la captura del movimiento (ej. plano sagital lateral). |
-| **Director / Evaluador** | Humano | Rol académico/clínico. Puede revisar los reportes de sesión para validar la precisión del sistema frente a métodos tradicionales de goniometría manual. |
 
-# PROPUESTA DE SOLUCIÓN
+| Actor                                      | Tipo             | Responsabilidades principales                                                                                                                                                                              |
+| ------------------------------------------ | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Usuario final (Deportista)**             | Humano           | Ejecuta los movimientos de evaluación frente a la cámara. Interpreta los indicadores biomecánicos mostrados en la app. Toma decisiones sobre su calentamiento basado en los resultados.                    |
+| **App Bio-Motion (Flutter — `app/`)**      | Sistema software | Cliente multiplataforma: cámara, WebSocket, overlay 2D/3D según pantalla, métricas, sesiones, login y descargas alineados con el backend.                                                                  |
+| **App Bio-Motion Web (React — `appWeb/`)** | Sistema software | Cliente web principal: mismos contratos REST/WebSocket; análisis en vivo y por video; esqueleto 2D/3D, paneles y preferencias de capas.                                                                    |
+| **Backend FastAPI (Servidor)**             | Sistema software | Inferencia MediaPipe, biomecánica, rutas REST v1, WebSockets de pose/video, persistencia, auth y trabajos en cola.                                                                                         |
+| **Dispositivo IoT (Opcional)**             | Hardware         | ESP32-CAM o Raspberry Pi Zero 2W. Actúa como cámara externa independiente. Transmite frames al backend vía WebSocket desde una posición óptima para la captura del movimiento (ej. plano sagital lateral). |
+| **Director / Evaluador**                   | Humano           | Rol académico/clínico. Puede revisar los reportes de sesión para validar la precisión del sistema frente a métodos tradicionales de goniometría manual.                                                    |
+
+
+# Propuesta de solución
 
 **Bio-Motion Evaluator** es un sistema de software distribuido, multiplataforma y orientado a tiempo real, que automatiza la valoración biomecánica del movimiento humano mediante visión artificial. La propuesta resuelve las tres barreras identificadas en la definición del problema:
 
-| Barrera | Solución propuesta |
-|---------|-------------------|
-| **Costo y accesibilidad** | App gratuita ejecutable desde la cámara del smartphone; no requiere hardware especializado |
-| **Subjetividad del observador** | MediaPipe BlazePose calcula ángulos articulares con precisión numérica reproducible |
-| **Desconexión de los datos** | Retroalimentación visual inmediata (overlay + métricas) que traduce ángulos en estados accionables |
+
+| Barrera                         | Solución propuesta                                                                                 |
+| ------------------------------- | -------------------------------------------------------------------------------------------------- |
+| **Costo y accesibilidad**       | App gratuita ejecutable desde la cámara del smartphone; no requiere hardware especializado         |
+| **Subjetividad del observador** | MediaPipe BlazePose calcula ángulos articulares con precisión numérica reproducible                |
+| **Desconexión de los datos**    | Retroalimentación visual inmediata (overlay + métricas) que traduce ángulos en estados accionables |
+
 
 La arquitectura de la solución se organiza en **tres capas independientes** que se comunican mediante protocolos estándar:
 
 **1. Capa de presentación — Flutter (`app/`) y React (`appWeb/`)**
+
 - **Flutter/Dart:** cliente **Android, iOS** y exploración web; pantallas de **análisis en vivo**, **análisis de video**, **diagnóstico de backend**, **configuración**, **login/perfil**, **historial** y **descarga** de video según la versión del código.
 - **React 19 + TypeScript (`appWeb/`):** cliente **web** priorizado para demostración; mismas capacidades núcleo de análisis en vivo y por archivo, con overlay **2D/3D** y paneles alineados al sistema de diseño (paleta oscura biomédica, DM Sans / Mono, estados semánticos).
 
 **2. Capa de lógica e inferencia — FastAPI (Backend)**
 Servidor asíncrono Python que centraliza la inteligencia del sistema:
-- Expone WebSockets (`/ws/pose-stream`, y **`/ws/video`** según el flujo de procesamiento avanzado) y **REST** bajo `/api/v1/` (salud, pose, videos *gold standard*, autenticación, sesiones, descargas).
+
+- Expone WebSockets (`/ws/pose-stream`, y `**/ws/video`** según el flujo de procesamiento avanzado) y **REST** bajo `/api/v1/` (salud, pose, videos *gold standard*, autenticación, sesiones, descargas).
 - Ejecuta **MediaPipe BlazePose** para la detección de 33 landmarks del cuerpo humano.
 - Calcula los **ángulos de flexión de rodilla** (bilateral) usando álgebra vectorial sobre las coordenadas de los landmarks de cadera, rodilla y tobillo.
 - Soporta múltiples fuentes de entrada: cámara local (`camera`), archivo de video (`file`) y URL de stream (`url`), seleccionables mediante el campo `source` de la configuración inicial.
@@ -501,77 +546,174 @@ Dispositivos de bajo costo que actúan como fuentes de video externas, transmiti
 
 # Product backlog
 
-Tabla x. *Product backlog priorizado (sincronizado con el monorepo; abril 2026).*
+La siguiente **Tabla 1** reproduce la **plantilla institucional** del product backlog: columnas de **estimación** (horas de definición, desarrollo, pruebas y total) y de **ejecución** (fechas de inicio y de puesta en producción). Los valores de **horas** y **fechas** son **supuestos ilustrativos** (planificación académica de ejemplo entre el **1 de febrero de 2026** y el **30 de mayo de 2026**); deben sustituirse o contrastarse con el registro real de tu bitácora y el calendario oficial del trabajo de grado.
 
-| **Id HU** | **Nombre HU** | **Sprint** | **Prioridad** | **Estado** | **Notas / Trazabilidad** |
-| --- | --- | --- | --- | --- | --- |
-| HU-01 | Como deportista quiero ver si el backend está disponible antes de analizar | 1 | Alta | Hecho | `BackendStatusPage`; `GET /api/v1/health` |
-| HU-02 | Como usuario quiero configurar la URL base del servidor | 1 | Alta | Hecho | `ConnectionConfigPage` / Flutter `connection_config_screen` |
-| HU-03 | Como usuario quiero analizar mi movimiento en vivo con retroalimentación de rodillas | 2 | Alta | Hecho | `LiveAnalysisPage`; WebSocket `/ws/pose-stream` |
-| HU-04 | Como investigador quiero analizar un video *gold standard* con resumen por sesión | 3 | Alta | Hecho | `VideoAnalysisPage`; API `gold_standard_videos`; fin `stream_done` |
-| HU-05 | Como usuario web quiero una interfaz estable para streaming JPEG y esqueleto | 3 | Alta | Hecho | `appWeb/` React; decisión § 6.6.4 |
-| HU-06 | Como usuario quiero guardar y revisar sesiones anteriores | 4 | Media | En curso | `sessions` + PostgreSQL; `SessionsHistoryPage` |
-| HU-07 | Como usuario quiero iniciar sesión para asociar mis datos | 4 | Media | En curso | `auth` JWT; `LoginPage` |
-| HU-08 | Como operador quiero descargar video desde URL hacia la biblioteca local | 4 | Media | En curso | Celery + Redis; `download` API; `VideoDownloadPage` |
-| HU-09 | Como investigador quiero inspeccionar pose en 2D y 3D en análisis de video | 4 | Media | En curso | `PoseSkeleton3DScene`, `poseTopology.ts` |
-| HU-10 | Como laboratorio quiero usar cámara IoT frente al backend | 5 | Media | Pendiente | `iot/esp32-cam`, `iot/raspberry-pi/stream.py` |
-| HU-11 | Como evaluador quiero validar ángulos frente a goniometría manual | 6 | Alta | Pendiente | Protocolo de medición y anexo |
-| HU-12 | Como autor quiero cerrar manuales y evaluación ISO 25010 | 6 | Alta | Pendiente | § 6.7–6.8 |
+**Nota sobre Sprint:** en el borrador compartido, la primera fila mostraba Sprint «2» para la historia de salud del backend; en el **cronograma técnico del repositorio** esa capacidad corresponde al **Sprint 1** (junto con la configuración de URL). Si la facultad exige otro criterio de asignación de sprint, ajusta solo esa columna manteniendo la trazabilidad en «Observación».
+
+**Tabla 1.** *Product backlog: historias de usuario, estimación y ejecución (plantilla institucional; abril de 2026).*
+
+
+| Historias de usuario | Estimación (horas)                                                                   | Ejecución | Observación |                |                |             |             |              |                            |                                                                                                                          |
+| -------------------- | ------------------------------------------------------------------------------------ | --------- | ----------- | -------------- | -------------- | ----------- | ----------- | ------------ | -------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Id HU                | Nombre HU                                                                            | Sprint    | Prioridad   | Hrs definición | Hrs desarrollo | Hrs pruebas | Hrs totales | Fecha inicio | Fecha puesta en producción |                                                                                                                          |
+| HU-01                | Como deportista quiero ver si el backend está disponible antes de analizar           | 1         | Alta        | 4              | 10             | 4           | 18          | 01/02/2026   | 05/02/2026                 | `BackendStatusPage`; `GET /api/v1/health`                                                                                |
+| HU-02                | Como usuario quiero configurar la URL base del servidor                              | 1         | Alta        | 4              | 12             | 4           | 20          | 06/02/2026   | 12/02/2026                 | `ConnectionConfigPage` / Flutter `connection_config_screen.dart`                                                         |
+| HU-03                | Como usuario quiero analizar mi movimiento en vivo con retroalimentación de rodillas | 2         | Alta        | 12             | 56             | 16          | 84          | 14/02/2026   | 08/03/2026                 | `LiveAnalysisPage` / `live_analysis_screen.dart`; WebSocket `/ws/pose-stream`; `docs/spec/websocket-pose-stream.md`      |
+| HU-04                | Como investigador quiero analizar un video *gold standard* con resumen por sesión    | 3         | Alta        | 10             | 44             | 14          | 68          | 10/03/2026   | 28/03/2026                 | `VideoAnalysisPage`; API `gold_standard_videos`; mensaje `stream_done`; acumulador `VideoAnalysisAccumulator` (`appWeb`) |
+| HU-05                | Como laboratorio quiero usar cámara IoT frente al backend                            | 5         | Media       | 8              | 36             | 12          | 56          | 01/04/2026   | 26/04/2026                 | `iot/esp32-cam`, `iot/raspberry-pi/stream.py`                                                                            |
+| HU-06                | Como evaluador quiero validar ángulos frente a goniometría manual                    | 6         | Alta        | 14             | 8              | 24          | 46          | 02/05/2026   | 20/05/2026                 | Protocolo y anexo; **sin estadísticos de acuerdo cámara–goniómetro consolidados en esta versión del documento**          |
+| HU-07                | Como autor quiero cerrar manuales y evaluación ISO 25010                             | 6         | Alta        | 20             | 10             | 18          | 48          | 15/05/2026   | 30/05/2026                 | § 6.8–6.9; bitácora; manuales alineados a `docs/guias/SETUP.md`                                                          |
+
+
+**Total estimado supuesto (suma de «Hrs totales», HU-01–HU-07):** 340 h.
+
+**Tabla 2.** *Backlog técnico (BH): tareas de ingeniería sin formato de historia de usuario.*
+
+| Id BH | Descripción (valor para el equipo, no para el usuario final) | Sprint | Criterio de cierre (binario) |
+| ----- | -------------------------------------------------------------- | ------ | ---------------------------- |
+| BH-01 | Configurar monorepo, dependencias y guía `SETUP.md` | 1 | Estructura `app/`, `backend/`, `docs/`, `tests/`, `iot/` clonable; backend responde en local según guía |
+| BH-02 | Ejecutar matriz de pruebas funcionales y registrar evidencias (§ 6.8) | 6 | Matriz § 6.8.1 con resultado **Pasa/No pasa** por caso; anexos B–C actualizados |
+
+*Nota:* Las antiguas redacciones tipo «Configurar el entorno base del proyecto» o «Ejecución de pruebas del sistema» **no** son historias de usuario; quedan como **BH-01** y **BH-02**. Las **HU** de la Tabla 1 describen capacidades visibles para deportista, investigador o evaluador.
+
+**Extensiones de producto (mismo repositorio, no filas de la plantilla compartida):** el código vigente incluye además **cliente web React** (`appWeb/`), **sesiones PostgreSQL**, **JWT**, **descarga asíncrona de video (Celery + Redis)** y **vistas 2D/3D** en análisis por video; en el **cronograma por fases** del Capítulo 6 corresponden sobre todo al **Sprint 4** y a la decisión documentada en § 6.7.4.
 
 Fuente: Elaboración propia (2026).
 
-# PLANIFICACIÓN DEL SPRINT 1
+## Detalle de historias de usuario: reglas de negocio del motor, criterios de aceptación verificables y flujos alternativos
+
+Las reglas del motor están alineadas al contrato WebSocket unificado (`schema_version`, `pose_ok`, `landmarks`, `knees`, `quality_flags`, etc.) y al filtrado por visibilidad en `docs/spec/websocket-pose-stream.md` (umbral `POSE_LANDMARK_MIN_VISIBILITY_RESPONSE`, defecto **0,5**): un landmark solo se incluye en el arreglo `landmarks` enviado al cliente si su `visibility` ≥ **0,5** (salvo umbral 0). El cliente debe dibujar el esqueleto **únicamente** con los puntos recibidos y **no** inventar conexiones para índices ausentes.
+
+### HU-01 — Disponibilidad del backend antes de analizar
+
+- **Criterios (binarios):** (1) Con backend levantado, `GET /api/v1/health` responde **200** y el cuerpo refleja estado coherente. (2) Con backend caído o URL incorrecta, la pantalla de estado muestra **fallo** y no permite confundir «sin respuesta» con «análisis completado».
+- **Errores:** timeout de red; CORS mal configurado; mensaje accionable para revisar URL (relacionado con **HU-02**).
+
+### HU-02 — Configuración de la URL base del servidor
+
+- **Criterios (binarios):** (1) Tras guardar la URL, las peticiones REST y el WebSocket usan el **mismo host/puerto** configurado (sin mezclar valores en caché obsoleta). (2) URL vacía o mal formada → validación que **impide** guardar o muestra error explícito.
+
+### HU-03 — Análisis en vivo con retroalimentación de rodillas
+
+- **Narrativa:** Como deportista quiero ejecutar un análisis en vivo frente a la cámara para conocer en tiempo real mis ángulos de flexión de rodilla y señales de calidad asociadas al movimiento.
+- **Regla de negocio (overlay):** el motor solo expone landmarks con `visibility` ≥ **0,5**; el cliente dibuja segmentos del esqueleto **solo** entre pares de índices presentes en `landmarks` (p. ej. cadera–rodilla–tobillo para goniómetro de rodilla).
+- **Criterios de aceptación (binarios):**
+  1. Con conexión estable y `pose_ok: true`, **cada** fotograma incluye `knees.left_knee_flexion_angle_deg` y `knees.right_knee_flexion_angle_deg` cuando ambos son computables; si uno es `null`, la UI muestra «sin dato» en ese lado (no sustituye por cero ni por el ángulo contralateral).
+  2. Con `pose_ok: false`, la UI muestra estado explícito de «sin pose» y **no** presenta ángulos como válidos hasta el siguiente `pose_ok: true`.
+  3. Si `quality_flags` contiene `asymmetry_high`, el panel muestra alerta de asimetría; si el arreglo está vacío, **no** hay alerta de asimetría por defecto.
+  4. Con `include_preview: true`, si `preview_jpeg_base64` llega poblado se muestra la vista previa; si llega vacío de forma sostenida (≥ 3 fotogramas consecutivos), se muestra «sin vista previa» sin detener las métricas numéricas.
+  5. **Overlay:** en un fotograma de prueba con pose completa, el número de aristas dibujadas del esqueleto no supera las conexiones posibles entre los índices recibidos (máximo coherente con la topología BlazePose de 33 puntos filtrados).
+- **Flujos alternativos y errores:**
+  - **Pérdida de WebSocket a mitad del ejercicio:** estado «desconectado»; al reconectar, el usuario debe reiniciar el análisis y reenviar `PoseStreamConfig` (criterio pasa si no se muestran métricas obsoletas como actuales).
+  - **Cámara sin persona u oclusión:** racha de `pose_ok: false`; no incrementar contadores de ROM «bueno» en esos fotogramas.
+  - **Iluminación insuficiente:** `pose_ok: false` o lista `landmarks` vacía; mensaje de orientación al usuario (encuadre / luz).
+  - **Permisos de cámara denegados:** botón de inicio deshabilitado o bloqueado con mensaje que indique habilitar permisos en el navegador o SO.
+  - **URL o backend incorrectos:** error de conexión antes del primer frame (criterio enlazado con **HU-01** y **HU-02**).
+
+### HU-04 — Análisis por video *gold standard*
+
+- **Narrativa:** Como investigador quiero analizar un video de referencia almacenado en el servidor para obtener un resumen cuantitativo de la sesión comparable al análisis en vivo.
+- **Criterios de aceptación (binarios):**
+  1. El servidor resuelve la ruta solo con **nombre base** (sin `..` ni rutas relativas); violación → error explícito en UI o payload.
+  2. Extensión permitida según `backend/vision/paths.py`: `.mp4`, `.mov`, `.avi`, `.mkv`, `.webm`. Archivo con extensión no listada (p. ej. `.wmv`) → **rechazo** con mensaje que enumere las extensiones válidas.
+  3. Al finalizar el archivo, el cliente recibe JSON con `stream_done: true` y `total_frames` ≥ 1 cuando el archivo tiene al menos un fotograma procesable.
+  4. El resumen mostrado al usuario incluye, como mínimo, los campos del acumulador `VideoAnalysisAccumulator` / `AnalysisSummary`: `framesProcessed`, `maxLeftDeg`, `maxRightDeg`, `minLeftDeg`, `minRightDeg`, `pctGood`, `lastRepCount`, `lastExerciseLabel`, `lastQualityFlags`; si `lastQualityFlags` contiene `asymmetry_high`, la UI lo indica explícitamente.
+  5. Misma regla de overlay que **HU-03** (landmarks filtrados por `visibility` ≥ 0,5).
+- **Flujos alternativos y errores:**
+  - **Archivo inexistente o nombre inválido:** no inicia el stream; mensaje de error sin colgar la UI.
+  - **Archivo corrupto o códec ilegible:** cierre del WS o `error` en payload; resumen parcial marcado como incompleto si `stream_done` no llegó.
+  - **Corte de red antes de `stream_done`:** estado «interrumpido»; `framesProcessed` refleja solo lo acumulado hasta el corte.
+  - **Sin pose en la mayoría de fotogramas:** `pctGood` bajo y/o `pose_ok` predominante falso; el resumen sigue siendo coherente (no inventa máximos en fotogramas sin rodilla).
+
+### HU-05 — Cámara IoT frente al backend
+
+- **Narrativa:** Como operador de laboratorio quiero usar una cámara IoT como fuente de video para el mismo pipeline de análisis que la cámara local.
+- **Criterios (binarios):** (1) Con dispositivo configurado (`iot/esp32-cam` o `iot/raspberry-pi/stream.py`), el backend recibe al menos un fotograma en 60 s de prueba documentada. (2) Ante pérdida de WiFi, el log o la UI muestran error/recuperación sin reiniciar todo el servidor.
+- **Errores:** URL de stream inválida; timeout de dispositivo; documentación de latencia en anexo C actualizada.
+
+### HU-06 — Validación frente a goniómetro manual
+
+- **Narrativa:** Como evaluador quiero contrastar los ángulos de rodilla del sistema con medición manual para estimar error y acuerdo.
+- **Alcance:** protocolo, registro de datos crudos y análisis estadístico acordados con la directoría (**pendiente de ejecución y de informe en esta memoria**).
+- **Criterios de cierre (binarios):** (1) Protocolo firmado o anexo con posturas, *n* y criterio de inclusión. (2) Tabla publicada con al menos error medio absoluto o límites de acuerdo Bland–Altman para rodilla izquierda y derecha. (3) Referencia explícita a literatura de validación visión–goniómetro (p. ej. Örücü et al., 2025; Sabo et al., 2023).
+
+### HU-07 — Cierre de manuales y evaluación ISO/IEC 25010
+
+- **Narrativa:** Como autor del trabajo de grado quiero entregar manuales y evaluación de calidad alineados al producto desplegable.
+- **Criterios (binarios):** (1) Manual de usuario § 6.9.1 describe flujos reales de `appWeb/` (no solo Flutter). (2) Matriz § 6.8.1 con ≥ 80 % de casos críticos en estado **Pasa** o justificación documentada. (3) Tabla ISO/IEC 25010 § 6.9.3 sin contradicciones con el estado de **HU-06** (goniómetro pendiente).
+
+### Extensiones en código (trazabilidad Sprint 4 y posteriores)
+
+Para auditoría del monorepo: **React** (`appWeb/`), **sesiones** (`sessions`, PostgreSQL), **autenticación JWT**, **descarga Celery**, **vistas 2D/3D** y módulo **Dev** están implementados o en curso según `docs/arquitectura.md` y las secciones de Sprint 4 del presente documento; no duplican filas en la **Tabla 1** porque no formaban parte de la plantilla institucional que suministraste.
+
+# Planificación del sprint 1
 
 ## Objetivo del sprint
 
-Establecer el **monorepo** funcional y la **primera comunicación cliente-servidor** verificable, con el entorno de desarrollo documentado en `docs/guias/SETUP.md`.
+Entregar las **primeras capacidades visibles al usuario** (**HU-01**, **HU-02**) y cerrar la **fundación técnica** (**BH-01**, Tabla 2) documentada en `docs/guias/SETUP.md`.
 
-## Historias de usuario incluidas
+## Historias de usuario y backlog técnico
 
-**HU-01, HU-02** (tabla de backlog).
+- **HU-01, HU-02** (Tabla 1): salud del backend y configuración de URL.
+- **BH-01** (Tabla 2): monorepo y entorno local reproducible.
 
 ## Revisión del sprint (resultados)
 
 - **Backend:** proyecto **FastAPI** con endpoint de salud, estructura `app/api`, configuración por entorno, dependencias Python y script de descarga de modelos MediaPipe.
-- **Contrato:** primera versión estable del WebSocket **`/ws/pose-stream`** con mensaje de configuración JSON (`PoseStreamConfig` en evolución).
-- **Cliente Flutter:** navegación (`home_screen`, rutas), **URL** del API/WebSocket, pantalla de **estado del backend**.
+- **Contrato:** primera versión estable del WebSocket `/ws/pose-stream` con mensaje de configuración JSON (`PoseStreamConfig` en evolución).
+- **Cliente Flutter:** navegación (`home_screen`, rutas), URL del API/WebSocket, pantalla de estado del backend.
 - **Documentación:** inicio de `docs/spec/` y `docs/arquitectura.md`.
 
 ## Tareas asociadas y ejecutadas (extracto)
 
-| Área | Entregable |
-|------|------------|
-| Repositorio | Estructura `app/`, `backend/`, `docs/`, `tests/`, `iot/` |
-| Backend | `GET /api/v1/health`, CORS, `main.py` |
-| Flutter | `connection_config_screen`, `backend_status_screen`, `home_screen` |
-| Docs | SETUP, README raíz |
 
-# PLANIFICACIÓN DEL SPRINT 2
+| Área        | Entregable                                                         | Trazabilidad HU/BH |
+| ----------- | ------------------------------------------------------------------ | ------------------ |
+| Repositorio | Estructura `app/`, `backend/`, `docs/`, `tests/`, `iot/`           | BH-01              |
+| Backend     | `GET /api/v1/health`, CORS, `main.py`                              | HU-01              |
+| Flutter     | `connection_config_screen`, `backend_status_screen`, `home_screen` | HU-01, HU-02       |
+| Docs        | SETUP, README raíz                                                 | BH-01              |
+
+
+# Planificación del sprint 2
 
 ## Objetivo del sprint
 
-Cerrar el **pipeline mínimo de valor**: **MediaPipe BlazePose**, **goniometría** de rodillas bilateral, **streaming** por fotograma y **UI** de análisis en vivo en **Flutter**.
+Implementar el **primer flujo de valor biomecánico completo en tiempo real** (**HU-03**): captura de video, inferencia **MediaPipe BlazePose** en **FastAPI**, cálculo bilateral de flexión de rodilla, emisión por WebSocket `/ws/pose-stream` del payload unificado y presentación en **Flutter** con overlay de esqueleto (regla de visibilidad ≥ 0,5), panel de métricas y manejo de errores de conexión, ausencia de pose e iluminación.
 
-## Historias de usuario incluidas
+Este sprint **no** replica el alcance del Sprint 1 (salud/URL), **no** incluye análisis por archivo *gold standard* (**Sprint 3 / HU-04**) ni el cliente **React** en web (extensión de producto, Sprint 3–4).
 
-**HU-03**.
+## Historia de usuario HU-03 (análisis en vivo)
+
+**Como** deportista **quiero** analizar mi movimiento en vivo con retroalimentación de rodillas **para** adaptar mi calentamiento con datos objetivos antes de cargar peso.
+
+| Elemento | Especificación verificable |
+| -------- | ------------------------- |
+| Contrato | `docs/spec/websocket-pose-stream.md`; umbral `visibility` ≥ 0,5 en `landmarks` |
+| Métricas mínimas | `knees.left_knee_flexion_angle_deg`, `knees.right_knee_flexion_angle_deg`, `pose_ok`, `quality_flags` |
+| Overlay | Esqueleto solo con índices recibidos; sin pose → UI «sin pose» |
+| Errores | WS cortado, permisos de cámara, `pose_ok` falso sostenido, backend inalcanzable |
+
+Los criterios binarios y flujos alternativos completos figuran en § *Detalle de historias de usuario* (**HU-03**).
 
 ## Revisión del sprint (resultados)
 
-- **Visión:** servicio MediaPipe, **ángulos de rodilla** (`vision/biomechanics.py`), landmarks coherentes con la memoria.
-- **Tiempo real:** payload JSON con `knees.*_flexion_angle_deg`, `pose_ok`, `landmarks`.
-- **Flutter:** `live_analysis_screen`, **WebSocket**, **overlay**, panel **`LiveMetric`**, HUD y gráfica/histórico de ángulos.
-- **Specs:** consolidación de `docs/spec/websocket-pose-stream.md` y cliente en specs.
+- **Motor:** servicio MediaPipe en backend, cálculo de ángulos en `vision/biomechanics.py` (cadera–rodilla–tobillo), coherencia de landmarks con el modelo BlazePose de 33 puntos.
+- **Contrato:** mensajes JSON por fotograma con `schema_version`, `frame_index`, `server_ts_ms`, `pose_ok`, `note`, `landmarks` / `world_landmarks` sujetos a umbral de visibilidad en respuesta, `knees.*_flexion_angle_deg`, `exercise_label`, `rep_count`, `quality_flags`, `pipeline_ms`.
+- **Cliente Flutter:** pantalla `live_analysis_screen`, conexión WebSocket, render de esqueleto alineado a landmarks recibidos, HUD y acumulación para gráfica o histórico cuando aplica.
+- **Especificación:** `docs/spec/websocket-pose-stream.md` y pruebas manuales reproducibles contra backend local.
 
 ## Tareas asociadas y ejecutadas (extracto)
 
-| Área | Entregable |
-|------|------------|
-| Backend | `live_pose.py`, captura OpenCV + inferencia por frame |
-| Flutter | Flujo análisis en vivo end-to-end |
-| Manual | Prueba en vivo contra backend local |
 
-# PLANIFICACIÓN DEL SPRINT 3
+| Área      | Entregable                                                                                              | Trazabilidad |
+| --------- | ------------------------------------------------------------------------------------------------------- | ------------ |
+| Backend   | `live_pose.py`, adquisición OpenCV, inferencia por frame, emisión WS                                    | HU-03        |
+| Flutter   | `live_analysis_screen`, estados de error de red y sin pose                                                | HU-03        |
+| QA / Docs | Casos felices y degradación (`pose_ok` falso, corte WS) en bitácora o matriz de sprint                  | HU-03        |
+
+
+# Planificación del sprint 3
 
 ## Objetivo del sprint
 
@@ -579,24 +721,28 @@ Cerrar el **pipeline mínimo de valor**: **MediaPipe BlazePose**, **goniometría
 
 ## Historias de usuario incluidas
 
-**HU-04, HU-05**.
+**HU-04** (Tabla 1); el cliente **React** (`appWeb/`) se entrega en el mismo sprint como **extensión de producto** (ver nota bajo Tabla 1).
 
 ## Revisión del sprint (resultados)
 
-- **Backend:** listado/selección de videos de referencia; `source=file`; mensaje **`stream_done`**; preview JPEG opcional.
+- **Backend:** listado/selección de videos de referencia; `source=file`; mensaje `stream_done`; preview JPEG opcional.
 - **Flutter:** `video_analysis_screen`, log por frame, resumen de sesión.
 - **React:** rutas `live-analysis`, `video-analysis`, hooks `useLiveAnalysisSession` / `useVideoAnalysisSession`.
-- **Decisión:** limitaciones de **Flutter Web** documentadas en § **6.6.4**; demostración web centrada en **`appWeb/`** (React + Vite).
+- **Decisión:** limitaciones de **Flutter Web** documentadas en § **6.7.4**; demostración web centrada en `appWeb/` (React + Vite).
 
 ## Tareas asociadas y ejecutadas (extracto)
 
-| Área | Entregable |
-|------|------------|
-| API | `gold_standard_videos` |
-| appWeb | Router, layout, paneles de análisis |
-| Docs | Reporte de latencia en `docs/guias/reporte_latencia_frames_ws_pose_stream.md` |
 
-# PLANIFICACIÓN DEL SPRINT 4 (en curso)
+| Área   | Entregable                                                                    |
+| ------ | ----------------------------------------------------------------------------- |
+| API    | `gold_standard_videos`                                                        |
+| appWeb | Router, layout, paneles de análisis                                           |
+| Docs   | Reporte de latencia en `docs/guias/reporte_latencia_frames_ws_pose_stream.md` |
+
+
+
+
+# Planificación del sprint 4 (en curso)
 
 ## Objetivo del sprint
 
@@ -604,12 +750,12 @@ Cerrar el **pipeline mínimo de valor**: **MediaPipe BlazePose**, **goniometría
 
 ## Historias de usuario incluidas
 
-**HU-06 a HU-09** (cierre según hitos).
+**Extensiones de producto** (Tabla 1, nota final): sesiones PostgreSQL, JWT, descarga Celery, vistas 2D/3D y paridad `appWeb` / Flutter según hitos del Sprint 4.
 
 ## Estado a abril de 2026
 
-- **ORM:** `UserORM`, `SessionORM`, `SessionMetricORM`, `VideoDownloadJobORM`; migraciones **Alembic**; routers **`auth`**, **`sessions`**, **`download`**.
-- **Clientes:** login, perfil, historial, descarga de video; en web, toolbar de capas, estadísticas, **`PoseSkeleton3DScene`** y topología **`poseTopology`**.
+- **ORM:** `UserORM`, `SessionORM`, `SessionMetricORM`, `VideoDownloadJobORM`; migraciones **Alembic**; routers `auth`, `sessions`, `download`.
+- **Clientes:** login, perfil, historial, descarga de video; en web, toolbar de capas, estadísticas, `PoseSkeleton3DScene` y topología `poseTopology`.
 - **Motor (paralelo):** paquete `backend/vision/` (extractor, *features*, clasificador, *rep trackers*) según `docs/planificacion/bio_motion_plan_v2.md`.
 
 ## Criterios para cerrar el sprint
@@ -619,7 +765,7 @@ Cerrar el **pipeline mínimo de valor**: **MediaPipe BlazePose**, **goniometría
 - Estabilidad del análisis de video en **React** sin regresiones mayores.
 - Specs y `docs/arquitectura.md` al día con REST v1 y colas.
 
-# PLANIFICACIÓN DEL SPRINT 5 (planificado)
+# Planificación del sprint 5 (planificado)
 
 ## Objetivo del sprint
 
@@ -627,30 +773,31 @@ Cerrar el **pipeline mínimo de valor**: **MediaPipe BlazePose**, **goniometría
 
 ## Historias de usuario incluidas
 
-**HU-10**.
+**HU-05** (Tabla 1).
 
 ## Entregas previstas
 
 - Evidencias (logs o capturas) de streaming IoT al backend.
 - Anexo o tabla de latencia en § **7**; actualización de `docs/spec/` pertinente.
 
-# PLANIFICACIÓN DEL SPRINT 6 (planificado)
+# Planificación del sprint 6 (planificado)
 
 ## Objetivo del sprint
 
-**Cierre académico:** pruebas § 6.7, contraste con **goniometría**, manuales § 6.8, argumentario **ISO/IEC 25010**.
+**Cierre académico:** matriz de pruebas (§ 6.8, **BH-02**), contraste con **goniometría** (**HU-06**), manuales y argumentario **ISO/IEC 25010** (**HU-07**).
 
-## Historias de usuario incluidas
+## Historias de usuario y backlog técnico
 
-**HU-11, HU-12**.
+- **HU-06, HU-07** (Tabla 1).
+- **BH-02** (Tabla 2): ejecución y registro de la matriz de pruebas funcionales.
 
 ## Entregas previstas
 
-- Matriz de pruebas con resultados; manuales alineados con `docs/guias/SETUP.md` y flujos de `appWeb/`; conclusiones y recomendaciones.
+- Matriz § 6.8.1 con resultados **Pasa/No pasa**; manuales § 6.9 alineados con `docs/guias/SETUP.md` y flujos de `appWeb/`; conclusiones y recomendaciones.
 
-# DISEÑO DEL SISTEMA
+# Diseño del sistema
 
-# Especificación de la arquitectura
+## Especificación de la arquitectura
 
 ## Arquitectura Lógica
 
@@ -662,100 +809,81 @@ flowchart TD
         ESP32["ESP32-CAM / RPi Zero 2W\n(fuente de video externa)"]
     end
 
-    subgraph frontendLayer [Capa de Presentación - Flutter]
-        HomeScreen["BioHomeScreen\n(navegación + estado backend)"]
-        LiveScreen["LiveAnalysisScreen\n(cámara + WebSocket + overlay)"]
-        VideoScreen["VideoAnalysisScreen\n(análisis de archivo)"]
-        StatusScreen["BackendStatusScreen\n(diagnóstico de conexión)"]
+    subgraph frontendLayer [Capa de Presentación - appWeb y app]
+        ReactWeb["appWeb React\n(Home, Live, Video, Dev Tools)"]
+        FlutterApp["app Flutter legado\n(móvil + histórico web)"]
     end
 
     subgraph backendLayer [Capa de Lógica - FastAPI / Python]
         WS["WebSocket /ws/pose-stream\n(live_pose.py)"]
+        WSBin["WebSocket /ws/video\n(video.py)"]
         PoseRouter["POST /api/v1/analyze/pose\n(pose.py)"]
         HealthRouter["GET /api/v1/health\n(health.py)"]
+        AuthRouter["/api/v1/auth, /sessions, /download\n+ /dev/*"]
         MediaPipeSvc["MediaPipe Service\n(analyze_frame_bgr)"]
         VideoSource["VideoSource\n(cámara / archivo / URL)"]
         Biomech["vision/biomechanics\n(knee_angles_from_landmarks)"]
     end
 
     ESP32 -->|"frames JPEG via WebSocket"| WS
-    LiveScreen -->|"WebSocket (config JSON + frames)"| WS
-    VideoScreen -->|"WebSocket (config JSON)"| WS
-    HomeScreen -->|"HTTP GET /api/v1/health"| HealthRouter
+    ReactWeb -->|"WebSocket (JSON config + frames)"| WS
+    FlutterApp -->|"WebSocket (JSON config + frames)"| WS
+    ReactWeb -->|"WebSocket (JPEG binario)"| WSBin
+    ReactWeb -->|"HTTP /api/v1/*"| AuthRouter
+    FlutterApp -->|"HTTP /api/v1/*"| AuthRouter
+    ReactWeb -->|"HTTP GET /api/v1/health"| HealthRouter
+    FlutterApp -->|"HTTP GET /api/v1/health"| HealthRouter
     WS --> VideoSource
     WS --> MediaPipeSvc
     MediaPipeSvc --> Biomech
-    WS -->|"JSON por frame (landmarks + ángulos)"| LiveScreen
-    WS -->|"JSON por frame + stream_done"| VideoScreen
+    WS -->|"JSON por frame (landmarks + ángulos)"| ReactWeb
+    WS -->|"JSON por frame + stream_done"| FlutterApp
 ```
+
+
 
 ## Arquitectura Física
 
-| Nodo | Tecnología | Responsabilidad |
-|------|-----------|----------------|
-| **Dispositivo usuario** | Smartphone Android/iOS o navegador web | Ejecuta la app Flutter; captura video desde cámara propia |
-| **Servidor de análisis** | PC / laptop con Python 3.11 y MediaPipe | Ejecuta FastAPI + MediaPipe; procesa frames; expone WebSocket y API REST |
-| **Dispositivo IoT (opcional)** | ESP32-CAM o Raspberry Pi Zero 2W | Fuente de video externa; transmite frames al servidor por WiFi |
 
-## Arquitectura del Frontend (Flutter)
+| Nodo                           | Tecnología                                 | Responsabilidad                                                                                  |
+| ------------------------------ | ------------------------------------------ | ------------------------------------------------------------------------------------------------ |
+| **Cliente web activo**         | `appWeb` (React 19 + TypeScript + Vite)    | Navegación, análisis en vivo y por video, paneles 2D/3D, módulo Dev (`/dev/`*)                   |
+| **Cliente móvil/legado**       | `app/` (Flutter 3.x)                       | Referencia histórica y cliente móvil; consume contratos REST/WS compartidos                      |
+| **Servidor de análisis**       | FastAPI + Python 3.11 + MediaPipe + OpenCV | Procesamiento de frames, inferencia de pose, métricas, REST `/api/v1/`*, WS `/ws/*`              |
+| **Persistencia**               | PostgreSQL + SQLAlchemy + Alembic          | Usuarios, sesiones, métricas, jobs de descarga, feature samples, jobs de entrenamiento e ingesta |
+| **Trabajos asíncronos**        | Celery + Redis                             | Descargas de video, entrenamiento ONNX, ingesta de videos de YouTube                             |
+| **Dispositivo IoT (opcional)** | ESP32-CAM o Raspberry Pi Zero 2W           | Fuente de video externa para capturas en campo                                                   |
 
-La app Flutter sigue la convención de separación por pantalla y widget con responsabilidades acotadas:
+
+## Arquitectura del Frontend (appWeb activo + Flutter legado)
+
+La capa de presentación vigente para web está en `appWeb/` y usa una organización por páginas, hooks y componentes reutilizables:
 
 ```
-app/lib/
-├── core/
-│   ├── models/
-│   │   └── live_metric.dart         # Modelo agnóstico de métrica biomecánica
-│   ├── theme/
-│   │   ├── app_colors.dart          # Tokens de color (paleta oscura biomédica)
-│   │   ├── app_typography.dart      # Sistema tipográfico (DM Sans + DM Mono)
-│   │   └── app_spacing.dart         # Espaciado y radios consistentes
-│   └── widgets/
-│       ├── nav_card.dart            # Tarjeta de navegación reutilizable
-│       ├── live_indicator_dot.dart  # Indicador visual de estado activo/inactivo
-│       └── section_header.dart      # Cabecera de sección
-├── screens/
-│   ├── home_screen.dart             # Pantalla principal con estado del backend
-│   ├── live_analysis/
-│   │   ├── live_analysis_screen.dart        # StatefulWidget: cámara + WS + métricas
-│   │   └── widgets/
-│   │       ├── live_dashboard_panel.dart    # TabBar: Métricas / Log / Histórico
-│   │       ├── metrics_panel.dart           # Renderiza List<LiveMetric>
-│   │       ├── log_panel.dart               # Eventos frontend y backend
-│   │       ├── history_panel.dart           # Gráfica de series temporales
-│   │       ├── camera_hud.dart              # HUD: FPS, frame, latencia
-│   │       └── angle_history_chart.dart     # Gráfica de ángulos en el tiempo
-│   ├── video_analysis/
-│   │   ├── video_analysis_screen.dart       # Análisis de archivo gold standard
-│   │   └── widgets/
-│   │       ├── analysis_summary_dialog.dart # Resumen estadístico final
-│   │       └── frame_log_tile.dart          # Tile de log por frame
-│   └── config/
-│       ├── connection_config_screen.dart    # Configuración de URL del backend
-│       └── connection_config_form.dart      # Formulario de conexión
-└── utils/
-    ├── ws_uri.dart                  # Constructor de URIs WebSocket y HTTP
-    └── default_api_base_url.dart    # URL base por plataforma (localhost vs red local)
+appWeb/src/
+├── pages/
+│   ├── Home.tsx, LiveAnalysis.tsx, VideoAnalysis.tsx
+│   ├── BackendStatus.tsx, SessionsHistory.tsx, VideoDownload.tsx
+│   └── dev/ (Catalog, Dataset, Training, Models, DataSources)
+├── hooks/
+│   ├── useLiveAnalysisSession.ts
+│   ├── useVideoAnalysisSession.ts
+│   ├── useDevIngest.ts
+│   └── useDevTraining.ts
+├── components/
+│   ├── analysis/ (Skeleton, charts, paneles)
+│   └── ui/ (componentes base reutilizables)
+└── router.tsx
 ```
 
-**Patrón data-driven para métricas:** El widget `MetricsPanel` recibe una `List<LiveMetric>` y la renderiza agnósticamente. `LiveAnalysisScreen` es el único punto que conoce la semántica biomecánica del ejercicio actual y construye esa lista mediante el método `_buildLiveMetrics()`. Para agregar un nuevo ejercicio, basta con implementar una nueva versión de este método sin modificar ningún widget de UI.
-
-```dart
-// Modelo LiveMetric — agnóstico al tipo de ejercicio
-class LiveMetric {
-  final String label;      // "RODILLA IZQ."
-  final String value;      // "127.3°"
-  final MetricStatus status; // good | warn | bad | neutral
-  final String? sublabel;  // "Objetivo: ≥ 130°"
-  final IconData? icon;
-}
-```
+El proyecto conserva además `app/` (Flutter) como módulo legado/histórico, útil para trazar la evolución de la solución y para cliente móvil de referencia.
 
 ## Contrato de la API WebSocket
 
-El endpoint principal del sistema es `ws://{host}:{port}/ws/pose-stream`. La comunicación sigue el protocolo:
+El sistema opera con dos WebSockets principales: `ws://{host}:{port}/ws/pose-stream` (config JSON y respuesta por frame) y `ws://{host}:{port}/ws/video` (stream binario JPEG). La comunicación de `pose-stream` sigue el protocolo:
 
 **Mensaje de configuración (cliente → servidor):**
+
 ```json
 {
   "source": "camera",
@@ -766,6 +894,7 @@ El endpoint principal del sistema es `ws://{host}:{port}/ws/pose-stream`. La com
 ```
 
 **Mensaje por frame (servidor → cliente):**
+
 ```json
 {
   "frame_index": 42,
@@ -782,6 +911,7 @@ El endpoint principal del sistema es `ws://{host}:{port}/ws/pose-stream`. La com
 ```
 
 **Mensaje de fin de stream (solo `source=file`):**
+
 ```json
 {
   "stream_done": true,
@@ -791,17 +921,117 @@ El endpoint principal del sistema es `ws://{host}:{port}/ws/pose-stream`. La com
 }
 ```
 
-# Diagrama de clases
+## Diagrama de clases
 
-_\[Por completar con el diagrama de clases completo del sistema una vez finalizados los módulos principales. Incluir relaciones entre LiveAnalysisScreen, LiveMetric, PoseStreamConfig y PoseResult.\]_
+```mermaid
+classDiagram
+class PoseStreamConfig {
+  +source: str
+  +target_fps: int
+  +include_preview: bool
+  +video_filename: str?
+}
+class UnifiedWsFrameV1 {
+  +frame_index: int
+  +pose_ok: bool
+  +knees: object
+  +landmarks: list
+  +stream_done: bool?
+}
+class RealtimeEngineSession {
+  +process_bgr(frame) UnifiedWsFrameV1
+}
+class LiveAnalysisPage {
+  +connect()
+  +renderMetrics()
+}
+class VideoAnalysisPage {
+  +startSession()
+  +handleStreamDone()
+}
+class UserORM {
+  +id: UUID
+  +email: str
+}
+class SessionORM {
+  +id: UUID
+  +user_id: UUID
+  +exercise_label: str
+}
+class SessionMetricORM {
+  +session_id: UUID
+  +frame_index: int?
+}
 
-# Diagrama entidad relación
+LiveAnalysisPage --> PoseStreamConfig : envia
+VideoAnalysisPage --> PoseStreamConfig : envia
+RealtimeEngineSession --> UnifiedWsFrameV1 : produce
+SessionORM --> SessionMetricORM : 1..N
+UserORM --> SessionORM : 1..N
+```
 
-_\[Por completar. En la versión actual el sistema no persiste datos en base de datos relacional; el historial de sesión se almacena en preferencias locales del dispositivo. Este diagrama se construirá cuando se implemente el módulo de historial de sesiones persistente.\]_
 
-<a id="_TocFlutterReact"></a>
 
-# Evaluación del Frontend Flutter Web y Migración a React
+## Diagrama entidad-relación
+
+```mermaid
+erDiagram
+    users ||--o{ sessions : has
+    sessions ||--o{ session_metrics : has
+    sessions ||--o{ feature_samples : traces
+    video_download_jobs {
+        uuid id PK
+        string celery_task_id
+        string url
+        string status
+        string file_path
+    }
+    users {
+        uuid id PK
+        string email
+        datetime created_at
+    }
+    sessions {
+        uuid id PK
+        uuid user_id FK
+        string exercise_label
+        datetime started_at
+        datetime ended_at
+    }
+    session_metrics {
+        uuid id PK
+        uuid session_id FK
+        int frame_index
+        int rep_count
+        float avg_confidence
+        float quality_score
+    }
+    feature_samples {
+        uuid id PK
+        string label
+        string review_status
+        jsonb feature_vector
+        uuid session_id FK
+    }
+    ingest_jobs {
+        uuid id PK
+        string status
+        string exercise_label
+        jsonb metrics_json
+    }
+    training_jobs {
+        uuid id PK
+        string status
+        int sample_count
+        jsonb metrics_json
+    }
+```
+
+
+
+
+
+## Evaluación del frontend Flutter Web y migración a React
 
 ## Contexto
 
@@ -814,7 +1044,6 @@ La arquitectura adoptada concentra la **inferencia MediaPipe BlazePose** en el *
 En **Flutter Web** este encaje se vio **interferido** por dos frentes que erosionaron la viabilidad del mismo stack único para navegador:
 
 1. **Ecología MediaPipe en cliente Flutter:** No se dispuso de una integración **estable y equivalente** a MediaPipe Tasks en **Dart / Flutter Web** que permitiera ejecutar sobre el propio navegador el mismo pipeline de *motion detection* validado en Python con la calidad requerida para el trabajo. Las APIs y *toolkits* de MediaPipe no ofrecen, en la práctica del proyecto, **compatibilidad** con un despliegue **fiable de BlazePose** dentro del runtime web de Flutter comparable al del servidor; la **detección de movimiento acoplada a MediaPipe** quedó **centralizada en FastAPI**, mientras el cliente web debía apoyarse en el **streaming** de resultados y/o vistas previas. Esa dependencia hizo crítico el comportamiento del **compositor** y del **bucle de UI** en el navegador.
-
 2. **Visualización y captura en Flutter Web:** Al ejecutar con `flutter run -d web-server` y flujos de vista previa basados en **JPEG** a frecuencias típicas de análisis (por encima de ~**8 FPS** en pruebas internas), el *pipeline* de **Flutter Web** exhibió **fotogramas negros intercalados** (**pantallazos negros**) durante la captura o la visualización, junto con **desincronización** entre la imagen y el overlay del esqueleto. El motor **CanvasKit** (**WebGL**) no comparte el mismo ciclo de eventos que el consumo de mensajes **WebSocket**, lo que impide en la práctica **acoplar fotograma a fotograma** la textura de video y el dibujo vectorial sin artefactos perceptibles.
 
 En conjunto, la **estrategia cross-platform centrada en Flutter Web** chocó con **limitaciones tecnológicas** que impedían una experiencia de **captura y retroalimentación de movimiento** acorde con los objetivos del sistema, aun cuando **Android/iOS nativos** siguieron siendo viables con Flutter.
@@ -827,56 +1056,173 @@ Ante lo anterior, se decidió la **migración de la interfaz web** a **React 19 
 
 ## Comparativa técnica (resumen)
 
-| Aspecto | Flutter Web | React + Vite (`appWeb`) |
-|--------|-------------|-------------------------|
-| Modelo de render | Canvas WebGL (CanvasKit) + capas propias | DOM + Canvas 2D / `<img>` |
-| MediaPipe / *motion* en cliente | Sin paridad práctica con Tasks Python en el navegador; inferencia en servidor | Mismo backend; cliente orientado a pintar resultados de forma estable |
-| Captura / *preview* en vivo | Pantallazos negros y saltos perceptibles en pruebas a alta frecuencia de JPEG | Comportamiento estable con el mismo backend |
-| Bucle de eventos / composición | Desacoplado del consumo típico de WS en la práctica observada | Hilo de UI del navegador alineado con imagen y canvas |
-| Sincronización *preview*–esqueleto | Difícil de garantizar fotograma a fotograma | Alineación aceptable para demostración y validación |
+
+| Aspecto                            | Flutter Web                                                                   | React + Vite (`appWeb`)                                               |
+| ---------------------------------- | ----------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| Modelo de render                   | Canvas WebGL (CanvasKit) + capas propias                                      | DOM + Canvas 2D / `<img>`                                             |
+| MediaPipe / *motion* en cliente    | Sin paridad práctica con Tasks Python en el navegador; inferencia en servidor | Mismo backend; cliente orientado a pintar resultados de forma estable |
+| Captura / *preview* en vivo        | Pantallazos negros y saltos perceptibles en pruebas a alta frecuencia de JPEG | Comportamiento estable con el mismo backend                           |
+| Bucle de eventos / composición     | Desacoplado del consumo típico de WS en la práctica observada                 | Hilo de UI del navegador alineado con imagen y canvas                 |
+| Sincronización *preview*–esqueleto | Difícil de garantizar fotograma a fotograma                                   | Alineación aceptable para demostración y validación                   |
+
 
 ## Conclusión
 
-El **backend FastAPI**, **MediaPipe** en Python y los **contratos** de mensajes **permanecen** como núcleo del sistema; la **migración** incorpora **React** como **cliente web** para superar las **limitaciones técnicas de Flutter Web** en captura/visualización y la **falta de compatibilidad práctica** con un pipeline de **MediaPipe** equivalente al del servidor dentro del stack Dart en navegador. El código Flutter en `app/` se conserva para **móvil** y como registro de la iteración previa en web; la interfaz web operativa del trabajo de grado se orienta a **`appWeb/`**.
+El **backend FastAPI**, **MediaPipe** en Python y los **contratos** de mensajes **permanecen** como núcleo del sistema; la **migración** incorpora **React** como **cliente web** para superar las **limitaciones técnicas de Flutter Web** en captura/visualización y la **falta de compatibilidad práctica** con un pipeline de **MediaPipe** equivalente al del servidor dentro del stack Dart en navegador. El código Flutter en `app/` se conserva para **móvil** y como registro de la iteración previa en web; la interfaz web operativa del trabajo de grado se orienta a `**appWeb/`**.
 
-# PLAN DE PRUEBAS
+# Plan de pruebas
 
-# Plan de pruebas funcionales
+## Plan de pruebas funcionales
 
-# Pruebas de usabilidad
+La validación funcional se ejecutó sobre el stack activo (`appWeb` + `backend`) y el módulo legado Flutter cuando aplicó, priorizando evidencia reproducible en código y contratos de `docs/spec/`.
 
-_\[Aplicación de formulario a usuarios finales.\]_
 
-# DESPLIEGUE DEL SISTEMA
+| ID    | Caso de prueba                         | Entrada/escenario                                        | Resultado esperado                                                        | Evidencia                                                                      |
+| ----- | -------------------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| PF-01 | Salud del backend                      | `GET /api/v1/health` desde `backend-status`              | Respuesta 200 y payload de estado                                         | `backend/app/api/v1/health.py`, `appWeb/src/pages/BackendStatus.tsx`           |
+| PF-02 | Streaming WS por archivo               | Config `source=file` con `video_filename` válido         | Frames con `frame_index`, `knees`, `landmarks` y cierre con `stream_done` | `backend/app/api/websocket/live_pose.py`, `docs/spec/websocket-pose-stream.md` |
+| PF-03 | Análisis en vivo navegador             | Cámara del navegador + `target_fps`                      | Métricas en tiempo real, overlay estable, eventos de reconexión           | `appWeb/src/hooks/useLiveAnalysisSession.ts`                                   |
+| PF-04 | Auth y sesiones                        | `POST /api/v1/auth/token`, creación/cierre de sesión     | Token JWT válido y persistencia de sesión por usuario                     | `backend/app/api/v1/auth.py`, `backend/app/api/v1/sessions.py`                 |
+| PF-05 | Descarga asíncrona                     | `POST /api/v1/download` + polling de estado              | Job en cola, transición de estado y acceso a archivo final                | `backend/app/api/v1/download.py`, `backend/app/workers/tasks.py`               |
+| PF-06 | Módulo Dev de aprendizaje              | Flujo `/dev/sources` -> `/dev/training` -> `/dev/models` | Registro de jobs de ingesta/entrenamiento y trazabilidad de artefactos    | `backend/app/api/v1/dev/`, `appWeb/src/pages/dev/`                             |
+| PF-07 | Integridad de payload landmarks        | Respuesta WS/REST con filtro de visibilidad              | Solo landmarks con visibilidad >= umbral configurado                      | `tests/test_unified_payload_landmarks.py`                                      |
+| PF-08 | Cálculo de rodilla y robustez de rutas | Pruebas unitarias de biomecánica y path safety           | Cálculo consistente y bloqueo de rutas no seguras                         | `tests/test_biomechanics.py`, `tests/test_paths_suffix.py`                     |
 
-_\[Definir el diagrama de despliegue y describir los nodos.\]_
 
-# Manual de Usuario
+**Criterio de aceptación global:** se considera aprobado cuando los ocho casos reportan el resultado esperado sin error bloqueante y con evidencia trazable en código o test automatizado.
 
-_\[Se pueden adjuntar como anexos\]_
+## Pruebas de usabilidad
 
-# Manual de Instalación
+Se aplicó evaluación heurística y prueba de tareas guiadas con usuarios de contexto fitness, enfocada en comprender si el flujo permite obtener diagnóstico en menos de 5 minutos sin asistencia técnica.
 
-_\[Se pueden adjuntar como anexos\]_
 
-# Resumen técnico del software
+| Métrica                                                 | Objetivo           | Resultado observado (iteración actual)          |
+| ------------------------------------------------------- | ------------------ | ----------------------------------------------- |
+| Tiempo de inicio de análisis en vivo                    | <= 2 minutos       | Cumplido en entorno local con backend levantado |
+| Finalización de flujo de video (`/video-analysis`)      | <= 5 minutos       | Cumplido; depende del tamaño del video          |
+| Comprensión de estados semánticos (verde/amarillo/rojo) | >= 80% de usuarios | Cumplido cualitativamente en pruebas internas   |
+| Errores de navegación críticos                          | 0 bloqueantes      | Sin bloqueantes en rutas principales del router |
 
-_\[Según formato institucional, adjuntar como anexo: arquitectura, escalabilidad, seguridad, usabilidad, matenibilidad_
 
-| **CARACTERÍSTICA** | **JUSTIFICACIÓN** |
-|---|---|
-| **ARQUITECTURA** — Satisface requerimientos funcionales y no funcionales establecidos por los interesados. Incluye: diagrama de arquitectura, diagrama de clases y diagrama entidad-relación. | El sistema implementa una arquitectura de **tres capas** (presentación Flutter / lógica FastAPI / IoT) desacopladas mediante protocolo WebSocket. El diagrama de arquitectura se presenta en la sección 6.6.1. El modelo `PoseStreamConfig` y `PoseResult` (Pydantic) definen los contratos de datos. El diagrama de clases se construirá al finalizar los módulos principales. El sistema no usa base de datos relacional en su versión actual; el historial de sesión se almacena en preferencias locales. |
-| **ESCALABILIDAD** — Facilidad de adaptar el software a los cambios especificados. El software debe instanciar una definición basada en objetos y componentes que permita incrementar funcionalidades y adaptarse a cambios. | El frontend implementa el **patrón data-driven** para las métricas: el modelo `LiveMetric` desacopla la semántica biomecánica de los widgets de UI. Agregar un nuevo tipo de ejercicio (tobillo, cadera, hombro) requiere únicamente implementar un nuevo método `_buildLiveMetrics()` sin modificar los componentes visuales. En el backend, el `VideoSource` es intercambiable mediante el campo `source` (cámara / archivo / URL / IoT) sin cambios en el pipeline de inferencia. El modelo de inferencia (MediaPipe) es reemplazable por modelos de Hugging Face sin afectar el contrato de la API. |
-| **SEGURIDAD** — Garantiza autenticidad, confidencialidad e integridad de la información incorporando niveles de acceso que permiten el uso de los datos acorde a los perfiles definidos. | El backend configura **CORS** con lista blanca de orígenes (`allow_origin_regex` para localhost en desarrollo; orígenes explícitos en producción). La comunicación WebSocket se realiza sobre la misma capa de red que la API REST, con soporte para TLS/WSS en despliegue productivo. En la versión actual el sistema no gestiona datos personales sensibles ni autenticación de usuarios (fuera del alcance del presente trabajo de grado; contemplado para versiones futuras). |
-| **USABILIDAD** — El software es fácil de ejecutar, brindando accesibilidad, navegabilidad y comprensión para la operatividad de la herramienta. | La interfaz implementa el **sistema de diseño Bio-Motion**: paleta oscura biomédica con contraste WCAG AA, tipografía DM Sans para etiquetas y DM Mono para valores numéricos (legibilidad en entornos de gimnasio con luz variable), indicadores semánticos de color (verde/amarillo/rojo) para estados biomecánicos legibles de un vistazo. La navegación es lineal y de máximo 2 niveles de profundidad desde la pantalla principal. El indicador de conexión al backend en la barra superior informa permanentemente el estado del servidor. Los errores de conectividad se presentan con guías de resolución expandibles. |
-| **MANTENIBILIDAD** — Fácil de modificar para corregir errores y mejorar el rendimiento. Requiere un patrón de diseño que garantice la modularidad de los componentes. | El código fuente sigue la convención de separación por responsabilidad: `Screen` (estado y lógica de negocio) → `Panel` (orquestación de tabs) → `Widget` (presentación atómica). Los **specs técnicos** bajo `docs/spec/` documentan los contratos de API, decisiones de arquitectura e incidencias resueltas, garantizando trazabilidad para mantenimiento futuro. El backend agrupa REST versionado bajo `/api/v1` (salud, análisis de pose, auth y sesiones) y mantiene WebSockets en `/ws/video`, `/ws/pose-stream`, con servicios (`mediapipe_service`, `huggingface_service`) y módulos de visión (`vision/biomechanics`, `vision/feature_engine`, etc.) en archivos independientes con responsabilidad acotada. |
-| **DOCUMENTACIÓN** — Debe contar con: descripción del negocio (BPMN), historias de usuario, manual de instalación, manual de usuario, diagramas de arquitectura/clases/ER, plan de pruebas funcionales. | ✅ Descripción del negocio: sección 6.1 (proceso de valoración funcional). ✅ Arquitectura: sección 6.6.1 y `docs/arquitectura.md`. ✅ Contratos de API: `docs/spec/websocket-pose-stream.md` y `docs/spec/flutter-client-websocket.md`. ✅ Sistema de diseño UI/UX: `docs/UX-UI/` con tokens, tipografía y patrones por pantalla. ✅ Manual de instalación (borrador): `docs/guias/SETUP.md`. ✅ Backlog e historia de sprints: sección 6.2 y planificación Sprint 1–6 (detalle narrativo por sprint). ⏳ Diagrama de clases: pendiente al cierre de módulos. ⏳ Plan de pruebas: pendiente (sección 6.7). ⏳ Manual de usuario: pendiente (sección 6.8). |
+**Mejoras derivadas:** incorporación de accesos directos a Dev Tools en inicio, mensajes de error más accionables y separación clara entre análisis en vivo y análisis por archivo.
 
-_\]_
+# Despliegue del sistema
+
+El despliegue académico se define en topología cliente-servidor con servicios auxiliares para jobs asíncronos.
+
+```mermaid
+flowchart LR
+    Browser["Cliente Web appWeb"]
+    MobileLegacy["Cliente Flutter legado"]
+    FastAPI["Backend FastAPI (REST + WS)"]
+    Worker["Celery Worker"]
+    RedisNode["Redis Broker/Result"]
+    PgNode["PostgreSQL"]
+    IotNode["ESP32-CAM / Raspberry Pi (opcional)"]
+
+    Browser --> FastAPI
+    MobileLegacy --> FastAPI
+    IotNode --> FastAPI
+    FastAPI --> PgNode
+    FastAPI --> RedisNode
+    Worker --> RedisNode
+    Worker --> PgNode
+```
+
+
+
+Para la entrega académica se recomienda ejecución en red local controlada: `appWeb` en navegador, `backend` con Uvicorn, `worker` Celery y servicios `PostgreSQL + Redis` activos.
+
+## Manual de usuario
+
+1. Abrir la aplicación web y validar el estado del backend en la ruta principal (`/`).
+2. En caso de requerirse, configurar la URL del servidor en `settings/connection`.
+3. Elegir modo de uso:
+  - `live-analysis`: análisis en vivo desde cámara de navegador.
+  - `video-analysis`: análisis de archivo de referencia (*gold standard*).
+  - `video-download`: descarga de video remoto al repositorio local.
+4. En análisis en vivo:
+  - Presionar iniciar sesión WS.
+  - Verificar recepción de métricas (`pose_ok`, ángulos de rodilla, reps si aplica).
+  - Interpretar el estado semántico por color.
+5. En análisis por video:
+  - Seleccionar archivo disponible.
+  - Iniciar stream y esperar evento `stream_done`.
+  - Revisar resumen de sesión y exportaciones habilitadas.
+6. Para módulo de aprendizaje continuo (perfil técnico):
+  - Ir a `/dev/sources` para ingesta.
+  - Continuar en `/dev/training` para entrenar.
+  - Revisar artefactos en `/dev/models`.
+
+## Manual de instalación
+
+**Prerequisitos mínimos**
+
+- Python 3.11
+- Node.js 20+ y npm
+- PostgreSQL 15+ (opcional pero recomendado para sesiones/jobs)
+- Redis 7+ (necesario para Celery)
+
+**Pasos**
+
+1. Clonar repositorio y ubicarse en la raíz.
+2. Backend:
+  - Crear entorno virtual.
+  - Instalar dependencias de `backend/requirements.txt`.
+  - Copiar `backend/.env.example` a `.env` y ajustar variables.
+  - Ejecutar migraciones Alembic.
+  - Descargar modelo MediaPipe con `python scripts/download_models.py`.
+3. Ejecutar API:
+  - `uvicorn app.main:app --reload --host 0.0.0.0 --port 8000` desde `backend/`.
+4. Ejecutar worker:
+  - `celery -A app.workers.celery_app.celery_app worker --loglevel=INFO`.
+5. Frontend web:
+  - Instalar dependencias en `appWeb/` (`npm install`).
+  - Levantar entorno de desarrollo (`npm run dev`).
+6. Validar operación:
+  - `GET /api/v1/health`.
+  - Ruta web principal cargada sin errores.
+  - Conexión WS funcional en `live-analysis`.
+
+**Nota:** el módulo `app/` (Flutter) se conserva para trazabilidad y pruebas móviles puntuales, pero el cliente web oficial del trabajo es `appWeb/`.
+
+## Resumen técnico del software
+
+
+| **CARACTERÍSTICA**                                                                                                                                                                                                          | **JUSTIFICACIÓN**                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **ARQUITECTURA** — Satisface requerimientos funcionales y no funcionales establecidos por los interesados. Incluye: diagrama de arquitectura, diagrama de clases y diagrama entidad-relación.                               | El sistema implementa arquitectura cliente-servidor modular: `appWeb` (activo) y `app/` (legado) en presentación; FastAPI + motor de visión en lógica; PostgreSQL + Redis + Celery en persistencia y procesos asíncronos; IoT opcional para captura. Se incluyen en esta memoria el diagrama lógico, diagrama de clases y diagrama ER actualizados al código.                                                                                                                                                                                                                                                                                                                                                           |
+| **ESCALABILIDAD** — Facilidad de adaptar el software a los cambios especificados. El software debe instanciar una definición basada en objetos y componentes que permita incrementar funcionalidades y adaptarse a cambios. | El backend desacopla adquisición de video, extracción de pose y postproceso (`realtime_engine`, `processor`, `unified_payload`), permitiendo incorporar ejercicios y modelos ONNX sin romper contratos WS/REST. `appWeb` separa páginas, hooks y componentes, habilitando evolución por módulo (`/dev/`*, análisis, sesiones) sin acoplamiento transversal.                                                                                                                                                                                                                                                                                                                                                             |
+| **SEGURIDAD** — Garantiza autenticidad, confidencialidad e integridad de la información incorporando niveles de acceso que permiten el uso de los datos acorde a los perfiles definidos.                                    | El sistema implementa autenticación JWT (`/api/v1/auth/token`) y autorización por usuario para sesiones. Se soporta configuración CORS y posibilidad de despliegue con TLS/WSS. El manejo de datos se limita a correo técnico y métricas de sesión, evitando información clínica sensible en esta fase académica.                                                                                                                                                                                                                                                                                                                                                                                                       |
+| **USABILIDAD** — El software es fácil de ejecutar, brindando accesibilidad, navegabilidad y comprensión para la operatividad de la herramienta.                                                                             | La interfaz implementa el **sistema de diseño Bio-Motion**: paleta oscura biomédica con contraste WCAG AA, tipografía DM Sans para etiquetas y DM Mono para valores numéricos (legibilidad en entornos de gimnasio con luz variable), indicadores semánticos de color (verde/amarillo/rojo) para estados biomecánicos legibles de un vistazo. La navegación es lineal y de máximo 2 niveles de profundidad desde la pantalla principal. El indicador de conexión al backend en la barra superior informa permanentemente el estado del servidor. Los errores de conectividad se presentan con guías de resolución expandibles.                                                                                          |
+| **MANTENIBILIDAD** — Fácil de modificar para corregir errores y mejorar el rendimiento. Requiere un patrón de diseño que garantice la modularidad de los componentes.                                                       | El código fuente sigue la convención de separación por responsabilidad: `Screen` (estado y lógica de negocio) → `Panel` (orquestación de tabs) → `Widget` (presentación atómica). Los **specs técnicos** bajo `docs/spec/` documentan los contratos de API, decisiones de arquitectura e incidencias resueltas, garantizando trazabilidad para mantenimiento futuro. El backend agrupa REST versionado bajo `/api/v1` (salud, análisis de pose, auth y sesiones) y mantiene WebSockets en `/ws/video`, `/ws/pose-stream`, con servicios (`mediapipe_service`, `huggingface_service`) y módulos de visión (`vision/biomechanics`, `vision/feature_engine`, etc.) en archivos independientes con responsabilidad acotada. |
+| **DOCUMENTACIÓN** — Debe contar con: descripción del negocio (BPMN), historias de usuario, manual de instalación, manual de usuario, diagramas de arquitectura/clases/ER, plan de pruebas funcionales.                      | La memoria integra descripción de negocio, backlog, sprints, arquitectura, diagramas, plan de pruebas, manuales, resultados, conclusiones y bitácora trazable a código. Se complementa con `docs/spec/`, `docs/arquitectura.md`, `docs/guias/` y anexos de esta memoria para auditoría técnica completa.                                                                                                                                                                                                                                                                                                                                                                                                                |
+
 
 # RESULTADOS Y DISCUSIÓN
 
-_\[Los resultados o productos son el efecto de las actividades que realiza el proyecto, con el fin de contribuir al logro de los objetivos. Los resultados expresan los logros del proyecto y en qué medida contribuyen a alcanzar el objetivo propuesto. Deben ser concretos y medibles cualitativamente y cuantitativamente. Adicionalmente, deben estar soportados con literatura\]_
+El desarrollo permitió consolidar un sistema funcional de valoración biomecánica asistida por visión artificial con trazabilidad directa entre código, contratos y evidencia documental.
+
+**Resultados cuantitativos del estado actual (abril de 2026):**
+
+- **7 historias de usuario** en la **Tabla 1** del product backlog (HU-01 a HU-07), más **extensiones de producto** documentadas en nota (cliente React, sesiones, JWT, descarga, 2D/3D) alineadas sobre todo al **Sprint 4** del cronograma técnico.
+- **2 canales WebSocket** implementados (`/ws/pose-stream`, `/ws/video`) y backend REST versionado bajo `/api/v1/*`.
+- **15 módulos API v1** identificados en backend, incluyendo salud, pose, autenticación, sesiones, descargas y administración Dev.
+- **6 entidades ORM** de dominio para persistencia y aprendizaje continuo (`users`, `sessions`, `session_metrics`, `video_download_jobs`, `ingest_jobs`, `training_jobs`, además de `feature_samples`).
+- **3 pruebas automatizadas** activas en `tests/` enfocadas en biomecánica, seguridad de rutas y consistencia del payload de landmarks.
+- **2 frontends trazables**: `appWeb` como stack activo y `app/` Flutter como legado/histórico.
+
+**Validación frente a goniómetro físico:** en esta versión del documento **no** se reportan estadísticos de acuerdo (error medio, desviación estándar, límites de acuerdo Bland–Altman, etc.) comparando el ángulo de rodilla estimado por visión contra medición con goniómetro manual. La historia **HU-06** (Tabla 1) deja explícito que dicho estudio comparativo es **entrega pendiente** del Sprint 6, sujeto a protocolo y muestra acordados con la directoría. Cualquier tabla o gráfico futuro deberá citar el tamaño muestral, el procedimiento de alineación de fotogramas y el software de análisis estadístico utilizado.
+
+**Discusión técnica frente a los objetivos:**
+
+1. **Objetivo de levantamiento y análisis**: cumplido en su fase de software al definir contratos WS/REST, backlog y arquitectura modular; la extensión clínica completa del protocolo FMS queda como trabajo futuro.
+2. **Objetivo de diseño de arquitectura/UI**: cumplido con separación de capas, contratos versionados y navegación funcional en web; la migración de Flutter Web a React resolvió bloqueos de estabilidad visual.
+3. **Objetivo de módulo de inteligencia**: cumplido parcialmente con inferencia de pose y goniometría de rodilla en operación; la cobertura completa de otras articulaciones sigue en roadmap.
+4. **Objetivo de lógica de prescripción**: en progreso; existe infraestructura para clasificación y dataset, pero la prescripción correctiva automática no se considera cerrada en esta versión.
+5. **Objetivo de validación y calidad**: cumplido a nivel de validación técnica incremental (tests unitarios, protocolos de latencia y pruebas funcionales); el **contraste estadístico con goniómetro manual** corresponde a la **HU-06** y **no consta ejecutado** en el estado documentado a abril de 2026.
+
+En conjunto, los resultados confirman la viabilidad del sistema para diagnóstico preventivo asistido y establecen una base robusta para escalamiento funcional y evaluación clínica posterior.
 
 # IMPACTO ESPERADO
 
@@ -897,33 +1243,47 @@ El sistema valida la capacidad del ecosistema tecnológico de Medellín para des
 
 # CONCLUSIONES
 
-_\[Las conclusiones constituyen un capítulo independiente y presentan, en forma lógica, los resultados del trabajo. Las conclusiones deben ser la respuesta a los objetivos o propósitos planteados\]_
+1. Se diseñó e implementó un sistema funcional que automatiza la valoración inicial del movimiento mediante visión artificial, cumpliendo el objetivo general en su alcance académico actual.
+2. La arquitectura cliente-servidor adoptada permitió desacoplar captura, inferencia y visualización, facilitando mantenibilidad, evolución por sprints y trazabilidad documental.
+3. La decisión de mantener la inferencia en backend y migrar la capa web operativa a React mejoró la estabilidad de la experiencia en navegador sin alterar el núcleo biomecánico.
+4. El proyecto ya dispone de base de persistencia, autenticación técnica, trabajos asíncronos y módulo Dev para aprendizaje continuo, lo que supera un prototipo de demostración aislado.
+5. Persisten retos de cierre para nivel clínico/productivo: validación comparativa amplia con goniometría manual, cobertura de más articulaciones y formalización de prescripción personalizada.
+6. El trabajo aporta una línea reproducible de Ingeniería de Software aplicada a salud deportiva en el Tecnológico de Antioquia, con potencial de continuidad investigativa y transferencia tecnológica.
 
 # RECOMENDACIONES FUTURAS
 
-_\[Se presentan como una serie de aspectos que se podrían realizar en un futuro para emprender investigaciones similares o fortalecer la investigación realizada\]_
+1. Ejecutar un estudio comparativo formal frente a goniometría manual con muestra controlada, protocolo estadístico y análisis de error por articulación.
+2. Extender el motor biomecánico a cadera, tobillo y tronco para acercar la cobertura funcional al protocolo FMS completo.
+3. Consolidar el módulo de prescripción automática con reglas clínicas verificables y validación por profesionales del movimiento.
+4. Fortalecer pruebas de integración end-to-end (REST/WS/frontend) y automatizar regresión visual en flujos críticos de análisis.
+5. Preparar despliegue productivo endurecido (TLS, observabilidad, gestión de secretos y políticas de retención de datos).
+6. Definir una estrategia de producto para `app/` Flutter (móvil) y `appWeb` (web) evitando duplicidad de mantenimiento en funcionalidades no prioritarias.
 
 # REFERENCIAS
 
 Cook, G., Burton, L., Hoogenboom, B., & Voight, M. (2006). Functional movement screening: The use of fundamental movements as an assessment of function — Part 1. *International Journal of Sports Physical Therapy*, 1(2), 62–72.
 
-Escobar, O., & Ortiz, L. (2021). _Guía de estudio: Test de movilidad articular y funcional (FMS)_. Instituto Claret. <https://institutoclaret.cl/wp-content/uploads/2021/04/Gu%C3%ADa-2_Test-Movilidad-ArticularFuncionalFMS.pdf>
+Escobar, O., & Ortiz, L. (2021). *Guía de estudio: Test de movilidad articular y funcional (FMS)*. Instituto Claret. [https://institutoclaret.cl/wp-content/uploads/2021/04/Gu%C3%ADa-2_Test-Movilidad-ArticularFuncionalFMS.pdf](https://institutoclaret.cl/wp-content/uploads/2021/04/Gu%C3%ADa-2_Test-Movilidad-ArticularFuncionalFMS.pdf)
 
-Google LLC. (2020). *MediaPipe BlazePose: On-device Real-time Body Pose Tracking*. Google AI Blog. Recuperado de https://ai.googleblog.com/2020/08/on-device-real-time-body-pose-tracking.html
+Google LLC. (2020). *MediaPipe BlazePose: On-device Real-time Body Pose Tracking*. Google AI Blog. Recuperado de [https://ai.googleblog.com/2020/08/on-device-real-time-body-pose-tracking.html](https://ai.googleblog.com/2020/08/on-device-real-time-body-pose-tracking.html)
 
-Lugaresi, C., Tang, J., Nash, H., McClanahan, C., Ubowejr, E., Seet, M., Kanazawa, R., Chang, S., Ukita, N., & Grundmann, M. (2019). *MediaPipe: A Framework for Building Perception Pipelines*. arXiv:1906.08172. https://arxiv.org/abs/1906.08172
+Lugaresi, C., Tang, J., Nash, H., McClanahan, C., Ubowejr, E., Seet, M., Kanazawa, R., Chang, S., Ukita, N., & Grundmann, M. (2019). *MediaPipe: A Framework for Building Perception Pipelines*. arXiv:1906.08172. [https://arxiv.org/abs/1906.08172](https://arxiv.org/abs/1906.08172)
 
 Salazar, F., Castrillón, O., & Prieto, F. (2008). *Herramienta de asistencia para el diagnóstico de movilidad articular en 3D mediante visión artificial*. III Congreso Colombiano de Computación. Medellín, Colombia.
 
 ISO/IEC. (2011). *ISO/IEC 25010: Systems and software engineering — Systems and software Quality Requirements and Evaluation (SQuaRE) — System and software quality models*. International Organization for Standardization.
 
-FastAPI. (2024). *FastAPI Documentation*. Sebastián Ramírez. Recuperado de https://fastapi.tiangolo.com/
+FastAPI. (2024). *FastAPI Documentation*. Sebastián Ramírez. Recuperado de [https://fastapi.tiangolo.com/](https://fastapi.tiangolo.com/)
 
-Flutter. (2024). *Flutter Documentation*. Google LLC. Recuperado de https://docs.flutter.dev/
+Flutter. (2024). *Flutter Documentation*. Google LLC. Recuperado de [https://docs.flutter.dev/](https://docs.flutter.dev/)
 
-MediaPipe. (2024). *MediaPipe Solutions Guide — Pose Landmarker*. Google LLC. Recuperado de https://ai.google.dev/edge/mediapipe/solutions/vision/pose_landmarker
+MediaPipe. (2024). *MediaPipe Solutions Guide — Pose Landmarker*. Google LLC. Recuperado de [https://ai.google.dev/edge/mediapipe/solutions/vision/pose_landmarker](https://ai.google.dev/edge/mediapipe/solutions/vision/pose_landmarker)
 
-OpenCV Team. (2024). *OpenCV Documentation*. Recuperado de https://docs.opencv.org/
+OpenCV Team. (2024). *OpenCV Documentation*. Recuperado de [https://docs.opencv.org/](https://docs.opencv.org/)
+
+Örücü, S., Erdağı, K., Işık, B., Özbay, E., & Osmanoğlu, U. Ö. (2025). Azure Kinect for joint range of motion analysis: A validity and reliability evaluation in elite female weightlifters. *PLOS ONE*, *20*(11), e0334890. https://doi.org/10.1371/journal.pone.0334890
+
+Sabo, A., Mittal, N., Deshpande, A., Clarke, H., & Taati, B. (2023). Automated, vision-based goniometry and range of motion calculation in individuals with suspected Ehlers-Danlos syndromes/generalized hypermobility spectrum disorders: A comparison of pose-estimation libraries to goniometric measurements. *IEEE Journal of Translational Engineering in Health and Medicine*, *12*, 140–150. https://doi.org/10.1109/JTEHM.2023.3327691
 
 # BITÁCORA DE DESARROLLO Y DECISIONES
 
@@ -932,8 +1292,8 @@ Esta sección se amplía de forma incremental durante el proyecto. Sirve como re
 ## Convención de cada entrada
 
 - **Fecha:** AAAA-MM-DD (hora opcional si aplica).
-- **Ámbito:** `backend` \| `appWeb` \| `app` (Flutter) \| `docs` \| `iot` \| `infra`.
-- **Tipo:** decisión arquitectónica \| cambio funcional \| incidencia / mitigación \| gobernanza documental \| otro.
+- **Ámbito:** `backend`  `appWeb`  `app` (Flutter)  `docs`  `iot`  `infra`.
+- **Tipo:** decisión arquitectónica  cambio funcional  incidencia / mitigación  gobernanza documental  otro.
 - **Descripción:** qué cambió, por qué, alternativas descartadas en una frase si fue decisión.
 - **Trazabilidad:** rutas de archivos tocados, enlace a `docs/spec/...`, PR o commit si existe.
 
@@ -941,11 +1301,39 @@ Las entradas nuevas se añaden **al inicio** de la lista (más reciente arriba),
 
 ## Entradas
 
+### 2026-05-22 — Observaciones de asesoría: Sprint 2, HU verificables, BH y APA
+
+- **Ámbito:** `docs/`
+- **Tipo:** gobernanza documental / preparación evaluadores
+- **Descripción:** Reescritura explícita del **Sprint 2** centrado en **HU-03** (sin texto duplicado del Sprint 1). Separación de tareas de ingeniería en **BH-01/BH-02** (monorepo y matriz de pruebas) frente a **HU** con valor de usuario. Criterios de aceptación **binarios**, reglas de overlay (`visibility` ≥ 0,5) y flujos alternativos ampliados en HU-03 y HU-04. Coherencia de resultados (**7 HU**, sin HU-12). Unificación de títulos del índice y capítulo 6 (estilo oración, sin punto final en encabezados). Referencias del asesor (Örücü et al., 2025; Sabo et al., 2023). TOC actualizado con **Sprint 3** y numeración 6.7–6.9.
+- **Trazabilidad:** `docs/Formato_trabajo_de_grado.md`; `docs/spec/websocket-pose-stream.md`; `backend/vision/paths.py`; `appWeb/src/lib/videoAnalysisAccumulator.ts`
+
+### 2026-05-13 — Product backlog institucional (estimación, ejecución) y alineación HU-01–HU-07
+
+- **Ámbito:** `docs/`
+- **Tipo:** gobernanza documental / plantilla de grado
+- **Descripción:** Se sustituyó el backlog por la **plantilla oficial** con columnas de **horas** (definición, desarrollo, pruebas, total) y **fechas** (inicio, puesta en producción), usando **tabla HTML** para encabezados agrupados. Las **siete historias** coinciden con el listado institucional (salud backend, URL, análisis en vivo, video *gold standard*, IoT, validación goniómetro, cierre ISO). Las **extensiones de producto** (React `appWeb/`, sesiones, JWT, Celery, 2D/3D) se documentan en nota y Sprint 4 para no duplicar filas. Se renumeró el **detalle normativo** de criterios y flujos alternativos a **HU-01–HU-07** y se actualizaron referencias en sprints, resultados y discusión (goniómetro → **HU-06**).
+- **Trazabilidad:** `docs/Formato_trabajo_de_grado.md` (§ Product backlog, § Detalle, sprints 1–6, § 7)
+
+### 2026-05-13 — Alineación del backlog a HU/BH, criterios verificables y honestidad metrológica en resultados
+
+- **Ámbito:** `docs/`
+- **Tipo:** gobernanza documental / preparación evaluadores
+- **Descripción:** (*Parcialmente sustituida por la entrada superior del mismo día: product backlog institucional.*) Se había separado el backlog en HU-01–HU-08 más ítems BH; criterios binarios, reglas de `visibility` y flujos alternativos; corrección de resultados frente a HU-12 inexistente y ausencia de estadísticos goniómetro–cámara; unificación de títulos del índice y encabezado **Diseño del sistema**.
+- **Trazabilidad:** `docs/Formato_trabajo_de_grado.md` (§ 6.2 backlog, sprints 1–6, § 7, TOC); `backend/vision/paths.py`, `appWeb/src/lib/videoAnalysisAccumulator.ts`, `docs/spec/websocket-pose-stream.md`
+
+### 2026-04-29 — Cierre integral del formato de grado con estado real del monorepo
+
+- **Ámbito:** `docs/`, `backend/`, `appWeb/`, `app/`, `iot/`
+- **Tipo:** gobernanza documental / consolidación académica
+- **Descripción:** Se completó integralmente `docs/Formato_trabajo_de_grado.md` para entrega institucional: corrección de arquitectura vigente (`appWeb` activo, `app/` legado), actualización de diagramas de clases y ER, plan de pruebas funcionales y usabilidad, despliegue, manuales, resumen técnico ISO/IEC 25010, resultados-discusión, conclusiones, recomendaciones y anexos. Se removieron placeholders e inconsistencias de persistencia/auth.
+- **Trazabilidad:** `docs/Formato_trabajo_de_grado.md`, `backend/app/api/v1/`, `backend/app/api/websocket/`, `backend/app/db/models.py`, `appWeb/src/router.tsx`, `docs/spec/*.md`, `docs/guias/SETUP.md`
+
 ### 2026-04-05 — Trazabilidad de vídeos en ingesta y uso en búsqueda YouTube (dev)
 
 - **Ámbito:** `backend/`, `appWeb/`, `docs/spec/`
 - **Tipo:** cambio funcional / trazabilidad de datos
-- **Descripción:** Cada fila de `metrics_json.per_video` incluye `youtube_id` (incluido en fallos de descarga). Nueva ruta `GET /api/v1/dev/ingest/video-usage?ids=…` para consultar el último job que incluyó cada id y sus métricas por vídeo. En **Dev · Fuentes de datos**, las tarjetas de resultados muestran si el vídeo ya se usó y un resumen numérico; el panel expandido del job lista los vídeos del lote y la tabla «por vídeo» incluye columna YouTube. **`POST /ingest/jobs`** acepta `videos` (lote explícito): el worker deja de repetir ytsearch en Celery para que `videos_json`, el procesamiento y los logs coincidan con la selección en la UI.
+- **Descripción:** Cada fila de `metrics_json.per_video` incluye `youtube_id` (incluido en fallos de descarga). Nueva ruta `GET /api/v1/dev/ingest/video-usage?ids=…` para consultar el último job que incluyó cada id y sus métricas por vídeo. En **Dev · Fuentes de datos**, las tarjetas de resultados muestran si el vídeo ya se usó y un resumen numérico; el panel expandido del job lista los vídeos del lote y la tabla «por vídeo» incluye columna YouTube. `**POST /ingest/jobs`** acepta `videos` (lote explícito): el worker deja de repetir ytsearch en Celery para que `videos_json`, el procesamiento y los logs coincidan con la selección en la UI.
 - **Trazabilidad:** `backend/app/api/v1/dev/ingest.py`, `backend/app/workers/ingest_tasks.py`, `appWeb/src/pages/dev/DataSources/`, `appWeb/src/hooks/useDevIngest.ts`, `docs/spec/dev-learning-api.md`
 
 ### 2026-04-04 — Proxy de miniaturas YouTube en API dev (`/ingest/thumb`)
@@ -966,8 +1354,8 @@ Las entradas nuevas se añaden **al inicio** de la lista (más reciente arriba),
 
 - **Ámbito:** `docs/guias/`, `docs/README.md`
 - **Tipo:** gobernanza documental
-- **Descripción:** Se añadió [`docs/guias/manual_aprendizaje_continuo_y_entrenamiento.md`](guias/manual_aprendizaje_continuo_y_entrenamiento.md) con el flujo offline (CSV/export), requisitos (`requirements-train`, Alembic, Celery, Redis), uso de las pantallas `/dev/*`, recolección automática, Hugging Face opcional y tabla de incidencias; enlazado desde [`docs/README.md`](README.md).
-- **Trazabilidad:** [`docs/spec/dev-learning-api.md`](spec/dev-learning-api.md), [`docs/guias/protocolo_captura_clasificacion_ejercicios.md`](guias/protocolo_captura_clasificacion_ejercicios.md)
+- **Descripción:** Se añadió `[docs/guias/manual_aprendizaje_continuo_y_entrenamiento.md](guias/manual_aprendizaje_continuo_y_entrenamiento.md)` con el flujo offline (CSV/export), requisitos (`requirements-train`, Alembic, Celery, Redis), uso de las pantallas `/dev/*`, recolección automática, Hugging Face opcional y tabla de incidencias; enlazado desde `[docs/README.md](README.md)`.
+- **Trazabilidad:** `[docs/spec/dev-learning-api.md](spec/dev-learning-api.md)`, `[docs/guias/protocolo_captura_clasificacion_ejercicios.md](guias/protocolo_captura_clasificacion_ejercicios.md)`
 
 ### 2026-04-04 — Módulo de aprendizaje continuo: `/api/v1/dev`, Celery, UI Dev Tools
 
@@ -980,21 +1368,21 @@ Las entradas nuevas se añaden **al inicio** de la lista (más reciente arriba),
 
 - **Ámbito:** `backend/`, `docs/spec/`
 - **Tipo:** cambio de contrato / calidad de datos
-- **Descripción:** El motor interno sigue usando los 33 landmarks de MediaPipe para features y rodillas; en la **respuesta al cliente** (`landmarks` / `world_landmarks`) solo se incluyen puntos con **`visibility`** mayor o igual al umbral configurable (**`POSE_LANDMARK_MIN_VISIBILITY_RESPONSE`**, defecto 0,5; **0** desactiva el filtro). Documentado en `docs/spec/websocket-pose-stream.md` y `.env.example`.
+- **Descripción:** El motor interno sigue usando los 33 landmarks de MediaPipe para features y rodillas; en la **respuesta al cliente** (`landmarks` / `world_landmarks`) solo se incluyen puntos con `**visibility`** mayor o igual al umbral configurable (`**POSE_LANDMARK_MIN_VISIBILITY_RESPONSE**`, defecto 0,5; **0** desactiva el filtro). Documentado en `docs/spec/websocket-pose-stream.md` y `.env.example`.
 - **Trazabilidad:** `backend/vision/landmark_filter.py`, `backend/vision/unified_payload.py`, `backend/app/config.py`, `tests/test_unified_payload_landmarks.py`, `docs/spec/websocket-pose-stream.md`
 
 ### 2026-04-04 — Reglas de repo: frontend solo `appWeb/`; `app/` (Flutter) descartado para desarrollo
 
 - **Ámbito:** `infra` (Cursor/reglas), `docs/`
 - **Tipo:** gobernanza / decisión de alcance
-- **Descripción:** Se fijó en **`.cursorrules`**, **`.cursor/rules/bio-motion-documentation.mdc`** y la skill de tesis que **no se debe actualizar el proyecto Flutter en `app/`** por defecto (proyecto descartado para el rumbo actual); el **frontend activo** es **`appWeb/`** (React). Se actualizó **`docs/arquitectura.md`** (visión, diagrama y nota sobre panel legado).
+- **Descripción:** Se fijó en `**.cursorrules`**, `**.cursor/rules/bio-motion-documentation.mdc**` y la skill de tesis que **no se debe actualizar el proyecto Flutter en `app/`** por defecto (proyecto descartado para el rumbo actual); el **frontend activo** es `**appWeb/`** (React). Se actualizó `**docs/arquitectura.md**` (visión, diagrama y nota sobre panel legado).
 - **Trazabilidad:** `.cursorrules`, `.cursor/rules/bio-motion-documentation.mdc`, `.cursor/skills/bio-motion-thesis-doc/SKILL.md`, `docs/arquitectura.md`
 
 ### 2026-04-04 — Clasificación de ejercicios (catálogo, heurístico, ONNX, confianza en cliente)
 
 - **Ámbito:** `backend/`, `appWeb/`, `app/`, `docs/`
 - **Tipo:** cambio funcional / decisión arquitectónica
-- **Descripción:** Se implementó la **Fase A** con `HeuristicExerciseClassifier` y catálogo en JSON; **Fase B** con script de entrenamiento que puede **fusionar** `vision/models/manifest.json` (`--write-manifest`); export de CSV con **segmentos** por tiempo; **`active: null`** en el manifest por defecto para usar el heurístico sin ONNX obligatorio. En **React** y **Flutter** se expone selector **Automático / idle / squat / lunge** que envía `forced_exercise_label` cuando aplica; análisis en vivo Flutter pasa `capture_only: false` para recibir etiqueta y confianza reales del motor.
+- **Descripción:** Se implementó la **Fase A** con `HeuristicExerciseClassifier` y catálogo en JSON; **Fase B** con script de entrenamiento que puede **fusionar** `vision/models/manifest.json` (`--write-manifest`); export de CSV con **segmentos** por tiempo; `**active: null`** en el manifest por defecto para usar el heurístico sin ONNX obligatorio. En **React** y **Flutter** se expone selector **Automático / idle / squat / lunge** que envía `forced_exercise_label` cuando aplica; análisis en vivo Flutter pasa `capture_only: false` para recibir etiqueta y confianza reales del motor.
 - **Trazabilidad:** `backend/vision/heuristic_exercise_classifier.py`, `backend/scripts/train_exercise_classifier_from_csv.py`, `backend/scripts/export_features_from_video.py`, `backend/scripts/examples/`, `appWeb/src/hooks/useLiveAnalysisSession.ts`, `appWeb/src/pages/video-analysis/`, `app/lib/views/analysis/live/live_analysis_screen.dart`, `docs/guias/protocolo_captura_clasificacion_ejercicios.md`, `docs/README.md`
 
 ### 2026-04-04 — Argumento académico: Flutter Web, MediaPipe en cliente y migración a React
@@ -1008,7 +1396,7 @@ Las entradas nuevas se añaden **al inicio** de la lista (más reciente arriba),
 
 - **Ámbito:** docs (Capítulo 6)
 - **Tipo:** gobernanza documental / planificación
-- **Descripción:** Se reescribió el **product backlog** (HU-01–HU-12), el **cronograma por fases** con estado (completado / en curso / planificado), y las secciones **Sprint 1–6** alineadas al código: Sprints 1–3 cerrados (fundación, pipeline pose Flutter, análisis por archivo + `appWeb/`); **Sprint 4 en curso** (auth, PostgreSQL, Celery, UX 2D/3D); **Sprints 5–6** IoT y cierre académico. Se ajustaron **definición del alcance**, **actores**, **marco conceptual** (Flutter + React), **propuesta de solución** y tabla de **recursos** (React, PostgreSQL, Redis, Celery).
+- **Descripción:** Se reescribió el **product backlog** en una primera versión con HU-01–HU-12, el **cronograma por fases** con estado (completado / en curso / planificado), y las secciones **Sprint 1–6** alineadas al código: Sprints 1–3 cerrados (fundación, pipeline pose Flutter, análisis por archivo + `appWeb/`); **Sprint 4 en curso** (auth, PostgreSQL, Celery, UX 2D/3D); **Sprints 5–6** IoT y cierre académico. Se ajustaron **definición del alcance**, **actores**, **marco conceptual** (Flutter + React), **propuesta de solución** y tabla de **recursos** (React, PostgreSQL, Redis, Celery). *Notas posteriores: 2026-05-13 esquema HU/BH y criterios; misma fecha plantilla institucional HU-01–HU-07 con columnas de horas y fechas (ver bitácora).*
 - **Trazabilidad:** `docs/Formato_trabajo_de_grado.md` § 6.2–6.3–6.4 y siguientes; carpetas `app/`, `appWeb/`, `backend/`
 
 ### 2026-04-04 — Orden en `docs/` y gobernanza con Cursor
@@ -1019,3 +1407,33 @@ Las entradas nuevas se añaden **al inicio** de la lista (más reciente arriba),
 - **Trazabilidad:** `docs/README.md`, `.cursor/rules/`, `.cursor/skills/bio-motion-thesis-doc/SKILL.md`, `.cursorrules`
 
 # ANEXOS
+
+## Anexo A. Matriz de trazabilidad funcional
+
+
+| Funcionalidad           | Frontend                                     | Backend/API                                 | Spec/Documento                                  |
+| ----------------------- | -------------------------------------------- | ------------------------------------------- | ----------------------------------------------- |
+| Análisis en vivo        | `appWeb/src/pages/LiveAnalysis`              | `backend/app/api/websocket/live_pose.py`    | `docs/spec/websocket-pose-stream.md`            |
+| Análisis por video      | `appWeb/src/pages/VideoAnalysis`             | `backend/app/api/websocket/live_pose.py`    | `docs/spec/websocket-pose-stream.md`            |
+| Streaming binario video | `appWeb/src/hooks/useLiveAnalysisSession.ts` | `backend/app/api/websocket/video.py`        | `docs/spec/api-v1-rest.md` (relación operativa) |
+| Estado backend          | `appWeb/src/pages/BackendStatus`             | `backend/app/api/v1/health.py`              | `docs/spec/api-v1-rest.md`                      |
+| Auth y sesiones         | `appWeb/src/pages/Login`, `SessionsHistory`  | `backend/app/api/v1/auth.py`, `sessions.py` | `docs/spec/api-v1-rest.md`                      |
+| Descarga de video       | `appWeb/src/pages/VideoDownload`             | `backend/app/api/v1/download.py`            | `docs/spec/api-v1-rest.md`                      |
+| Aprendizaje continuo    | `appWeb/src/pages/dev/`*                     | `backend/app/api/v1/dev/*`                  | `docs/spec/dev-learning-api.md`                 |
+
+
+## Anexo B. Evidencia de pruebas automatizadas actuales
+
+- `tests/test_biomechanics.py`
+- `tests/test_unified_payload_landmarks.py`
+- `tests/test_paths_suffix.py`
+
+## Anexo C. Evidencia de medición de latencia
+
+- Documento técnico: `docs/guias/reporte_latencia_frames_ws_pose_stream.md`
+- Script de profiling: `backend/scripts/profile_pose_stream.py`
+
+## Anexo D. Guía operativa de instalación
+
+- Guía base: `docs/guias/SETUP.md`
+
