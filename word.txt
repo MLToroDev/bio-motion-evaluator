@@ -73,7 +73,7 @@ ABREVIATURAS	8
 6.3.	PLANIFICACIÓN DEL SPRINT 1	59
 6.3.1.	Historias de usuario	59
 6.3.2.	Revisión	60
-6.3.3.	Tareas asociadas y ejecutadas.	61
+6.3.3.	Tareas asociadas y ejecutadas	61
 6.4.	PLANIFICACIÓN DEL SPRINT 2	62
 6.4.1.	Historias de usuario	62
 Objetivo del sprint: implementar el primer flujo de valor biomecÃ¡nico en tiempo real (HU-03): captura de video, inferencia MediaPipe BlazePose en FastAPI, flexiÃ³n bilateral de rodilla, WebSocket /ws/pose-stream y presentaciÃ³n en Flutter con overlay (visibility â‰¥ 0,5), mÃ©tricas y manejo de errores.
@@ -84,39 +84,72 @@ Objetivo del sprint: implementar el primer flujo de valor biomecÃ¡nico en tiem
 Este sprint no replica Sprint 1 (salud/URL), no incluye anÃ¡lisis por archivo (Sprint 3 / HU-04) ni cliente React (extensiÃ³n Sprint 3â€“4).
 
 
+ /ws/pose-stream y presentaciÃ³n en Flutter con overlay (visibility â‰¥ 0,5), mÃ©tricas y manejo de errores.
+Este sprint no replica Sprint 1 (salud/URL), no incluye anÃ¡lisis por archivo (Sprint 3 / HU-04) ni cliente React (extensiÃ³n Sprint 3â€“4).
+
+
+
+ /ws/pose-stream y presentaciÃ³n en Flutter con overlay (visibility â‰¥ 0,5), mÃ©tricas y manejo de errores.
+Este sprint no replica Sprint 1 (salud/URL), no incluye anÃ¡lisis por archivo (Sprint 3 / HU-04) ni cliente React (extensiÃ³n Sprint 3â€“4).
+
+
+
+ /ws/pose-stream y presentaciÃ³n en Flutter con overlay (visibility â‰¥ 0,5), mÃ©tricas y manejo de errores.
+Este sprint no replica Sprint 1 (salud/URL), no incluye anÃ¡lisis por archivo (Sprint 3 / HU-04) ni cliente React (extensiÃ³n Sprint 3â€“4).
+
+
+
 6.4.2.	Revisión	63
-6.4.3.	Tareas asociadas y ejecutadas.	63
+6.4.3.	Tareas asociadas y ejecutadas	63
 6.5.	PLANIFICACIÓN DEL SPRINT 3	64
 6.5.1.	Historias de usuario	64
 6.5.2.	Revisión	65
-6.5.3.	Tareas asociadas y ejecutadas.	66
+6.5.3.	Tareas asociadas y ejecutadas	66
 6.6.	PLANIFICACIÓN DEL SPRINT 4	66
 6.6.1.	Historias de usuario	66
 6.6.2.	Revisión	70
-6.6.3.	Tareas asociadas y ejecutadas.	71
+6.6.3.	Tareas asociadas y ejecutadas	71
 6.6.4.	Criterios de cierre del sprint	71
 6.7.	PLANIFICACIÓN DEL SPRINT 5	72
 6.7.1.	Historias de usuario	72
 6.7.2.	Revisión	72
-6.7.3.	Tareas asociadas y ejecutadas.	73
+6.7.3.	Tareas asociadas y ejecutadas	73
 6.8.	PLANIFICACIÓN DEL SPRINT 6	73
 6.8.1.	Historias de usuario	73
 6.9.	DISEÑO DEL SISTEMA	74
 6.9.1.	Especificación de la arquitectura	74
-6.9.2.	Diagrama de clases.	79
+6.9.2.	Diagrama de clases	79
 6.9.3.	Diagrama entidad relación.	79
 6.9.4.	Evaluación del Frontend Flutter Web y Migración a React	80
 6.10.	PLAN DE PRUEBAS	84
 6.10.1.	Plan de pruebas funcionales	84
 6.10.2.	Pruebas de usabilidad	85
 6.11.	DESPLIEGUE DEL SISTEMA	86
-6.11.1.	Manual de Usuario	87
+6.11.1.	Manual de usuario	87
 6.11.2.	Manual de Instalación	88
 6.11.3.	Resumen técnico del software	90
 7.	RESULTADOS Y DISCUSIÓN	93
 8.	IMPACTO ESPERADO	95
 9.	CONCLUSIONES	97
 10.	RECOMENDACIONES FUTURAS	98
+g/10.1371/journal.pone.0334890
+
+Sabo, A., Mittal, N., Deshpande, A., Clarke, H., & Taati, B. (2023). Automated, vision-based goniometry (MediaPipe vs goniometer). IEEE J Transl Eng Health Med, 12, 140-150. https://doi.org/10.1109/JTEHM.2023.3327691
+
+
+
+g/10.1371/journal.pone.0334890
+
+Sabo, A., Mittal, N., Deshpande, A., Clarke, H., & Taati, B. (2023). Automated, vision-based goniometry (MediaPipe vs goniometer). IEEE J Transl Eng Health Med, 12, 140-150. https://doi.org/10.1109/JTEHM.2023.3327691
+
+
+
+g/10.1371/journal.pone.0334890
+
+Sabo, A., Mittal, N., Deshpande, A., Clarke, H., & Taati, B. (2023). Automated, vision-based goniometry (MediaPipe vs goniometer). IEEE J Transl Eng Health Med, 12, 140-150. https://doi.org/10.1109/JTEHM.2023.3327691
+
+
+
 REFERENCIAS	98
 
 
@@ -124,36 +157,37 @@ REFERENCIAS	98
  
 ÍNDICE DE FIGURAS
 ÍNDICE DE TABLAS
-Tabla 1 Glosario de abreviaturas y acrónimos	5
-Tabla 2 Equipo de trabajo y dedicación al proyecto	21
-Tabla 3 Recursos de hardware requeridos	21
-Tabla 4 Stack tecnológico: herramientas, versiones y roles	22
-Tabla 5 Plan de fases, sprints y estado de avance	24
-Tabla 6 Diagrama de flujo del proceso de análisis biomecánico (BPMN)	37
-Tabla 7 Convenciones de notación del diagrama de flujo	41
-Tabla 8 Actores del sistema y sus responsabilidades	42
-Tabla 9 Barreras de acceso al análisis biomecánico y soluciones propuestas	45
-Tabla 10 Product Backlog: historias de usuario, estimaciones y ejecución	50
-Tabla 11 Historia de usuario HU-01: Configuración del entorno de desarrollo	56
-Tabla 12 Entregables del Sprint 1	57
-Tabla 13 Entregables del Sprint 1	58
-Tabla 14 Historia de usuario HU-01: Análisis biomecánico en tiempo real	59
-Tabla 15 Entregables del Sprint 2	60
-Tabla 16 Historia de usuario HU-04: Análisis de movimiento desde archivo	61
-Tabla 17 Historia de usuario HU-05: Cliente web para análisis biomecánico	62
-Tabla 18 Entregables del Sprint 2 — módulo web y documentación	63
-Tabla 19 Historia de usuario HU-06: Autenticación de usuarios	64
-Tabla 20 Historia de usuario HU-07: Registro de sesiones de análisis	65
-Tabla 21 Historia de usuario HU-08: Descarga de videos de análisis	66
-Tabla 22 Historia de usuario HU-09: Visualización 2D/3D de la pose	67
-Tabla 23 Historia de usuario HU-10: Captura de datos desde dispositivos IoT	69
-Tabla 24 Entregables del Sprint — integración IoT y pruebas de streaming	70
-Tabla 25 Historia de usuario HU-11: Ejecución de pruebas del sistema	70
-Tabla 26 Comparativa técnica: Flutter Web vs. React + Vite	78
-Tabla 27 Casos de prueba funcional del sistema	80
-Tabla 28 Métricas de rendimiento: objetivos y resultados observados	81
-Tabla 29 Evaluación de características de calidad del sistema (ISO/IEEE)	86
-Tabla 30 Matriz de trazabilidad: funcionalidades, módulos y especificaciones	106
+Tabla 1 Glosario de abreviaturas y acrónimos	14
+Tabla 2 Equipo de trabajo y dedicación al proyecto	33
+Tabla 3 Recursos de hardware requeridos	33
+Tabla 4 Stack tecnológico: herramientas, versiones y roles	34
+Tabla 5 Plan de fases, sprints y estado de avance	36
+Tabla 6 Diagrama de flujo del proceso de análisis biomecánico (BPMN)	49
+Tabla 7 Convenciones de notación del diagrama de flujo	53
+Tabla 8 Actores del sistema y sus responsabilidades	54
+Tabla 9 Barreras de acceso al análisis biomecánico y soluciones propuestas	57
+Tabla 10 Product Backlog: historias de usuario, estimaciones y ejecución	62
+Tabla 11 Backlog técnico (BH-01, BH-02)	67
+Tabla 12 Historia de usuario HU-01: Disponibilidad del backend	69
+Tabla 13 Historia de usuario HU-02: Configuración de URL del servidor	70
+Tabla 14 Entregables del Sprint 1	71
+Tabla 15 Historia de usuario HU-03: Análisis en vivo con retroalimentación de rodillas	72
+Tabla 16 Entregables del Sprint 2	73
+Tabla 17 Historia de usuario HU-04: Análisis por video gold standard	74
+Tabla 18 Entregables del Sprint 3	75
+Tabla 19 Extensión de producto: cliente web React (Sprint 3–4)	77
+Tabla 20 Extensión de producto: Autenticación de usuarios	77
+Tabla 21 Extensión de producto: Registro de sesiones de análisis	78
+Tabla 22 Extensión de producto: Descarga de videos de análisis	79
+Tabla 23 Extensión de producto: Visualización 2D/3D de la pose	80
+Tabla 24 Historia de usuario HU-05: Cámara IoT	82
+Tabla 25 Entregables Sprint 5 (IoT)	83
+Tabla 26 Backlog técnico BH-02: Matriz de pruebas funcionales	83
+Tabla 27 Comparativa técnica: Flutter Web vs. React + Vite	92
+Tabla 28 Casos de prueba funcional del sistema	94
+Tabla 29 Métricas de usabilidad: objetivos y resultados observados	95
+Tabla 30 Evaluación de características de calidad del sistema (ISO/IEC 25010)	100
+Tabla 31 Matriz de trazabilidad: funcionalidades, módulos y especificaciones	120
 
 
 
@@ -531,7 +565,7 @@ Fuente: Elaboración propia (2026).
 
 
 Total, estimado supuesto (suma de «Hrs totales», HU-01–HU-07): 340 h.
-Tabla 11 Backlog técnico (BH): tareas de ingeniería sin formato de historia de usuario.
+Tabla 11 Backlog técnico (BH-01, BH-02)
 Id BH	Descripción (valor para el equipo, no para el usuario final)	Sprint	Criterio de cierre (binario)
 BH-01	Configurar monorepo, dependencias y guía SETUP.md	1	Estructura app/, backend/, docs/, tests/, iot/ clonable; backend responde en local según guía
 BH-02	Ejecutar matriz de pruebas funcionales y registrar evidencias (§ 6.8)	6	Matriz § 6.8.1 con resultado Pasa/No pasa por caso; anexos B–C actualizados
@@ -542,7 +576,8 @@ Fuente: Elaboración propia (2026).
 6.3.	PLANIFICACIÓN DEL SPRINT 1
 6.3.1.	Historias de usuario
 Historia de usuario: HU-01 — Configuración del entorno.
-Tabla 12 Historia de usuario HU-01: Configuración del entorno de desarrollo
+Tabla 12 Historia de usuario HU-01: Disponibilidad del backend
+
 NOMBRE DE LA HISTORIA	Configuración del entorno de desarrollo
 ID HISTORIA	HU-01
 PUNTOS DE LA HISTORIA	3
@@ -556,7 +591,8 @@ Cuando:	Se instalan las dependencias
 Espero:	Que el backend FastAPI inicie correctamente
 Fuente: Elaboración propia (2026).
  Historia de usuario: HU-02 — Verificación cliente-servidor
-Tabla 13 Entregables del Sprint 1
+Tabla 13 Historia de usuario HU-02: Configuración de URL del servidor
+
 NOMBRE DE LA HISTORIA	Verificación de comunicación cliente-servidor
 ID HISTORIA	HU-02
 PUNTOS DE LA HISTORIA	5
@@ -581,7 +617,7 @@ Implementación de navegación base (home_screen, rutas), configuración de cone
 •	Documentación:
 Creación inicial de documentación técnica en docs/spec/ y docs/arquitectura.md.
 
-6.3.3.	Tareas asociadas y ejecutadas.
+6.3.3.	Tareas asociadas y ejecutadas
 Tabla 14 Entregables del Sprint 1
 Área	Entregable
 Repositorio	Estructura base (app/, backend/, docs/, tests/, iot/)
@@ -591,7 +627,8 @@ Documentación	Guía SETUP, README principal
 6.4.	PLANIFICACIÓN DEL SPRINT 2
 6.4.1.	Historias de usuario
 Historia de usuario: HU-3 — Análisis en vivo
-Tabla 15 Historia de usuario HU-01: Análisis biomecánico en tiempo real
+Tabla 15 Historia de usuario HU-03: Análisis en vivo con retroalimentación de rodillas
+
 NOMBRE DE LA HISTORIA	Análisis biomecánico en tiempo real
 ID HISTORIA	HU-01
 PUNTOS DE LA HISTORIA	3
@@ -614,7 +651,7 @@ Generación de payload JSON por frame con métricas biomecánicas (knee flexion 
 Desarrollo de live_analysis_screen, integración con WebSocket, visualización con overlay, panel de métricas (LiveMetric) y gráfica histórica. 
 •	Documentación:
 Consolidación del contrato en docs/spec/websocket-pose-stream.md.
-6.4.3.	Tareas asociadas y ejecutadas.
+6.4.3.	Tareas asociadas y ejecutadas
 Tabla 16 Entregables del Sprint 2
 Área	Entregable
 Backend	live_pose.py, captura OpenCV e inferencia por frame
@@ -624,7 +661,7 @@ Manual	Pruebas en entorno local
 6.5.	PLANIFICACIÓN DEL SPRINT 3
 6.5.1.	Historias de usuario
 Historia de usuario: HU-4 — Análisis por video
-Tabla 17 Historia de usuario HU-04: Análisis de movimiento desde archivo
+Tabla 17 Historia de usuario HU-04: Análisis por video gold standard
 NOMBRE DE LA HISTORIA	Análisis de movimiento desde archivo
 ID HISTORIA	HU-04
 PUNTOS DE LA HISTORIA	3
@@ -638,7 +675,7 @@ Cuando:	finaliza el análisis
 Espero:	recibir un resumen del desempeño
 Fuente: Elaboración propia (2026).
 Historia de usuario: HU-05 — Cliente web
-Tabla 18 Historia de usuario HU-05: Cliente web para análisis biomecánico
+Tabla 18 Entregables del Sprint 3
 NOMBRE DE LA HISTORIA	Cliente web para análisis biomecánico
 ID HISTORIA	HU-05
 PUNTOS DE LA HISTORIA	8
@@ -663,8 +700,8 @@ Rutas live-analysis y video-analysis, implementación de hooks (useLiveAnalysisS
 •	Decisión técnica:
 Se documentaron limitaciones de Flutter Web, priorizando React (appWeb/) como cliente principal web.
 
-6.5.3.	Tareas asociadas y ejecutadas.
-Tabla 19 Entregables del Sprint 2 — módulo web y documentación
+6.5.3.	Tareas asociadas y ejecutadas
+Tabla 19 Extensión de producto: cliente web React (Sprint 3–4)
 Área	gold_standard_videos
 appWeb	Router, layout y paneles de análisis
 Docs	Reporte de latencia (reporte_latencia_frames_ws_pose_stream.md)
@@ -672,7 +709,7 @@ Docs	Reporte de latencia (reporte_latencia_frames_ws_pose_stream.md)
 6.6.	PLANIFICACIÓN DEL SPRINT 4
 6.6.1.	Historias de usuario
 Historia de usuario: HU-06 — Autenticación
-Tabla 20 Historia de usuario HU-06: Autenticación de usuarios
+Tabla 20 Extensión de producto: Autenticación de usuarios
 NOMBRE DE LA HISTORIA	Autenticación de usuarios
 ID HISTORIA	HU-06
 PUNTOS DE LA HISTORIA	5
@@ -686,7 +723,7 @@ Cuando:	ingreso credenciales incorrectas
 Espero:	recibir un mensaje de error
 Fuente: Elaboración propia (2026).
 Historia de usuario: HU-07 — Gestión de sesiones
-Tabla 21 Historia de usuario HU-07: Registro de sesiones de análisis
+Tabla 21 Extensión de producto: Registro de sesiones de análisis
 NOMBRE DE LA HISTORIA	Registro de sesiones de análisis
 ID HISTORIA	HU-07
 PUNTOS DE LA HISTORIA	8
@@ -700,7 +737,7 @@ Cuando:	consulto el historial
 Espero:	ver sesiones anteriores
 Fuente: Elaboración propia (2026).
 Historia de usuario: HU-08 — Descarga de videos
-Tabla 22 Historia de usuario HU-08: Descarga de videos de análisis
+Tabla 22 Extensión de producto: Descarga de videos de análisis
 NOMBRE DE LA HISTORIA	Descarga de videos de análisis
 ID HISTORIA	HU-08
 PUNTOS DE LA HISTORIA	5
@@ -714,7 +751,7 @@ Cuando:	finaliza el proceso
 Espero:	poder acceder al video
 Fuente: Elaboración propia (2026).
 Historia de usuario: HU-09 — Visualización avanzada
-Tabla 23 Historia de usuario HU-09: Visualización 2D/3D de la pose
+Tabla 23 Extensión de producto: Visualización 2D/3D de la pose
 NOMBRE DE LA HISTORIA	Visualización 2D/3D de la pose
 ID HISTORIA	HU-09
 PUNTOS DE LA HISTORIA	8
@@ -737,7 +774,7 @@ En web: visualización avanzada (PoseSkeleton3DScene, poseTopology).
 •	Motor de análisis:
 Desarrollo del módulo backend/vision/ (extractor, features, clasificación y tracking).
 
-6.6.3.	Tareas asociadas y ejecutadas.
+6.6.3.	Tareas asociadas y ejecutadas
 •	Implementación de routers (auth, sessions, download) 
 •	Integración frontend-backend con persistencia 
 •	Desarrollo de visualización 3D 
@@ -750,7 +787,7 @@ Desarrollo del módulo backend/vision/ (extractor, features, clasificación y tr
 6.7.	PLANIFICACIÓN DEL SPRINT 5
 6.7.1.	Historias de usuario
 Historia de usuario: HU-10 — Integración IoT
-Tabla 24 Historia de usuario HU-10: Captura de datos desde dispositivos IoT
+Tabla 24 Historia de usuario HU-05: Cámara IoT
 NOMBRE DE LA HISTORIA	Captura de datos desde dispositivos IoT
 ID HISTORIA	HU-10
 PUNTOS DE LA HISTORIA	3
@@ -765,15 +802,15 @@ Espero:	obtener valores registrados
 Fuente: Elaboración propia (2026).
 6.7.2.	Revisión
 Sprint orientado a integración con dispositivos IoT para pruebas en campo.
-6.7.3.	Tareas asociadas y ejecutadas.
-Tabla 25 Entregables del Sprint — integración IoT y pruebas de streaming
+6.7.3.	Tareas asociadas y ejecutadas
+Tabla 25 Entregables Sprint 5 (IoT)
 Integración con ESP32-CAM / Raspberry Pi 	Integración con ESP32-CAM / Raspberry Pi 
 Pruebas de streaming hacia backend 	Pruebas de streaming hacia backend 
 Medición de latencia 	Medición de latencia 
 6.8.	PLANIFICACIÓN DEL SPRINT 6
 6.8.1.	Historias de usuario
 Historia de usuario: HU-11 — Pruebas del sistema
-Tabla 26 Historia de usuario HU-11: Ejecución de pruebas del sistema
+Tabla 26 Backlog técnico BH-02: Matriz de pruebas funcionales
 NOMBRE DE LA HISTORIA	Ejecución de pruebas del sistema
 ID HISTORIA	HU-11
 PUNTOS DE LA HISTORIA	5
@@ -855,7 +892,7 @@ Mensaje de fin de stream (solo `source=file`):
       "server_ts_ms": 1748000000500     
     }     
      
-6.9.2.	Diagrama de clases.
+6.9.2.	Diagrama de clases
  
 6.9.3.	Diagrama entidad relación.
  
@@ -908,7 +945,7 @@ PF-08 	Cálculo de rodilla y robustez de rutas 	Pruebas unitarias de biomecánic
 Criterio de aceptación global: se considera aprobado cuando los ocho casos reportan el resultado esperado sin error bloqueante y con evidencia trazable en código o test automatizado.
 6.10.2.	Pruebas de usabilidad 
 Se aplicó evaluación heurística y prueba de tareas guiadas con usuarios de contexto fitness, enfocada en comprender si el flujo permite obtener diagnóstico en menos de 5 minutos sin asistencia técnica.
-Tabla 29 Métricas de rendimiento: objetivos y resultados observados
+Tabla 29 Métricas de usabilidad: objetivos y resultados observados
 Métrica 	Objetivo 	Resultado observado (iteración actual) 
 Tiempo de inicio de análisis en vivo 	<= 2 minutos 	Cumplido en entorno local con backend levantado 
 Finalización de flujo de video (/video-analysis) 	<= 5 minutos 	Cumplido; depende del tamaño del video 
@@ -923,7 +960,7 @@ El despliegue académico se define en topología cliente-servidor con servicios 
   
 Para la entrega académica se recomienda ejecución en red local controlada: appWeb en navegador, backend con Uvicorn, worker Celery y servicios PostgreSQL + Redis activos. 
   
-6.11.1.	Manual de Usuario 
+6.11.1.	Manual de usuario 
 1. Abrir la aplicación web y validar el estado del backend en la ruta principal (/). 
 2. En caso de requerirse, configurar la URL del servidor en settings/connection. 
 3. Elegir modo de uso: 
@@ -974,14 +1011,14 @@ Nota: el módulo app/ (Flutter) se conserva para trazabilidad y pruebas móviles
   
 6.11.3.	Resumen técnico del software 
   
-Tabla 30 Evaluación de características de calidad del sistema (ISO/IEEE)
+Tabla 30 Evaluación de características de calidad del sistema (ISO/IEC 25010)
 **CARACTERÍSTICA** 	**JUSTIFICACIÓN** 
 ARQUITECTURA — Satisface requerimientos funcionales y no funcionales establecidos por los interesados. Incluye: diagrama de arquitectura, diagrama de clases y diagrama entidad-relación. 	El sistema implementa arquitectura cliente-servidor modular: appWeb (activo) y app/ (legado) en presentación; FastAPI + motor de visión en lógica; PostgreSQL + Redis + Celery en persistencia y procesos asíncronos; IoT opcional para captura. Se incluyen en esta memoria el diagrama lógico, diagrama de clases y diagrama ER actualizados al código. 
 ESCALABILIDAD — Facilidad de adaptar el software a los cambios especificados. El software debe instanciar una definición basada en objetos y componentes que permita incrementar funcionalidades y adaptarse a cambios. 	El backend desacopla adquisición de video, extracción de pose y postproceso (realtime_engine, processor, unified_payload), permitiendo incorporar ejercicios y modelos ONNX sin romper contratos WS/REST. appWeb separa páginas, hooks y componentes, habilitando evolución por módulo (/dev/*, análisis, sesiones) sin acoplamiento transversal. 
 SEGURIDAD — Garantiza autenticidad, confidencialidad e integridad de la información incorporando niveles de acceso que permiten el uso de los datos acorde a los perfiles definidos. 	El sistema implementa autenticación JWT (/api/v1/auth/token) y autorización por usuario para sesiones. Se soporta configuración CORS y posibilidad de despliegue con TLS/WSS. El manejo de datos se limita a correo técnico y métricas de sesión, evitando información clínica sensible en esta fase académica. 
 USABILIDAD — El software es fácil de ejecutar, brindando accesibilidad, navegabilidad y comprensión para la operatividad de la herramienta. 	La interfaz implementa el sistema de diseño Bio-Motion: paleta oscura biomédica con contraste WCAG AA, tipografía DM Sans para etiquetas y DM Mono para valores numéricos (legibilidad en entornos de gimnasio con luz variable), indicadores semánticos de color (verde/amarillo/rojo) para estados biomecánicos legibles de un vistazo. La navegación es lineal y de máximo 2 niveles de profundidad desde la pantalla principal. El indicador de conexión al backend en la barra superior informa permanentemente el estado del servidor. Los errores de conectividad se presentan con guías de resolución expandibles. 
 MANTENIBILIDAD — Fácil de modificar para corregir errores y mejorar el rendimiento. Requiere un patrón de diseño que garantice la modularidad de los componentes. 	El código fuente sigue la convención de separación por responsabilidad: Screen (estado y lógica de negocio) → Panel (orquestación de tabs) → Widget (presentación atómica). Los specs técnicos bajo docs/spec/ documentan los contratos de API, decisiones de arquitectura e incidencias resueltas, garantizando trazabilidad para mantenimiento futuro. El backend agrupa REST versionado bajo /api/v1 (salud, análisis de pose, auth y sesiones) y mantiene WebSockets en /ws/video, /ws/pose-stream, con servicios (mediapipe_service, huggingface_service) y módulos de visión (vision/biomechanics, vision/feature_engine, etc.) en archivos independientes con responsabilidad acotada. 
-DOCUMENTACIÓN — Debe contar con: descripción del negocio (BPMN), historias de usuario, manual de instalación, manual de usuario, diagramas de arquitectura/clases/ER, plan de pruebas funcionales. 	La memoria integra descripción de negocio, backlog, sprints, arquitectura, diagramas, plan de pruebas, manuales, resultados, conclusiones y bitácora trazable a código. Se complementa con docs/spec/, docs/arquitectura.md, docs/guias/ y anexos de esta memoria para auditoría técnica completa. 
+DOCUMENTACIÓN — Debe contar con: descripción del negocio (BPMN), historias de usuario, manual de instalación, Manual de usuario, diagramas de arquitectura/clases/ER, Plan de pruebas funcionales. 	La memoria integra descripción de negocio, backlog, sprints, arquitectura, diagramas, Plan de pruebas, manuales, resultados, conclusiones y bitácora trazable a código. Se complementa con docs/spec/, docs/arquitectura.md, docs/guias/ y anexos de esta memoria para auditoría técnica completa. 
   
 7.	RESULTADOS Y DISCUSIÓN 
 El desarrollo permitió consolidar un sistema funcional de valoración biomecánica asistida por visión artificial con trazabilidad directa entre código, contratos y evidencia documental. 
@@ -1079,7 +1116,7 @@ Entradas
 2026-04-29 — Cierre integral del formato de grado con estado real del monorepo 
 •	Ámbito: docs/, backend/, appWeb/, app/, iot/ 
 •	Tipo: gobernanza documental / consolidación académica 
-•	Descripción: Se completó integralmente docs/Formato_trabajo_de_grado.md para entrega institucional: corrección de arquitectura vigente (appWeb activo, app/ legado), actualización de diagramas de clases y ER, plan de pruebas funcionales y usabilidad, despliegue, manuales, resumen técnico ISO/IEC 25010, resultados-discusión, conclusiones, recomendaciones y anexos. Se removieron placeholders e inconsistencias de persistencia/auth. 
+•	Descripción: Se completó integralmente docs/Formato_trabajo_de_grado.md para entrega institucional: corrección de arquitectura vigente (appWeb activo, app/ legado), actualización de diagramas de clases y ER, Plan de pruebas funcionales y usabilidad, despliegue, manuales, resumen técnico ISO/IEC 25010, resultados-discusión, conclusiones, recomendaciones y anexos. Se removieron placeholders e inconsistencias de persistencia/auth. 
 •	Trazabilidad: docs/Formato_trabajo_de_grado.md, backend/app/api/v1/, backend/app/api/websocket/, backend/app/db/models.py, appWeb/src/router.tsx, docs/spec/*.md, docs/guias/SETUP.md 
   
 2026-04-05 — Trazabilidad de vídeos en ingesta y uso en búsqueda YouTube (dev) 

@@ -12,6 +12,7 @@ import {
 import { persistApiBase, readApiBase, readTargetRepGoal } from '../../../lib/prefs';
 import type { AnalysisSummary } from '../../../lib/videoAnalysisAccumulator';
 import { buildGoldStandardVideosHttpUrl } from '../../../lib/wsUri';
+import { flags, mvpVideoAnalysisDefaults } from '../../../config/featureFlags';
 import type { AnalysisInputSource, ConfigValues, VideoExerciseMode } from '../components/ConfigPanel';
 
 const VIDEO_ANALYSIS_CONFIG_OPEN_KEY = 'bm-video-analysis-config-open';
@@ -54,7 +55,7 @@ export function useVideoAnalysis() {
     },
   });
 
-  const [config, setConfig] = useState<ConfigValues>({
+  const [config, setConfig] = useState<ConfigValues>(() => ({
     apiBase: readApiBase(),
     videoFilename: '',
     serverCameraDeviceIndex: 0,
@@ -63,14 +64,15 @@ export function useVideoAnalysis() {
     fpsText: '10',
     maxThroughput: false,
     includePreview: true,
-    captureOnly: true,
+    captureOnly: false,
     exerciseMode: 'auto' satisfies VideoExerciseMode,
     serverDiagnostics: false,
     streamTuningAuto: true,
     skeletonOnly: false,
     previewFps: 10,
     previewQuality: 84,
-  });
+    ...mvpVideoAnalysisDefaults(),
+  }));
 
   const handleConfigChange = useCallback(
     <K extends keyof ConfigValues>(key: K, value: ConfigValues[K]) => {
@@ -189,16 +191,19 @@ export function useVideoAnalysis() {
     if (!formValid) return;
     resetCsv();
     const previewQ = Math.round(config.previewQuality);
+    const inputSource = flags.mvpDemoMode ? 'file' : config.inputSource;
+    const captureOnly = flags.mvpDemoMode ? false : config.captureOnly;
     const targetFps =
-      config.inputSource === 'browser_camera'
+      inputSource === 'browser_camera'
         ? fpsParsed.value
         : config.maxThroughput
           ? 30
           : fpsParsed.value;
 
-    const forcedExerciseLabel = !config.captureOnly && config.exerciseMode !== 'auto' ? config.exerciseMode : null;
+    const forcedExerciseLabel =
+      !captureOnly && config.exerciseMode !== 'auto' ? config.exerciseMode : null;
     let err: string | null = null;
-    if (config.inputSource === 'file') {
+    if (inputSource === 'file') {
       err = await start({
         mode: 'file',
         apiBaseUrl: config.apiBase,
@@ -208,12 +213,12 @@ export function useVideoAnalysis() {
         includePreview: config.includePreview,
         previewFps: config.previewFps,
         previewJpegQuality: previewQ,
-        captureOnly: config.captureOnly,
+        captureOnly,
         serverDiagnostics: config.serverDiagnostics,
         streamTuning: config.streamTuningAuto ? 'auto' : 'off',
         forcedExerciseLabel,
       });
-    } else if (config.inputSource === 'server_camera') {
+    } else if (inputSource === 'server_camera') {
       err = await start({
         mode: 'server_camera',
         apiBaseUrl: config.apiBase,
@@ -223,7 +228,7 @@ export function useVideoAnalysis() {
         includePreview: config.includePreview,
         previewFps: config.previewFps,
         previewJpegQuality: previewQ,
-        captureOnly: config.captureOnly,
+        captureOnly,
         serverDiagnostics: config.serverDiagnostics,
         streamTuning: config.streamTuningAuto ? 'auto' : 'off',
         forcedExerciseLabel,
@@ -236,7 +241,7 @@ export function useVideoAnalysis() {
         targetFps,
         includePreview: config.includePreview,
         previewJpegQuality: previewQ,
-        captureOnly: config.captureOnly,
+        captureOnly,
         forcedExerciseLabel,
       });
     }

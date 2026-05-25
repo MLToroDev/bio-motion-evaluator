@@ -1,4 +1,5 @@
 import { Fragment, lazy, Suspense } from 'react';
+import { flags } from '../../config/featureFlags';
 import { AnalysisSummaryDialog } from '../../components/AnalysisSummaryDialog';
 import { DashboardPanel } from '../../components/DashboardPanel';
 import { ConfigPanel } from './components/ConfigPanel';
@@ -177,28 +178,30 @@ export default function VideoAnalysis() {
               exerciseConfidence={ui.exerciseConfidence}
               variant="hero"
             />
-            <Suspense
-              fallback={
-                <div
-                  className="bm-caption"
-                  style={{
-                    border: '1px solid var(--bm-border)',
-                    borderRadius: 'var(--bm-radius-md)',
-                    padding: '2rem',
-                    textAlign: 'center',
-                    color: 'var(--bm-text-secondary)',
-                  }}
-                >
-                  Cargando vista 3D…
-                </div>
-              }
-            >
-              <PoseSkeleton3DPanel
-                landmarks={ui.landmarks}
-                worldLandmarks={ui.worldLandmarks}
-                mirrorHorizontal={false}
-              />
-            </Suspense>
+            {flags.showVideo3D ? (
+              <Suspense
+                fallback={
+                  <div
+                    className="bm-caption"
+                    style={{
+                      border: '1px solid var(--bm-border)',
+                      borderRadius: 'var(--bm-radius-md)',
+                      padding: '2rem',
+                      textAlign: 'center',
+                      color: 'var(--bm-text-secondary)',
+                    }}
+                  >
+                    Cargando vista 3D…
+                  </div>
+                }
+              >
+                <PoseSkeleton3DPanel
+                  landmarks={ui.landmarks}
+                  worldLandmarks={ui.worldLandmarks}
+                  mirrorHorizontal={false}
+                />
+              </Suspense>
+            ) : null}
           </div>
           <div
             style={{

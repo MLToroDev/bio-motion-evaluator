@@ -1,14 +1,17 @@
 import { useNavigate } from 'react-router-dom';
+import { flags } from '../../config/featureFlags';
 import { BmButton } from '../../components/BmButton';
 import { LiveIndicatorDot } from '../../components/LiveIndicatorDot';
 import { NavCard } from '../../components/NavCard';
 import { SectionHeader } from '../../components/SectionHeader';
 import { StatusBadge } from '../../components/StatusBadge';
+import { useSprint4Availability } from '../../hooks/useSprint4Availability';
 import { useHome } from './hooks/useHome';
 
 export default function Home() {
   const navigate = useNavigate();
   const { apiBase, lastSession, ok, loading, ping, badgeStatus } = useHome();
+  const { sprint4UiEnabled, checking: sprint4Checking, unavailableMessage } = useSprint4Availability(apiBase);
 
   return (
     <div>
@@ -37,6 +40,11 @@ export default function Home() {
         Evaluación biomecánica en tiempo real
       </p>
       <StatusBadge status={badgeStatus} />
+      {flags.mvpDemoMode && (
+        <p className="bm-caption" style={{ marginTop: 'var(--bm-space-sm)', color: 'var(--bm-text-disabled)' }}>
+          Modo demostración (MVP): análisis en vivo y por archivo gold standard.
+        </p>
+      )}
       {!ok && !loading && (
         <p className="bm-caption" style={{ marginTop: 'var(--bm-space-md)', color: 'var(--bm-angle-warn)' }}>
           Verifica el servidor en {apiBase}.{' '}
@@ -49,6 +57,11 @@ export default function Home() {
           </button>
         </p>
       )}
+      {unavailableMessage && !sprint4Checking ? (
+        <p className="bm-caption" style={{ marginTop: 'var(--bm-space-md)', color: 'var(--bm-angle-warn)' }}>
+          {unavailableMessage}
+        </p>
+      ) : null}
 
       <SectionHeader>Análisis</SectionHeader>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -67,57 +80,71 @@ export default function Home() {
         />
       </div>
 
-      <SectionHeader>Herramientas</SectionHeader>
-      <NavCard
-        title="Descarga remota de vídeo"
-        subtitle="Cola en el servidor (yt-dlp)."
-        icon="⬇️"
-        onClick={() => navigate('/video-download')}
-      />
+      {sprint4UiEnabled ? (
+        <>
+          <SectionHeader>Herramientas</SectionHeader>
+          <NavCard
+            title="Descarga remota de vídeo"
+            subtitle="Cola en el servidor (yt-dlp)."
+            icon="⬇️"
+            onClick={() => navigate('/video-download')}
+          />
 
-      <SectionHeader>Desarrollo — aprendizaje del clasificador</SectionHeader>
-      <p className="bm-caption" style={{ marginBottom: 8, maxWidth: 520 }}>
-        No forma parte del flujo de análisis clínico: dataset, entrenamiento ONNX y manifest. También en el menú lateral bajo «Dev Tools».
-      </p>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-        <NavCard
-          title="Dev · Fuentes de datos"
-          subtitle="Buscar vídeos YouTube e ingestar muestras automáticamente."
-          icon="🔍"
-          onClick={() => navigate('/dev/sources')}
-        />
-        <NavCard
-          title="Dev · Catálogo"
-          subtitle="Ejercicios y conteo de muestras por etiqueta."
-          icon="📚"
-          onClick={() => navigate('/dev/catalog')}
-        />
-        <NavCard
-          title="Dev · Dataset"
-          subtitle="Revisar y aprobar muestras 32D antes de entrenar."
-          icon="🗃️"
-          onClick={() => navigate('/dev/dataset')}
-        />
-        <NavCard
-          title="Dev · Entrenamiento"
-          subtitle="Encolar job Celery (requiere worker + requirements-train)."
-          icon="🧠"
-          onClick={() => navigate('/dev/training')}
-        />
-        <NavCard
-          title="Dev · Modelos"
-          subtitle="Activar versión ONNX en manifest.json."
-          icon="⚙️"
-          onClick={() => navigate('/dev/models')}
-        />
-      </div>
+          <SectionHeader>Cuenta</SectionHeader>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <NavCard title="Iniciar sesión" subtitle="Acceso y token JWT." icon="🔐" onClick={() => navigate('/login')} />
+            <NavCard
+              title="Historial de sesiones"
+              subtitle="Lista con JWT."
+              icon="📋"
+              onClick={() => navigate('/sessions')}
+            />
+            <NavCard title="Perfil" subtitle="Token y cierre de sesión local." icon="👤" onClick={() => navigate('/profile')} />
+          </div>
+        </>
+      ) : null}
 
-      <SectionHeader>Cuenta</SectionHeader>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-        <NavCard title="Iniciar sesión" subtitle="Acceso y token JWT." icon="🔐" onClick={() => navigate('/login')} />
-        <NavCard title="Historial de sesiones" subtitle="Lista con JWT." icon="📋" onClick={() => navigate('/sessions')} />
-        <NavCard title="Perfil" subtitle="Token y cierre de sesión local." icon="👤" onClick={() => navigate('/profile')} />
-      </div>
+      {flags.showDevTools ? (
+        <>
+          <SectionHeader>Desarrollo — aprendizaje del clasificador</SectionHeader>
+          <p className="bm-caption" style={{ marginBottom: 8, maxWidth: 520 }}>
+            No forma parte del flujo de análisis clínico: dataset, entrenamiento ONNX y manifest. También en el menú lateral
+            bajo «Dev Tools».
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <NavCard
+              title="Dev · Fuentes de datos"
+              subtitle="Buscar vídeos YouTube e ingestar muestras automáticamente."
+              icon="🔍"
+              onClick={() => navigate('/dev/sources')}
+            />
+            <NavCard
+              title="Dev · Catálogo"
+              subtitle="Ejercicios y conteo de muestras por etiqueta."
+              icon="📚"
+              onClick={() => navigate('/dev/catalog')}
+            />
+            <NavCard
+              title="Dev · Dataset"
+              subtitle="Revisar y aprobar muestras 32D antes de entrenar."
+              icon="🗃️"
+              onClick={() => navigate('/dev/dataset')}
+            />
+            <NavCard
+              title="Dev · Entrenamiento"
+              subtitle="Encolar job Celery (requiere worker + requirements-train)."
+              icon="🧠"
+              onClick={() => navigate('/dev/training')}
+            />
+            <NavCard
+              title="Dev · Modelos"
+              subtitle="Activar versión ONNX en manifest.json."
+              icon="⚙️"
+              onClick={() => navigate('/dev/models')}
+            />
+          </div>
+        </>
+      ) : null}
 
       <SectionHeader>Diagnóstico</SectionHeader>
       <NavCard

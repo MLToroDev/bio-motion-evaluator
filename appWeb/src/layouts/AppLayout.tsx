@@ -1,28 +1,11 @@
 import { useCallback, useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
+import { getDevSidebarLinks, getSidebarLinks } from '../config/navLinks';
+import { useSprint4Availability } from '../hooks/useSprint4Availability';
+import { readApiBase } from '../lib/prefs';
 import './AppLayout.css';
 
 const SIDEBAR_COLLAPSED_KEY = 'bm-sidebar-collapsed';
-
-const links = [
-  { to: '/', label: 'Inicio', end: true },
-  { to: '/live-analysis', label: 'Análisis en vivo' },
-  { to: '/video-analysis', label: 'Análisis de video' },
-  { to: '/video-download', label: 'Descarga de video' },
-  { to: '/login', label: 'Iniciar sesión' },
-  { to: '/sessions', label: 'Historial sesiones' },
-  { to: '/profile', label: 'Perfil' },
-  { to: '/backend-status', label: 'Diagnóstico' },
-  { to: '/settings/connection', label: 'Configuración' },
-];
-
-const devLinks = [
-  { to: '/dev/sources', label: 'Dev · Fuentes de datos' },
-  { to: '/dev/catalog', label: 'Dev · Catálogo' },
-  { to: '/dev/dataset', label: 'Dev · Dataset' },
-  { to: '/dev/training', label: 'Dev · Entrenamiento' },
-  { to: '/dev/models', label: 'Dev · Modelos' },
-];
 
 function readSidebarCollapsed(): boolean {
   try {
@@ -34,6 +17,9 @@ function readSidebarCollapsed(): boolean {
 
 export default function AppLayout() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(readSidebarCollapsed);
+  const { sprint4UiEnabled } = useSprint4Availability(readApiBase());
+  const links = getSidebarLinks(sprint4UiEnabled);
+  const devLinks = getDevSidebarLinks();
 
   const toggleSidebar = useCallback(() => {
     setSidebarCollapsed((prev) => {
@@ -68,22 +54,26 @@ export default function AppLayout() {
             {label}
           </NavLink>
         ))}
-        <div
-          style={{
-            margin: '0.75rem 0.6rem',
-            fontSize: '0.65rem',
-            textTransform: 'uppercase',
-            letterSpacing: '0.06em',
-            opacity: 0.45,
-          }}
-        >
-          Dev Tools
-        </div>
-        {devLinks.map(({ to, label }) => (
-          <NavLink key={to} to={to} className={({ isActive }) => (isActive ? 'active' : '')}>
-            {label}
-          </NavLink>
-        ))}
+        {devLinks.length > 0 ? (
+          <>
+            <div
+              style={{
+                margin: '0.75rem 0.6rem',
+                fontSize: '0.65rem',
+                textTransform: 'uppercase',
+                letterSpacing: '0.06em',
+                opacity: 0.45,
+              }}
+            >
+              Dev Tools
+            </div>
+            {devLinks.map(({ to, label }) => (
+              <NavLink key={to} to={to} className={({ isActive }) => (isActive ? 'active' : '')}>
+                {label}
+              </NavLink>
+            ))}
+          </>
+        ) : null}
       </aside>
 
       {sidebarCollapsed && (

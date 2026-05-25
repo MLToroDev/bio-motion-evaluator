@@ -5,10 +5,12 @@ Attribute VB_Name = "ActualizarTesisBioMotion"
 '
 ' USO:
 '   1. Abre tu .docx del trabajo de grado.
-'   2. Alt+F11 → Archivo → Importar archivo → selecciona este .bas
-'   3. Ejecuta: ActualizarTesisBioMotion
-'   4. Guarda copia antes (Ctrl+Shift+S) — la macro modifica el documento activo.
-'   5. Al finalizar: Actualizar tabla de contenido (clic derecho TOC → Actualizar).
+'   2. Alt+F11 → si ya importó antes, elimine el módulo «ActualizarTesisBioMotion» viejo
+'   3. Archivo → Importar archivo → selecciona este .bas
+'      (error «too many continuations»: use esta versión; no mezcle con copia antigua)
+'   4. Ejecuta: ActualizarTesisBioMotion
+'   5. Guarda copia antes (Ctrl+Shift+S) — la macro modifica el documento activo.
+'   6. Al finalizar: Actualizar tabla de contenido (clic derecho TOC → Actualizar).
 '
 ' Requiere: Microsoft Word con macros habilitadas.
 '==============================================================================
@@ -16,6 +18,7 @@ Attribute VB_Name = "ActualizarTesisBioMotion"
 Option Explicit
 
 Private Const SEP As String = vbCrLf
+Private Const WD_FIND_MAX As Long = 255   ' Límite de Word para Find.Text / Replacement.Text
 
 '--- Punto de entrada principal -------------------------------------------------
 Public Sub ActualizarTesisBioMotion()
@@ -27,7 +30,7 @@ Public Sub ActualizarTesisBioMotion()
         "• Resultados (7 HU, sin HU-12)" & SEP & _
         "• Backlog, referencias, títulos y criterios binarios" & SEP & SEP & _
         "¿Desea continuar? (recomendado: guardar copia antes)", _
-        vbYesNo + vbQuestion, "Bio-Motion — Actualizar tesis")
+        vbYesNo + vbQuestion, "Bio-Motion - Actualizar tesis")
     If resp <> vbYes Then Exit Sub
 
     Application.ScreenUpdating = False
@@ -43,20 +46,23 @@ Public Sub ActualizarTesisBioMotion()
     InsertarAntecedentesValidacion
     InsertarReferenciasAsesor
     NormalizarTitulosCapitulo6
+    ActualizarIndiceDeTablas
     AgregarNotaDetalleHU
 
     Application.ScreenUpdating = True
     MsgBox "Correcciones automáticas aplicadas." & SEP & SEP & _
            "REVISE MANUALMENTE:" & SEP & _
-           "1) Tablas con numeración vieja en índice de tablas (Tabla 11–26)." & SEP & _
-           "2) Inserte § «Detalle de historias de usuario» desde docs/Formato_trabajo_de_grado.md si falta." & SEP & _
-           "3) Actualice tabla de contenido y campos." & SEP & _
-           "4) Compruebe diagramas y figuras.", vbInformation, "Bio-Motion — Listo"
+           "1) Inserte § «Detalle de historias de usuario» desde docs/Formato_trabajo_de_grado.md si falta." & SEP & _
+           "2) Actualice tabla de contenido y campos (clic derecho TOC)." & SEP & _
+           "3) Compruebe números de página del índice de tablas." & SEP & _
+           "4) Compruebe diagramas y figuras.", vbInformation, "Bio-Motion - Listo"
     Exit Sub
 
 ErrHandler:
     Application.ScreenUpdating = True
-    MsgBox "Error " & Err.Number & ": " & Err.Description, vbCritical, "Bio-Motion — Error"
+    MsgBox "Error " & Err.Number & ": " & Err.Description & SEP & SEP & _
+           "Sugerencia: ejecute SoloCorregirSprint2 o corrija la sección indicada manualmente.", _
+           vbCritical, "Bio-Motion - Error"
 End Sub
 
 '--- Reemplazos de texto en todo el documento ---------------------------------
@@ -81,16 +87,20 @@ Private Sub AplicarReemplazosGlobales()
         ReplaceAll CStr(reps(i)(0)), CStr(reps(i)(1))
     Next i
 
-    ' Criterios genéricos HU-04 (si aún existen)
-    ReplaceAll "Cuando: 	selecciono un video" & vbTab & "Espero:	que el sistema procese el archivo correctamente", _
-               "Cuando:	selecciono un video .mp4, .mov, .avi, .mkv o .webm válido" & vbTab & _
-               "Espero:	recibir frames con stream_done y resumen con maxLeftDeg, maxRightDeg, minLeftDeg, minRightDeg, pctGood, lastRepCount, lastExerciseLabel y lastQualityFlags"
-    ReplaceAll "Cuando:	finaliza el análisis" & vbTab & "Espero:	recibir un resumen del desempeño", _
-               "Cuando:	el archivo tiene extensión no permitida (p. ej. .wmv)" & vbTab & _
-               "Espero:	rechazo con mensaje que enumere .mp4, .mov, .avi, .mkv, .webm"
+    ' Criterios genéricos HU-04 (reemplazo corto; detalle completo va en tabla vía ReplaceTablaHU)
+    ReplaceAll "Espero:	que el sistema procese el archivo correctamente", _
+               "Espero:	recibo stream_done y resumen con maxLeftDeg, maxRightDeg, pctGood (pasa/no pasa)"
+    ReplaceAll "Espero:	recibir un resumen del desempeño", _
+               "Espero:	rechazo si la extensión no es .mp4, .mov, .avi, .mkv o .webm"
 End Sub
 
+' Find/Reemplazar solo admite 255 caracteres; textos largos usan Range.
 Private Sub ReplaceAll(ByVal findText As String, ByVal replaceText As String)
+    If Len(findText) = 0 Then Exit Sub
+    If Len(findText) > WD_FIND_MAX Or Len(replaceText) > WD_FIND_MAX Then
+        ReplaceAllPorRango findText, replaceText
+        Exit Sub
+    End If
     With ActiveDocument.Content.Find
         .ClearFormatting
         .Replacement.ClearFormatting
@@ -104,6 +114,36 @@ Private Sub ReplaceAll(ByVal findText As String, ByVal replaceText As String)
         .MatchWildcards = False
         .Execute Replace:=wdReplaceAll
     End With
+End Sub
+
+Private Sub ReplaceAllPorRango(ByVal findText As String, ByVal replaceText As String)
+    Dim rng As Range
+    Dim n As Long
+    n = 0
+    Do
+        Set rng = BuscarTexto(findText)
+        If rng Is Nothing Then Exit Do
+        EstablecerTextoRango rng, replaceText
+        n = n + 1
+        If n > 300 Then Exit Do
+    Loop
+End Sub
+
+' Escribe en un Range sin límite de 255 (por trozos).
+Private Sub EstablecerTextoRango(ByVal rng As Range, ByVal texto As String)
+    Dim i As Long
+    Dim parte As String
+    If rng Is Nothing Then Exit Sub
+    rng.Text = ""
+    If Len(texto) = 0 Then Exit Sub
+    For i = 1 To Len(texto) Step WD_FIND_MAX
+        parte = Mid$(texto, i, WD_FIND_MAX)
+        rng.InsertAfter parte
+    Next i
+End Sub
+
+Private Sub EstablecerTextoCelda(ByVal celda As Cell, ByVal texto As String)
+    EstablecerTextoRango celda.Range, texto
 End Sub
 
 '--- Corrige Sprint de HU-01 y observaciones HU-04/HU-05 en Tabla 10 -----------
@@ -277,20 +317,20 @@ Private Sub ReplaceTablaHU(ByVal tituloTabla As String, ByVal idHu As String, _
     Set t = rng.Tables(1)
     On Error Resume Next
     ' Plantilla institucional: fila 1 = nombre, 2 = ID, 4 = Como, 5 = Quiero, 6 = Para
-    t.Cell(1, 2).Range.Text = nombre
-    t.Cell(2, 2).Range.Text = idHu
+    EstablecerTextoCelda t.Cell(1, 2), nombre
+    EstablecerTextoCelda t.Cell(2, 2), idHu
     If t.Rows.Count >= 5 Then
-        t.Cell(4, 2).Range.Text = como
-        t.Cell(5, 2).Range.Text = quiero
+        EstablecerTextoCelda t.Cell(4, 2), como
+        EstablecerTextoCelda t.Cell(5, 2), quiero
     End If
-    If t.Rows.Count >= 6 Then t.Cell(6, 2).Range.Text = para
+    If t.Rows.Count >= 6 Then EstablecerTextoCelda t.Cell(6, 2), para
     Dim r As Long
     For r = 1 To t.Rows.Count
         If InStr(1, Normalizar(t.Cell(r, 1).Range.Text), "CRITERIOS", vbTextCompare) > 0 Then
             If r < t.Rows.Count And t.Rows(r + 1).Cells.Count >= 1 Then
-                t.Cell(r + 1, 1).Range.Text = criterios
+                EstablecerTextoCelda t.Cell(r + 1, 1), criterios
             ElseIf t.Rows(r).Cells.Count >= 2 Then
-                t.Cell(r, 2).Range.Text = criterios
+                EstablecerTextoCelda t.Cell(r, 2), criterios
             End If
             Exit For
         End If
@@ -308,11 +348,13 @@ Private Sub InsertarAntecedentesValidacion()
 End Sub
 
 Private Sub InsertarReferenciasAsesor()
-    If BuscarTexto("Örücü") Is Nothing Then
-        InsertarAntesDe "11.	BITÁCORA", _
-            "Örücü, S., Erdağı, K., Işık, B., Özbay, E., & Osmanoğlu, U. Ö. (2025). Azure Kinect for joint range of motion analysis: A validity and reliability evaluation in elite female weightlifters. PLOS ONE, 20(11), e0334890. https://doi.org/10.1371/journal.pone.0334890" & SEP & SEP & _
-            "Sabo, A., Mittal, N., Deshpande, A., Clarke, H., & Taati, B. (2023). Automated, vision-based goniometry and range of motion calculation in individuals with suspected Ehlers-Danlos syndromes/generalized hypermobility spectrum disorders: A comparison of pose-estimation libraries to goniometric measurements. IEEE Journal of Translational Engineering in Health and Medicine, 12, 140–150. https://doi.org/10.1109/JTEHM.2023.3327691" & SEP & SEP
-    End If
+    Dim ref1 As String, ref2 As String
+    If Not BuscarTexto("Orucu") Is Nothing Then Exit Sub
+    If Not BuscarTexto("Örücü") Is Nothing Then Exit Sub
+    ref1 = "Orucu, S., Erdagi, K., Isik, B., Ozbay, E., & Osmanoglu, U. O. (2025). Azure Kinect for joint range of motion analysis. PLOS ONE, 20(11), e0334890. https://doi.org/10.1371/journal.pone.0334890"
+    ref2 = "Sabo, A., Mittal, N., Deshpande, A., Clarke, H., & Taati, B. (2023). Automated, vision-based goniometry (MediaPipe vs goniometer). IEEE J Transl Eng Health Med, 12, 140-150. https://doi.org/10.1109/JTEHM.2023.3327691"
+    InsertarAntesDe "11.	BITÁCORA", ref1 & SEP & SEP & ref2 & SEP & SEP
+    InsertarAntesDe "REFERENCIAS", ref1 & SEP & SEP & ref2 & SEP & SEP
 End Sub
 
 '--- Títulos capítulo 6: estilo oración, sin punto final en encabezados -------
@@ -336,6 +378,72 @@ Private Sub NormalizarTitulosCapitulo6()
     Next i
 End Sub
 
+'--- Índice de tablas y pies «Tabla N …» (cap. 6) ------------------------------
+' Sin Array() gigante: VBA limita a 25 continuaciones (_) por procedimiento al importar.
+Private Sub ActualizarIndiceDeTablas()
+    ReplaceAll "Tabla 27 Historia de usuario HU-06:", "Historia de usuario HU-06:"
+    ReplaceAll "Tabla 28 Historia de usuario HU-07:", "Historia de usuario HU-07:"
+    IndiceTablasReemplazos10a19
+    IndiceTablasReemplazos20a26
+    CorregirNumeracionTablas27a31
+End Sub
+
+Private Sub IndiceTablasReemplazos10a19()
+    ReplaceAll "Tabla 11 Backlog técnico (BH): tareas de ingeniería sin formato de historia de usuario.", "Tabla 11 Backlog técnico (BH-01, BH-02)"
+    ReplaceAll "Tabla 12 Historia de usuario HU-01: Configuración del entorno de desarrollo", "Tabla 12 Historia de usuario HU-01: Disponibilidad del backend"
+    ReplaceAll "Tabla 12 Historia de usuario HU-01: Configuración del entorno", "Tabla 12 Historia de usuario HU-01: Disponibilidad del backend"
+    ReplaceAll "Tabla 13 Entregables del Sprint 1", "Tabla 13 Historia de usuario HU-02: Configuración de URL del servidor"
+    ReplaceAll "Tabla 13 Historia de usuario HU-02: Configuración de la URL base del servidor", "Tabla 13 Historia de usuario HU-02: Configuración de URL del servidor"
+    ReplaceAll "Tabla 14 Historia de usuario HU-02: Configuración de URL del servidor", "Tabla 14 Entregables del Sprint 1"
+    ReplaceAll "Tabla 15 Historia de usuario HU-01: Análisis biomecánico en tiempo real", "Tabla 15 Historia de usuario HU-03: Análisis en vivo con retroalimentación de rodillas"
+    ReplaceAll "Tabla 15 Historia de usuario HU-03: Análisis biomecánico en tiempo real", "Tabla 15 Historia de usuario HU-03: Análisis en vivo con retroalimentación de rodillas"
+    ReplaceAll "Tabla 16 Historia de usuario HU-03: Análisis en vivo con retroalimentación de rodillas", "Tabla 16 Entregables del Sprint 2"
+    ReplaceAll "Tabla 17 Historia de usuario HU-04: Análisis de movimiento desde archivo", "Tabla 17 Historia de usuario HU-04: Análisis por video gold standard"
+    ReplaceAll "Tabla 17 Historia de usuario HU-03: Análisis en vivo con retroalimentación de rodillas", "Tabla 17 Historia de usuario HU-04: Análisis por video gold standard"
+    ReplaceAll "Tabla 18 Historia de usuario HU-04: Análisis por video gold standard", "Tabla 18 Entregables del Sprint 3"
+    ReplaceAll "Tabla 19 Entregables del Sprint 2 — módulo web y documentación", "Tabla 18 Entregables del Sprint 3"
+    ReplaceAll "Tabla 19 Entregables del Sprint 2", "Tabla 18 Entregables del Sprint 3"
+    ReplaceAll "Tabla 19 Extensión de producto: cliente web React", "Tabla 19 Extensión de producto: cliente web React (Sprint 3–4)"
+End Sub
+
+Private Sub IndiceTablasReemplazos20a26()
+    ReplaceAll "Tabla 20 Historia de usuario HU-06", "Tabla 20 Extensión de producto: Autenticación de usuarios"
+    ReplaceAll "Tabla 21 Historia de usuario HU-07", "Tabla 21 Extensión de producto: Registro de sesiones de análisis"
+    ReplaceAll "Tabla 22 Historia de usuario HU-08", "Tabla 22 Extensión de producto: Descarga de videos de análisis"
+    ReplaceAll "Tabla 23 Historia de usuario HU-09", "Tabla 23 Extensión de producto: Visualización 2D/3D de la pose"
+    ReplaceAll "Tabla 24 Historia de usuario HU-10: Integración IoT", "Tabla 24 Historia de usuario HU-05: Cámara IoT"
+    ReplaceAll "Tabla 24 Historia de usuario HU-10: Cámara IoT", "Tabla 24 Historia de usuario HU-05: Cámara IoT"
+    ReplaceAll "Tabla 24 Historia de usuario HU-05: Cámara IoT frente al backend", "Tabla 24 Historia de usuario HU-05: Cámara IoT"
+    ReplaceAll "Tabla 25 Entregables del Sprint — integración IoT y pruebas de streaming", "Tabla 25 Entregables Sprint 5 (IoT)"
+    ReplaceAll "Tabla 26 Historia de usuario HU-11: Ejecución de pruebas del sistema", "Tabla 26 Backlog técnico BH-02: Matriz de pruebas funcionales"
+    ReplaceAll "Tabla 26 Historia de usuario HU-11: Ejecución de pruebas", "Tabla 26 Backlog técnico BH-02: Matriz de pruebas funcionales"
+    ReplaceAll "Tabla 26 Backlog técnico BH-02: Ejecución de matriz de pruebas funcionales", "Tabla 26 Backlog técnico BH-02: Matriz de pruebas funcionales"
+End Sub
+
+' Segunda «Tabla 26» en índice (Comparativa) → 27…31 en cascada, o apunta a Tabla 27 existente
+Private Sub CorregirNumeracionTablas27a31()
+    If BuscarTexto("Tabla 26 Comparativa técnica") Is Nothing Then Exit Sub
+    If BuscarTexto("Tabla 26 Backlog técnico BH-02") Is Nothing Then Exit Sub
+
+    If Not BuscarTexto("Tabla 27 Comparativa técnica") Is Nothing Then
+        If Not BuscarTexto("Tabla 28 Casos de prueba funcional del sistema") Is Nothing Then
+            ReplaceAll "Tabla 30 Matriz de trazabilidad: funcionalidades, módulos y especificaciones", "Tabla 31 Matriz de trazabilidad: funcionalidades, módulos y especificaciones"
+            ReplaceAll "Tabla 29 Evaluación de características de calidad del sistema (ISO/IEEE)", "Tabla 30 Evaluación de características de calidad del sistema (ISO/IEEE)"
+            ReplaceAll "Tabla 28 Métricas de rendimiento: objetivos y resultados observados", "Tabla 29 Métricas de usabilidad: objetivos y resultados observados"
+            ReplaceAll "Tabla 27 Casos de prueba funcional del sistema", "Tabla 28 Casos de prueba funcional del sistema"
+        End If
+        ReplaceAll "Tabla 26 Comparativa técnica: Flutter Web vs. React + Vite", "Tabla 27 Comparativa técnica: Flutter Web vs. React + Vite"
+        Exit Sub
+    End If
+
+    ReplaceAll "Tabla 30 Matriz de trazabilidad: funcionalidades, módulos y especificaciones", "Tabla 31 Matriz de trazabilidad: funcionalidades, módulos y especificaciones"
+    ReplaceAll "Tabla 30 Matriz de trazabilidad", "Tabla 31 Matriz de trazabilidad"
+    ReplaceAll "Tabla 29 Evaluación de características de calidad del sistema (ISO/IEEE)", "Tabla 30 Evaluación de características de calidad del sistema (ISO/IEEE)"
+    ReplaceAll "Tabla 28 Métricas de rendimiento: objetivos y resultados observados", "Tabla 29 Métricas de rendimiento: objetivos y resultados observados"
+    ReplaceAll "Tabla 27 Casos de prueba funcional del sistema", "Tabla 28 Casos de prueba funcional del sistema"
+    ReplaceAll "Tabla 26 Comparativa técnica: Flutter Web vs. React + Vite", "Tabla 27 Comparativa técnica: Flutter Web vs. React + Vite"
+End Sub
+
 '--- Nota para pegar detalle normativo desde el repo ---------------------------
 Private Sub AgregarNotaDetalleHU()
     Dim nota As String
@@ -355,14 +463,32 @@ Private Sub ReplaceBetweenAnchors(ByVal startAnchor As String, ByVal endAnchor A
     If rngStart Is Nothing Or rngEnd Is Nothing Then Exit Sub
     If rngEnd.Start <= rngStart.Start Then Exit Sub
     Set rngReplace = ActiveDocument.Range(rngStart.Start, rngEnd.Start)
-    rngReplace.Text = newText & SEP
+    EstablecerTextoRango rngReplace, newText & SEP
 End Sub
 
 Private Sub InsertarAntesDe(ByVal anchor As String, ByVal texto As String)
     Dim rng As Range
+    Dim insRng As Range
+    Dim bloque As String
+    Dim i As Long
+    Dim parte As String
+
     Set rng = BuscarTexto(anchor)
     If rng Is Nothing Then Exit Sub
-    rng.InsertBefore texto & SEP
+
+    bloque = texto & SEP
+    Set insRng = ActiveDocument.Range(rng.Start, rng.Start)
+
+    If Len(bloque) <= WD_FIND_MAX Then
+        insRng.InsertBefore bloque
+        Exit Sub
+    End If
+
+    ' InsertBefore también falla con cadenas muy largas: trocear de atrás hacia adelante
+    For i = Len(bloque) To 1 Step -WD_FIND_MAX
+        parte = Mid$(bloque, i, WD_FIND_MAX)
+        insRng.InsertBefore parte
+    Next i
 End Sub
 
 Private Function BuscarTexto(ByVal texto As String) As Range
@@ -383,6 +509,15 @@ Private Function BuscarTexto(ByVal texto As String) As Range
         Set BuscarTexto = Nothing
     End If
 End Function
+
+'--- Solo índice de tablas y pies Tabla 10–31 -----------------------------------
+Public Sub SoloActualizarIndiceDeTablas()
+    Application.ScreenUpdating = False
+    ActualizarIndiceDeTablas
+    Application.ScreenUpdating = True
+    MsgBox "Títulos del índice de tablas y pies «Tabla N» actualizados (10–31)." & SEP & _
+           "Actualice campos/TOC y revise números de página.", vbInformation
+End Sub
 
 '--- Solo reemplazos de títulos (ejecución parcial) ----------------------------
 Public Sub SoloNormalizarTitulos()

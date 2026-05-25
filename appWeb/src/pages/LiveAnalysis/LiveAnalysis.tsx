@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { flags } from '../../config/featureFlags';
 import { BmButton } from '../../components/BmButton';
 import { DashboardPanel } from '../../components/DashboardPanel';
 import { PoseSkeletonCanvas } from '../../components/PoseSkeletonCanvas';
@@ -28,8 +29,8 @@ export default function LiveAnalysis() {
       <header className="header">
         <h1 className="bm-screen-title">Análisis en vivo</h1>
         <p className="subtitle">
-          Cámara + WebSocket <code>/ws/video</code> (JPEG binario). Usa <code>https</code> o{' '}
-          <code>localhost</code> para permisos de cámara.
+          Conecta la cámara del navegador y recibe métricas de rodilla en tiempo real. En{' '}
+          <code>localhost</code> o <code>https</code> el permiso de cámara suele concederse sin problemas.
         </p>
       </header>
 
@@ -101,37 +102,39 @@ export default function LiveAnalysis() {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--bm-space-sm)', marginBottom: 'var(--bm-space-md)' }}>
-            <label className="bm-caption" style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-              <span style={{ color: 'var(--bm-text-secondary)' }}>Ejercicio (clasificador)</span>
-              <select
-                value={exerciseMode}
-                onChange={(e) => setExerciseMode(e.target.value as LiveExerciseMode)}
-                disabled={ui.transmitting}
-                style={{
-                  maxWidth: 280,
-                  padding: '0.45rem 0.6rem',
-                  borderRadius: 'var(--bm-radius-sm)',
-                  border: '1px solid var(--bm-border)',
-                  background: 'var(--bm-surface)',
-                  color: 'var(--bm-text-primary)',
-                  fontFamily: 'var(--bm-font-body)',
-                }}
-              >
-                <option value="auto">Automático</option>
-                <option value="idle">idle</option>
-                <option value="squat">squat</option>
-                <option value="lunge">lunge</option>
-              </select>
-              {ui.transmitting ? (
-                <span style={{ color: 'var(--bm-text-disabled)', fontSize: '0.75rem' }}>
-                  Detén la transmisión para cambiar el modo.
-                </span>
-              ) : (
-                <span style={{ color: 'var(--bm-text-disabled)', fontSize: '0.75rem' }}>
-                  «Automático» usa el motor del servidor; otras opciones fijan la etiqueta (confianza 1,0).
-                </span>
-              )}
-            </label>
+            {flags.showLiveExerciseSelector ? (
+              <label className="bm-caption" style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                <span style={{ color: 'var(--bm-text-secondary)' }}>Ejercicio (clasificador)</span>
+                <select
+                  value={exerciseMode}
+                  onChange={(e) => setExerciseMode(e.target.value as LiveExerciseMode)}
+                  disabled={ui.transmitting}
+                  style={{
+                    maxWidth: 280,
+                    padding: '0.45rem 0.6rem',
+                    borderRadius: 'var(--bm-radius-sm)',
+                    border: '1px solid var(--bm-border)',
+                    background: 'var(--bm-surface)',
+                    color: 'var(--bm-text-primary)',
+                    fontFamily: 'var(--bm-font-body)',
+                  }}
+                >
+                  <option value="auto">Automático</option>
+                  <option value="idle">idle</option>
+                  <option value="squat">squat</option>
+                  <option value="lunge">lunge</option>
+                </select>
+                {ui.transmitting ? (
+                  <span style={{ color: 'var(--bm-text-disabled)', fontSize: '0.75rem' }}>
+                    Detén la transmisión para cambiar el modo.
+                  </span>
+                ) : (
+                  <span style={{ color: 'var(--bm-text-disabled)', fontSize: '0.75rem' }}>
+                    «Automático» usa el motor del servidor; otras opciones fijan la etiqueta (confianza 1,0).
+                  </span>
+                )}
+              </label>
+            ) : null}
             {ui.cameraOn && ui.transmitting && (
               <BmButton variant="outline" onClick={stopTransmit} style={{ width: '100%', fontWeight: 700, letterSpacing: '0.06em' }}>
                 DETENER

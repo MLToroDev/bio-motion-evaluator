@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { flags } from '../../../config/featureFlags';
 import type { PreviewFpsAllowed } from '../../../lib/previewStreamConfig';
 import {
   PREVIEW_FPS_ALLOWED,
@@ -376,36 +377,45 @@ export function ConfigPanel({
             />
           </Field>
 
-          <Field label="Tipo de fuente">
-            <select
-              style={inputStyle}
-              value={values.inputSource}
-              onChange={(e) => onChange('inputSource', e.target.value as AnalysisInputSource)}
-              disabled={running}
+          {flags.showAdvancedVideoConfig ? (
+            <Field label="Tipo de fuente">
+              <select
+                style={inputStyle}
+                value={values.inputSource}
+                onChange={(e) => onChange('inputSource', e.target.value as AnalysisInputSource)}
+                disabled={running}
+              >
+                <option value="file">Vídeo en servidor (gold standard)</option>
+                <option value="server_camera">Webcam del servidor (OpenCV en el API)</option>
+                <option value="browser_camera">Webcam de este equipo (navegador)</option>
+              </select>
+              <span
+                style={{
+                  fontSize: '0.72rem',
+                  color: 'var(--bm-text-secondary)',
+                  fontFamily: 'var(--bm-font-body)',
+                  lineHeight: 1.35,
+                  display: 'block',
+                  marginTop: '0.35rem',
+                }}
+              >
+                {values.inputSource === 'server_camera'
+                  ? 'El API debe ejecutarse en el PC donde está la webcam; no sirve si el backend está en la nube sin cámara.'
+                  : values.inputSource === 'browser_camera'
+                    ? 'El vídeo se captura en tu navegador y se envía al API (válido con servidor local o remoto).'
+                    : 'Lista de archivos bajo la ruta de vídeos gold standard del backend.'}
+              </span>
+            </Field>
+          ) : (
+            <p
+              className="bm-caption"
+              style={{ margin: 0, color: 'var(--bm-text-secondary)', lineHeight: 1.4 }}
             >
-              <option value="file">Vídeo en servidor (gold standard)</option>
-              <option value="server_camera">Webcam del servidor (OpenCV en el API)</option>
-              <option value="browser_camera">Webcam de este equipo (navegador)</option>
-            </select>
-            <span
-              style={{
-                fontSize: '0.72rem',
-                color: 'var(--bm-text-secondary)',
-                fontFamily: 'var(--bm-font-body)',
-                lineHeight: 1.35,
-                display: 'block',
-                marginTop: '0.35rem',
-              }}
-            >
-              {values.inputSource === 'server_camera'
-                ? 'El API debe ejecutarse en el PC donde está la webcam; no sirve si el backend está en la nube sin cámara.'
-                : values.inputSource === 'browser_camera'
-                  ? 'El vídeo se captura en tu navegador y se envía al API (válido con servidor local o remoto).'
-                  : 'Lista de archivos bajo la ruta de vídeos gold standard del backend.'}
-            </span>
-          </Field>
+              Vídeo gold standard en el servidor (modo demostración MVP).
+            </p>
+          )}
 
-          {values.inputSource === 'file' ? (
+          {values.inputSource === 'file' || !flags.showAdvancedVideoConfig ? (
             <>
               <div>
                 <button
@@ -454,7 +464,7 @@ export function ConfigPanel({
             </>
           ) : null}
 
-          {values.inputSource === 'server_camera' ? (
+          {flags.showAdvancedVideoConfig && values.inputSource === 'server_camera' ? (
             <Field
               label="Índice de dispositivo OpenCV"
               hint="0 suele ser la webcam principal en el equipo del API."
@@ -475,7 +485,7 @@ export function ConfigPanel({
             </Field>
           ) : null}
 
-          {values.inputSource === 'browser_camera' ? (
+          {flags.showAdvancedVideoConfig && values.inputSource === 'browser_camera' ? (
             <BrowserCameraFields
               running={running}
               selectedDeviceId={values.browserCameraDeviceId}
@@ -483,27 +493,31 @@ export function ConfigPanel({
             />
           ) : null}
 
-          <CheckRow
-            label="Máximo rendimiento (sin limitar FPS en servidor)"
-            checked={values.maxThroughput}
-            onChange={(v) => onChange('maxThroughput', v)}
-            disabled={running || values.inputSource === 'browser_camera'}
-          />
+          {flags.showAdvancedVideoConfig ? (
+            <CheckRow
+              label="Máximo rendimiento (sin limitar FPS en servidor)"
+              checked={values.maxThroughput}
+              onChange={(v) => onChange('maxThroughput', v)}
+              disabled={running || values.inputSource === 'browser_camera'}
+            />
+          ) : null}
           <Field
             label={
-              values.inputSource === 'browser_camera'
+              flags.showAdvancedVideoConfig && values.inputSource === 'browser_camera'
                 ? 'FPS de envío (navegador → API)'
-                : 'Target FPS'
+                : 'Velocidad de análisis (FPS)'
             }
             error={values.maxThroughput ? undefined : fpsParsedError}
             hint={
-              values.maxThroughput
-                ? values.inputSource === 'browser_camera'
-                  ? undefined
-                  : 'Opción desactivada: el backend procesa cada frame tan pronto como pueda.'
-                : values.inputSource === 'browser_camera'
-                  ? 'Intervalo entre JPEG enviados por WebSocket (también limitado por la latencia de red).'
-                  : undefined
+              flags.showAdvancedVideoConfig
+                ? values.maxThroughput
+                  ? values.inputSource === 'browser_camera'
+                    ? undefined
+                    : 'Opción desactivada: el backend procesa cada frame tan pronto como pueda.'
+                  : values.inputSource === 'browser_camera'
+                    ? 'Intervalo entre JPEG enviados por WebSocket (también limitado por la latencia de red).'
+                    : undefined
+                : 'Fotogramas por segundo enviados al servidor para inferencia de rodilla.'
             }
           >
             <input
@@ -518,6 +532,7 @@ export function ConfigPanel({
           </Field>
         </ConfigCard>
 
+        {flags.showAdvancedVideoConfig ? (
         <ConfigCard title="Opciones">
           <CheckRow
             label="Incluir vista previa JPEG"
@@ -570,7 +585,9 @@ export function ConfigPanel({
             disabled={running}
           />
         </ConfigCard>
+        ) : null}
 
+        {flags.showAdvancedVideoConfig ? (
         <ConfigCard title="Calidad de preview">
           <Field
             label="Preview FPS"
@@ -613,6 +630,7 @@ export function ConfigPanel({
             />
           </Field>
         </ConfigCard>
+        ) : null}
       </div>
 
       {statusError ? (

@@ -1301,6 +1301,20 @@ Las entradas nuevas se añaden **al inicio** de la lista (más reciente arriba),
 
 ## Entradas
 
+### 2026-05-25 — Modo demo MVP en `appWeb` (flags Vite, sin eliminar rutas)
+
+- **Ámbito:** `appWeb`  `docs`
+- **Tipo:** decisión de entrega / usabilidad
+- **Descripción:** Se añadió `src/config/featureFlags.ts` y variables `VITE_MVP_*` para ocultar en la UI de sustentación Dev Tools, Sprint 4 (auth/sesiones/descarga), vista 3D, controles avanzados de video y clasificador manual, manteniendo el núcleo HU-01–HU-04. Las rutas siguen registradas; `MvpRouteGuard` redirige a `/` si el flag está desactivado. Se corrigió el default `captureOnly: false` en análisis por archivo (antes `true` deshabilitaba inferencia en el backend). Comprobación opcional de PostgreSQL vía `POST /api/v1/auth/token` antes de mostrar Sprint 4.
+- **Trazabilidad:** `appWeb/src/config/featureFlags.ts`, `appWeb/.env.example`, `appWeb/README.md`, `appWeb/src/config/navLinks.ts`, `appWeb/src/components/MvpRouteGuard.tsx`, `appWeb/src/hooks/useSprint4Availability.ts`, `appWeb/src/pages/VideoAnalysis/hooks/useVideoAnalysis.ts`
+
+### 2026-05-22 — Cierre documental Cap. 6 en word.txt (observaciones asesoría)
+
+- **Ámbito:** `docs/`
+- **Tipo:** gobernanza documental
+- **Descripción:** Se completó la alineación del borrador Word (`word.txt`) con el esquema HU-01–HU-07, BH-01/BH-02, Sprint 2/HU-03 sin copia del Sprint 1, criterios binarios, reglas visibility ≥ 0,5, extensiones Sprint 4 renombradas, índice de tablas y títulos APA. Guía de pegado en `docs/guias/Pegar_en_Word_Capitulo6.md`.
+- **Trazabilidad:** `word.txt`, `docs/guias/Pegar_en_Word_Capitulo6.md`, `docs/Formato_trabajo_de_grado.md`
+
 ### 2026-05-22 — Observaciones de asesoría: Sprint 2, HU verificables, BH y APA
 
 - **Ámbito:** `docs/`

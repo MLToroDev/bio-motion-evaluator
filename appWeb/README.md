@@ -1,73 +1,67 @@
-# React + TypeScript + Vite
+# Bio-Motion Evaluator — cliente web (`appWeb`)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Cliente React 19 + Vite + TypeScript para análisis biomecánico en navegador (HU-03, HU-04). Consume el backend FastAPI vía REST y WebSocket.
 
-Currently, two official plugins are available:
+## Desarrollo local
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Por defecto el dev server usa la URL del API en `localStorage` o `http://localhost:8000` (ver pantalla **Configuración**).
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Build para entrega MVP (demo jurado)
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Copia las variables de [`.env.example`](.env.example) a `.env.local` (o exporta en el entorno de build):
+
+```env
+VITE_MVP_DEMO_MODE=true
+VITE_MVP_SHOW_DEV=false
+VITE_MVP_SHOW_SPRINT4=false
+VITE_MVP_SHOW_3D=false
+VITE_MVP_SHOW_ADV_VIDEO=false
+VITE_MVP_SHOW_LIVE_EXERCISE=false
+VITE_MVP_SHOW_REP_GOAL=false
 ```
+
+Luego:
+
+```bash
+npm run build
+npm run preview
+```
+
+En modo demo se muestran **Inicio**, **Análisis en vivo**, **Análisis de video** (solo gold standard), **Diagnóstico** y **Configuración**. Las rutas `/dev/*`, login, sesiones y descarga remota permanecen en el código pero no aparecen en el menú; el acceso directo por URL redirige a `/`.
+
+Si PostgreSQL y auth están operativos el día de la sustentación, puedes activar Sprint 4 en la demo:
+
+```env
+VITE_MVP_SHOW_SPRINT4=true
+```
+
+El cliente comprobará `POST /api/v1/auth/token` antes de mostrar cuenta y descarga.
+
+## Build con UI completa (desarrollo)
+
+```env
+VITE_MVP_DEMO_MODE=false
+```
+
+(o omite las variables; sin `VITE_MVP_DEMO_MODE=true` se asume UI completa).
+
+## Flags (`src/config/featureFlags.ts`)
+
+| Variable | Efecto |
+|----------|--------|
+| `VITE_MVP_DEMO_MODE` | Activa perfil demo y defaults HU-04 (`captureOnly: false`, fuente `file`). |
+| `VITE_MVP_SHOW_DEV` | Menú y rutas `/dev/*`. |
+| `VITE_MVP_SHOW_SPRINT4` | Login, perfil, historial, descarga de video. |
+| `VITE_MVP_SHOW_3D` | Panel Three.js en análisis por archivo. |
+| `VITE_MVP_SHOW_ADV_VIDEO` | Fuentes alternativas y toggles de ingeniería en video. |
+| `VITE_MVP_SHOW_LIVE_EXERCISE` | Selector manual de ejercicio en vivo. |
+| `VITE_MVP_SHOW_REP_GOAL` | Objetivo de repeticiones en configuración. |
+
+## Stack
+
+Ver [Tabla 4 del trabajo de grado](../docs/Formato_trabajo_de_grado.md) y contratos en [`docs/spec/`](../docs/spec/).
