@@ -19,6 +19,7 @@ export default function LiveAnalysis() {
   const forcedLabel = exerciseMode === 'auto' ? null : exerciseMode;
   const {
     ui,
+    overlayLandmarksRef,
     videoRef,
     videoContentAspect,
     startCamera,
@@ -79,9 +80,10 @@ export default function LiveAnalysis() {
             />
             {ui.transmitting && (
               <PoseSkeletonCanvas
-                landmarks={ui.landmarks}
+                landmarksRef={overlayLandmarksRef}
                 mirrorHorizontal={true}
                 contentAspect={videoContentAspect}
+                smoothMotion
               />
             )}
             <VideoPreviewOverlays

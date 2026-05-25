@@ -54,9 +54,44 @@ Flujo validado con **`facingMode: 'user'`** (cámara frontal). Cámara trasera u
 
 Con `capture_only: true` el motor no infiere pose (`analysis_enabled=false`).
 
-**2. Frames siguientes:** binarios JPEG (~cada 350 ms en `appWeb`).
+**2. Frames siguientes:** binarios JPEG enviados en paralelo hasta el techo de backpressure del cliente (ver § Rendimiento captura).
 
 **3. Respuesta:** JSON por frame (landmarks, `knees`, `exercise_label`, `rep_phase`, etc.). Ver `UnifiedWsFrameV1` en `backend/app/models/schemas.py`.
+
+### Rendimiento captura (cliente)
+
+El hook separa dos caminos en el cliente:
+
+| Camino | Responsabilidad | Ritmo |
+|--------|-----------------|-------|
+| **Captura → WS** | JPEG al backend (`sendOneFrame`, backpressure) | `setInterval` **30 Hz** (`CAPTURE_HZ`) + `MAX_IN_FLIGHT` |
+| **Motor (servidor)** | MediaPipe, ángulos, clasificador, reps | Respuesta JSON asíncrona (~8–20 RX/s) |
+| **Overlay (cámara)** | `overlayLandmarksRef` + `PoseSkeletonCanvas` `smoothMotion` | **~60 FPS** (rAF estable + blend adaptativo) |
+
+Las métricas del panel (`ui`: rodillas, ejercicio, reps) se actualizan en `onmessage` vía `setUi`. El esqueleto lee **`overlayLandmarksRef`** sin `setState` y pinta en un bucle rAF que **no se reinicia** por cada pose del servidor.
+
+| Parámetro | Valor | Rol |
+|-----------|-------|-----|
+| Bucle de captura | `setInterval(1000/CAPTURE_HZ)` con `CAPTURE_HZ=30` | Desacoplado del rAF del overlay; menos contención en el hilo principal |
+| `MAX_IN_FLIGHT` | `3` | Backpressure: no envía si `rttQueueRef.length >= 3` |
+| `blobPendingRef` | boolean | Si `toBlob` tarda, ticks del intervalo retornan sin enviar (no encolan) |
+| `JPEG_QUALITY` | `0.6` | Payload JPEG en `/ws/video` |
+| Overlay `landmarksRef` | `useRef` en hook | Escritura en `onmessage`; sin re-render de `LiveAnalysis` por landmarks |
+| Blend overlay | `adaptiveBlendMs ≈ 0.9 × intervalo` entre poses (mín. 80 ms) | Completa antes de la siguiente muestra WS típica |
+| Estilos esqueleto | Cache al montar (`--bm-skeleton-*`) | Sin `getComputedStyle` en el hot path de pintura |
+| HUD `displayRxPerSec` | contador 1 s | Respuestas JSON/s (RX/s), no FPS de captura ni de overlay |
+
+**Cadencia efectiva de captura:** con hardware lento, si `toBlob` supera ~33 ms, la tasa real de envío puede bajar a **~15–20/s** (mismo backpressure que antes; no es regresión frente al intervalo fijo histórico ~2,8/s).
+
+**Expectativa en demo:** RX/s típico **8–20**; overlay percibido fluido a 60 FPS entre muestras del servidor.
+
+**Límites y cleanup:**
+
+- Pestaña oculta: el rAF del overlay se pausa; el intervalo de captura sigue (aceptable en demo; pestaña activa en sustentación).
+- Al detener: `clearInterval` captura, cierre WS, `overlayLandmarksRef.current = null`; el canvas limpia refs si lee `null` antes del desmontaje.
+- `resetStreamState` vacía `rttQueueRef` y `blobPendingRef = false`.
+
+Sin cambios en `backend/app/api/websocket/video.py`: acepta varios JPEG en el mismo WebSocket.
 
 ### Alineación espejo (cámara frontal)
 
@@ -83,9 +118,20 @@ El contenedor del preview puede tener relación de aspecto distinta al stream. `
 |-------|------|
 | UI | `appWeb/src/pages/LiveAnalysis/LiveAnalysis.tsx` |
 | Sesión WS + captura | `appWeb/src/hooks/useLiveAnalysisSession.ts` |
-| Overlay 2D | `appWeb/src/components/PoseSkeletonCanvas.tsx` |
+| Overlay 2D | `appWeb/src/components/PoseSkeletonCanvas.tsx` (`smoothMotion`, `landmarkInterpolation.ts`) |
 | WS backend | `backend/app/api/websocket/video.py` |
 | Motor | `backend/vision/realtime_engine.py` |
+
+## Incidencias overlay (mitigadas 2026-05-25)
+
+| ID | Síntoma | Mitigación |
+|----|---------|------------|
+| INC-OVERLAY-001 | Doble rAF captura + pintura | Captura a 30 Hz (`CAPTURE_HZ`); overlay en rAF único `[smoothMotion]` |
+| INC-OVERLAY-002 | Reinicio rAF por cada RX | `landmarks` fuera de deps del bucle; detección en `tick` vía `landmarksRef` |
+| INC-OVERLAY-003 | Doble `setState` por landmarks | `overlayLandmarksRef` sin `setOverlayLandmarks` |
+| INC-OVERLAY-004 | Blend 100 ms vs RX/s | `adaptiveBlendMsRef` según intervalo entre poses |
+
+Diagnóstico previo y verificación post-fix: [`live-overlay-inestabilidad-diagnostico.md`](live-overlay-inestabilidad-diagnostico.md).
 
 ## Pruebas manuales
 
@@ -94,3 +140,4 @@ El contenedor del preview puede tener relación de aspecto distinta al stream. `
 3. **Horizontal:** brazo derecho levantado → landmark del hombro derecho sobre el hombro derecho en pantalla.
 4. **Vertical:** hombros/cadera del esqueleto alineados con la silueta (sin bloque desplazado por recorte).
 5. Ángulos de rodilla actualizándose en el panel.
+6. **Reconexión:** DETENER → Iniciar transmisión de nuevo: sin esqueleto residual; colores del esqueleto visibles (verde/blanco).

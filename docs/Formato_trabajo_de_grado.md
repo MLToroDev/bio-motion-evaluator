@@ -1301,6 +1301,27 @@ Las entradas nuevas se añaden **al inicio** de la lista (más reciente arriba),
 
 ## Entradas
 
+### 2026-05-25 — Mitigación inestabilidad overlay en vivo (60 FPS percibidos)
+
+- **Ámbito:** `appWeb`  `docs/spec/`
+- **Tipo:** incidencia / mitigación (rendimiento, usabilidad ISO 25010)
+- **Descripción:** Tras el diagnóstico INC-OVERLAY-001..004 se estabilizó el overlay: rAF de pintura sin reinicio por RX (`landmarksRef` + deps `[smoothMotion]`), landmarks fuera de React (`overlayLandmarksRef`), blend adaptativo, cache de tokens `--bm-skeleton-*`, captura JPEG a 30 Hz desacoplada del rAF del canvas y `lerpLandmarksInto` con snapshot de `from` (sin alias del buffer). `PreviewCanvas` conserva prop `landmarks` sin `smoothMotion`.
+- **Trazabilidad:** `appWeb/src/components/PoseSkeletonCanvas.tsx`, `appWeb/src/hooks/useLiveAnalysisSession.ts`, `appWeb/src/lib/landmarkInterpolation.ts`, `appWeb/src/pages/LiveAnalysis/LiveAnalysis.tsx`, `docs/spec/live-camera-analysis.md`, `docs/spec/live-overlay-inestabilidad-diagnostico.md`
+
+### 2026-05-25 — Overlay de esqueleto desacoplado del motor (vivo HU-03)
+
+- **Ámbito:** `appWeb`  `docs/spec/`
+- **Tipo:** cambio funcional / usabilidad (ISO 25010)
+- **Descripción:** La cámara y el overlay ya no comparten el mismo ciclo que el motor: `overlayLandmarks` se alimenta por WebSocket pero `PoseSkeletonCanvas` con `smoothMotion` interpola a ~60 FPS (`lerpLandmarks`); el panel de métricas sigue en `ui` al ritmo RX/s del servidor. Objetivo: esqueleto percibido fluido aunque el análisis vaya a 8–20 respuestas/s.
+- **Trazabilidad:** `appWeb/src/hooks/useLiveAnalysisSession.ts`, `appWeb/src/components/PoseSkeletonCanvas.tsx`, `appWeb/src/lib/landmarkInterpolation.ts`, `docs/spec/live-camera-analysis.md`
+
+### 2026-05-25 — Pipeline paralelo en análisis en vivo (más RX/s, overlay más fluido)
+
+- **Ámbito:** `appWeb`  `docs/spec/`
+- **Tipo:** cambio funcional / rendimiento (usabilidad ISO 25010)
+- **Descripción:** Se eliminó el cuello de botella `setInterval(350 ms)` (~2.8 envíos/s) por bucle `requestAnimationFrame` con backpressure `MAX_IN_FLIGHT=3` (`rttQueueRef`), guard `blobPendingRef` para la carrera de `toBlob`, JPEG 0.6 y cleanup explícito (cancel rAF + guard `OPEN` en callback). Objetivo demo: RX/s **8–20** en portátil con backend MediaPipe CPU; overlay sigue con último JSON. Sin cambio de contrato WS ni backend.
+- **Trazabilidad:** `appWeb/src/hooks/useLiveAnalysisSession.ts`, `docs/spec/live-camera-analysis.md`
+
 ### 2026-05-25 — Alineación overlay cámara en vivo (espejo selfie HU-03)
 
 - **Ámbito:** `appWeb`  `docs/spec/`

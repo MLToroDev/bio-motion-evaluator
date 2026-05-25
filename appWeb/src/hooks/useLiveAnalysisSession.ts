@@ -12,15 +12,17 @@ import {
 } from '../lib/poseWsPayload';
 import { buildVideoWebSocketUri, normalizeApiBaseUrl } from '../lib/wsUri';
 
-const FRAME_MS = 350;
 const MAX_SERIES = 30;
-const MAX_RTT_PENDING = 2;
+/** Máximo de JPEG enviados sin respuesta JSON aún (backpressure). */
+const MAX_IN_FLIGHT = 3;
+const JPEG_QUALITY = 0.6;
+/** Captura JPEG desacoplada del rAF del overlay (~30 intentos/s). */
+const CAPTURE_HZ = 30;
 
 export interface LiveAnalysisUiState {
   cameraOn: boolean;
   transmitting: boolean;
   error: string | null;
-  landmarks: LandmarkMap[] | null;
   knees: Record<string, unknown> | null;
   frameIndex: number;
   exerciseLabel: string;
@@ -40,7 +42,6 @@ export interface LiveAnalysisUiState {
 const initialLive = (): Omit<LiveAnalysisUiState, 'cameraOn'> => ({
   transmitting: false,
   error: null,
-  landmarks: null,
   knees: null,
   frameIndex: -1,
   exerciseLabel: 'unknown',
@@ -70,13 +71,16 @@ export function useLiveAnalysisSession(
   const streamRef = useRef<MediaStream | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
-  const frameTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const captureIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const fpsTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const rxCountRef = useRef(0);
   const rttQueueRef = useRef<number[]>([]);
+  const blobPendingRef = useRef(false);
   const lastLRef = useRef<number | null>(null);
   const lastRRef = useRef<number | null>(null);
   const [videoContentAspect, setVideoContentAspect] = useState<number | null>(null);
+  /** Solo overlay (cámara); lectura imperativa en PoseSkeletonCanvas, sin setState. */
+  const overlayLandmarksRef = useRef<LandmarkMap[] | null>(null);
 
   const ensureCanvas = () => {
     if (!canvasRef.current) canvasRef.current = document.createElement('canvas');
@@ -84,14 +88,15 @@ export function useLiveAnalysisSession(
   };
 
   const stopTimers = useCallback(() => {
-    if (frameTimerRef.current) {
-      clearInterval(frameTimerRef.current);
-      frameTimerRef.current = null;
+    if (captureIntervalRef.current != null) {
+      clearInterval(captureIntervalRef.current);
+      captureIntervalRef.current = null;
     }
     if (fpsTimerRef.current) {
       clearInterval(fpsTimerRef.current);
       fpsTimerRef.current = null;
     }
+    blobPendingRef.current = false;
     rxCountRef.current = 0;
   }, []);
 
@@ -143,6 +148,7 @@ export function useLiveAnalysisSession(
     rttQueueRef.current = [];
     lastLRef.current = null;
     lastRRef.current = null;
+    overlayLandmarksRef.current = null;
     setUi((p) => ({
       ...p,
       ...initialLive(),
@@ -167,7 +173,7 @@ export function useLiveAnalysisSession(
     const ws = wsRef.current;
     const v = videoRef.current;
     if (!ws || ws.readyState !== WebSocket.OPEN || !v || v.readyState < 2) return;
-    if (rttQueueRef.current.length >= MAX_RTT_PENDING) return;
+    if (rttQueueRef.current.length >= MAX_IN_FLIGHT || blobPendingRef.current) return;
 
     const canvas = ensureCanvas();
     const w = v.videoWidth;
@@ -179,14 +185,16 @@ export function useLiveAnalysisSession(
     if (!ctx) return;
     // JPEG sin espejar: mismas coordenadas que el frame del <video>; el espejo es solo visual (CSS) + overlay (mirrorHorizontal).
     ctx.drawImage(v, 0, 0, w, h);
+    blobPendingRef.current = true;
     canvas.toBlob(
       (blob) => {
+        blobPendingRef.current = false;
         if (!blob || !wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) return;
         rttQueueRef.current.push(performance.now());
         wsRef.current.send(blob);
       },
       'image/jpeg',
-      0.85,
+      JPEG_QUALITY,
     );
   }, []);
 
@@ -248,7 +256,11 @@ export function useLiveAnalysisSession(
       setUi((p) => (p.transmitting ? { ...p, displayRxPerSec: n } : p));
     }, 1000);
 
-    frameTimerRef.current = setInterval(sendOneFrame, FRAME_MS);
+    captureIntervalRef.current = setInterval(() => {
+      if (wsRef.current?.readyState === WebSocket.OPEN) {
+        sendOneFrame();
+      }
+    }, 1000 / CAPTURE_HZ);
 
     ws.onmessage = (ev) => {
       if (typeof ev.data !== 'string') return;
@@ -285,6 +297,10 @@ export function useLiveAnalysisSession(
       const leftDeg = parseDeg(knees?.left_knee_flexion_angle_deg);
       const rightDeg = parseDeg(knees?.right_knee_flexion_angle_deg);
 
+      if (landmarks != null) {
+        overlayLandmarksRef.current = landmarks;
+      }
+
       setUi((p) => {
         const next: LiveAnalysisUiState = {
           ...p,
@@ -299,8 +315,7 @@ export function useLiveAnalysisSession(
           leftDeg,
           rightDeg,
         };
-        if (landmarks != null) {
-          next.landmarks = landmarks;
+        if (knees != null) {
           next.knees = knees;
         }
         if (leftDeg != null) lastLRef.current = leftDeg;
@@ -342,6 +357,7 @@ export function useLiveAnalysisSession(
 
   return {
     ui,
+    overlayLandmarksRef,
     videoRef,
     videoContentAspect,
     startCamera,
