@@ -17,8 +17,17 @@ export default function LiveAnalysis() {
   const targetRepGoal = useMemo(() => readTargetRepGoal(), []);
   const [exerciseMode, setExerciseMode] = useState<LiveExerciseMode>('auto');
   const forcedLabel = exerciseMode === 'auto' ? null : exerciseMode;
-  const { ui, videoRef, startCamera, stopCamera, startTransmit, stopTransmit, statusForLeft, statusForRight } =
-    useLiveAnalysisSession(apiBase, false, forcedLabel);
+  const {
+    ui,
+    videoRef,
+    videoContentAspect,
+    startCamera,
+    stopCamera,
+    startTransmit,
+    stopTransmit,
+    statusForLeft,
+    statusForRight,
+  } = useLiveAnalysisSession(apiBase, false, forcedLabel);
 
   const ex = ui.exerciseLabel;
   const leftSublabel = kneeFlexionMetricSublabelInContext(ui.leftDeg, true, ex, ui.rightDeg);
@@ -63,11 +72,18 @@ export default function LiveAnalysis() {
                 inset: 0,
                 width: '100%',
                 height: '100%',
-                objectFit: 'cover',
+                objectFit: 'contain',
+                transform: 'scaleX(-1)',
                 display: ui.cameraOn ? 'block' : 'none',
               }}
             />
-            {ui.transmitting && <PoseSkeletonCanvas landmarks={ui.landmarks} mirrorHorizontal={true} />}
+            {ui.transmitting && (
+              <PoseSkeletonCanvas
+                landmarks={ui.landmarks}
+                mirrorHorizontal={true}
+                contentAspect={videoContentAspect}
+              />
+            )}
             <VideoPreviewOverlays
               visible={ui.cameraOn}
               hudSections={{ exercise: ui.transmitting }}

@@ -1301,6 +1301,13 @@ Las entradas nuevas se añaden **al inicio** de la lista (más reciente arriba),
 
 ## Entradas
 
+### 2026-05-25 — Alineación overlay cámara en vivo (espejo selfie HU-03)
+
+- **Ámbito:** `appWeb`  `docs/spec/`
+- **Tipo:** incidencia / mitigación
+- **Descripción:** El esqueleto en `/live-analysis` quedaba desfasado (izq/der y vertical). Causa: doble convención de espejo (JPEG espejado en captura + overlay sin espejo, o `cover` vs `contain`). Solución vigente: JPEG sin espejar, `scaleX(-1)` en `<video>`, `object-fit: contain`, `mirrorHorizontal=true` en overlay y `contentAspect` del stream. Ver `docs/spec/live-camera-analysis.md`. Alcance MVP: cámara frontal (`facingMode: user`).
+- **Trazabilidad:** `appWeb/src/hooks/useLiveAnalysisSession.ts`, `appWeb/src/pages/LiveAnalysis/LiveAnalysis.tsx`, `docs/spec/live-camera-analysis.md`
+
 ### 2026-05-25 — Modo demo MVP en `appWeb` (flags Vite, sin eliminar rutas)
 
 - **Ámbito:** `appWeb`  `docs`

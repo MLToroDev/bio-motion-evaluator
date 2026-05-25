@@ -76,6 +76,7 @@ export function useLiveAnalysisSession(
   const rttQueueRef = useRef<number[]>([]);
   const lastLRef = useRef<number | null>(null);
   const lastRRef = useRef<number | null>(null);
+  const [videoContentAspect, setVideoContentAspect] = useState<number | null>(null);
 
   const ensureCanvas = () => {
     if (!canvasRef.current) canvasRef.current = document.createElement('canvas');
@@ -94,11 +95,21 @@ export function useLiveAnalysisSession(
     rxCountRef.current = 0;
   }, []);
 
+  const syncVideoAspect = useCallback(() => {
+    const v = videoRef.current;
+    if (!v || v.videoWidth < 2 || v.videoHeight < 2) return;
+    setVideoContentAspect(v.videoWidth / v.videoHeight);
+  }, []);
+
   const stopCamera = useCallback(() => {
     streamRef.current?.getTracks().forEach((t) => t.stop());
     streamRef.current = null;
     const v = videoRef.current;
-    if (v) v.srcObject = null;
+    if (v) {
+      v.onloadedmetadata = null;
+      v.srcObject = null;
+    }
+    setVideoContentAspect(null);
     setUi((p) => ({ ...p, cameraOn: false }));
   }, []);
 
@@ -113,7 +124,9 @@ export function useLiveAnalysisSession(
       const v = videoRef.current;
       if (v) {
         v.srcObject = stream;
+        v.onloadedmetadata = () => syncVideoAspect();
         await v.play();
+        syncVideoAspect();
       }
       setUi((p) => ({ ...p, cameraOn: true }));
     } catch (e) {
@@ -123,7 +136,7 @@ export function useLiveAnalysisSession(
         cameraOn: false,
       }));
     }
-  }, []);
+  }, [syncVideoAspect]);
 
   const resetStreamState = useCallback(() => {
     stopTimers();
@@ -164,7 +177,8 @@ export function useLiveAnalysisSession(
     canvas.height = h;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-    ctx.drawImage(v, 0, 0);
+    // JPEG sin espejar: mismas coordenadas que el frame del <video>; el espejo es solo visual (CSS) + overlay (mirrorHorizontal).
+    ctx.drawImage(v, 0, 0, w, h);
     canvas.toBlob(
       (blob) => {
         if (!blob || !wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) return;
@@ -329,6 +343,7 @@ export function useLiveAnalysisSession(
   return {
     ui,
     videoRef,
+    videoContentAspect,
     startCamera,
     stopCamera,
     startTransmit,
