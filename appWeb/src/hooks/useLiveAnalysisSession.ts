@@ -2,12 +2,16 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { statusForKneeFlexionInContext } from '../lib/angleFormatter';
 import {
   parseDeg,
+  parseDetectedObjects,
+  parseExerciseValidation,
   parseFrameIndex,
   parseKneesMap,
   parseLandmarksJson,
   parseQualityFlags,
   pipelineTotalMs,
   poseWsErrorMessage,
+  type DetectedObjectPayload,
+  type ExerciseValidationPayload,
   type LandmarkMap,
 } from '../lib/poseWsPayload';
 import { buildVideoWebSocketUri, normalizeApiBaseUrl } from '../lib/wsUri';
@@ -37,6 +41,11 @@ export interface LiveAnalysisUiState {
   displayRxPerSec: number;
   serverRttMs: number | null;
   serverPipelineTotalMs: number | null;
+  /** Slug de equipo (manual o inferido por detecciones). */
+  equipmentLabel: string | null;
+  detectedObjects: DetectedObjectPayload[];
+  /** Validador / teacher (confirm|reject|changed|uncertain); null si el backend no lo envía. */
+  exerciseValidation: ExerciseValidationPayload | null;
 }
 
 const initialLive = (): Omit<LiveAnalysisUiState, 'cameraOn'> => ({
@@ -56,6 +65,9 @@ const initialLive = (): Omit<LiveAnalysisUiState, 'cameraOn'> => ({
   displayRxPerSec: 0,
   serverRttMs: null,
   serverPipelineTotalMs: null,
+  equipmentLabel: null,
+  detectedObjects: [],
+  exerciseValidation: null,
 });
 
 export function useLiveAnalysisSession(
@@ -81,6 +93,8 @@ export function useLiveAnalysisSession(
   const [videoContentAspect, setVideoContentAspect] = useState<number | null>(null);
   /** Solo overlay (cámara); lectura imperativa en PoseSkeletonCanvas, sin setState. */
   const overlayLandmarksRef = useRef<LandmarkMap[] | null>(null);
+  /** Cajas de objetos; lectura imperativa en DetectedObjectsCanvas. */
+  const overlayObjectsRef = useRef<DetectedObjectPayload[] | null>(null);
 
   const ensureCanvas = () => {
     if (!canvasRef.current) canvasRef.current = document.createElement('canvas');
@@ -149,6 +163,7 @@ export function useLiveAnalysisSession(
     lastLRef.current = null;
     lastRRef.current = null;
     overlayLandmarksRef.current = null;
+    overlayObjectsRef.current = null;
     setUi((p) => ({
       ...p,
       ...initialLive(),
@@ -296,10 +311,17 @@ export function useLiveAnalysisSession(
       const pipeMs = pipelineTotalMs(map);
       const leftDeg = parseDeg(knees?.left_knee_flexion_angle_deg);
       const rightDeg = parseDeg(knees?.right_knee_flexion_angle_deg);
+      const detectedObjects = parseDetectedObjects(map.detected_objects);
+      const exerciseValidation = parseExerciseValidation(map.exercise_validation);
+      const equipmentLabel =
+        typeof map.equipment_label === 'string' && map.equipment_label.trim()
+          ? map.equipment_label.trim().toLowerCase()
+          : null;
 
       if (landmarks != null) {
         overlayLandmarksRef.current = landmarks;
       }
+      overlayObjectsRef.current = detectedObjects;
 
       setUi((p) => {
         const next: LiveAnalysisUiState = {
@@ -314,6 +336,9 @@ export function useLiveAnalysisSession(
           qualityFlags,
           leftDeg,
           rightDeg,
+          equipmentLabel,
+          detectedObjects,
+          exerciseValidation,
         };
         if (knees != null) {
           next.knees = knees;
@@ -358,6 +383,7 @@ export function useLiveAnalysisSession(
   return {
     ui,
     overlayLandmarksRef,
+    overlayObjectsRef,
     videoRef,
     videoContentAspect,
     startCamera,

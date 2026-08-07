@@ -1,3 +1,8 @@
+# Compose legado: solo Redis.
+# Preferir el stack completo en la raíz del monorepo:
+#   docker compose up --build
+# (ver docker-compose.yml en la raíz y docs/guias/SETUP.md)
+
 services:
   redis:
     image: redis:7-alpine

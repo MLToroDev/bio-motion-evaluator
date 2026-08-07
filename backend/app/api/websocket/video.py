@@ -7,6 +7,7 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
 from app.config import settings
 from app.paths import backend_root
+from app.services.equipment_detect_factory import build_optional_equipment_detector
 from app.services.feature_sample_persist import build_optional_feature_collector
 from vision.realtime_engine import RealtimeEngineSession
 
@@ -72,6 +73,7 @@ async def video_stream(ws: WebSocket) -> None:
     analyze_pose = False
     capture_only = False
     forced_exercise_label: str | None = None
+    equipment_label: str | None = None
     frames = 0
     bytes_in = 0
     frame_idx = 0
@@ -91,6 +93,8 @@ async def video_stream(ws: WebSocket) -> None:
                     forced_exercise_label = None
                 else:
                     forced_exercise_label = str(raw_f).strip().lower() or None
+                raw_eq = data.get("equipment_label")
+                equipment_label = str(raw_eq).strip().lower() or None if raw_eq is not None else None
             except json.JSONDecodeError:
                 await ws.send_json({"error": 'Primer mensaje inválido. Usa {"analyze_pose": true} antes de los JPEG.'})
                 await ws.close(code=4000)
@@ -108,7 +112,10 @@ async def video_stream(ws: WebSocket) -> None:
                         inference_stride=settings.pose_inference_stride,
                         analysis_enabled=not capture_only,
                         forced_exercise_label=forced_exercise_label,
+                        equipment_label=equipment_label,
                         feature_collector=build_optional_feature_collector(),
+                        equipment_detector=build_optional_equipment_detector(),
+                        object_detect_stride=settings.object_detect_stride,
                     )
                 payload = await asyncio.to_thread(_process_jpeg_frame, engine, chunk, frame_idx)
                 _maybe_log_pose_timing(frame_idx, payload)
@@ -135,7 +142,10 @@ async def video_stream(ws: WebSocket) -> None:
                             inference_stride=settings.pose_inference_stride,
                             analysis_enabled=not capture_only,
                             forced_exercise_label=forced_exercise_label,
+                            equipment_label=equipment_label,
                             feature_collector=build_optional_feature_collector(),
+                            equipment_detector=build_optional_equipment_detector(),
+                            object_detect_stride=settings.object_detect_stride,
                         )
                     payload = await asyncio.to_thread(_process_jpeg_frame, engine, chunk, frame_idx)
                     _maybe_log_pose_timing(frame_idx, payload)

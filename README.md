@@ -88,6 +88,25 @@ Instalación detallada: [`docs/guias/SETUP.md`](docs/guias/SETUP.md).
 
 ## Inicio rápido (evaluadores / desarrollo)
 
+### Opción A — Docker Compose (recomendado)
+
+Requiere Docker Desktop. Desde la raíz del monorepo:
+
+```bash
+cp .env.docker.example .env   # opcional
+docker compose up --build
+```
+
+| Servicio | URL |
+|----------|-----|
+| Cliente (`appWeb`, Vite) | http://localhost:5173 |
+| API | http://localhost:8000/api/v1/health · http://localhost:8000/docs |
+| Demo estática (perfil `demo`) | `docker compose --profile demo up --build web-demo` → http://localhost:8080 |
+
+Detalle: [`docs/spec/docker-compose-stack.md`](docs/spec/docker-compose-stack.md) · [`docs/guias/SETUP.md`](docs/guias/SETUP.md).
+
+### Opción B — Procesos locales
+
 ### 1. Backend
 
 ```bash

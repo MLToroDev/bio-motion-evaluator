@@ -20,6 +20,9 @@ def build_frame_payload_v1(
     exercise_confidence: float,
     rep: RepState,
     pipeline_ms: dict[str, float],
+    equipment_label: str | None = None,
+    detected_objects: list[dict[str, Any]] | None = None,
+    exercise_validation: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     min_vis = float(settings.pose_landmark_min_visibility_response)
     lm_out, wl_out = landmarks_for_api_response(
@@ -42,6 +45,14 @@ def build_frame_payload_v1(
         "quality_flags": rep.quality_flags,
         "pipeline_ms": pipeline_ms,
     }
+    if equipment_label:
+        # Manual o inferido por detector de objetos (extensión compatible v1).
+        out["equipment_label"] = equipment_label
+    if detected_objects:
+        out["detected_objects"] = detected_objects
+    if exercise_validation:
+        # Extensión compatible v1: veredicto confirm|reject|changed|uncertain.
+        out["exercise_validation"] = exercise_validation
     if pose.world_landmarks:
         out["world_landmarks"] = wl_out if wl_out is not None else []
     return out

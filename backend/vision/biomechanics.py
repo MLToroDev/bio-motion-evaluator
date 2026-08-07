@@ -133,3 +133,102 @@ def shoulder_width_proxy(landmarks: list[dict[str, Any]]) -> float | None:
     d = float(np.linalg.norm(a[:2] - b[:2]))
     return d if d > 1e-6 else None
 
+
+def _midpoint_2d(landmarks: list[dict[str, Any]], idx_a: int, idx_b: int) -> np.ndarray | None:
+    a = _lm_xyz(landmarks, idx_a)
+    b = _lm_xyz(landmarks, idx_b)
+    if a is None or b is None:
+        return None
+    return (a[:2] + b[:2]) / 2.0
+
+
+def trunk_inclination_angle_deg(landmarks: list[dict[str, Any]]) -> float:
+    """
+    Inclinación del tronco respecto a la vertical de imagen, en grados [0, 180].
+
+    Segmento: cadera-media (23/24) → hombro-medio (11/12), en coordenadas
+    normalizadas 2D (x, y). 0° ≈ tronco erguido; valores mayores ≈ más inclinado
+    (flexión de tronco anterior/lateral indistinta en 2D). ``nan`` si faltan puntos.
+    """
+    mid_sh = _midpoint_2d(landmarks, LEFT_SHOULDER, RIGHT_SHOULDER)
+    mid_hip = _midpoint_2d(landmarks, LEFT_HIP, RIGHT_HIP)
+    if mid_sh is None or mid_hip is None:
+        return float("nan")
+    v = mid_sh - mid_hip
+    # En imagen, y crece hacia abajo: la vertical "arriba" es (0, -1).
+    up = np.array([0.0, -1.0], dtype=np.float64)
+    return _angle_between_vectors_deg(v, up)
+
+
+def base_of_support_ratio(landmarks: list[dict[str, Any]]) -> float:
+    """
+    Ancho de base de apoyo: distancia 2D entre tobillos (27/28) dividida por el
+    ancho de caderas (23/24). ~1–2 en bipedestación estándar; crece con stance
+    ancho o zancada (lunge). ``nan`` si faltan puntos o el ancho de cadera es ~0.
+    """
+    la = _lm_xyz(landmarks, LEFT_ANKLE)
+    ra = _lm_xyz(landmarks, RIGHT_ANKLE)
+    lh = _lm_xyz(landmarks, LEFT_HIP)
+    rh = _lm_xyz(landmarks, RIGHT_HIP)
+    if la is None or ra is None or lh is None or rh is None:
+        return float("nan")
+    hip_w = float(np.linalg.norm(lh[:2] - rh[:2]))
+    if hip_w < 1e-6:
+        return float("nan")
+    ankle_d = float(np.linalg.norm(la[:2] - ra[:2]))
+    return ankle_d / hip_w
+
+
+def _hip_flex_for_side(
+    landmarks: list[dict[str, Any]],
+    shoulder_i: int,
+    hip_i: int,
+    knee_i: int,
+) -> float:
+    """Flexión de cadera como 180° − ángulo interno hombro–cadera–rodilla (0 ≈ erguido)."""
+    sh = _lm_xyz(landmarks, shoulder_i)
+    hp = _lm_xyz(landmarks, hip_i)
+    kn = _lm_xyz(landmarks, knee_i)
+    if sh is None or hp is None or kn is None:
+        return float("nan")
+    interior = _angle_between_vectors_deg(sh - hp, kn - hp)
+    if math.isnan(interior):
+        return float("nan")
+    return float(max(0.0, min(180.0, 180.0 - interior)))
+
+
+def hip_flexion_angles_from_landmarks(landmarks: list[dict[str, Any]]) -> dict[str, float]:
+    """Flexión de cadera izq./der. en grados (convención análoga a rodilla/codo)."""
+    return {
+        "left_hip_flexion_angle_deg": _hip_flex_for_side(landmarks, LEFT_SHOULDER, LEFT_HIP, LEFT_KNEE),
+        "right_hip_flexion_angle_deg": _hip_flex_for_side(landmarks, RIGHT_SHOULDER, RIGHT_HIP, RIGHT_KNEE),
+    }
+
+
+def wrist_relative_heights(landmarks: list[dict[str, Any]]) -> dict[str, float]:
+    """
+    Altura de muñecas relativa al torso, adimensional por lado.
+
+    0 ≈ muñeca a la altura de cadera-media; 1 ≈ a la altura de hombro-medio;
+    >1 por encima de hombros (press/overhead); <0 por debajo de cadera (colgado,
+    peso muerto). Normalizada por la longitud de torso 2D. ``nan`` si faltan puntos.
+    """
+    mid_sh = _midpoint_2d(landmarks, LEFT_SHOULDER, RIGHT_SHOULDER)
+    mid_hip = _midpoint_2d(landmarks, LEFT_HIP, RIGHT_HIP)
+    out = {
+        "left_wrist_relative_height": float("nan"),
+        "right_wrist_relative_height": float("nan"),
+    }
+    if mid_sh is None or mid_hip is None:
+        return out
+    torso_len = float(np.linalg.norm(mid_sh - mid_hip))
+    if torso_len < 1e-6:
+        return out
+    for key, idx in (("left_wrist_relative_height", LEFT_WRIST), ("right_wrist_relative_height", RIGHT_WRIST)):
+        wr = _lm_xyz(landmarks, idx)
+        if wr is None:
+            continue
+        # y crece hacia abajo: (hip_y − wrist_y) positivo cuando la muñeca está por encima de la cadera.
+        out[key] = float((mid_hip[1] - wr[1]) / torso_len)
+    return out
+

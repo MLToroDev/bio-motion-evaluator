@@ -11,7 +11,20 @@ import { VideoAnalysisActions } from './VideoAnalysisActions';
 export type AnalysisInputSource = 'file' | 'server_camera' | 'browser_camera';
 
 /** Modo de etiqueta de ejercicio enviado al backend (`forced_exercise_label` si no es auto). */
-export type VideoExerciseMode = 'auto' | 'idle' | 'squat' | 'lunge';
+export type VideoExerciseMode = 'auto' | 'idle' | 'squat' | 'lunge' | 'curl' | 'running';
+
+/** Equipamiento declarado por el usuario (`equipment_label`; '' = sin declarar). */
+export type EquipmentLabel = '' | 'bodyweight' | 'barbell' | 'dumbbell' | 'kettlebell' | 'machine' | 'band';
+
+export const EQUIPMENT_OPTIONS: { value: EquipmentLabel; text: string }[] = [
+  { value: '', text: 'Sin declarar' },
+  { value: 'bodyweight', text: 'Peso corporal' },
+  { value: 'barbell', text: 'Barra' },
+  { value: 'dumbbell', text: 'Mancuernas' },
+  { value: 'kettlebell', text: 'Kettlebell' },
+  { value: 'machine', text: 'Máquina' },
+  { value: 'band', text: 'Banda elástica' },
+];
 
 export interface ConfigValues {
   apiBase: string;
@@ -27,6 +40,8 @@ export interface ConfigValues {
   includePreview: boolean;
   captureOnly: boolean;
   exerciseMode: VideoExerciseMode;
+  /** Metadato enviado al backend y ecoado en cada payload (ground truth futuro). */
+  equipmentLabel: EquipmentLabel;
   serverDiagnostics: boolean;
   /** Perfil automático según resolución/FPS del clip (backend). */
   streamTuningAuto: boolean;
@@ -564,6 +579,25 @@ export function ConfigPanel({
               <option value="idle">idle</option>
               <option value="squat">squat</option>
               <option value="lunge">lunge</option>
+              <option value="curl">curl</option>
+              <option value="running">running</option>
+            </select>
+          </Field>
+          <Field
+            label="Equipamiento"
+            hint="Metadato declarado (no altera el análisis): se guarda con cada frame como ground truth futuro."
+          >
+            <select
+              style={inputStyle}
+              value={values.equipmentLabel}
+              onChange={(e) => onChange('equipmentLabel', e.target.value as EquipmentLabel)}
+              disabled={running}
+            >
+              {EQUIPMENT_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.text}
+                </option>
+              ))}
             </select>
           </Field>
           <CheckRow

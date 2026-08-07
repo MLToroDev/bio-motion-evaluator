@@ -24,6 +24,8 @@ Tipo: **texto** UTF-8, objeto JSON.
 | `stream_url` | string \| null | si `source=url` | RTSP/HTTP | — |
 | `target_fps` | number | no | 15 | 0.5–60 |
 | `include_preview` | bool \| null | no | `true` | Coerción: ver abajo |
+| `forced_exercise_label` | string \| null | no | `null` | Fija la etiqueta de ejercicio (omite clasificador; confianza 1.0) |
+| `equipment_label` | string \| null | no | `null` | Metadato de equipamiento declarado (p. ej. `barbell`, `dumbbell`, `bodyweight`); normalizado a minúsculas; **no altera el motor**, se ecoa por frame |
 
 ### Coerción de `include_preview` (servidor)
 
@@ -66,6 +68,9 @@ Campos habituales:
 | `pipeline_ms` | object \| null | Tiempos por etapa: `extract`, `feature`, `classify`, `track`, `total` |
 | `total_frames` | number \| null | Total de fotogramas del vídeo cuando `source=file` y OpenCV reporta `CAP_PROP_FRAME_COUNT` fiable; si no aplica, puede ser `null` (cámara, URL o códec sin metadatos). |
 | `server_ts_ms` | number | Marca de tiempo del servidor (epoch ms) al enviar el mensaje; útil para estimar latencia red + procesamiento. |
+| `equipment_label` | string | **Presente** si el cliente declaró equipo o el detector de objetos infiere un slug: eco como metadato. |
+| `detected_objects` | array | Opcional: objetos detectados `{label, label_es, confidence, bbox_norm:[x1,y1,x2,y2], equipment_slug?}`. Ver [equipment-object-detection.md](equipment-object-detection.md). |
+| `exercise_validation` | object | Opcional: veredicto del teacher `{verdict, primary_label, validator_label, confidence, score_margin, reason, ...}`. Ver [exercise-validator.md](exercise-validator.md). |
 | `preview_jpeg_base64` | string | Presente solo si `include_preview` era truthy en la config; JPEG en Base64 |
 
 ### Fin de stream (`source=file`)
@@ -99,6 +104,10 @@ Puede incluir **`error`** (string), p. ej. `sin_frame`, o cierre con código HTT
 2. **Flutter Web — `TypeError: null is not a subtype of bool`** (traza apuntando al payload o al estado del switch)  
    - **Contexto:** estado/`include_preview` en escenarios de hot reload o valores nulos en la frontera.  
    - **Mitigación cliente:** `_includePreview` como `bool?` y uso de **`?? true`** al construir JSON del primer mensaje y al enlazar `SwitchListTile.value` (ver spec Flutter).
+
+3. **2026-08-07 — `equipment_label` manual (extensión compatible)**  
+   - Se replica el patrón `forced_exercise_label`: campo opcional en `PoseStreamConfig` (y en el primer mensaje de `/ws/video`), pasa por `RealtimeEngineSession` y se incluye en `build_frame_payload_v1` solo si fue declarado. Cliente `appWeb`: selector «Equipamiento» en `ConfigPanel` (`appWeb/src/pages/VideoAnalysis/components/ConfigPanel.tsx`, tipo `EquipmentLabel`).  
+   - Decisión: etiqueta **manual** (sin detector visual, YOLO descartado en Fase 1); sirve como ground truth para un futuro clasificador de equipamiento.
 
 ## Pruebas manuales sugeridas
 

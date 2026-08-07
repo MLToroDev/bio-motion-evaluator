@@ -1,0 +1,31 @@
+# Compose / Docker (raíz del monorepo)
+.git
+.cursor
+**/.venv
+**/node_modules
+**/__pycache__
+**/*.pyc
+**/.pytest_cache
+**/dist
+**/build
+app/.dart_tool
+app/build
+app/ios
+app/android
+docs
+iot
+*.md
+!README.md
+word.txt
+presentacion.md
+vision_producto_robot_seguimiento_multideporte.md
+
+# Modelos pesados: se descargan en entrypoint o se montan por volumen
+backend/models/*.task
+backend/data/downloads
+backend/.env
+
+# Vídeos grandes: montar en runtime desde ./tests/assets/videos
+tests/assets/videos/*.mp4
+tests/assets/videos/*.mov
+tests/assets/videos/*.avi

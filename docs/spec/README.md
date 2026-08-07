@@ -27,6 +27,11 @@ Al cambiar protocolos o comportamiento visible, **actualizar el spec correspondi
 | [flutter-client-websocket.md](flutter-client-websocket.md) | Patrones Flutter/Web (null-safety, hot reload, WS) |
 | [api-v1-rest.md](api-v1-rest.md) | `/api/v1`: salud, `analyze/pose`, JWT stub, sesiones, métricas (PostgreSQL opcional) |
 | [dev-learning-api.md](dev-learning-api.md) | `/api/v1/dev/*`: dataset 32D, jobs de entrenamiento, manifest ONNX, auto-colección (manual operativo: [`../guias/manual_aprendizaje_continuo_y_entrenamiento.md`](../guias/manual_aprendizaje_continuo_y_entrenamiento.md)) |
+| [docker-compose-stack.md](docker-compose-stack.md) | Stack local Docker: `appWeb` + FastAPI + PostgreSQL + Redis + Celery (puertos, env, perfiles) |
+| [feature-vector-32d.md](feature-vector-32d.md) | Layout del vector 32D del clasificador: rodilla, postura (F1-F4), velocidad de ventana (F5) |
+| [exercise-catalog-external.md](exercise-catalog-external.md) | Catálogo del motor + enriquecimiento UI con hasaneyldrm/exercises-dataset (no es detector de pose) |
+| [equipment-object-detection.md](equipment-object-detection.md) | YOLO-World: cajas de equipamiento en WS + overlay appWeb |
+| [exercise-validator.md](exercise-validator.md) | Teacher/validador 32D: confirm/reject/changed + gate AUTO_COLLECT |
 
 Referencias de arquitectura general: [../arquitectura.md](../arquitectura.md).
 

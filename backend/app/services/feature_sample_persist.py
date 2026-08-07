@@ -19,8 +19,9 @@ def save_auto_collected_sample(
     confidence: float,
     pose_ok: bool,
     session_id: uuid.UUID | None,
+    label_source: str = "auto_soft",
 ) -> None:
-    """Inserta una fila ``auto_soft`` en estado ``pending``."""
+    """Inserta una fila en estado ``pending`` (``auto_soft`` o ``auto_validated``)."""
     if not engine_configured():
         return
     if len(feature_vector) != 32:
@@ -31,9 +32,10 @@ def save_auto_collected_sample(
     except RuntimeError:
         return
     try:
+        src = (label_source or "auto_soft").strip().lower()[:32] or "auto_soft"
         row = FeatureSampleORM(
             label=label.strip().lower()[:64],
-            label_source="auto_soft",
+            label_source=src,
             review_status="pending",
             feature_vector=feature_vector,
             confidence_at_collection=float(confidence),
@@ -56,15 +58,17 @@ def build_optional_feature_collector(
     *,
     session_id: uuid.UUID | None = None,
 ) -> FeatureCollector | None:
-    """Hook para ``RealtimeEngineSession`` cuando ``AUTO_COLLECT_ENABLED`` y DB están configurados."""
+    """Hook para ``RealtimeEngineSession`` cuando ``AUTO_COLLECT_ENABLED`` y DB estan configurados."""
     if not settings.auto_collect_enabled:
         return None
     if not engine_configured():
         return None
 
+    gate = bool(settings.exercise_validator_enabled and settings.exercise_validator_gate_collect)
     return FeatureCollector(
         unknown_label=settings.classifier_unknown_label,
         min_confidence=float(settings.auto_collect_min_confidence),
         on_save=save_auto_collected_sample,
         session_id=session_id,
+        require_validation_confirm=gate,
     )

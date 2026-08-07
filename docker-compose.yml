@@ -1,0 +1,173 @@
+# Bio-Motion Evaluator — stack Docker (desarrollo / demo local)
+#
+# Uso (desde la raíz del monorepo):
+#   docker compose up --build
+#
+# Servicios:
+#   web      http://localhost:5173  (Vite, perfil por defecto)
+#   backend  http://localhost:8000  (FastAPI + MediaPipe)
+#   db       PostgreSQL 16
+#   redis    Redis 7
+#   worker   Celery
+#
+# Demo estática (nginx, build de producción):
+#   docker compose --profile demo up --build web-demo
+
+name: bio-motion
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-biomotion}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-biomotion}
+      POSTGRES_DB: ${POSTGRES_DB:-bio_motion}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-biomotion} -d ${POSTGRES_DB:-bio_motion}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    environment:
+      APP_NAME: bio-motion-evaluator-api
+      APP_VERSION: 0.1.0
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173,http://127.0.0.1:5173,http://localhost:8080,http://127.0.0.1:8080}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-biomotion}:${POSTGRES_PASSWORD:-biomotion}@db:5432/${POSTGRES_DB:-bio_motion}
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      MEDIAPIPE_POSE_MODEL_PATH: models/pose_landmarker_full.task
+      JWT_SECRET: ${JWT_SECRET:-dev-insecure-change-me}
+      DEV_API_KEY: ${DEV_API_KEY:-}
+      # Aprendizaje continuo (recolecta 32D en feature_samples durante inferencia)
+      AUTO_COLLECT_ENABLED: ${AUTO_COLLECT_ENABLED:-false}
+      AUTO_COLLECT_MIN_CONFIDENCE: ${AUTO_COLLECT_MIN_CONFIDENCE:-0.85}
+      # Validador / teacher de ejercicio (confirm|reject|changed) sobre vector 32D
+      EXERCISE_VALIDATOR_ENABLED: ${EXERCISE_VALIDATOR_ENABLED:-true}
+      EXERCISE_VALIDATOR_TEACHER: ${EXERCISE_VALIDATOR_TEACHER:-onnx}
+      EXERCISE_VALIDATOR_GATE_COLLECT: ${EXERCISE_VALIDATOR_GATE_COLLECT:-true}
+      # Detección de objetos (YOLO-World): cajas de mancuernas/barra/máquina en el overlay
+      OBJECT_DETECT_ENABLED: ${OBJECT_DETECT_ENABLED:-true}
+      OBJECT_DETECT_STRIDE: ${OBJECT_DETECT_STRIDE:-4}
+      OBJECT_DETECT_CONF: ${OBJECT_DETECT_CONF:-0.28}
+      # Evita PermissionError al escribir settings.yaml de Ultralytics en contenedor
+      YOLO_CONFIG_DIR: /tmp/Ultralytics
+    volumes:
+      # Modelo .task del host (si falta, el entrypoint lo descarga)
+      - ./backend/models:/workspace/backend/models
+      # Modelos ONNX + manifest compartidos backend/worker (el worker entrena y activa)
+      - ./backend/vision/models:/workspace/backend/vision/models
+      - backend_downloads:/workspace/backend/data/downloads
+      # Vídeos gold standard del host (lectura)
+      - ./tests/assets/videos:/workspace/tests/assets/videos:ro
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8000/api/v1/health"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 40s
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    command: ["celery", "-A", "app.workers.celery_app", "worker", "--loglevel=info"]
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-biomotion}:${POSTGRES_PASSWORD:-biomotion}@db:5432/${POSTGRES_DB:-bio_motion}
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      MEDIAPIPE_POSE_MODEL_PATH: models/pose_landmarker_full.task
+      JWT_SECRET: ${JWT_SECRET:-dev-insecure-change-me}
+      DEV_API_KEY: ${DEV_API_KEY:-}
+      AUTO_COLLECT_ENABLED: ${AUTO_COLLECT_ENABLED:-false}
+      AUTO_COLLECT_MIN_CONFIDENCE: ${AUTO_COLLECT_MIN_CONFIDENCE:-0.85}
+      EXERCISE_VALIDATOR_ENABLED: ${EXERCISE_VALIDATOR_ENABLED:-true}
+      EXERCISE_VALIDATOR_TEACHER: ${EXERCISE_VALIDATOR_TEACHER:-onnx}
+      EXERCISE_VALIDATOR_GATE_COLLECT: ${EXERCISE_VALIDATOR_GATE_COLLECT:-true}
+      OBJECT_DETECT_ENABLED: ${OBJECT_DETECT_ENABLED:-true}
+      OBJECT_DETECT_STRIDE: ${OBJECT_DETECT_STRIDE:-4}
+      OBJECT_DETECT_CONF: ${OBJECT_DETECT_CONF:-0.28}
+      YOLO_CONFIG_DIR: /tmp/Ultralytics
+    volumes:
+      - ./backend/models:/workspace/backend/models
+      - ./backend/vision/models:/workspace/backend/vision/models
+      - backend_downloads:/workspace/backend/data/downloads
+      - ./tests/assets/videos:/workspace/tests/assets/videos:ro
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      backend:
+        condition: service_started
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: appWeb/Dockerfile.dev
+    ports:
+      - "${WEB_PORT:-5173}:5173"
+    volumes:
+      - ./appWeb/src:/app/src
+      - ./appWeb/public:/app/public
+      - ./appWeb/index.html:/app/index.html
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Build de producción servido por nginx (opcional)
+  web-demo:
+    profiles: ["demo"]
+    build:
+      context: .
+      dockerfile: appWeb/Dockerfile
+      args:
+        VITE_MVP_DEMO_MODE: ${VITE_MVP_DEMO_MODE:-true}
+        VITE_MVP_SHOW_DEV: ${VITE_MVP_SHOW_DEV:-false}
+        VITE_MVP_SHOW_SPRINT4: ${VITE_MVP_SHOW_SPRINT4:-false}
+        VITE_MVP_SHOW_3D: ${VITE_MVP_SHOW_3D:-false}
+        VITE_MVP_SHOW_ADV_VIDEO: ${VITE_MVP_SHOW_ADV_VIDEO:-false}
+        VITE_MVP_SHOW_LIVE_EXERCISE: ${VITE_MVP_SHOW_LIVE_EXERCISE:-false}
+        VITE_MVP_SHOW_REP_GOAL: ${VITE_MVP_SHOW_REP_GOAL:-false}
+    ports:
+      - "${WEB_DEMO_PORT:-8080}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  pg_data:
+  redis_data:
+  backend_downloads:

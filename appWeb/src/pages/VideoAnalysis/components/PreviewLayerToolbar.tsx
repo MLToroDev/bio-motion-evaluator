@@ -68,6 +68,7 @@ export function PreviewLayerToolbar({ layers, onToggle }: PreviewLayerToolbarPro
       {chip('tips', 'Consejos', 'Mostrar u ocultar la lista de consejos sobre el vídeo')}
       {chip('quality', 'Calidad', 'Mostrar u ocultar avisos de calidad del servidor')}
       {chip('skeletonOverlay', 'Esqueleto 2D', 'Superponer el esqueleto vectorial sobre el fotograma')}
+      {chip('objectsOverlay', 'Objetos', 'Superponer cajas de equipamiento detectado (YOLO-World)')}
     </div>
   );
 }

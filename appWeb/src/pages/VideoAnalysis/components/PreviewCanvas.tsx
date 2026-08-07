@@ -1,16 +1,18 @@
+import { DetectedObjectsCanvas } from '../../../components/DetectedObjectsCanvas';
 import { PoseSkeletonCanvas } from '../../../components/PoseSkeletonCanvas';
 import {
   FILE_PREVIEW_TIPS,
   type VideoPreviewHudSections,
   VideoPreviewOverlays,
 } from '../../../components/VideoPreviewOverlays';
-import type { LandmarkMap } from '../../../lib/poseWsPayload';
+import type { DetectedObjectPayload, LandmarkMap } from '../../../lib/poseWsPayload';
 
 interface PreviewCanvasProps {
   previewDataUrl: string | null;
   previewKey: number | string;
   previewAspect: string | number;
   landmarks: LandmarkMap[] | null;
+  detectedObjects?: DetectedObjectPayload[] | null;
   includePreview: boolean;
   skeletonOnly: boolean;
   running: boolean;
@@ -18,6 +20,8 @@ interface PreviewCanvasProps {
   hudSections?: VideoPreviewHudSections;
   /** Si false, no se dibuja el canvas de pose 2D sobre el vídeo. */
   skeletonOverlay?: boolean;
+  /** Si false, no se dibujan cajas de equipamiento. */
+  objectsOverlay?: boolean;
   overlayRxPerSec?: number | null;
   overlayQualityFlags?: string[];
   /** Clasificación del motor (visible si `hudSections.exercise` es true). */
@@ -37,11 +41,13 @@ export function PreviewCanvas({
   previewKey,
   previewAspect,
   landmarks,
+  detectedObjects = null,
   includePreview,
   skeletonOnly,
   running,
   hudSections,
   skeletonOverlay = true,
+  objectsOverlay = true,
   overlayRxPerSec = null,
   overlayQualityFlags = [],
   exerciseLabel = 'unknown',
@@ -53,6 +59,7 @@ export function PreviewCanvas({
   const showPlaceholder = !previewDataUrl && !landmarks;
   const showHud = running;
   const showSkeleton2d = skeletonOverlay;
+  const showObjects = objectsOverlay && !!detectedObjects && detectedObjects.length > 0;
 
   const placeholderText = running
     ? 'Esperando fotogramas…'
@@ -116,6 +123,14 @@ export function PreviewCanvas({
             contentAspect={imgObjectFit === 'contain' ? aspectNum : null}
           />
         </div>
+      ) : null}
+
+      {showObjects ? (
+        <DetectedObjectsCanvas
+          objects={detectedObjects}
+          mirrorHorizontal={false}
+          contentAspect={imgObjectFit === 'contain' ? aspectNum : null}
+        />
       ) : null}
 
       {showServerFpsPill && running && overlayRxPerSec != null ? (

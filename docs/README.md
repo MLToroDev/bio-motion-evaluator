@@ -21,7 +21,8 @@
 
 | Recurso | Descripción |
 |---------|-------------|
-| [guias/SETUP.md](guias/SETUP.md) | Instalación (`gh`, Python, MediaPipe); Flutter solo si trabajas el legado en `app/` |
+| [guias/SETUP.md](guias/SETUP.md) | Instalación (`gh`, Python, MediaPipe, **Docker Compose**); Flutter solo si trabajas el legado en `app/` |
+| [spec/docker-compose-stack.md](spec/docker-compose-stack.md) | Stack Docker: puertos, servicios, perfiles `demo` |
 | [guias/ui_patterns.md](guias/ui_patterns.md) | Catálogo de patrones de UI de referencia |
 | [guias/EstandarDiseño.md](guias/EstandarDiseño.md) | Estándar visual del proyecto |
 | [guias/reporte_latencia_frames_ws_pose_stream.md](guias/reporte_latencia_frames_ws_pose_stream.md) | Notas de latencia en streaming |

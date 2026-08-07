@@ -68,3 +68,6 @@ tests/assets/**/*.mkv
 tests/assets/**/*.MKV
 tests/assets/**/*.webm
 tests/assets/**/*.WEBM
+
+# Dataset externo completo (descargar con script; no versionar)
+backend/vision/data/external/exercises_dataset.json

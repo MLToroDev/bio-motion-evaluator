@@ -85,6 +85,21 @@ Todas las rutas bajo prefijo **`/api/v1/dev`**.
 | Frontend | `appWeb/src/pages/dev/*.tsx`, `appWeb/src/lib/devLearningApi.ts` |
 | Config | `backend/app/config.py`, `backend/.env.example` |
 
+## Incidencias y decisiones
+
+1. **2026-08-07 — Parseo incorrecto de salidas ONNX (etiqueta fija en clase 0)**  
+   - **Causa:** el runtime (`_try_onnx_classifier` en `backend/vision/exercise_classifier.py`) tomaba `out[0]` como logits, pero los modelos RandomForest de `skl2onnx` (`zipmap=False`) emiten `[output_label int64, output_probability float]`; el argmax de un tensor de etiqueta de 1 elemento siempre es 0 → **cualquier entrada se clasificaba como la primera clase** con confianza 1.0.  
+   - **Mitigación:** el clasificador ahora selecciona el tensor **float con tantas columnas como clases** (probabilidades o logits con softmax) y usa el tensor entero solo como fallback de índice. Verificado E2E: `Running.mp4` pasó de `squat` (bug) a `running`.
+2. **2026-08-07 — Modelos ONNX IR v11 ilegibles por el runtime**  
+   - **Causa:** `onnxruntime<1.22` (fijado en requirements) soporta IR ≤ 10; los artefactos generados con `onnx>=1.18` usan IR 11 → `InferenceSession` fallaba y el motor caía silenciosamente al heurístico.  
+   - **Mitigación:** `onnxruntime>=1.22,<2` en `backend/requirements.txt`. Además se añadieron `scikit-learn`, `skl2onnx` y `onnx` al requirements principal para que la imagen Docker del worker pueda entrenar (antes solo existían en el venv de desarrollo).
+3. **2026-08-07 — `vision/models/` compartido entre backend y worker en Docker**  
+   - **Causa:** el worker Celery escribía el `.onnx` y el `manifest.json` en su propio filesystem de contenedor; el backend no veía el modelo recién activado y los artefactos se perdían al recrear el contenedor.  
+   - **Mitigación:** bind mount `./backend/vision/models:/workspace/backend/vision/models` en los servicios `backend` y `worker` de `docker-compose.yml`.
+4. **2026-08-07 — Primer modelo multi-clase real activado (`exercise_rf_14bc169b`, squat/running)**  
+   - Dataset: 139 muestras `squat` (`SentadillaProfunda.mp4`) + 1098 `running` (`Running.mp4`, `Running2.mp4`, `CintaRunning.mp4`), ingeridas con `_extract_and_insert` (ruta oficial de `ingest_tasks`), `label_source=video_ingest`, `review_status=approved`, con el **vector 32D nuevo** (F1-F5, ver [feature-vector-32d.md](feature-vector-32d.md)).  
+   - Métricas holdout (20 %): accuracy 1.0, macro-F1 1.0, matriz de confusión `[[28,0],[0,220]]`. `set_active=true`. Los modelos previos de 1 clase quedan obsoletos (vector y parseo antiguos).
+
 ## Guía operativa (manual)
 
 Procedimiento paso a paso para desarrolladores: **[`docs/guias/manual_aprendizaje_continuo_y_entrenamiento.md`](../guias/manual_aprendizaje_continuo_y_entrenamiento.md)**.
@@ -94,5 +109,5 @@ Procedimiento paso a paso para desarrolladores: **[`docs/guias/manual_aprendizaj
 1. Configurar `DATABASE_URL`, ejecutar `alembic upgrade head`.
 2. `AUTO_COLLECT_ENABLED=true`, ejecutar análisis con vídeo hasta ventana llena; verificar filas en `feature_samples`.
 3. Aprobar muestras vía `PATCH` o UI Dev · Dataset.
-4. Encolar job con Redis + worker Celery y dependencias `requirements-train.txt`.
+4. Encolar job con Redis + worker Celery (las dependencias de entrenamiento ya están en `requirements.txt` / imagen Docker).
 5. `GET /models` y `POST .../activate` para cambiar modelo activo.

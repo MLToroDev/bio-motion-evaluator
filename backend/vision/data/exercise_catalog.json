@@ -1,6 +1,12 @@
 {
-  "version": 1,
+  "version": 2,
   "rules_version": "heuristic_v1",
+  "source_note_es": "Los campos external_* enriquecen la UI con metadatos del dataset público hasaneyldrm/exercises-dataset (© Gym visual). No sustituyen al clasificador de pose: solo enriquecen la etiqueta detectada.",
+  "external_dataset": {
+    "repo": "https://github.com/hasaneyldrm/exercises-dataset",
+    "cdn_base": "https://cdn.jsdelivr.net/gh/hasaneyldrm/exercises-dataset@main/",
+    "attribution": "© Gym visual — https://gymvisual.com/"
+  },
   "camera_protocol": {
     "primary_angle": "sagittal_full_body",
     "distance_m": [2.0, 3.5],
@@ -11,19 +17,83 @@
       "id": "idle",
       "display_es": "Reposo / en pie",
       "rep_tracker_key": "unknown",
-      "description_es": "Postura neutra, poca flexión de rodilla y baja periodicidad en la ventana."
+      "description_es": "Postura neutra, poca flexión de rodilla y baja periodicidad en la ventana.",
+      "youtube_search_queries": [
+        "person standing still full body camera",
+        "standing rest pose full body side view"
+      ]
     },
     {
       "id": "squat",
       "display_es": "Sentadilla",
       "rep_tracker_key": "squat",
-      "description_es": "Patrón bilateral con flexión de rodilla y ciclos perceptibles."
+      "description_es": "Patrón bilateral con flexión de rodilla y ciclos perceptibles.",
+      "external_id": "0043",
+      "external_name": "barbell full squat",
+      "equipment": "barbell",
+      "target_muscle": "glutes",
+      "muscle_group": "legs",
+      "gif_path": "videos/0043-qXTaZnJ.gif",
+      "instructions_es": "Coloca la barra sobre la espalda alta, pies al ancho de hombros. Flexiona caderas y rodillas hasta bajar el torso, mantén el pecho erguido y vuelve a la posición inicial.",
+      "youtube_search_queries": [
+        "perfect bodyweight squat form side view full body",
+        "barbell back squat technique tutorial side camera",
+        "goblet squat correct form full body"
+      ]
     },
     {
       "id": "lunge",
-      "display_es": "Estocada (beta)",
+      "display_es": "Estocada",
       "rep_tracker_key": "unknown",
-      "description_es": "Patrón con mayor asimetría entre lados; tracking de reps genérico hasta tracker dedicado."
+      "description_es": "Patrón con mayor asimetría entre lados; tracking genérico hasta tracker dedicado.",
+      "external_id": "1460",
+      "external_name": "walking lunge",
+      "equipment": "body weight",
+      "target_muscle": "glutes",
+      "muscle_group": "legs",
+      "gif_path": "videos/1460-IZVHb27.gif",
+      "instructions_es": "Da un paso largo hacia delante, baja la cadera hasta que ambas rodillas queden cerca de 90°, empuja con el pie delantero y alterna piernas.",
+      "youtube_search_queries": [
+        "walking lunge perfect form side view",
+        "forward lunge technique full body camera",
+        "bodyweight reverse lunge form tutorial"
+      ]
+    },
+    {
+      "id": "curl",
+      "display_es": "Curl de bíceps",
+      "rep_tracker_key": "curl",
+      "description_es": "Flexión cíclica de codo; tracker ElbowCurlRepTracker.",
+      "external_id": "0294",
+      "external_name": "dumbbell biceps curl",
+      "equipment": "dumbbell",
+      "target_muscle": "biceps",
+      "muscle_group": "upper arms",
+      "gif_path": "videos/0294-NbVPDMW.gif",
+      "instructions_es": "De pie con mancuernas a los lados, flexiona los codos llevando las pesas hacia los hombros sin balancear el tronco; baja controlado.",
+      "youtube_search_queries": [
+        "dumbbell biceps curl perfect form front view",
+        "barbell curl technique tutorial full body",
+        "standing dumbbell curl correct form side"
+      ]
+    },
+    {
+      "id": "running",
+      "display_es": "Carrera / trote",
+      "rep_tracker_key": "unknown",
+      "description_es": "Locomoción cíclica; sin conteo de reps de fuerza.",
+      "external_id": "0685",
+      "external_name": "run",
+      "equipment": "body weight",
+      "target_muscle": "cardiovascular system",
+      "muscle_group": "cardio",
+      "gif_path": "videos/0685-oLrKqDH.gif",
+      "instructions_es": "Mantén una cadencia cómoda, tronco estable y brazos en contramovimiento. En cinta o pista, cuerpo completo a la cámara.",
+      "youtube_search_queries": [
+        "treadmill running form side view full body",
+        "jogging technique side camera full body",
+        "running in place form tutorial"
+      ]
     }
   ]
 }

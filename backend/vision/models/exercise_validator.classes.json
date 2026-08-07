@@ -1,0 +1,12 @@
+{
+  "classes": [
+    "squat",
+    "lunge",
+    "curl",
+    "idle",
+    "running"
+  ],
+  "feature_vector_dim": 32,
+  "role": "exercise_validator",
+  "updated_at": "2026-08-07"
+}

@@ -1,25 +1,34 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { flags } from '../../config/featureFlags';
 import { BmButton } from '../../components/BmButton';
 import { DashboardPanel } from '../../components/DashboardPanel';
+import { DetectedExerciseHero } from '../../components/DetectedExerciseHero';
+import { DetectedObjectsCanvas } from '../../components/DetectedObjectsCanvas';
 import { PoseSkeletonCanvas } from '../../components/PoseSkeletonCanvas';
 import { LIVE_POSE_TIPS, VideoPreviewOverlays } from '../../components/VideoPreviewOverlays';
 import { useLiveAnalysisSession } from '../../hooks/useLiveAnalysisSession';
 import { kneeFlexionMetricSublabelInContext } from '../../lib/angleFormatter';
+import {
+  fetchExerciseCatalog,
+  resolveExerciseDisplay,
+  type ExerciseCatalogResponse,
+} from '../../lib/exerciseCatalog';
 import { readApiBase, readTargetRepGoal } from '../../lib/prefs';
 import '../../App.css';
 
-export type LiveExerciseMode = 'auto' | 'idle' | 'squat' | 'lunge';
+export type LiveExerciseMode = 'auto' | 'idle' | 'squat' | 'lunge' | 'curl' | 'running';
 
 export default function LiveAnalysis() {
   const apiBase = useMemo(() => readApiBase(), []);
   const targetRepGoal = useMemo(() => readTargetRepGoal(), []);
   const [exerciseMode, setExerciseMode] = useState<LiveExerciseMode>('auto');
+  const [catalog, setCatalog] = useState<ExerciseCatalogResponse | null>(null);
   const forcedLabel = exerciseMode === 'auto' ? null : exerciseMode;
   const {
     ui,
     overlayLandmarksRef,
+    overlayObjectsRef,
     videoRef,
     videoContentAspect,
     startCamera,
@@ -30,7 +39,18 @@ export default function LiveAnalysis() {
     statusForRight,
   } = useLiveAnalysisSession(apiBase, false, forcedLabel);
 
+  useEffect(() => {
+    let cancelled = false;
+    void fetchExerciseCatalog(apiBase).then((c) => {
+      if (!cancelled) setCatalog(c);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [apiBase]);
+
   const ex = ui.exerciseLabel;
+  const { title: exerciseTitle, entry: exerciseEntry } = resolveExerciseDisplay(ex, catalog);
   const leftSublabel = kneeFlexionMetricSublabelInContext(ui.leftDeg, true, ex, ui.rightDeg);
   const rightSublabel = kneeFlexionMetricSublabelInContext(ui.rightDeg, false, ex, ui.leftDeg);
 
@@ -79,12 +99,19 @@ export default function LiveAnalysis() {
               }}
             />
             {ui.transmitting && (
-              <PoseSkeletonCanvas
-                landmarksRef={overlayLandmarksRef}
-                mirrorHorizontal={true}
-                contentAspect={videoContentAspect}
-                smoothMotion
-              />
+              <>
+                <PoseSkeletonCanvas
+                  landmarksRef={overlayLandmarksRef}
+                  mirrorHorizontal={true}
+                  contentAspect={videoContentAspect}
+                  smoothMotion
+                />
+                <DetectedObjectsCanvas
+                  objectsRef={overlayObjectsRef}
+                  mirrorHorizontal={true}
+                  contentAspect={videoContentAspect}
+                />
+              </>
             )}
             <VideoPreviewOverlays
               visible={ui.cameraOn}
@@ -94,7 +121,7 @@ export default function LiveAnalysis() {
               rateSuffix="RX/s"
               bullets={LIVE_POSE_TIPS}
               qualityFlags={ui.transmitting ? ui.qualityFlags : []}
-              exerciseLabel={ex}
+              exerciseLabel={exerciseTitle}
               exerciseConfidence={ui.exerciseConfidence}
             />
             {!ui.cameraOn && (
@@ -141,6 +168,8 @@ export default function LiveAnalysis() {
                   <option value="idle">idle</option>
                   <option value="squat">squat</option>
                   <option value="lunge">lunge</option>
+                  <option value="curl">curl</option>
+                  <option value="running">running</option>
                 </select>
                 {ui.transmitting ? (
                   <span style={{ color: 'var(--bm-text-disabled)', fontSize: '0.75rem' }}>
@@ -174,11 +203,25 @@ export default function LiveAnalysis() {
             </div>
           </div>
 
+          <DetectedExerciseHero
+            transmitting={ui.transmitting}
+            labelId={ex}
+            title={exerciseTitle}
+            confidence={ui.exerciseConfidence}
+            repPhase={ui.repPhase}
+            repCount={ui.repCount}
+            entry={exerciseEntry}
+            attribution={catalog?.external_dataset?.attribution}
+            equipmentLabel={ui.equipmentLabel}
+            detectedObjects={ui.detectedObjects}
+            exerciseValidation={ui.exerciseValidation}
+          />
+
           <DashboardPanel
             running={ui.transmitting}
             captureOnly={false}
             targetRepGoal={targetRepGoal}
-            exerciseLabel={ex}
+            exerciseLabel={exerciseTitle}
             exerciseConfidence={ui.exerciseConfidence}
             repPhase={ui.repPhase}
             repCount={ui.repCount}

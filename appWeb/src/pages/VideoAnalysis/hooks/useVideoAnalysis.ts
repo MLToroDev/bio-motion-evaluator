@@ -66,6 +66,7 @@ export function useVideoAnalysis() {
     includePreview: true,
     captureOnly: false,
     exerciseMode: 'auto' satisfies VideoExerciseMode,
+    equipmentLabel: '',
     serverDiagnostics: false,
     streamTuningAuto: true,
     skeletonOnly: false,
@@ -202,6 +203,7 @@ export function useVideoAnalysis() {
 
     const forcedExerciseLabel =
       !captureOnly && config.exerciseMode !== 'auto' ? config.exerciseMode : null;
+    const equipmentLabel = config.equipmentLabel || null;
     let err: string | null = null;
     if (inputSource === 'file') {
       err = await start({
@@ -217,6 +219,7 @@ export function useVideoAnalysis() {
         serverDiagnostics: config.serverDiagnostics,
         streamTuning: config.streamTuningAuto ? 'auto' : 'off',
         forcedExerciseLabel,
+        equipmentLabel,
       });
     } else if (inputSource === 'server_camera') {
       err = await start({
@@ -232,6 +235,7 @@ export function useVideoAnalysis() {
         serverDiagnostics: config.serverDiagnostics,
         streamTuning: config.streamTuningAuto ? 'auto' : 'off',
         forcedExerciseLabel,
+        equipmentLabel,
       });
     } else {
       err = await start({
@@ -243,6 +247,7 @@ export function useVideoAnalysis() {
         previewJpegQuality: previewQ,
         captureOnly,
         forcedExerciseLabel,
+        equipmentLabel,
       });
     }
     if (err) console.warn(err);

@@ -11,13 +11,18 @@ import numpy as np
 
 from app.models.schemas import ExerciseClassifierConfig
 from vision.biomechanics import (
+    base_of_support_ratio,
     elbow_flex_angles_from_landmarks,
+    hip_flexion_angles_from_landmarks,
     knee_angles_from_landmarks,
     shoulder_width_proxy,
+    trunk_inclination_angle_deg,
+    wrist_relative_heights,
 )
 from vision.types import FeatureFrame, PoseFrame
 
 # Dimensión fija de entrada ONNX / contrato documentado; sobrante relleno con ceros.
+# Layout completo (índices 0-31): ver docs/spec/feature-vector-32d.md
 FEATURE_VECTOR_DIM = 32
 
 _ANGLE_KEYS_VEL = (
@@ -98,6 +103,49 @@ def _bilateral_knee_mean_series(poses: list[PoseFrame]) -> np.ndarray:
     return np.array(vals, dtype=np.float64)
 
 
+def _posture_series(poses: list[PoseFrame]) -> dict[str, np.ndarray]:
+    """
+    Series por frame de las features posturales F1-F4 (nan cuando faltan landmarks):
+    tronco vs vertical, base de apoyo, flexión de cadera L/R, altura de muñecas L/R.
+    """
+    n = len(poses)
+    trunk = np.full(n, np.nan, dtype=np.float64)
+    base = np.full(n, np.nan, dtype=np.float64)
+    hip_l = np.full(n, np.nan, dtype=np.float64)
+    hip_r = np.full(n, np.nan, dtype=np.float64)
+    wrist_l = np.full(n, np.nan, dtype=np.float64)
+    wrist_r = np.full(n, np.nan, dtype=np.float64)
+    for i, p in enumerate(poses):
+        if not p.ok or not p.landmarks:
+            continue
+        trunk[i] = trunk_inclination_angle_deg(p.landmarks)
+        base[i] = base_of_support_ratio(p.landmarks)
+        hips = hip_flexion_angles_from_landmarks(p.landmarks)
+        hip_l[i] = hips.get("left_hip_flexion_angle_deg", float("nan"))
+        hip_r[i] = hips.get("right_hip_flexion_angle_deg", float("nan"))
+        wrists = wrist_relative_heights(p.landmarks)
+        wrist_l[i] = wrists.get("left_wrist_relative_height", float("nan"))
+        wrist_r[i] = wrists.get("right_wrist_relative_height", float("nan"))
+    return {
+        "trunk": trunk,
+        "base": base,
+        "hip_l": hip_l,
+        "hip_r": hip_r,
+        "wrist_l": wrist_l,
+        "wrist_r": wrist_r,
+    }
+
+
+def _nan_mean(a: np.ndarray) -> float:
+    x = a[~np.isnan(a)]
+    return float(np.mean(x)) if x.size else 0.0
+
+
+def _nan_rom(a: np.ndarray) -> float:
+    x = a[~np.isnan(a)]
+    return float(np.max(x) - np.min(x)) if x.size else 0.0
+
+
 def _periodicity_score_from_series(series: np.ndarray) -> float:
     x = series[~np.isnan(series)]
     if x.size < 4:
@@ -122,6 +170,8 @@ class FeatureEngine:
         self._calib_ref: float | None = None
         self._prev_angles: dict[str, float] | None = None
         self._last_angular_vel: dict[str, float] = {}
+        # Serie de velocidades angulares alineada con la ventana (F5, índices 29-31).
+        self._vel_window: deque[dict[str, float]] = deque(maxlen=max(2, cfg.window_size_frames))
 
     def push(self, pose: PoseFrame, dt_s: float | None = None) -> None:
         dt = float(dt_s if dt_s is not None else self._default_dt_s)
@@ -139,6 +189,7 @@ class FeatureEngine:
                     continue
                 vels[f"{short}_deg_s"] = (a1 - a0) / dt
         self._last_angular_vel = vels
+        self._vel_window.append(dict(vels))
         if pose.ok and angles:
             self._prev_angles = angles
         elif not pose.ok:
@@ -152,6 +203,7 @@ class FeatureEngine:
         self._calib_ref = None
         self._prev_angles = None
         self._last_angular_vel.clear()
+        self._vel_window.clear()
 
     def _update_calibration(self, pose: PoseFrame) -> None:
         if not pose.ok or not pose.landmarks:
@@ -227,6 +279,37 @@ class FeatureEngine:
         ang_keys = ["left_knee_deg_s", "right_knee_deg_s", "left_elbow_deg_s", "right_elbow_deg_s"]
         ang = [float(self._last_angular_vel.get(k, 0.0)) for k in ang_keys]
 
+        # F1-F4 (índices 21-28): postura de ventana; nan → 0.0 (neutro documentado).
+        posture = _posture_series(poses)
+        hip_rom = 0.5 * (_nan_rom(posture["hip_l"]) + _nan_rom(posture["hip_r"]))
+        posture_block = [
+            _nan_mean(posture["trunk"]),  # 21 trunk_incl_mean_deg
+            _nan_rom(posture["trunk"]),  # 22 trunk_incl_rom_deg
+            _nan_mean(posture["base"]),  # 23 base_support_ratio_mean
+            _nan_mean(posture["hip_l"]),  # 24 hip_flex_mean_l_deg
+            _nan_mean(posture["hip_r"]),  # 25 hip_flex_mean_r_deg
+            hip_rom,  # 26 hip_flex_rom_bilateral_deg
+            _nan_mean(posture["wrist_l"]),  # 27 wrist_rel_height_mean_l
+            _nan_mean(posture["wrist_r"]),  # 28 wrist_rel_height_mean_r
+        ]
+
+        # F5 (índices 29-31): estadísticos de velocidad angular sobre la ventana.
+        # La aceleración queda fuera: sin slots libres restantes (documentado en el spec).
+        knee_speeds: list[float] = []
+        elbow_speeds: list[float] = []
+        for v in self._vel_window:
+            for k in ("left_knee_deg_s", "right_knee_deg_s"):
+                if k in v:
+                    knee_speeds.append(abs(float(v[k])))
+            for k in ("left_elbow_deg_s", "right_elbow_deg_s"):
+                if k in v:
+                    elbow_speeds.append(abs(float(v[k])))
+        vel_block = [
+            float(np.mean(knee_speeds)) if knee_speeds else 0.0,  # 29 knee_speed_mean_abs_deg_s
+            float(np.max(knee_speeds)) if knee_speeds else 0.0,  # 30 knee_speed_max_abs_deg_s
+            float(np.max(elbow_speeds)) if elbow_speeds else 0.0,  # 31 elbow_speed_max_abs_deg_s
+        ]
+
         core = [
             ml,
             mr,
@@ -245,7 +328,7 @@ class FeatureEngine:
             max_r - min_r,
             periodicity,
         ]
-        vec = np.array(core + ang + [cal_scale], dtype=np.float32)
+        vec = np.array(core + ang + [cal_scale] + posture_block + vel_block, dtype=np.float32)
         if vec.size > FEATURE_VECTOR_DIM:
             vec = vec[:FEATURE_VECTOR_DIM]
         elif vec.size < FEATURE_VECTOR_DIM:

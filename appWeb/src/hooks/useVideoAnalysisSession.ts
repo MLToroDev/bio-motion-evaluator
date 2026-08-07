@@ -7,6 +7,7 @@ import type { MetricStatus } from '../lib/metricStatus';
 import { persistApiBase, persistLastSessionSummary } from '../lib/prefs';
 import {
   parseDeg,
+  parseDetectedObjects,
   parseFrameIndex,
   parseKneesMap,
   parseLandmarksJson,
@@ -14,6 +15,7 @@ import {
   parseTotalFrames,
   pipelineTotalMs,
   poseWsErrorMessage,
+  type DetectedObjectPayload,
   type LandmarkMap,
 } from '../lib/poseWsPayload';
 import { sanitizePreviewFps, sanitizePreviewJpegQuality } from '../lib/previewStreamConfig';
@@ -60,6 +62,8 @@ export interface VideoAnalysisUiState {
   exerciseConfidence: number;
   repPhase: string;
   repCount: number;
+  /** Cajas de equipamiento (YOLO-World) del frame actual. */
+  detectedObjects: DetectedObjectPayload[];
   serverPipelineTotalMs: number | null;
   displayRxPerSec: number;
   csvText: string;
@@ -87,6 +91,7 @@ const initialUi = (): VideoAnalysisUiState => ({
   exerciseConfidence: 0,
   repPhase: 'idle',
   repCount: 0,
+  detectedObjects: [],
   serverPipelineTotalMs: null,
   displayRxPerSec: 0,
   csvText: CSV_HEADER,
@@ -99,6 +104,12 @@ const initialUi = (): VideoAnalysisUiState => ({
 function wsForcedExercise(forced: string | null | undefined): Record<string, string> {
   const s = (forced ?? '').trim().toLowerCase();
   return s ? { forced_exercise_label: s } : {};
+}
+
+/** Metadato de equipamiento declarado; el backend lo ecoa en cada payload (extensión compatible v1). */
+function wsEquipmentLabel(equipment: string | null | undefined): Record<string, string> {
+  const s = (equipment ?? '').trim().toLowerCase();
+  return s ? { equipment_label: s } : {};
 }
 
 export type SessionStartParams =
@@ -115,6 +126,7 @@ export type SessionStartParams =
       serverDiagnostics: boolean;
       streamTuning: 'auto' | 'off';
       forcedExerciseLabel?: string | null;
+      equipmentLabel?: string | null;
     }
   | {
       mode: 'server_camera';
@@ -129,6 +141,7 @@ export type SessionStartParams =
       serverDiagnostics: boolean;
       streamTuning: 'auto' | 'off';
       forcedExerciseLabel?: string | null;
+      equipmentLabel?: string | null;
     }
   | {
       mode: 'browser_camera';
@@ -139,6 +152,7 @@ export type SessionStartParams =
       previewJpegQuality: number;
       captureOnly: boolean;
       forcedExerciseLabel?: string | null;
+      equipmentLabel?: string | null;
     };
 
 async function wsPayloadToText(data: unknown): Promise<string | null> {
@@ -367,6 +381,7 @@ export function useVideoAnalysisSession(opts?: UseVideoAnalysisSessionOptions) {
       const repCount = typeof map.rep_count === 'number' ? Math.trunc(map.rep_count) : 0;
       const qualityFlags = parseQualityFlags(map.quality_flags);
       const pipeMs = pipelineTotalMs(map);
+      const detectedObjects = parseDetectedObjects(map.detected_objects);
 
       const leftDeg = parseDeg(knees?.left_knee_flexion_angle_deg);
       const rightDeg = parseDeg(knees?.right_knee_flexion_angle_deg);
@@ -447,6 +462,7 @@ export function useVideoAnalysisSession(opts?: UseVideoAnalysisSessionOptions) {
         exerciseConfidence,
         repPhase,
         repCount,
+        detectedObjects,
         serverPipelineTotalMs: pipeMs,
         leftDeg,
         rightDeg,
@@ -641,6 +657,7 @@ export function useVideoAnalysisSession(opts?: UseVideoAnalysisSessionOptions) {
                   analyze_pose: true,
                   capture_only: params.captureOnly,
                   ...wsForcedExercise(params.forcedExerciseLabel),
+                  ...wsEquipmentLabel(params.equipmentLabel),
                 }),
               );
             } catch (e) {
@@ -712,6 +729,7 @@ export function useVideoAnalysisSession(opts?: UseVideoAnalysisSessionOptions) {
               diagnostics: params.serverDiagnostics,
               stream_tuning: params.streamTuning,
               ...wsForcedExercise(params.forcedExerciseLabel),
+              ...wsEquipmentLabel(params.equipmentLabel),
             }
           : {
               source: 'camera' as const,
@@ -725,6 +743,7 @@ export function useVideoAnalysisSession(opts?: UseVideoAnalysisSessionOptions) {
               diagnostics: params.serverDiagnostics,
               stream_tuning: params.streamTuning,
               ...wsForcedExercise(params.forcedExerciseLabel),
+              ...wsEquipmentLabel(params.equipmentLabel),
             };
 
       const url = buildPoseStreamWebSocketUri(params.apiBaseUrl);

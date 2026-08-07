@@ -147,16 +147,38 @@ def _try_onnx_classifier(manifest: ExerciseModelManifest, cfg: ExerciseClassifie
 
         def classify(self, features: np.ndarray, window_full: bool) -> ClassificationResult:
             x = features.astype(np.float32).reshape(1, -1)
-            out = self._session.run(None, {self._input_name: x})
-            logits = np.asarray(out[0]).reshape(-1)
-            if logits.size == 0:
+            outs = self._session.run(None, {self._input_name: x})
+
+            # skl2onnx (zipmap=False) emite [output_label int64, output_probability float];
+            # el stub de logits emite un único tensor float [1, n_classes]. Elegir el tensor
+            # float con tantas columnas como clases; usar out[0] a ciegas confunde la etiqueta
+            # entera con logits (argmax de 1 elemento => siempre clase 0).
+            prob: np.ndarray | None = None
+            label_idx: int | None = None
+            for o in outs:
+                arr = np.asarray(o)
+                flat = arr.reshape(-1)
+                if arr.dtype.kind == "f" and flat.size == len(self._classes) and prob is None:
+                    if flat.min() >= 0.0 and abs(float(flat.sum()) - 1.0) < 1e-3:
+                        prob = flat.astype(np.float64)
+                    else:
+                        exp = np.exp(flat - np.max(flat))
+                        prob = exp / (np.sum(exp) + 1e-9)
+                elif arr.dtype.kind in ("i", "u") and flat.size >= 1 and label_idx is None:
+                    label_idx = int(flat[0])
+
+            if prob is not None:
+                idx = int(np.argmax(prob))
+                confidence = float(prob[idx])
+                raw = {self._classes[i]: float(prob[i]) for i in range(min(len(self._classes), prob.size))}
+            elif label_idx is not None:
+                idx = label_idx
+                confidence = 1.0
+                raw = None
+            else:
                 return ClassificationResult(label=cfg.unknown_label, confidence=0.0)
-            exp = np.exp(logits - np.max(logits))
-            prob = exp / (np.sum(exp) + 1e-9)
-            idx = int(np.argmax(prob))
-            label = self._classes[idx] if idx < len(self._classes) else cfg.unknown_label
-            confidence = float(prob[idx])
-            raw = {self._classes[i]: float(prob[i]) for i in range(min(len(self._classes), prob.size))}
+
+            label = self._classes[idx] if 0 <= idx < len(self._classes) else cfg.unknown_label
             return ClassificationResult(label=label, confidence=confidence, raw_scores=raw)
 
     return _OnnxCls()

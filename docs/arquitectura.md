@@ -40,12 +40,36 @@ flowchart TD
 3. **Inferencia**: MediaPipe Pose Landmarker en el backend; modelos HF opcionales para tareas de clasificación.
 4. **Presentación**: **`appWeb/`** (React) muestra resultados y métricas al usuario.
 
+### Motor de análisis (visión)
+
+- **Vector de features 32D** (`vision/feature_engine.py`): rodilla (0-20), postura de ventana F1-F4 — tronco, base de apoyo, cadera, muñecas — (21-28) y velocidad angular de ventana F5 (29-31). Layout: [`docs/spec/feature-vector-32d.md`](spec/feature-vector-32d.md).
+- **Clasificador** (`vision/exercise_classifier.py`): ONNX activo según `vision/models/manifest.json` (multi-clase: squat / lunge / idle / running) con fallback heurístico; envoltura de histéresis + EMA.
+- **Validador / teacher** (`vision/exercise_validator.py`, opcional): segunda etapa sobre el mismo 32D (`confirm` / `reject` / `changed` / `uncertain`); teacher preferido **ONNX RF** (`vision/models/exercise_validator.onnx`, entrenable con `scripts/train_exercise_validator.py` desde muestras approved); fallback heurístico/margen. Campo WS `exercise_validation`; puede gatear `AUTO_COLLECT` (`auto_validated`). Spec: [`docs/spec/exercise-validator.md`](spec/exercise-validator.md).
+- **Catálogo UI** (`GET /api/v1/exercises/catalog`): enriquecimiento con [exercises-dataset](https://github.com/hasaneyldrm/exercises-dataset) (nombre ES, equipo, GIF CDN). No detecta pose; solo presenta la etiqueta del motor.
+- **Detección de objetos** (`vision/equipment_detector.py`, opcional): YOLO-World localiza mancuernas/barra/máquinas; cajas en `detected_objects` del WS y overlay `DetectedObjectsCanvas` en vivo y en análisis de vídeo (`appWeb`).
+- **Rep tracking** (`vision/rep_tracker.py`): FSM genérica `ThresholdCycleTracker` parametrizable por señal/umbrales/fases; trackers concretos (`SquatRepTracker`, `ElbowCurlRepTracker`) registrados en `DEFAULT_TRACKER_FACTORIES`, fallback `UnknownRepTracker`.
+
 ### Aprendizaje continuo (administración)
 
 - **PostgreSQL** almacena `feature_samples` (vectores 32D curados) y `training_jobs` (métricas de entrenamiento).
 - Recolección opcional durante inferencia WebSocket/REST cuando `AUTO_COLLECT_ENABLED` y umbral de confianza.
-- **Celery** ejecuta `train_exercise_classifier`: RandomForest → ONNX, fusiona `vision/models/manifest.json`, opcional **push** a Hugging Face Hub.
+- **Celery** ejecuta `train_exercise_classifier`: RandomForest → ONNX, fusiona `vision/models/manifest.json`, opcional **push** a Hugging Face Hub. En Docker, `vision/models/` es un bind mount compartido backend/worker.
 - **React** expone rutas **`/dev/*`** (catálogo, dataset, entrenamiento, modelos) para desarrolladores; contrato en `docs/spec/dev-learning-api.md`.
+
+### Despliegue local (Docker Compose)
+
+El monorepo incluye un **`docker-compose.yml` en la raíz** que orquesta:
+
+| Contenedor | Rol |
+|------------|-----|
+| `web` | Vite (`appWeb`) en desarrollo |
+| `web-demo` | nginx con build de producción (perfil `demo`) |
+| `backend` | FastAPI + MediaPipe |
+| `worker` | Celery |
+| `db` | PostgreSQL 16 |
+| `redis` | Broker / backend de resultados Celery |
+
+El navegador sigue apuntando a `http://localhost:8000` (puerto publicado). Spec: [`docs/spec/docker-compose-stack.md`](spec/docker-compose-stack.md).
 
 ---
 

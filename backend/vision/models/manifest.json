@@ -1,5 +1,5 @@
 {
-  "active": "exercise_rf_a0eac3d7",
+  "active": "exercise_rf_6b86c67d",
   "models": {
     "exercise_classifier_stub": {
       "path": "models/exercise_classifier_stub.onnx",
@@ -34,6 +34,73 @@
       "feature_vector_dim": 32,
       "created_at": "2026-04-05",
       "note": "Celery train_exercise_classifier job=a0eac3d7-e492-4790-9857-a5f8c2cacdc5"
+    },
+    "exercise_rf_14bc169b": {
+      "path": "vision/models/exercise_rf_14bc169b.onnx",
+      "classes": [
+        "squat",
+        "running"
+      ],
+      "window_size": 45,
+      "feature_vector_dim": 32,
+      "created_at": "2026-08-07",
+      "note": "Celery train_exercise_classifier job=14bc169b-c59d-4ebe-9d62-9ebcd90ca54f"
+    },
+    "exercise_rf_2eccaed2": {
+      "path": "vision/models/exercise_rf_2eccaed2.onnx",
+      "classes": [
+        "squat",
+        "lunge",
+        "idle",
+        "running"
+      ],
+      "window_size": 45,
+      "feature_vector_dim": 32,
+      "created_at": "2026-08-07",
+      "note": "Celery train_exercise_classifier job=2eccaed2-44bf-491a-ba8d-b2492ea4346c"
+    },
+    "exercise_rf_6b86c67d": {
+      "path": "vision/models/exercise_rf_6b86c67d.onnx",
+      "classes": [
+        "squat",
+        "lunge",
+        "curl",
+        "idle",
+        "running"
+      ],
+      "window_size": 45,
+      "feature_vector_dim": 32,
+      "created_at": "2026-08-07",
+      "note": "Celery train_exercise_classifier job=6b86c67d-27fe-434e-915c-bcf928dc2e50"
+    },
+    "exercise_validator_57be9f6a": {
+      "path": "vision/models/exercise_validator_57be9f6a.onnx",
+      "classes": [
+        "idle",
+        "squat",
+        "lunge"
+      ],
+      "window_size": 45,
+      "feature_vector_dim": 32,
+      "role": "exercise_validator",
+      "created_at": "2026-08-07",
+      "note": "RandomForest teacher (train_validator_export_onnx)"
+    },
+    "exercise_validator_d46ca2a7": {
+      "path": "vision/models/exercise_validator_d46ca2a7.onnx",
+      "classes": [
+        "squat",
+        "lunge",
+        "curl",
+        "idle",
+        "running"
+      ],
+      "window_size": 45,
+      "feature_vector_dim": 32,
+      "role": "exercise_validator",
+      "created_at": "2026-08-07",
+      "note": "RandomForest teacher (train_validator_export_onnx)"
     }
-  }
+  },
+  "validator_active": "exercise_validator_d46ca2a7"
 }

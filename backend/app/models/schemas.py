@@ -61,6 +61,25 @@ class UnifiedWsFrameV1(BaseModel):
     rep_count: int = 0
     quality_flags: list[str] = Field(default_factory=list)
     pipeline_ms: dict[str, float] | None = None
+    equipment_label: str | None = Field(
+        default=None,
+        description="Eco del equipamiento (manual o inferido por detector de objetos).",
+    )
+    detected_objects: list[dict[str, Any]] | None = Field(
+        default=None,
+        description=(
+            "Objetos detectados en el frame: "
+            "{label, label_es, confidence, bbox_norm:[x1,y1,x2,y2], equipment_slug?}."
+        ),
+    )
+    exercise_validation: dict[str, Any] | None = Field(
+        default=None,
+        description=(
+            "Validador / teacher de ejercicio (opcional): "
+            "{verdict: confirm|reject|changed|uncertain, primary_label, validator_label, "
+            "confidence, score_margin, reason, previous_label?, teacher_mode}."
+        ),
+    )
     preview_jpeg_base64: str | None = None
     total_frames: int | None = None
     error: str | None = None
@@ -168,6 +187,13 @@ class PoseStreamConfig(BaseModel):
             "con confianza 1.0 para pruebas y demostración."
         ),
     )
+    equipment_label: str | None = Field(
+        default=None,
+        description=(
+            "Equipamiento declarado por el usuario (p. ej. barbell, dumbbell, bodyweight). "
+            "No altera el motor: se ecoa en cada payload como metadato / ground truth futuro."
+        ),
+    )
 
     @field_validator("include_preview", mode="before")
     @classmethod
@@ -192,6 +218,14 @@ class PoseStreamConfig(BaseModel):
         if v is None:
             return None
         s = str(v).strip()
+        return s if s else None
+
+    @field_validator("equipment_label", mode="before")
+    @classmethod
+    def equipment_label_coerce(cls, v: object) -> str | None:
+        if v is None:
+            return None
+        s = str(v).strip().lower()
         return s if s else None
 
     @field_validator("capture_only", mode="before")

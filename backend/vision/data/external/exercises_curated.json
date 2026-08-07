@@ -1,0 +1,186 @@
+[
+  {
+    "id": "0043",
+    "name": "barbell full squat",
+    "equipment": "barbell",
+    "target": "glutes",
+    "muscle_group": "quadriceps",
+    "secondary_muscles": [
+      "quadriceps",
+      "hamstrings",
+      "calves",
+      "core"
+    ],
+    "instructions": {
+      "es": "Ponte de pie con los pies separados a la altura de los hombros, con los dedos de los pies ligeramente hacia afuera. Sujeta la barra sobre la parte superior de la espalda, apoyándola en los trapecios o los deltoides posteriores. Activa el core y mantén el pecho elevado mientras comienzas a bajar el cuerpo. Flexiona las rodillas y las caderas, empujando las caderas hacia atrás y hacia abajo como si te sentaras en una silla. Baja hasta que los muslos queden paralelos al suelo o un poco por debajo. Mantén las rodillas alineadas con los dedos de los pies y el peso sobre los talones. Empuja con los talones para volver a ponerte de pie, extendiendo las caderas y las rodillas. Repite el número de repeticiones deseado.",
+      "en": "Stand with your feet shoulder-width apart, toes slightly turned out. Hold the barbell across your upper back, resting it on your traps or rear delts. Engage your core and keep your chest up as you begin to lower your body down. Bend at the knees and hips, pushing your hips back and down as if sitting into a chair. Lower yourself until your thighs are parallel to the ground or slightly below. Keep your knees in line with your toes and your weight in your heels. Drive through your heels to stand back up, extending your hips and knees. Repeat for the desired number of repetitions."
+    },
+    "instruction_steps": {
+      "es": [
+        "Ponte de pie con los pies separados a la altura de los hombros, con los dedos de los pies ligeramente hacia afuera.",
+        "Sujeta la barra sobre la parte superior de la espalda, apoyándola en los trapecios o los deltoides posteriores.",
+        "Activa el core y mantén el pecho elevado mientras comienzas a bajar el cuerpo.",
+        "Flexiona las rodillas y las caderas, empujando las caderas hacia atrás y hacia abajo como si te sentaras en una silla.",
+        "Baja hasta que los muslos queden paralelos al suelo o un poco por debajo.",
+        "Mantén las rodillas alineadas con los dedos de los pies y el peso sobre los talones.",
+        "Empuja con los talones para volver a ponerte de pie, extendiendo las caderas y las rodillas.",
+        "Repite el número de repeticiones deseado."
+      ],
+      "en": [
+        "Stand with your feet shoulder-width apart, toes slightly turned out.",
+        "Hold the barbell across your upper back, resting it on your traps or rear delts.",
+        "Engage your core and keep your chest up as you begin to lower your body down.",
+        "Bend at the knees and hips, pushing your hips back and down as if sitting into a chair.",
+        "Lower yourself until your thighs are parallel to the ground or slightly below.",
+        "Keep your knees in line with your toes and your weight in your heels.",
+        "Drive through your heels to stand back up, extending your hips and knees.",
+        "Repeat for the desired number of repetitions."
+      ]
+    },
+    "gif_url": "videos/0043-qXTaZnJ.gif",
+    "image": "images/0043-qXTaZnJ.jpg",
+    "attribution": "© Gym visual — https://gymvisual.com/"
+  },
+  {
+    "id": "1460",
+    "name": "walking lunge",
+    "equipment": "body weight",
+    "target": "glutes",
+    "muscle_group": "quadriceps",
+    "secondary_muscles": [
+      "quadriceps",
+      "hamstrings",
+      "calves"
+    ],
+    "instructions": {
+      "es": "Ponte de pie con los pies separados a la altura de los hombros. Da un paso adelante con la pierna derecha, bajando el cuerpo a una posición de zancada. Mantén el torso erguido y la rodilla delantera alineada con el tobillo. Empújate con el pie derecho y lleva el pie izquierdo hacia adelante, entrando en una posición de zancada con la pierna izquierda. Continúa alternando las piernas y avanzando, manteniendo un ritmo controlado y constante. Repite el número de repeticiones deseado.",
+      "en": "Stand with your feet shoulder-width apart. Take a step forward with your right leg, lowering your body into a lunge position. Keep your torso upright and your front knee aligned with your ankle. Push off with your right foot and bring your left foot forward, stepping into a lunge position with your left leg. Continue alternating legs and walking forward, maintaining a controlled and steady pace. Repeat for the desired number of repetitions."
+    },
+    "instruction_steps": {
+      "es": [
+        "Ponte de pie con los pies separados a la altura de los hombros.",
+        "Da un paso adelante con la pierna derecha, bajando el cuerpo a una posición de zancada.",
+        "Mantén el torso erguido y la rodilla delantera alineada con el tobillo.",
+        "Empújate con el pie derecho y lleva el pie izquierdo hacia adelante, entrando en una posición de zancada con la pierna izquierda.",
+        "Continúa alternando las piernas y avanzando, manteniendo un ritmo controlado y constante.",
+        "Repite el número de repeticiones deseado."
+      ],
+      "en": [
+        "Stand with your feet shoulder-width apart.",
+        "Take a step forward with your right leg, lowering your body into a lunge position.",
+        "Keep your torso upright and your front knee aligned with your ankle.",
+        "Push off with your right foot and bring your left foot forward, stepping into a lunge position with your left leg.",
+        "Continue alternating legs and walking forward, maintaining a controlled and steady pace.",
+        "Repeat for the desired number of repetitions."
+      ]
+    },
+    "gif_url": "videos/1460-IZVHb27.gif",
+    "image": "images/1460-IZVHb27.jpg",
+    "attribution": "© Gym visual — https://gymvisual.com/"
+  },
+  {
+    "id": "0294",
+    "name": "dumbbell biceps curl",
+    "equipment": "dumbbell",
+    "target": "biceps",
+    "muscle_group": "forearms",
+    "secondary_muscles": [
+      "forearms"
+    ],
+    "instructions": {
+      "es": "Ponte de pie con una mancuerna en cada mano, con las palmas hacia adelante y los brazos completamente extendidos. Manteniendo los brazos superiores fijos, exhala y levanta el peso mientras contraes los bíceps. Continúa levantando las pesas hasta que los bíceps estén completamente contraídos y las mancuernas estén a la altura de los hombros. Mantén la posición contraída durante una breve pausa mientras aprietas los bíceps. Inhala y comienza a bajar lentamente las mancuernas de vuelta a la posición inicial. Repite el número de repeticiones deseado.",
+      "en": "Stand up straight with a dumbbell in each hand, palms facing forward and arms fully extended. Keeping your upper arms stationary, exhale and curl the weights while contracting your biceps. Continue to raise the weights until your biceps are fully contracted and the dumbbells are at shoulder level. Hold the contracted position for a brief pause as you squeeze your biceps. Inhale and slowly begin to lower the dumbbells back to the starting position. Repeat for the desired number of repetitions."
+    },
+    "instruction_steps": {
+      "es": [
+        "Ponte de pie con una mancuerna en cada mano, con las palmas hacia adelante y los brazos completamente extendidos.",
+        "Manteniendo los brazos superiores fijos, exhala y levanta el peso mientras contraes los bíceps.",
+        "Continúa levantando las pesas hasta que los bíceps estén completamente contraídos y las mancuernas estén a la altura de los hombros.",
+        "Mantén la posición contraída durante una breve pausa mientras aprietas los bíceps.",
+        "Inhala y comienza a bajar lentamente las mancuernas de vuelta a la posición inicial.",
+        "Repite el número de repeticiones deseado."
+      ],
+      "en": [
+        "Stand up straight with a dumbbell in each hand, palms facing forward and arms fully extended.",
+        "Keeping your upper arms stationary, exhale and curl the weights while contracting your biceps.",
+        "Continue to raise the weights until your biceps are fully contracted and the dumbbells are at shoulder level.",
+        "Hold the contracted position for a brief pause as you squeeze your biceps.",
+        "Inhale and slowly begin to lower the dumbbells back to the starting position.",
+        "Repeat for the desired number of repetitions."
+      ]
+    },
+    "gif_url": "videos/0294-NbVPDMW.gif",
+    "image": "images/0294-NbVPDMW.jpg",
+    "attribution": "© Gym visual — https://gymvisual.com/"
+  },
+  {
+    "id": "0685",
+    "name": "run",
+    "equipment": "body weight",
+    "target": "cardiovascular system",
+    "muscle_group": "quadriceps",
+    "secondary_muscles": [
+      "quadriceps",
+      "hamstrings",
+      "calves"
+    ],
+    "instructions": {
+      "es": "Comienza de pie con los pies separados a la altura de la cadera. Activa el core y mantén la parte superior del cuerpo relajada. Comienza a trotar en el lugar, levantando las rodillas hacia el pecho y aterrizando suavemente sobre la punta de los pies. Mantén un ritmo constante y continúa trotando durante la duración o distancia deseada. Recuerda respirar profundamente y mantener una buena postura durante todo el ejercicio.",
+      "en": "Start by standing upright with your feet hip-width apart. Engage your core and keep your upper body relaxed. Begin jogging in place, lifting your knees up towards your chest and landing softly on the balls of your feet. Maintain a steady pace and continue jogging for the desired duration or distance. Remember to breathe deeply and maintain good posture throughout the exercise."
+    },
+    "instruction_steps": {
+      "es": [
+        "Comienza de pie con los pies separados a la altura de la cadera.",
+        "Activa el core y mantén la parte superior del cuerpo relajada.",
+        "Comienza a trotar en el lugar, levantando las rodillas hacia el pecho y aterrizando suavemente sobre la punta de los pies.",
+        "Mantén un ritmo constante y continúa trotando durante la duración o distancia deseada.",
+        "Recuerda respirar profundamente y mantener una buena postura durante todo el ejercicio."
+      ],
+      "en": [
+        "Start by standing upright with your feet hip-width apart.",
+        "Engage your core and keep your upper body relaxed.",
+        "Begin jogging in place, lifting your knees up towards your chest and landing softly on the balls of your feet.",
+        "Maintain a steady pace and continue jogging for the desired duration or distance.",
+        "Remember to breathe deeply and maintain good posture throughout the exercise."
+      ]
+    },
+    "gif_url": "videos/0685-oLrKqDH.gif",
+    "image": "images/0685-oLrKqDH.jpg",
+    "attribution": "© Gym visual — https://gymvisual.com/"
+  },
+  {
+    "id": "3470",
+    "name": "forward lunge (male)",
+    "equipment": "body weight",
+    "target": "glutes",
+    "muscle_group": "quadriceps",
+    "secondary_muscles": [
+      "quadriceps",
+      "hamstrings",
+      "calves"
+    ],
+    "instructions": {
+      "es": "Ponte de pie con los pies separados a la altura de las caderas y las manos en las caderas. Da un paso grande hacia adelante con el pie derecho, bajando el cuerpo hasta una posición de zancada. Dobla la rodilla derecha hasta unos 90 grados, manteniendo la rodilla alineada con el tobillo. Empuja con el pie derecho y vuelve a la posición inicial. Repite con la pierna izquierda, alternando los lados durante el número de repeticiones deseado.",
+      "en": "Stand with your feet hip-width apart and hands on your hips. Take a big step forward with your right foot, lowering your body into a lunge position. Bend your right knee to about 90 degrees, keeping your knee aligned with your ankle. Push off with your right foot and return to the starting position. Repeat with your left leg, alternating sides for the desired number of repetitions."
+    },
+    "instruction_steps": {
+      "es": [
+        "Ponte de pie con los pies separados a la altura de las caderas y las manos en las caderas.",
+        "Da un paso grande hacia adelante con el pie derecho, bajando el cuerpo hasta una posición de zancada.",
+        "Dobla la rodilla derecha hasta unos 90 grados, manteniendo la rodilla alineada con el tobillo.",
+        "Empuja con el pie derecho y vuelve a la posición inicial.",
+        "Repite con la pierna izquierda, alternando los lados durante el número de repeticiones deseado."
+      ],
+      "en": [
+        "Stand with your feet hip-width apart and hands on your hips.",
+        "Take a big step forward with your right foot, lowering your body into a lunge position.",
+        "Bend your right knee to about 90 degrees, keeping your knee aligned with your ankle.",
+        "Push off with your right foot and return to the starting position.",
+        "Repeat with your left leg, alternating sides for the desired number of repetitions."
+      ]
+    },
+    "gif_url": "videos/3470-kMzUs9Y.gif",
+    "image": "images/3470-kMzUs9Y.jpg",
+    "attribution": "© Gym visual — https://gymvisual.com/"
+  }
+]

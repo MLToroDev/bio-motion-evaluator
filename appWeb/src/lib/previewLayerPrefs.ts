@@ -14,6 +14,7 @@ export type PreviewLayerToggleState = {
   tips: boolean;
   quality: boolean;
   skeletonOverlay: boolean;
+  objectsOverlay: boolean;
 };
 
 export const defaultPreviewLayerState: PreviewLayerToggleState = {
@@ -23,6 +24,7 @@ export const defaultPreviewLayerState: PreviewLayerToggleState = {
   tips: true,
   quality: true,
   skeletonOverlay: true,
+  objectsOverlay: true,
 };
 
 export function loadPreviewLayerState(): PreviewLayerToggleState {
@@ -38,6 +40,7 @@ export function loadPreviewLayerState(): PreviewLayerToggleState {
       tips: b('tips', defaultPreviewLayerState.tips),
       quality: b('quality', defaultPreviewLayerState.quality),
       skeletonOverlay: b('skeletonOverlay', defaultPreviewLayerState.skeletonOverlay),
+      objectsOverlay: b('objectsOverlay', defaultPreviewLayerState.objectsOverlay),
     };
   } catch {
     return { ...defaultPreviewLayerState };

@@ -37,6 +37,7 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from app.config import settings
 from app.models.schemas import PoseStreamConfig
 from app.paths import backend_root
+from app.services.equipment_detect_factory import build_optional_equipment_detector
 from app.services.feature_sample_persist import build_optional_feature_collector
 from app.services.pose.mediapipe import reset_pose_video_timestamp_anchor
 from vision.paths import resolve_gold_standard_video
@@ -210,7 +211,10 @@ async def pose_stream(ws: WebSocket) -> None:
                 inference_stride=plan.inference_stride,
                 analysis_enabled=not cfg.capture_only,
                 forced_exercise_label=cfg.forced_exercise_label,
+                equipment_label=cfg.equipment_label,
                 feature_collector=build_optional_feature_collector(),
+                equipment_detector=build_optional_equipment_detector(),
+                object_detect_stride=settings.object_detect_stride,
             )
 
             max_tp = bool(cfg.max_throughput)

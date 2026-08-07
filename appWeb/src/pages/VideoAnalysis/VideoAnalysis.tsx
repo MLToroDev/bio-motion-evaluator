@@ -161,6 +161,7 @@ export default function VideoAnalysis() {
               previewKey={ui.previewKey}
               previewAspect={ui.previewAspect}
               landmarks={ui.landmarks}
+              detectedObjects={ui.detectedObjects}
               includePreview={config.includePreview}
               skeletonOnly={config.skeletonOnly}
               running={ui.running}
@@ -172,6 +173,7 @@ export default function VideoAnalysis() {
                 quality: previewLayers.quality,
               }}
               skeletonOverlay={previewLayers.skeletonOverlay}
+              objectsOverlay={previewLayers.objectsOverlay}
               overlayRxPerSec={ui.running ? ui.displayRxPerSec : null}
               overlayQualityFlags={ui.qualityFlags}
               exerciseLabel={ex}

@@ -1301,6 +1301,62 @@ Las entradas nuevas se añaden **al inicio** de la lista (más reciente arriba),
 
 ## Entradas
 
+### 2026-08-07 — Teacher ONNX del validador (RF entrenable → exercise_validator.onnx)
+
+- **Ámbito:** `backend` · `docs` · `infra`
+- **Tipo:** cambio funcional + decisión arquitectónica (modelo pequeño en servidor para sí/no/cambió)
+- **Descripción:** Se materializa el teacher ONNX del validador: RandomForest 32D exportado con skl2onnx a `vision/models/exercise_validator.onnx` (+ versionado `exercise_validator_<hash>.onnx`, sidecar de clases y `manifest.validator_active`). Script `train_exercise_validator.py` reentrena desde CSV o `feature_samples` approved. Runtime con `EXERCISE_VALIDATOR_TEACHER=onnx|auto` carga onnxruntime y emite `confirm|reject|changed`; si no hay artefacto, fallback heuristic. Compose default `TEACHER=onnx`.
+- **Trazabilidad:** `backend/vision/exercise_validator_train.py`, `backend/scripts/train_exercise_validator.py`, `backend/vision/exercise_validator.py`, `backend/app/config.py`, `docs/spec/exercise-validator.md`
+
+### 2026-08-07 — Validador / teacher de ejercicio (confirm|reject|changed)
+
+- **Ámbito:** `backend` · `appWeb` · `docs`
+- **Tipo:** cambio funcional + decisión arquitectónica (calidad de etiquetas para aprendizaje continuo)
+- **Descripción:** Se añade una segunda etapa ligera sobre el vector 32D (`ExerciseValidator`) que responde si la etiqueta primaria se confirma, se rechaza o cambió de ejercicio. Emite `exercise_validation` en el WS v1 (extensión compatible). Con `EXERCISE_VALIDATOR_GATE_COLLECT`, `AUTO_COLLECT` solo persiste muestras en `confirm` (`label_source=auto_validated`). Teacher por defecto: heurística independiente; alternativas `margin` y ONNX opcional (`vision/models/exercise_validator.onnx`). UI: chip en `DetectedExerciseHero`. Se descartó un modelo HF/Torch adicional para no duplicar peso con YOLO.
+- **Trazabilidad:** `backend/vision/exercise_validator.py`, `backend/vision/realtime_engine.py`, `backend/vision/feature_collector.py`, `appWeb/src/components/DetectedExerciseHero.tsx`, `docs/spec/exercise-validator.md`
+
+### 2026-08-07 — Detección de equipamiento con cajas en el overlay (YOLO-World)
+
+- **Ámbito:** `backend` · `appWeb` · `docs`
+- **Tipo:** cambio funcional (visión de objetos + usabilidad)
+- **Descripción:** Se añade un detector open-vocabulary (Ultralytics YOLO-World) que localiza mancuernas, barras, kettlebells, bancos y máquinas en el frame. Las detecciones viajan en `detected_objects` del contrato WS v1 (extensión compatible) y se dibujan como bounding boxes etiquetadas en Análisis en vivo y en Análisis de vídeo (`DetectedObjectsCanvas`, capa «Objetos»). Si el usuario no declara `equipment_label`, se infiere un slug por voto de confianza. Flag `OBJECT_DETECT_ENABLED` (Compose lo activa por defecto), `YOLO_CONFIG_DIR=/tmp/Ultralytics` y CLIP (`git` + paquete Ultralytics CLIP en el Dockerfile) para que el detector arranque en contenedor.
+- **Trazabilidad:** `backend/vision/equipment_detector.py`, `backend/Dockerfile`, `docker-compose.yml`, `appWeb/src/components/DetectedObjectsCanvas.tsx`, `appWeb/src/pages/VideoAnalysis/components/PreviewCanvas.tsx`, `docs/spec/equipment-object-detection.md`
+
+### 2026-08-07 — Catálogo exercises-dataset + entrenamiento YouTube multi-clase
+
+- **Ámbito:** `backend` · `appWeb` · `docs`
+- **Tipo:** cambio funcional (enriquecimiento UI + pipeline de datos)
+- **Descripción:** Se integra [hasaneyldrm/exercises-dataset](https://github.com/hasaneyldrm/exercises-dataset) **como capa de metadatos** (nombre ES, músculo, equipo, GIF vía CDN), no como detector de pose: el ejercicio en vivo sigue saliendo del clasificador 32D. Catálogo ampliado a `idle/squat/lunge/curl/running` con queries YouTube; API pública `GET /api/v1/exercises/catalog`; hero en Análisis en vivo (`DetectedExerciseHero`). Script `batch_youtube_ingest_and_train.py` para ingesta masiva auto-aprobada + reentreno ONNX con `set_active`.
+- **Trazabilidad:** `backend/vision/data/exercise_catalog.json`, `backend/app/api/v1/exercises.py`, `backend/scripts/batch_youtube_ingest_and_train.py`, `appWeb/src/components/DetectedExerciseHero.tsx`, `appWeb/src/lib/exerciseCatalog.ts`, `docs/spec/exercise-catalog-external.md`
+
+### 2026-08-07 — Motor multi-ejercicio Fase 1: vector 32D completo y primer clasificador multi-clase activo
+
+- **Ámbito:** `backend`  `infra`  `docs`
+- **Tipo:** cambio funcional + incidencia / mitigación (motor de aprendizaje)
+- **Descripción:** Se rellenaron los 11 slots de padding del vector de features (índices 21-31) con postura de ventana — inclinación de tronco, base de apoyo, flexión de cadera L/R, altura de muñecas (F1-F4) — y estadísticos de velocidad angular (F5); la aceleración (F6) quedó fuera por falta de slots (ampliar dimensión rompería la entrada ONNX `[1,32]`). La heurística de squat/lunge aprovecha F1/F2 con pesos bajos. Se pobló el dataset por la ruta oficial de ingesta (139 muestras `squat` + 1098 `running` desde vídeos gold, aprobadas) y se entrenó vía Celery el primer RandomForest **multi-clase real** (`exercise_rf_14bc169b`, accuracy/macro-F1 1.0 en holdout, `set_active`). En el camino se corrigieron dos fallos sistemáticos: el runtime tomaba `out[0]` del ONNX como logits cuando skl2onnx emite la **etiqueta** ahí (todo se clasificaba como clase 0), y `onnxruntime<1.22` no cargaba modelos IR v11 (caída silenciosa al heurístico). `AUTO_COLLECT_*` ahora llega a los contenedores y `vision/models/` es un bind mount compartido backend/worker. Verificación E2E: `SentadillaProfunda.mp4` → `squat` (1 rep), `Running.mp4`/`CintaRunning.mp4` → `running`, y el auto-colector persiste muestras `pending`.
+- **Trazabilidad:** `backend/vision/feature_engine.py`, `backend/vision/biomechanics.py`, `backend/vision/heuristic_exercise_classifier.py`, `backend/vision/exercise_classifier.py`, `backend/requirements.txt`, `docker-compose.yml`, `.env.docker.example`, `docs/spec/feature-vector-32d.md` (nuevo), `docs/spec/dev-learning-api.md`, `docs/spec/docker-compose-stack.md`
+
+### 2026-08-07 — Rep tracker generalizado: FSM parametrizable + tracker de codo + registro
+
+- **Ámbito:** `backend`
+- **Tipo:** decisión arquitectónica (extensibilidad del conteo de repeticiones)
+- **Descripción:** La FSM de umbrales que vivía hardcodeada en `SquatRepTracker` se extrajo a `ThresholdCycleTracker`, parametrizada por extractor de señal, umbrales (entrada/fondo/retroceso/salida) y **mapeo de fases** ida/vuelta (en squat la señal sube en la excéntrica; en curl, en la concéntrica). `SquatRepTracker` pasa a ser una configuración de esa FSM (mismos umbrales y flags) y se añade `ElbowCurlRepTracker` sobre flexión bilateral de codo. El dict fijo del router se reemplaza por el registro `DEFAULT_TRACKER_FACTORIES` con instanciación perezosa y fallback a `UnknownRepTracker`: añadir un ejercicio ya no toca el router. Verificado con simulaciones (3 reps squat, 2 reps curl, flags de asimetría, fallback lunge).
+- **Trazabilidad:** `backend/vision/rep_trackers/threshold_cycle.py` (nuevo), `backend/vision/rep_trackers/squat.py`, `backend/vision/rep_trackers/elbow_curl.py` (nuevo), `backend/vision/rep_tracker.py`
+
+### 2026-08-07 — Campo `equipment_label` en el contrato WS v1 + selector en appWeb
+
+- **Ámbito:** `backend`  `appWeb`  `docs`
+- **Tipo:** cambio de contrato (extensión compatible, sin bump de `schema_version`)
+- **Descripción:** Siguiendo el patrón de `forced_exercise_label`, el cliente puede declarar el equipamiento (`barbell`, `dumbbell`, `bodyweight`, …) en la config inicial de `/ws/pose-stream` y `/ws/video`; el backend lo normaliza y lo **ecoa en cada payload** como metadato (no altera el motor). Sirve como ground truth para un futuro clasificador de equipamiento — el detector visual (YOLO) quedó descartado en Fase 1. En `appWeb` se añadió el selector «Equipamiento» al panel de configuración del análisis por vídeo.
+- **Trazabilidad:** `backend/app/models/schemas.py`, `backend/app/api/websocket/video.py`, `backend/app/api/websocket/live_pose.py`, `backend/vision/realtime_engine.py`, `backend/vision/unified_payload.py`, `appWeb/src/pages/VideoAnalysis/components/ConfigPanel.tsx`, `appWeb/src/hooks/useVideoAnalysisSession.ts`, `docs/spec/websocket-pose-stream.md`
+
+### 2026-08-07 — Stack Docker Compose (API + appWeb + PG + Redis + Celery)
+
+- **Ámbito:** `infra`  `backend`  `appWeb`  `docs`
+- **Tipo:** decisión arquitectónica / despliegue local (reproducibilidad, onboarding evaluadores)
+- **Descripción:** Se añade orquestación Docker en la raíz del monorepo para levantar el cliente React, FastAPI/MediaPipe, PostgreSQL, Redis y worker Celery con un solo comando. El entrypoint del backend descarga el modelo Pose Landmarker si falta y aplica migraciones Alembic. Perfil `demo` sirve el build estático con nginx. No altera contratos REST/WebSocket; el navegador sigue usando `localhost:8000`. Flutter (`app/`) queda fuera del stack.
+- **Trazabilidad:** `docker-compose.yml`, `backend/Dockerfile`, `backend/docker/entrypoint.sh`, `appWeb/Dockerfile`, `appWeb/Dockerfile.dev`, `docs/spec/docker-compose-stack.md`, `docs/guias/SETUP.md`, `docs/arquitectura.md`
+
 ### 2026-05-25 — Mitigación inestabilidad overlay en vivo (60 FPS percibidos)
 
 - **Ámbito:** `appWeb`  `docs/spec/`

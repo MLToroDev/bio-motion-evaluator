@@ -33,6 +33,29 @@ class Settings(BaseSettings):
     auto_collect_enabled: bool = False
     auto_collect_min_confidence: float = 0.85
 
+    # Validador / teacher de ejercicio (segunda etapa sobre 32D; sin Torch extra).
+    exercise_validator_enabled: bool = False
+    exercise_validator_min_confidence: float = 0.65
+    exercise_validator_min_margin: float = 0.12
+    # margin | heuristic | onnx | auto (auto = ONNX si existe exercise_validator.onnx, si no heuristic)
+    exercise_validator_teacher: str = "auto"
+    exercise_validator_change_hold_frames: int = 8
+    # Si True y el validador esta activo: solo AUTO_COLLECT con verdict=confirm (label_source=auto_validated).
+    exercise_validator_gate_collect: bool = True
+    # Ruta opcional al teacher ONNX (relativa a backend/ o absoluta). Vacio = vision/models/exercise_validator.onnx
+    exercise_validator_onnx_path: str = ""
+    # Clases del teacher (coma). Vacio = sidecar .classes.json o manifest validator_active.
+    exercise_validator_classes: str = ""
+
+    # Detección de equipamiento (YOLO-World open-vocab). Requiere ultralytics.
+    object_detect_enabled: bool = False
+    object_detect_stride: int = 4
+    object_detect_conf: float = 0.28
+    object_detect_imgsz: int = 320
+    object_detect_model: str = "yolov8s-world.pt"
+    # Lista separada por comas; vacío = clases por defecto del módulo.
+    object_detect_classes: str = ""
+
     # Si se define, las rutas /api/v1/dev/* exigen cabecera X-Dev-API-Key con este valor.
     dev_api_key: str | None = None
 
@@ -120,6 +143,12 @@ class Settings(BaseSettings):
             return data if isinstance(data, dict) else {}
         except json.JSONDecodeError:
             return {}
+
+    def object_detect_class_list(self) -> list[str] | None:
+        raw = (self.object_detect_classes or "").strip()
+        if not raw:
+            return None
+        return [p.strip() for p in raw.split(",") if p.strip()]
 
 
 settings = Settings()

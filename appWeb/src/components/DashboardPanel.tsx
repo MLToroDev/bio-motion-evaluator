@@ -91,7 +91,7 @@ export function DashboardPanel({
               <>
                 <MetricTile
                   label="Ejercicio"
-                  value={exerciseLabel.toUpperCase()}
+                  value={exerciseLabel}
                   sublabel={`Confianza ${Math.min(100, Math.max(0, exerciseConfidence * 100)).toFixed(0)}%`}
                   status="neutral"
                 />

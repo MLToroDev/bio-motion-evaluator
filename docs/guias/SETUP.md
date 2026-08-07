@@ -60,9 +60,45 @@ Por defecto se descarga **pose_landmarker_full.task** (más preciso). Para **lit
 
 La ruta del modelo se puede configurar con `MEDIAPIPE_POSE_MODEL_PATH` en `.env` (ver `backend/.env.example`).
 
-## Desarrollo con recarga activa
+## Docker Compose (recomendado para demo / onboarding)
+
+Requisitos: Docker Desktop (o Engine + Compose v2). Spec: [`docs/spec/docker-compose-stack.md`](../spec/docker-compose-stack.md).
+
+Desde la **raíz del monorepo**:
+
+```bash
+# Opcional: variables (puertos, JWT, flags MVP)
+cp .env.docker.example .env
+
+docker compose up --build
+```
+
+| Servicio | URL |
+|----------|-----|
+| Cliente React (Vite) | http://localhost:5173 |
+| API FastAPI | http://localhost:8000 — salud `/api/v1/health`, docs `/docs` |
+| PostgreSQL | `localhost:5432` (user/db `biomotion`) |
+| Redis | `localhost:6379` |
+
+En **Configuración** del cliente usa `http://localhost:8000`. El entrypoint del backend descarga el modelo MediaPipe si falta en `backend/models/` y aplica migraciones Alembic.
+
+Demo estática (nginx, build de producción):
+
+```bash
+docker compose --profile demo up --build web-demo backend db redis worker
+# → http://localhost:8080
+```
+
+Solo infra (API y web en el host):
+
+```bash
+docker compose up db redis
+```
+
+## Desarrollo con recarga activa (sin Docker)
 
 - **FastAPI:** usa siempre `uvicorn ... --reload`, que reinicia el servidor al guardar cambios en `.py`. Script: [`scripts/start-dev-backend.ps1`](../../scripts/start-dev-backend.ps1) desde la raíz.
-- **Flutter:** el comando `flutter run` se queda en ejecución; en la misma terminal **r** = hot reload, **R** = hot restart. Script: [`scripts/start-dev-flutter.ps1`](../../scripts/start-dev-flutter.ps1).
-- Mantén **dos procesos** en paralelo (dos terminales o dos tareas): API + app.
+- **appWeb:** `cd appWeb && npm run dev` (Vite).
+- **Flutter (legado):** el comando `flutter run` se queda en ejecución; en la misma terminal **r** = hot reload, **R** = hot restart. Script: [`scripts/start-dev-flutter.ps1`](../../scripts/start-dev-flutter.ps1).
+- Mantén **API + appWeb** en paralelo (dos terminales) si no usas Compose.
 
