@@ -9,7 +9,10 @@
   },
   "camera_protocol": {
     "primary_angle": "sagittal_full_body",
-    "distance_m": [2.0, 3.5],
+    "distance_m": [
+      2.0,
+      3.5
+    ],
     "notes_es": "Cuerpo completo visible; plano sagital o tres-cuartos estable durante la toma."
   },
   "exercises": [
@@ -20,7 +23,13 @@
       "description_es": "Postura neutra, poca flexión de rodilla y baja periodicidad en la ventana.",
       "youtube_search_queries": [
         "person standing still full body camera",
-        "standing rest pose full body side view"
+        "standing rest pose full body side view",
+        "person standing casual living room full body phone camera",
+        "waiting standing still gym hallway full body",
+        "person standing idle no movement full body side view",
+        "standing still talking full body camera no exercise",
+        "person waiting in place full body static pose",
+        "man standing still living room full body phone"
       ]
     },
     {
@@ -38,7 +47,10 @@
       "youtube_search_queries": [
         "perfect bodyweight squat form side view full body",
         "barbell back squat technique tutorial side camera",
-        "goblet squat correct form full body"
+        "goblet squat correct form full body",
+        "beginner squat common mistakes front view full body",
+        "squat gym phone camera three quarter view",
+        "bodyweight squat home workout imperfect form side"
       ]
     },
     {
@@ -56,25 +68,32 @@
       "youtube_search_queries": [
         "walking lunge perfect form side view",
         "forward lunge technique full body camera",
-        "bodyweight reverse lunge form tutorial"
+        "bodyweight reverse lunge form tutorial",
+        "walking lunges gym aisle phone camera",
+        "reverse lunge beginner mistakes full body"
       ]
     },
     {
       "id": "curl",
       "display_es": "Curl de bíceps",
       "rep_tracker_key": "curl",
-      "description_es": "Flexión cíclica de codo; tracker ElbowCurlRepTracker.",
+      "description_es": "Flexión cíclica de codo (de pie o sentado); tracker ElbowCurlRepTracker. Sentado: rodillas fijas ~90°, no confundir con squat.",
       "external_id": "0294",
       "external_name": "dumbbell biceps curl",
       "equipment": "dumbbell",
       "target_muscle": "biceps",
       "muscle_group": "upper arms",
       "gif_path": "videos/0294-NbVPDMW.gif",
-      "instructions_es": "De pie con mancuernas a los lados, flexiona los codos llevando las pesas hacia los hombros sin balancear el tronco; baja controlado.",
+      "instructions_es": "De pie o sentado, con mancuernas, flexiona los codos hacia los hombros sin balancear el tronco; baja controlado. El curl sentado mantiene las rodillas fijas.",
       "youtube_search_queries": [
         "dumbbell biceps curl perfect form front view",
         "barbell curl technique tutorial full body",
-        "standing dumbbell curl correct form side"
+        "standing dumbbell curl correct form side",
+        "dumbbell curl gym selfie front camera full body",
+        "bicep curl common form mistakes side view",
+        "seated dumbbell bicep curl full body front",
+        "curl biceps mancuerna sentado tecnica",
+        "preacher curl vs seated dumbbell curl form"
       ]
     },
     {
@@ -92,7 +111,127 @@
       "youtube_search_queries": [
         "treadmill running form side view full body",
         "jogging technique side camera full body",
-        "running in place form tutorial"
+        "running in place form tutorial",
+        "outdoor jogging side view full body phone camera",
+        "treadmill run home gym laptop camera angle",
+        "beginner running form check side view"
+      ]
+    },
+    {
+      "id": "pushup",
+      "display_es": "Flexión de pecho (push-up)",
+      "rep_tracker_key": "pushup",
+      "description_es": "Flexión cíclica de codo con tronco casi horizontal (plancha alta); se distingue de curl por inclinación de tronco (F1, índice 21) y de squat/lunge por flexión de codo dominante en vez de rodilla.",
+      "external_id": "0662",
+      "external_name": "push-up",
+      "equipment": "body weight",
+      "target_muscle": "pectorals",
+      "muscle_group": "chest",
+      "gif_path": "videos/0662-I4hDWkc.gif",
+      "instructions_es": "Comienza en plancha alta con manos un poco más separadas que los hombros. Flexiona los codos bajando el pecho cerca del suelo manteniendo el cuerpo en línea recta, luego empuja de vuelta a la posición inicial.",
+      "youtube_search_queries": [
+        "perfect push up form side view full body tutorial",
+        "push up technique full body camera slow motion",
+        "bodyweight push up correct form side angle",
+        "push up beginner knee form home floor phone camera",
+        "pushups gym mirror front view full body"
+      ]
+    },
+    {
+      "id": "plank",
+      "display_es": "Plancha (isométrica)",
+      "rep_tracker_key": "unknown",
+      "description_es": "Postura isométrica con tronco horizontal sostenido; sin ciclos de flexión/extensión, por lo que la periodicidad de ventana (índice 15) es baja pese a tronco muy inclinado (F1) — útil para contrastar 'ejercicio activo sin reps' frente a idle (tronco erguido) y frente a pushup/mountain_climber (mismo tronco pero con ciclos).",
+      "external_id": null,
+      "external_name": null,
+      "equipment": "body weight",
+      "target_muscle": "core",
+      "muscle_group": "waist",
+      "gif_path": null,
+      "instructions_es": "Apóyate sobre antebrazos o manos y puntas de pies, manteniendo el cuerpo en línea recta desde hombros hasta tobillos, sin dejar caer ni elevar la cadera. Sostén la posición el tiempo objetivo.",
+      "youtube_search_queries": [
+        "plank exercise perfect form side view full body",
+        "how to hold a plank correct form tutorial",
+        "forearm plank home workout phone camera side",
+        "plank form check living room full body"
+      ]
+    },
+    {
+      "id": "jumping_jack",
+      "display_es": "Salto de tijera (jumping jack)",
+      "rep_tracker_key": "jumping_jack",
+      "description_es": "Patrón simétrico y rápido: brazos suben por encima de la cabeza (F4, altura de muñecas) mientras las piernas abren la base de apoyo (F2); alta velocidad angular (F5) lo distingue de overhead_press, que es más lento y controlado.",
+      "external_id": "3223",
+      "external_name": "star jump (male)",
+      "equipment": "body weight",
+      "target_muscle": "cardiovascular system",
+      "muscle_group": "cardio",
+      "gif_path": "videos/3223-HtfCpfi.gif",
+      "instructions_es": "De pie con brazos a los costados, salta separando las piernas mientras elevas los brazos por encima de la cabeza; vuelve a la posición inicial con otro salto sincronizado.",
+      "youtube_search_queries": [
+        "jumping jacks perfect form full body side view",
+        "jumping jack exercise tutorial full body camera",
+        "jumping jacks home workout front camera",
+        "cardio jumping jack gym class full body"
+      ]
+    },
+    {
+      "id": "overhead_press",
+      "display_es": "Press militar / press de hombros",
+      "rep_tracker_key": "overhead_press",
+      "description_es": "Muñecas muy por encima de hombros en el punto alto (F4 fuerte, índices 27-28), movimiento lento y controlado a diferencia de jumping_jack; tronco erguido lo distingue de pushup/plank.",
+      "external_id": "0426",
+      "external_name": "dumbbell standing overhead press",
+      "equipment": "dumbbell",
+      "target_muscle": "delts",
+      "muscle_group": "shoulders",
+      "gif_path": "videos/0426-A6wtbuL.gif",
+      "instructions_es": "De pie con mancuernas a la altura de los hombros y palmas al frente, presiona hacia arriba hasta extender completamente los brazos por encima de la cabeza; baja controlado a la posición inicial.",
+      "youtube_search_queries": [
+        "dumbbell overhead press perfect form front view full body",
+        "shoulder press standing technique tutorial side camera",
+        "barbell military press correct form full body",
+        "dumbbell shoulder press gym mirror front",
+        "overhead press beginner mistakes full body side"
+      ]
+    },
+    {
+      "id": "deadlift",
+      "display_es": "Peso muerto (deadlift)",
+      "rep_tracker_key": "deadlift",
+      "description_es": "Flexión de cadera dominante (F3, índices 24-26) con flexión de rodilla moderada, a diferencia de squat donde la rodilla domina; tronco se inclina hacia adelante (F1) durante la bajada.",
+      "external_id": "0032",
+      "external_name": "barbell deadlift",
+      "equipment": "barbell",
+      "target_muscle": "glutes",
+      "muscle_group": "upper legs",
+      "gif_path": "videos/0032-ila4NZS.gif",
+      "instructions_es": "De pie con la barra en el suelo frente a ti, flexiona caderas y rodillas para agarrarla, mantén la espalda recta y empuja con los talones para levantarla extendiendo caderas y rodillas; baja controlado con el mismo patrón de bisagra de cadera.",
+      "youtube_search_queries": [
+        "barbell deadlift perfect form side view full body tutorial",
+        "romanian deadlift technique full body camera",
+        "hip hinge deadlift correct form slow motion",
+        "conventional deadlift gym side view phone camera",
+        "deadlift beginner form check full body"
+      ]
+    },
+    {
+      "id": "mountain_climber",
+      "display_es": "Escalador (mountain climber)",
+      "rep_tracker_key": "unknown",
+      "description_es": "Flexión de rodilla alterna y rápida con tronco casi horizontal (plancha alta), similar a running pero con inclinación de tronco alta (F1) en vez de bipedestación; sin tracker dedicado por ahora (comparte ambigüedad de señal con pushup/plank en tronco), cae en UnknownRepTracker.",
+      "external_id": "0630",
+      "external_name": "mountain climber",
+      "equipment": "body weight",
+      "target_muscle": "cardiovascular system",
+      "muscle_group": "cardio",
+      "gif_path": "videos/0630-RJgzwny.gif",
+      "instructions_es": "En plancha alta con manos bajo los hombros, lleva alternadamente cada rodilla hacia el pecho en un movimiento rápido tipo carrera, manteniendo cadera baja y core activo.",
+      "youtube_search_queries": [
+        "mountain climber exercise perfect form side view",
+        "mountain climbers full body tutorial side camera",
+        "mountain climbers home floor workout side camera",
+        "mountain climber HIIT phone camera full body"
       ]
     }
   ]

@@ -2,6 +2,7 @@
 Entrenamiento RandomForest → ONNX para el clasificador de ejercicio (vector 32D).
 
 Usado por el script CLI y por la tarea Celery de aprendizaje continuo.
+Validación: ``vision.model_validation`` (GroupSplit / métricas honestas).
 """
 
 from __future__ import annotations
@@ -14,9 +15,12 @@ from typing import Any
 
 import numpy as np
 
+from vision.model_validation import compute_classification_metrics, resolve_split_indices
+
 log = logging.getLogger(__name__)
 
 FEATURE_DIM = 32
+MANIFEST_VERSION = 2
 
 
 def _export_constant_logit_gemm_onnx(
@@ -71,8 +75,11 @@ def merge_manifest(
     *,
     set_active: bool,
     note: str | None = None,
+    metrics: dict[str, Any] | None = None,
+    training_params: dict[str, Any] | None = None,
+    dataset_snapshot: dict[str, Any] | None = None,
 ) -> None:
-    """Fusiona o crea entrada en ``manifest.json``."""
+    """Fusiona o crea entrada en ``manifest.json`` (manifest_version=2)."""
     manifest_path = manifest_path.expanduser()
     if not manifest_path.is_absolute():
         manifest_path = (backend_root / manifest_path).resolve()
@@ -80,6 +87,7 @@ def merge_manifest(
     if manifest_path.is_file():
         with manifest_path.open(encoding="utf-8") as f:
             data = json.load(f)
+    data["manifest_version"] = MANIFEST_VERSION
     models = dict(data.get("models") or {})
     entry: dict[str, Any] = {
         "path": onnx_rel_posix,
@@ -89,6 +97,40 @@ def merge_manifest(
         "created_at": _dt.date.today().isoformat(),
         "note": note or "RandomForest (vision/exercise_rf_train.py)",
     }
+    if metrics is not None:
+        # Evitar classification_report enorme en manifest; conservar claves clave
+        slim = {
+            k: metrics[k]
+            for k in (
+                "accuracy",
+                "macro_f1",
+                "balanced_accuracy",
+                "f1_per_class",
+                "confusion_matrix",
+                "oob_score",
+                "oob_score_caveat",
+                "roc_auc_ovr",
+                "pr_auc_ovr",
+                "brier_score_multiclass",
+                "split_strategy",
+                "leakage_risk",
+                "unreliable_classes",
+                "high_variance_classes",
+                "n_train",
+                "n_val",
+                "n_groups_train",
+                "n_groups_val",
+                "train_macro_f1",
+                "overfit_gap_macro_f1",
+                "undefined_metrics",
+            )
+            if k in metrics
+        }
+        entry["metrics"] = slim
+    if training_params is not None:
+        entry["training_params"] = training_params
+    if dataset_snapshot is not None:
+        entry["dataset_snapshot"] = dataset_snapshot
     models[model_key] = entry
     data["models"] = models
     if set_active:
@@ -99,25 +141,33 @@ def merge_manifest(
         f.write("\n")
 
 
+def _dataset_snapshot(y_str: np.ndarray) -> dict[str, int]:
+    counts: dict[str, int] = {}
+    for lab in y_str.tolist():
+        k = str(lab).strip().lower()
+        counts[k] = counts.get(k, 0) + 1
+    return dict(sorted(counts.items()))
+
+
 def train_rf_export_onnx(
     X: np.ndarray,
     y_str: np.ndarray,
     class_list: list[str],
     out_path: Path,
     *,
+    groups: np.ndarray | None = None,
+    sample_splits: np.ndarray | None = None,
     test_size: float = 0.2,
     seed: int = 42,
     n_estimators: int = 200,
 ) -> dict[str, Any]:
     """
-    Entrena con holdout estratificado, exporta ONNX y devuelve métricas serializables.
+    Entrena con holdout (GroupSplit / frozen / row), exporta ONNX y devuelve métricas.
 
     Raises:
         ValueError: etiquetas fuera de ``class_list`` o pocas muestras.
     """
     from sklearn.ensemble import RandomForestClassifier
-    from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, f1_score
-    from sklearn.model_selection import train_test_split
 
     if X.shape[1] != FEATURE_DIM:
         raise ValueError(f"Se esperaban {FEATURE_DIM} columnas, hay {X.shape[1]}")
@@ -141,60 +191,72 @@ def train_rf_export_onnx(
             "a una sola etiqueta si solo tienes ejemplos de ese ejercicio."
         )
 
-    try:
-        X_train, X_val, y_train, y_val = train_test_split(
-            X.astype(np.float32),
-            y,
-            test_size=test_size,
-            random_state=seed,
-            stratify=y,
+    X_f = X.astype(np.float32)
+    split = resolve_split_indices(
+        y,
+        groups=groups,
+        sample_splits=sample_splits,
+        test_size=test_size,
+        seed=seed,
+        class_names=class_list,
+    )
+    for note in split.notes:
+        log.warning("split note: %s", note)
+    if split.strategy in ("row_stratified", "row_unstratified"):
+        log.warning(
+            "Split %s (leakage_risk=%s). Preferir groups=source_file o sample_splits congelados.",
+            split.strategy,
+            split.leakage_risk,
         )
-    except ValueError:
-        X_train, X_val, y_train, y_val = train_test_split(
-            X.astype(np.float32),
-            y,
-            test_size=test_size,
-            random_state=seed,
-        )
+    if not split.stratified:
+        log.warning("Split sin estratificación (stratified=False)")
+
+    X_train, X_val = X_f[split.train_idx], X_f[split.val_idx]
+    y_train, y_val = y[split.train_idx], y[split.val_idx]
 
     clf: RandomForestClassifier | None = None
     n_unique_full = int(len(np.unique(y)))
+    oob_score: float | None = None
+    y_proba: np.ndarray | None = None
 
     if n_unique_full == 1:
-        # Todo el dataset es una clase: sin RandomForest.
         y_pred = np.full(y_val.shape, int(np.unique(y)[0]), dtype=np.int64)
+        y_train_pred = np.full(y_train.shape, int(np.unique(y)[0]), dtype=np.int64)
     else:
         clf = RandomForestClassifier(
             n_estimators=n_estimators,
             random_state=seed,
             class_weight="balanced_subsample",
             n_jobs=-1,
+            oob_score=True,
         )
         clf.fit(X_train, y_train)
         y_pred = clf.predict(X_val)
+        y_train_pred = clf.predict(X_train)
+        oob_score = float(getattr(clf, "oob_score_", None) or 0.0) if getattr(clf, "oob_score_", None) is not None else None
+        try:
+            # Alinear columnas de proba al orden de class_list
+            proba_raw = clf.predict_proba(X_val)
+            proba_full = np.zeros((X_val.shape[0], len(class_list)), dtype=np.float64)
+            for local_i, cls_id in enumerate(clf.classes_):
+                proba_full[:, int(cls_id)] = proba_raw[:, local_i]
+            y_proba = proba_full
+        except Exception as exc:
+            log.warning("predict_proba no disponible: %s", exc)
+            y_proba = None
 
-    # Aunque ``y`` tenga varias clases, el split puede dejar ``y_train`` monoclas → bosque degenerado;
-    # ``skl2onnx`` entonces genera TreeEnsembleClassifier inválido.
     rf_is_monoclass = clf is not None and len(getattr(clf, "classes_", [])) == 1
     use_stub_onnx = n_unique_full == 1 or rf_is_monoclass
 
-    acc = float(accuracy_score(y_val, y_pred))
-    # Per-class F1 (macro / per class)
-    f1_each = f1_score(y_val, y_pred, average=None, labels=list(range(len(class_list))), zero_division=0)
-    f1_per_class = {class_list[i]: float(f1_each[i]) for i in range(len(class_list))}
-    cm = confusion_matrix(y_val, y_pred, labels=list(range(len(class_list))))
-    cm_list = [[int(x) for x in row] for row in cm.tolist()]
-    # Solo etiquetas que figuran en validación / predicción.
-    eval_labels_arr = np.union1d(np.unique(y_val), np.unique(y_pred)).astype(int)
-    eval_labels = [int(i) for i in sorted(eval_labels_arr.tolist())]
-    eval_names = [class_list[i] for i in eval_labels]
-    cls_rep = classification_report(
+    metrics = compute_classification_metrics(
         y_val,
         y_pred,
-        labels=eval_labels,
-        target_names=eval_names,
-        output_dict=True,
-        zero_division=0,
+        class_list,
+        y_proba=y_proba,
+        y_train_true=y_train,
+        y_train_pred=y_train_pred,
+        oob_score=oob_score,
+        split_meta=split,
     )
 
     if n_unique_full == 1:
@@ -245,16 +307,15 @@ def train_rf_export_onnx(
             )
             export_mode = "single_class_logit_stub_onnx_convert_failed"
 
-    macro_f1 = float(f1_score(y_val, y_pred, average="macro", zero_division=0))
-
-    return {
-        "accuracy": acc,
-        "macro_f1": macro_f1,
-        "f1_per_class": f1_per_class,
-        "confusion_matrix": cm_list,
-        "classification_report": cls_rep,
-        "class_names": list(class_list),
-        "n_train": int(X_train.shape[0]),
-        "n_val": int(X_val.shape[0]),
-        "export_mode": export_mode,
+    snap = _dataset_snapshot(y_str)
+    training_params = {
+        "seed": int(seed),
+        "n_estimators": int(n_estimators),
+        "test_size": float(test_size),
+        "class_weight": "balanced_subsample",
+        "split_strategy": split.strategy,
     }
+    metrics["export_mode"] = export_mode
+    metrics["dataset_snapshot"] = snap
+    metrics["training_params"] = training_params
+    return metrics

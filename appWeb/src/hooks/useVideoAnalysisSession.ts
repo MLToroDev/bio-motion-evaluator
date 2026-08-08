@@ -129,6 +129,21 @@ export type SessionStartParams =
       equipmentLabel?: string | null;
     }
   | {
+      mode: 'youtube';
+      apiBaseUrl: string;
+      streamUrl: string;
+      targetFps: number;
+      maxThroughput: boolean;
+      includePreview: boolean;
+      previewFps: number;
+      previewJpegQuality: number;
+      captureOnly: boolean;
+      serverDiagnostics: boolean;
+      streamTuning: 'auto' | 'off';
+      forcedExerciseLabel?: string | null;
+      equipmentLabel?: string | null;
+    }
+  | {
       mode: 'server_camera';
       apiBaseUrl: string;
       deviceIndex: number;
@@ -731,7 +746,22 @@ export function useVideoAnalysisSession(opts?: UseVideoAnalysisSessionOptions) {
               ...wsForcedExercise(params.forcedExerciseLabel),
               ...wsEquipmentLabel(params.equipmentLabel),
             }
-          : {
+          : params.mode === 'youtube'
+            ? {
+                source: 'url' as const,
+                stream_url: params.streamUrl,
+                target_fps: params.targetFps,
+                max_throughput: params.maxThroughput,
+                include_preview: params.includePreview,
+                preview_fps: sanitizePreviewFps(params.previewFps),
+                preview_jpeg_quality: sanitizePreviewJpegQuality(params.previewJpegQuality),
+                capture_only: params.captureOnly,
+                diagnostics: params.serverDiagnostics,
+                stream_tuning: params.streamTuning,
+                ...wsForcedExercise(params.forcedExerciseLabel),
+                ...wsEquipmentLabel(params.equipmentLabel),
+              }
+            : {
               source: 'camera' as const,
               device_index: params.deviceIndex,
               target_fps: params.targetFps,

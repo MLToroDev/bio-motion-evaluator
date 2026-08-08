@@ -18,7 +18,7 @@ from typing import Any
 
 import numpy as np
 
-from vision.exercise_rf_train import FEATURE_DIM, train_rf_export_onnx
+from vision.exercise_rf_train import FEATURE_DIM, MANIFEST_VERSION, train_rf_export_onnx
 
 log = logging.getLogger(__name__)
 
@@ -137,6 +137,9 @@ def merge_validator_manifest(
     *,
     set_active: bool,
     note: str | None = None,
+    metrics: dict[str, Any] | None = None,
+    training_params: dict[str, Any] | None = None,
+    dataset_snapshot: dict[str, Any] | None = None,
 ) -> None:
     """Registra el teacher en ``manifest.json`` sin tocar ``active`` del clasificador primario."""
     manifest_path = manifest_path.expanduser()
@@ -146,8 +149,9 @@ def merge_validator_manifest(
     if manifest_path.is_file():
         with manifest_path.open(encoding="utf-8") as f:
             data = json.load(f)
+    data["manifest_version"] = MANIFEST_VERSION
     models = dict(data.get("models") or {})
-    models[model_key] = {
+    entry: dict[str, Any] = {
         "path": onnx_rel_posix,
         "classes": class_list,
         "window_size": window_size,
@@ -156,6 +160,33 @@ def merge_validator_manifest(
         "created_at": _dt.date.today().isoformat(),
         "note": note or "RandomForest teacher (vision/exercise_validator_train.py)",
     }
+    if metrics is not None:
+        slim = {
+            k: metrics[k]
+            for k in (
+                "accuracy",
+                "macro_f1",
+                "balanced_accuracy",
+                "f1_per_class",
+                "confusion_matrix",
+                "oob_score",
+                "oob_score_caveat",
+                "split_strategy",
+                "leakage_risk",
+                "unreliable_classes",
+                "n_train",
+                "n_val",
+                "n_groups_train",
+                "n_groups_val",
+            )
+            if k in metrics
+        }
+        entry["metrics"] = slim
+    if training_params is not None:
+        entry["training_params"] = training_params
+    if dataset_snapshot is not None:
+        entry["dataset_snapshot"] = dataset_snapshot
+    models[model_key] = entry
     data["models"] = models
     if set_active:
         data[MANIFEST_VALIDATOR_ACTIVE_KEY] = model_key
@@ -176,6 +207,8 @@ def train_validator_export_onnx(
     class_list: list[str],
     backend_root: Path,
     *,
+    groups: np.ndarray | None = None,
+    sample_splits: np.ndarray | None = None,
     out_dir: Path | None = None,
     test_size: float = 0.2,
     seed: int = 42,
@@ -198,6 +231,8 @@ def train_validator_export_onnx(
         y_str,
         class_list,
         tmp_path,
+        groups=groups,
+        sample_splits=sample_splits,
         test_size=test_size,
         seed=seed,
         n_estimators=n_estimators,
@@ -229,6 +264,9 @@ def train_validator_export_onnx(
         window_size,
         set_active=set_manifest_active,
         note="RandomForest teacher (train_validator_export_onnx)",
+        metrics=metrics,
+        training_params=metrics.get("training_params"),
+        dataset_snapshot=metrics.get("dataset_snapshot"),
     )
 
     metrics = dict(metrics)

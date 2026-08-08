@@ -28,6 +28,7 @@ import json
 import logging
 import threading
 import time
+from pathlib import Path
 from typing import NamedTuple
 
 import cv2
@@ -40,6 +41,12 @@ from app.paths import backend_root
 from app.services.equipment_detect_factory import build_optional_equipment_detector
 from app.services.feature_sample_persist import build_optional_feature_collector
 from app.services.pose.mediapipe import reset_pose_video_timestamp_anchor
+from app.services.video.downloader import (
+    download_video,
+    is_youtube_page_url,
+    normalize_youtube_url,
+    resolve_playable_stream,
+)
 from vision.paths import resolve_gold_standard_video
 from vision.processor import VideoSource
 from vision.realtime_engine import RealtimeEngineSession
@@ -88,7 +95,35 @@ def _build_video_source(cfg: PoseStreamConfig) -> VideoSource:
     if cfg.source == "url":
         if not cfg.stream_url:
             raise ValueError("stream_url es obligatorio cuando source='url'")
-        return VideoSource("url", file_path=cfg.stream_url)
+        page = cfg.stream_url.strip()
+        if is_youtube_page_url(page):
+            page = normalize_youtube_url(page)
+        try:
+            playable = resolve_playable_stream(page)
+            try:
+                return VideoSource(
+                    "url",
+                    file_path=playable.url,
+                    finite=playable.finite,
+                    http_headers=playable.http_headers,
+                )
+            except RuntimeError as open_exc:
+                if not is_youtube_page_url(page):
+                    raise
+                log.warning(
+                    "OpenCV no abrió el stream YouTube; descarga H.264 de respaldo: %s",
+                    open_exc,
+                )
+                raise
+        except Exception as exc:
+            if not is_youtube_page_url(page):
+                raise RuntimeError(f"No se pudo abrir el stream: {exc}") from exc
+            log.warning("YouTube stream falló (%s); descarga H.264: %s", page, exc)
+            out_dir = settings.downloads_dir
+            if not Path(out_dir).is_absolute():
+                out_dir = str(backend_root() / out_dir)
+            local = download_video(page, out_dir, quality="720p")
+            return VideoSource("file", file_path=local)
     raise ValueError(f"Fuente no soportada: {cfg.source}")
 
 
@@ -164,6 +199,7 @@ async def pose_stream(ws: WebSocket) -> None:
 
         {"source":"file","video_filename":"squat_test.mp4","target_fps":15}
         {"source":"camera","device_index":0,"target_fps":10}
+        {"source":"url","stream_url":"https://www.youtube.com/watch?v=...","target_fps":12}
     """
     await ws.accept()
     try:
@@ -187,7 +223,7 @@ async def pose_stream(ws: WebSocket) -> None:
         stop_producer = threading.Event()
 
         try:
-            source = _build_video_source(cfg)
+            source = await asyncio.to_thread(_build_video_source, cfg)
             total_frames = source.total_frame_count
             nw, nh, nf = source.stream_geometry()
 
@@ -274,7 +310,7 @@ async def pose_stream(ws: WebSocket) -> None:
                 frame: np.ndarray | None = item
     
                 if frame is None:
-                    if cfg.source == "file":
+                    if source is not None and source.finite:
                         break
                     elapsed = time.perf_counter() - t_frame_start
                     t_sleep0 = time.perf_counter()
@@ -401,7 +437,7 @@ async def pose_stream(ws: WebSocket) -> None:
     
                 await asyncio.sleep(sleep_budget)
 
-            if cfg.source == "file":
+            if source is not None and source.finite:
                 try:
                     await ws.send_json({
                         "schema_version": 1,

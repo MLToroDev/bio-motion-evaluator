@@ -5,7 +5,7 @@
 - **Estado:** Activo
 - **Alcance:** Segunda etapa ligera sobre el vector 32D que valida la etiqueta del clasificador primario, ayuda a gatear `AUTO_COLLECT` y expone veredicto en el contrato WS v1.
 - **Código:** `backend/vision/exercise_validator.py`, `backend/vision/exercise_validator_train.py`, `backend/scripts/train_exercise_validator.py`, `backend/vision/realtime_engine.py`, `backend/vision/feature_collector.py`, `appWeb/src/components/DetectedExerciseHero.tsx`
-- **Última revisión:** 2026-08-07
+- **Última revisión:** 2026-08-07 (teacher `exercise_validator_fe345eab` cubre las 11 clases activas)
 
 ## Resumen
 
@@ -70,10 +70,11 @@ python scripts/train_exercise_validator.py \
   --csv scripts/examples/exercise_features_multiclass.csv \
   --classes idle,squat,lunge
 
-# Producción: muestras approved en PostgreSQL
+# Producción: muestras approved en PostgreSQL (11 clases, ronda 2026-08-07)
 python scripts/train_exercise_validator.py \
   --from-db \
-  --classes squat,lunge,curl,idle,running
+  --classes idle,squat,lunge,curl,running,pushup,plank,jumping_jack,overhead_press,deadlift,mountain_climber \
+  --n-estimators 40
 ```
 
 Reutiliza `vision/exercise_rf_train.train_rf_export_onnx` (RandomForest → skl2onnx). No hace falta descargar Torch/HF: el “modelo pequeño que se baja al servidor” es este ONNX generado y desplegado bajo `vision/models/` (bind mount en Compose).
@@ -105,6 +106,7 @@ EXERCISE_VALIDATOR_GATE_COLLECT=true
 2. **Prioridad de veredicto:** `changed` > `confirm` > `reject` > `uncertain` durante el hold de transición.
 3. Con etiqueta forzada (`forced_exercise_label`) no se emite validación ni se recolecta.
 4. El teacher ONNX es **independiente** del clasificador primario (`exercise_rf_*`): mismo layout 32D, distinto artefacto y `validator_active`.
+5. **2026-08-07 — Reentrenado a 11 clases, artefacto reducido por tamaño.** Con ~43 120 muestras approved (120 vídeos YouTube, 11 clases), un primer entrenamiento con `n_estimators=200` generó un ONNX de ~60 MB; se redujo a `n_estimators=40` (`exercise_validator_fe345eab.onnx`, ~20 MB) sin pérdida relevante de macro-F1 (0.9517 vs 0.9524 con 200 árboles), priorizando tamaño de artefacto versionable en Git. `f1_per_class` más bajo: `plank` (0.79) — se confunde parcialmente con `idle`/`overhead_press` por su naturaleza isométrica (ver limitaciones en `docs/spec/dev-learning-api.md`).
 
 ## Pruebas
 

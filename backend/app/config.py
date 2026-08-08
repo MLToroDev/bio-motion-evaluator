@@ -23,7 +23,7 @@ class Settings(BaseSettings):
     # 1 = inferir cada frame; 2–3 = reutilizar última pose OK en frames intermedios (más FPS, menos resolución temporal).
     pose_inference_stride: int = 1
     # Respuesta JSON (WS/REST): solo incluir landmarks con visibility >= este valor (0 = enviar los 33 como antes).
-    pose_landmark_min_visibility_response: float = 0.5
+    pose_landmark_min_visibility_response: float = 0.25
 
     hf_api_token: str | None = None
     hf_inference_url: str | None = None

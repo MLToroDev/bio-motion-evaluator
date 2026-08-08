@@ -71,14 +71,21 @@ def list_training_jobs(
     rows = q.offset(skip).limit(limit).all()
     items = []
     for r in rows:
+        mj = r.metrics_json if isinstance(r.metrics_json, dict) else {}
         items.append(
             {
                 "id": str(r.id),
                 "status": r.status,
                 "sample_count": r.sample_count,
                 "model_key": r.model_key,
-                "accuracy": (r.metrics_json or {}).get("accuracy") if r.metrics_json else None,
-                "macro_f1": (r.metrics_json or {}).get("macro_f1") if r.metrics_json else None,
+                "accuracy": mj.get("accuracy"),
+                "macro_f1": mj.get("macro_f1"),
+                "balanced_accuracy": mj.get("balanced_accuracy"),
+                "oob_score": mj.get("oob_score"),
+                "oob_score_caveat": mj.get("oob_score_caveat"),
+                "split_strategy": mj.get("split_strategy"),
+                "leakage_risk": mj.get("leakage_risk"),
+                "unreliable_classes": mj.get("unreliable_classes") or [],
                 "created_at": r.created_at.isoformat() if r.created_at else None,
                 "completed_at": r.completed_at.isoformat() if r.completed_at else None,
                 "error_message": r.error_message,

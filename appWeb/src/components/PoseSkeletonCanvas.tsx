@@ -3,7 +3,8 @@ import { lerpLandmarksInto } from '../lib/landmarkInterpolation';
 import { POSE_CONNECTIONS } from '../lib/poseTopology';
 import type { LandmarkMap } from '../lib/poseWsPayload';
 
-const MIN_VIS = 0.4;
+/** Dibuja brazos con visibilidad MediaPipe baja (curl unilateral / oclusión). */
+const MIN_VIS = 0.12;
 
 const SKELETON_TOKEN_FALLBACKS = {
   line: '#00e676',

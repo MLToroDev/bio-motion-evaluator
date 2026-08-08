@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "notes_es": "Mapa de grabaciones propias conocidas. Las tomas imperfectas son deseables (dominio real). Completar Media/ con paths etiquetados antes de ingerir el resto (~5461 archivos sin label).",
+  "items": [
+    {
+      "path": "tests/assets/videos/SentadillaProfunda.mp4",
+      "label": "squat",
+      "notes": "gold propio; forma de referencia"
+    },
+    {
+      "path": "tests/assets/videos/Running.mp4",
+      "label": "running",
+      "notes": "gold propio"
+    },
+    {
+      "path": "tests/assets/videos/Running2.mp4",
+      "label": "running",
+      "notes": "gold propio, ángulo/variante"
+    },
+    {
+      "path": "tests/assets/videos/CintaRunning.mp4",
+      "label": "running",
+      "notes": "cinta; dominio distinto a YouTube (antes fallaba E2E)"
+    },
+    {
+      "path": "tests/assets/videos/own/RunningLongRun.mp4",
+      "label": "running",
+      "notes": "copia desde Disco C_C/TRABAJO DE GRADO; forma imperfecta OK"
+    },
+    {
+      "path": "tests/assets/videos/own/RunningLongRun2.mp4",
+      "label": "running",
+      "notes": "copia desde Disco C_C/TRABAJO DE GRADO"
+    },
+    {
+      "path": "tests/assets/videos/own/Running_con_jeff.mp4",
+      "label": "running",
+      "notes": "Media/2026/07/31 — otra persona (Jeff); diversidad de sujeto"
+    },
+    {
+      "path": "tests/assets/videos/own/running_natacion.mp4",
+      "label": "running",
+      "notes": "Media/2026/07/31 — running natacion; dominio mixto"
+    }
+  ],
+  "pending_user_labeling": [
+    {
+      "path_hint": "/Volumes/Disco C_C/Media/2026/07/31/Videos/Entrenamiento.mp4",
+      "reason": "sesión mixta; requiere segmentos por ejercicio"
+    },
+    {
+      "path_hint": "/Volumes/Disco C_C/Media/2026/07/31/Videos/Entrenamiento con cristian.mp4",
+      "reason": "sesión mixta con otra persona; etiquetar por tramos"
+    },
+    {
+      "path_hint": "/Volumes/Disco C_C/Media/2026/07/31/Videos/Entreno de resistencia 09-06-2026.mp4",
+      "reason": "resistencia; confirmar si es running u otro"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "defined_at": "2026-08-07T23:48:00Z",
+  "defined_before_training": true,
+  "baseline_leaky_holdout": {
+    "model_key": "exercise_rf_ad157f19",
+    "macro_f1": 0.951965,
+    "accuracy": 0.945849,
+    "note": "NO usar como techo a igualar: split row-level con fuga por vídeo"
+  },
+  "activation_criteria_classifier": {
+    "split_strategy_in": ["group_shuffle", "frozen_split"],
+    "leakage_risk": false,
+    "unreliable_classes_empty": true,
+    "min_macro_f1_group_split": 0.70,
+    "min_balanced_accuracy": 0.65,
+    "min_f1_per_class": 0.40,
+    "rationale": "Con 11 clases y dominio YouTube→usuario, un macro-F1 group-split ≥0.70 demuestra discriminación real sin exigir el ~0.95 leaky. F1 por clase ≥0.40 evita activar un modelo que ignore por completo alguna clase. leakage_risk=false y unreliable_classes=[] son condiciones duras de integridad metodológica."
+  },
+  "activation_criteria_validator": {
+    "same_as_classifier_for_split_integrity": true,
+    "min_macro_f1_group_split": 0.70
+  },
+  "if_not_met": "No activar (set_active=false). Dejar modelo actual exercise_rf_ad157f19. Documentar métricas en bitácora."
+}

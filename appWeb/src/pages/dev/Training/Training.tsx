@@ -29,11 +29,10 @@ export default function Training() {
     <div className="bm-dev-page">
       <h1 className="bm-screen-title">Entrenamiento (Celery)</h1>
       <p className="bm-caption" style={{ marginBottom: 'var(--bm-space-md)' }}>
-        Usa muestras con review <span className="bm-dev-code-inline">approved</span>. Requiere worker Celery y dependencias de
-        entrenamiento (sklearn, skl2onnx). Si listas varias clases separadas por coma, hace falta al menos{' '}
-        <strong>una muestra aprobada por cada clase</strong> y, en la práctica,{' '}
-        <strong>al menos dos etiquetas distintas</strong> en el dataset; si solo tienes una clase (p. ej. solo squat),
-        deja solo esa etiqueta en el campo «Clases».
+        Usa muestras con review <span className="bm-dev-code-inline">approved</span>. El split por
+        defecto agrupa por vídeo (<span className="bm-dev-code-inline">source_file</span>) para
+        evitar fuga de datos. Requiere worker Celery y dependencias de entrenamiento (sklearn,
+        skl2onnx).
       </p>
       {error ? <p className="bm-caption bm-dev-msg--error">{error}</p> : null}
 
@@ -72,58 +71,94 @@ export default function Training() {
         Refrescar
       </BmButton>
       <ul className="bm-dev-list-plain">
-        {jobs.map((j) => (
-          <li key={j.id} className="bm-dev-card">
-            <BmButton variant="ghost" type="button" className="bm-dev-job-expand" onClick={() => void loadDetail(j.id)}>
-              <strong>{j.id.slice(0, 8)}</strong> · {j.status}
-              {j.accuracy != null ? ` · acc ${j.accuracy.toFixed(3)}` : ''}
-              {j.macro_f1 != null ? ` · macroF1 ${j.macro_f1.toFixed(3)}` : ''}
-              {j.model_key ? ` · ${j.model_key}` : ''}
-            </BmButton>
-            {j.error_message ? (
-              <p className="bm-caption bm-dev-msg--error" style={{ margin: 'var(--bm-space-xs) 0 0' }}>
-                {j.error_message}
-              </p>
-            ) : null}
-            {expandedId === j.id && jobDetail?.id === j.id && metrics?.confusion_matrix && metrics.class_names ? (
-              <div style={{ marginTop: 'var(--bm-space-sm)', overflow: 'auto' }}>
-                <table className="bm-dev-matrix">
-                  <thead>
-                    <tr>
-                      <th />
-                      {metrics.class_names.map((c) => (
-                        <th key={c}>{c}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {metrics.confusion_matrix.map((row, i) => (
-                      <tr key={i}>
-                        <td style={{ fontWeight: 600 }}>{metrics.class_names![i]}</td>
-                        {row.map((cell, ji) => (
-                          <td
-                            key={ji}
-                            style={{
-                              textAlign: 'center',
-                              background: `rgba(74, 222, 128, ${Math.min(0.35, cell * 0.08)})`,
-                            }}
-                          >
-                            {cell}
-                          </td>
+        {jobs.map((j) => {
+          const unreliable = j.unreliable_classes?.length ? j.unreliable_classes : [];
+          return (
+            <li key={j.id} className="bm-dev-card">
+              <BmButton variant="ghost" type="button" className="bm-dev-job-expand" onClick={() => void loadDetail(j.id)}>
+                <strong>{j.id.slice(0, 8)}</strong> · {j.status}
+                {j.macro_f1 != null ? ` · macroF1 ${j.macro_f1.toFixed(3)}` : ''}
+                {j.balanced_accuracy != null ? ` · balAcc ${j.balanced_accuracy.toFixed(3)}` : ''}
+                {j.split_strategy ? ` · ${j.split_strategy}` : ''}
+                {j.leakage_risk ? ' · leakage!' : ''}
+                {j.model_key ? ` · ${j.model_key}` : ''}
+              </BmButton>
+              {unreliable.length > 0 ? (
+                <p className="bm-caption bm-dev-msg--error" style={{ margin: 'var(--bm-space-xs) 0 0' }} role="status">
+                  Clases poco fiables (&lt;3 vídeos): {unreliable.join(', ')}
+                </p>
+              ) : null}
+              {j.oob_score != null ? (
+                <p className="bm-caption" style={{ margin: 'var(--bm-space-xs) 0 0', opacity: 0.75 }} title={j.oob_score_caveat || undefined}>
+                  OOB {j.oob_score.toFixed(3)}
+                  <span style={{ marginLeft: 6, fontSize: '0.85em' }} title={j.oob_score_caveat || ''}>
+                    (hover: caveat)
+                  </span>
+                </p>
+              ) : null}
+              {j.error_message ? (
+                <p className="bm-caption bm-dev-msg--error" style={{ margin: 'var(--bm-space-xs) 0 0' }}>
+                  {j.error_message}
+                </p>
+              ) : null}
+              {expandedId === j.id && jobDetail?.id === j.id && metrics?.confusion_matrix && metrics.class_names ? (
+                <div style={{ marginTop: 'var(--bm-space-sm)', overflow: 'auto' }}>
+                  <p className="bm-caption" style={{ marginBottom: 'var(--bm-space-xs)' }}>
+                    split={metrics.split_strategy ?? '—'} · groups train/val=
+                    {metrics.n_groups_train ?? '—'}/{metrics.n_groups_val ?? '—'}
+                    {metrics.train_macro_f1 != null ? ` · train macroF1 ${metrics.train_macro_f1.toFixed(3)}` : ''}
+                    {metrics.overfit_gap_macro_f1 != null
+                      ? ` · gap ${metrics.overfit_gap_macro_f1.toFixed(3)}`
+                      : ''}
+                  </p>
+                  {(metrics.unreliable_classes?.length ?? 0) > 0 ? (
+                    <p className="bm-caption bm-dev-msg--error">
+                      unreliable_classes: {metrics.unreliable_classes!.join(', ')}
+                    </p>
+                  ) : null}
+                  <table className="bm-dev-matrix">
+                    <thead>
+                      <tr>
+                        <th />
+                        {metrics.class_names.map((c) => (
+                          <th key={c}>{c}</th>
                         ))}
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-                {metrics.f1_per_class ? (
-                  <pre className="bm-mono bm-caption" style={{ marginTop: 'var(--bm-space-sm)', whiteSpace: 'pre-wrap' }}>
-                    {JSON.stringify(metrics.f1_per_class, null, 2)}
-                  </pre>
-                ) : null}
-              </div>
-            ) : null}
-          </li>
-        ))}
+                    </thead>
+                    <tbody>
+                      {metrics.confusion_matrix.map((row, i) => (
+                        <tr key={i}>
+                          <td style={{ fontWeight: 600 }}>{metrics.class_names![i]}</td>
+                          {row.map((cell, ji) => (
+                            <td
+                              key={ji}
+                              style={{
+                                textAlign: 'center',
+                                background: `rgba(74, 222, 128, ${Math.min(0.35, cell * 0.08)})`,
+                              }}
+                            >
+                              {cell}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {metrics.f1_per_class ? (
+                    <pre className="bm-mono bm-caption" style={{ marginTop: 'var(--bm-space-sm)', whiteSpace: 'pre-wrap' }}>
+                      {JSON.stringify(metrics.f1_per_class, null, 2)}
+                    </pre>
+                  ) : null}
+                  {metrics.oob_score != null ? (
+                    <p className="bm-caption" style={{ opacity: 0.7 }} title={metrics.oob_score_caveat}>
+                      OOB score (row-level, no leakage-free): {metrics.oob_score.toFixed(4)}
+                    </p>
+                  ) : null}
+                </div>
+              ) : null}
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

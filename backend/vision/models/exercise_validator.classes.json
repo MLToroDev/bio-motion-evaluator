@@ -1,10 +1,16 @@
 {
   "classes": [
+    "idle",
     "squat",
     "lunge",
     "curl",
-    "idle",
-    "running"
+    "running",
+    "pushup",
+    "plank",
+    "jumping_jack",
+    "overhead_press",
+    "deadlift",
+    "mountain_climber"
   ],
   "feature_vector_dim": 32,
   "role": "exercise_validator",

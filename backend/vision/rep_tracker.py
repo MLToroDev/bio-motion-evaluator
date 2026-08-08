@@ -12,15 +12,24 @@ from __future__ import annotations
 from collections.abc import Callable
 
 from vision.rep_tracker_abc import RepTracker
+from vision.rep_trackers.deadlift import DeadliftRepTracker
 from vision.rep_trackers.elbow_curl import ElbowCurlRepTracker
+from vision.rep_trackers.jumping_jack import JumpingJackRepTracker
+from vision.rep_trackers.overhead_press import OverheadPressRepTracker
+from vision.rep_trackers.pushup import PushupRepTracker
 from vision.rep_trackers.squat import SquatRepTracker
 from vision.rep_trackers.unknown import UnknownRepTracker
 from vision.types import FeatureFrame, RepState
 
 # Etiquetas sin factory dedicada caen en UnknownRepTracker (sin conteo).
+# plank y mountain_climber quedan sin tracker dedicado (ver docs/spec/exercise-catalog-external.md).
 DEFAULT_TRACKER_FACTORIES: dict[str, Callable[[], RepTracker]] = {
     "squat": SquatRepTracker,
     "curl": ElbowCurlRepTracker,
+    "pushup": PushupRepTracker,
+    "deadlift": DeadliftRepTracker,
+    "overhead_press": OverheadPressRepTracker,
+    "jumping_jack": JumpingJackRepTracker,
 }
 
 

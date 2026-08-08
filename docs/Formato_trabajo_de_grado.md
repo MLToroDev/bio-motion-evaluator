@@ -582,7 +582,7 @@ Fuente: Elaboración propia (2026).
 
 ## Detalle de historias de usuario: reglas de negocio del motor, criterios de aceptación verificables y flujos alternativos
 
-Las reglas del motor están alineadas al contrato WebSocket unificado (`schema_version`, `pose_ok`, `landmarks`, `knees`, `quality_flags`, etc.) y al filtrado por visibilidad en `docs/spec/websocket-pose-stream.md` (umbral `POSE_LANDMARK_MIN_VISIBILITY_RESPONSE`, defecto **0,5**): un landmark solo se incluye en el arreglo `landmarks` enviado al cliente si su `visibility` ≥ **0,5** (salvo umbral 0). El cliente debe dibujar el esqueleto **únicamente** con los puntos recibidos y **no** inventar conexiones para índices ausentes.
+Las reglas del motor están alineadas al contrato WebSocket unificado (`schema_version`, `pose_ok`, `landmarks`, `knees`, `quality_flags`, etc.) y al filtrado por visibilidad en `docs/spec/websocket-pose-stream.md` (umbral `POSE_LANDMARK_MIN_VISIBILITY_RESPONSE`, defecto **0,25**): un landmark solo se incluye en el arreglo `landmarks` enviado al cliente si su `visibility` ≥ **0,25** (salvo umbral 0). El overlay `appWeb` dibuja con `MIN_VIS=0.12`. El cliente debe dibujar el esqueleto **únicamente** con los puntos recibidos y **no** inventar conexiones para índices ausentes.
 
 ### HU-01 — Disponibilidad del backend antes de analizar
 
@@ -1300,6 +1300,62 @@ Esta sección se amplía de forma incremental durante el proyecto. Sirve como re
 Las entradas nuevas se añaden **al inicio** de la lista (más reciente arriba), salvo que se indique orden cronológico inverso para un apéndice institucional.
 
 ## Entradas
+
+### 2026-08-07 — youtu.be?si= no se abría (OpenCV vs página HTML)
+
+- **Ámbito:** `backend` · `docs` · `tests`
+- **Tipo:** incidencia / mitigación
+- **Descripción:** Pegar `https://youtu.be/96O5mvyblQM?si=…` fallaba con «No se pudo abrir la fuente: url …»: el backend del contenedor no tenía la resolución yt-dlp y OpenCV intentaba leer la página. Se normaliza a `watch?v=`, se resuelve el stream H.264 y, si falla, se descarga a `data/downloads` como respaldo.
+- **Trazabilidad:** `backend/app/services/video/downloader.py` (`normalize_youtube_url`), `backend/app/api/websocket/live_pose.py`, `tests/test_youtube_stream_resolve.py`, `docs/spec/websocket-pose-stream.md`
+
+### 2026-08-07 — Overlay a un brazo y curl que se suelta a mitad de serie
+
+- **Ámbito:** `backend` · `appWeb` · `docs`
+- **Tipo:** incidencia / mitigación
+- **Descripción:** En curl sentado unilateral el esqueleto solo mostraba un brazo (visibilidad MediaPipe del otro < 0,5/0,4) y la etiqueta `curl` aparecía al inicio y luego caía: el tracker promediaba L/R (brazo quieto diluye la flexión) y la histéresis soltaba a `unknown` en la extensión. Se bajó el umbral de landmarks (servidor 0,25 / canvas 0,12), el tracker usa el codo dominante, y hay hold de etiqueta (~24 frames) + enter/hold del rescate heurístico.
+- **Trazabilidad:** `backend/vision/rep_trackers/elbow_curl.py`, `backend/vision/rep_trackers/threshold_cycle.py` (`dominant_elbow_flexion`), `backend/vision/exercise_classifier.py`, `appWeb/src/components/PoseSkeletonCanvas.tsx`, `docs/spec/websocket-pose-stream.md`
+
+### 2026-08-07 — Curl sentado no clasificado (rescate heurístico + ingesta)
+
+- **Ámbito:** `backend` · `docs` · `tests`
+- **Tipo:** incidencia / mitigación
+- **Descripción:** El vídeo [CURL DE BICEPS CON MANCUERNA SENTADO](https://www.youtube.com/watch?v=96O5mvyblQM) no se etiquetaba como `curl`: el vector 32D está dominado por rodilla (0–20) y el RF activo se entrenó sobre todo con curls de pie; rodillas ~90° fijas se parecen a squat/idle. Se añadió `curl_isolation_score` (codo rápido, rodilla quieta, tronco erguido) y un wrapper ONNX que rescata `curl` si el score ≥ 0.70. No se activa un modelo GroupSplit nuevo (F5). Se ingesta el clip como muestra `curl` y se amplían queries de curl sentado en el catálogo.
+- **Trazabilidad:** `backend/vision/heuristic_exercise_classifier.py`, `backend/vision/exercise_classifier.py` (`_OnnxWithCurlRescue`), `tests/test_heuristic_curl_isolation.py`, `backend/vision/data/exercise_catalog.json`, `docs/spec/feature-vector-32d.md`
+
+### 2026-08-07 — Análisis YouTube en vivo sin descarga (pose-stream)
+
+- **Ámbito:** `backend` · `appWeb` · `docs`
+- **Tipo:** cambio funcional + decisión arquitectónica
+- **Descripción:** En Análisis de vídeo se puede pegar una URL de YouTube (`watch` / `shorts` / `youtu.be`). El backend resuelve el stream H.264 con yt-dlp (`extract_info`, **sin descargar** el MP4) y OpenCV lee frames como en cámara/RTSP; el VOD cierra con `stream_done`. La descarga a disco queda solo para ingesta/entrenamiento. Descartado iframe en el navegador (no entrega píxeles al motor).
+- **Trazabilidad:** `backend/app/services/video/downloader.py` (`resolve_playable_stream`), `backend/vision/processor.py`, `backend/app/api/websocket/live_pose.py`, `appWeb/src/pages/VideoAnalysis/components/ConfigPanel.tsx`, `docs/spec/websocket-pose-stream.md`
+
+### 2026-08-07 — Hallazgo leakage documentado + ronda de diversidad (propias + YouTube)
+
+- **Ámbito:** `backend` · `docs` · `tests`
+- **Tipo:** incidencia / mitigación (datos) + gobernanza documental
+- **Descripción:** Se documentó el hallazgo de que las métricas ~0.95 del clasificador activo midieron memorización de vídeo (fuga por ventana), no generalización (GroupKFold ventana 0.242±0.066). Se inició remediación: (1) manifiesto e ingesta de grabaciones propias etiquetadas (`label_source=own_recording`, forma imperfecta aceptada) desde gold + Disco C_C (running Jeff/natación/long runs → +1748 running, +46 squat); (2) queries YouTube de diversidad y `batch_diverse_youtube_ingest.py` (+3944 muestras, 22 jobs). Dataset pasó a **172 vídeos / 56 326 ventanas**; GroupKFold subió a **0.295±0.046** (ventana) y **0.393±0.060** (vídeo) — mejora, aún < umbral 0.70 → no activar. ~5461 clips en `Media/` pendientes de etiquetado (`docs/guias/etiquetar_grabaciones_propias.md`).
+- **Trazabilidad:** `docs/spec/data-leakage-findings-2026-08-07.md`, `backend/vision/data/own_recordings_manifest.json`, `backend/scripts/ingest_local_videos.py`, `backend/scripts/batch_diverse_youtube_ingest.py`, `backend/vision/models/reports/eval_kfold_20260808T000930Z.json`
+
+### 2026-08-07 — Sistema de validación rigurosa implementado; candidato GroupSplit NO activado
+
+- **Ámbito:** `backend` · `appWeb` · `docs`
+- **Tipo:** decisión arquitectónica + cambio funcional + incidencia / mitigación (rigor metodológico)
+- **Descripción:** Se implementó el núcleo `vision/model_validation.py` (GroupShuffleSplit por `source_file`, herencia de `split` por grupo, MetricsBundle con balanced accuracy, OOB+caveat «row-level, not leakage-free», ROC/PR-AUC seguros, `unreliable_classes` con umbral Gate F0 = 3 vídeos/clase), se cableó en `exercise_rf_train` / Celery / teacher, `manifest_version=2` con métricas versionadas, scripts `assign_group_splits.py` y `evaluate_exercise_classifier.py` (GroupKFold por defecto para Cap. 6), y UI Training con aviso de clases unreliable. Criterio de aceptación escrito *antes* del retrain (macro-F1 group-split ≥ 0.70 + integridad de split). El candidato `exercise_rf_1fba912f` obtuvo macro-F1 **0.216** (GroupKFold ventana **0.242±0.066**, vídeo **0.328±0.126**) frente al baseline leaky 0.952 → **no se activó**; permanecen `exercise_rf_ad157f19` y `exercise_validator_fe345eab` con salvedad de que sus métricas históricas no miden generalización a vídeos nuevos. Hallazgo para tesis: el gap OOB/train ~0.95 vs val group ~0.22 evidencia la fuga de datos del split por ventana.
+- **Trazabilidad:** `backend/vision/model_validation.py`, `backend/vision/exercise_rf_train.py`, `backend/app/workers/training_tasks.py`, `backend/scripts/evaluate_exercise_classifier.py`, `tests/test_model_validation.py`, `appWeb/src/pages/dev/Training/Training.tsx`, `docs/spec/model-validation-methodology.md`, `docs/spec/dev-learning-api.md`, `backend/vision/models/reports/f5_activation_decision.json`
+
+### 2026-08-07 — Ronda exhaustiva multi-ejercicio (11 clases, ~43k muestras)
+
+- **Ámbito:** `backend` · `docs`
+- **Tipo:** cambio funcional (dataset + modelos multi-clase)
+- **Descripción:** Ingesta YouTube masiva hasta 11 clases (~120 vídeos, 43120 ventanas approved). Clasificador activo `exercise_rf_ad157f19` y teacher `exercise_validator_fe345eab` (métricas holdout row-level ~0.95; ver limitaciones en `model-validation-methodology.md` y decisión posterior de no reemplazarlos por el candidato GroupSplit). Trackers nuevos (pushup, deadlift, overhead_press, jumping_jack); clase YOLO `yoga mat`.
+- **Trazabilidad:** `docs/spec/dev-learning-api.md` (entrada ronda exhaustiva), `backend/vision/models/manifest.json`, `backend/vision/data/exercise_catalog.json`
+
+### 2026-08-07 — Metodología de validación del clasificador de ejercicio (investigación + auditoría, sin cambios de pipeline)
+
+- **Ámbito:** `backend` · `docs`
+- **Tipo:** gobernanza documental + incidencia / mitigación (rigor metodológico, sin cambio de código en esta entrada)
+- **Descripción:** Se investigaron prácticas estándar (académicas e industriales) para sustentar rigurosamente que un clasificador multi-clase tipo RandomForest sobre datos tabulares desbalanceados "entrena bien": split agrupado por fuente (`GroupKFold`/`GroupShuffleSplit`) para evitar fuga de datos entre ventanas del mismo vídeo, métricas más allá de accuracy (macro-F1, balanced accuracy, matriz de confusión, ROC-AUC/PR-AUC one-vs-rest, OOB score de RandomForest), calibración de probabilidades (Brier score) dado que `exercise_validator.py` usa umbrales de confianza como lógica de negocio, y trazabilidad de reproducibilidad (semilla, hiperparámetros, métricas junto al artefacto versionado). Se auditó el código real del pipeline de entrenamiento continuo (`exercise_rf_train.py`, `training_tasks.py`, `exercise_validator_train.py`, `FeatureSampleORM`) y se confirmó la brecha más relevante: el split train/validación es **aleatorio por ventana/fila**, no por vídeo fuente (`source_file` existe en la tabla `feature_samples` pero no se usa como `groups=` en ningún `train_test_split`), por lo que las métricas históricas reportadas (incl. accuracy 1.0 del primer modelo) deben leerse como cota optimista, no como generalización validada a vídeos/personas nuevas. También se detectó que las métricas de cada entrenamiento (`TrainingJobORM.metrics_json`) no se copian al `manifest.json` que efectivamente viaja con el modelo activo. No se modificó el pipeline de entrenamiento ni `vision/models/manifest.json` en esta sesión porque el stack Docker (`backend`/`worker`) estaba activo con jobs de ingesta/entrenamiento recién ejecutados; los cambios quedan propuestos con detalle para una sesión posterior sin entrenamientos en curso.
+- **Trazabilidad:** `docs/spec/model-validation-methodology.md` (nuevo), `docs/spec/README.md`, código auditado (sin cambios): `backend/vision/exercise_rf_train.py`, `backend/vision/exercise_validator_train.py`, `backend/app/workers/training_tasks.py`, `backend/app/db/models.py`, `backend/vision/models/manifest.json`
 
 ### 2026-08-07 — Teacher ONNX del validador (RF entrenable → exercise_validator.onnx)
 

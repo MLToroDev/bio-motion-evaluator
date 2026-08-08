@@ -8,10 +8,22 @@ import {
 } from '../../../lib/previewStreamConfig';
 import { VideoAnalysisActions } from './VideoAnalysisActions';
 
-export type AnalysisInputSource = 'file' | 'server_camera' | 'browser_camera';
+export type AnalysisInputSource = 'file' | 'youtube' | 'server_camera' | 'browser_camera';
 
 /** Modo de etiqueta de ejercicio enviado al backend (`forced_exercise_label` si no es auto). */
-export type VideoExerciseMode = 'auto' | 'idle' | 'squat' | 'lunge' | 'curl' | 'running';
+export type VideoExerciseMode =
+  | 'auto'
+  | 'idle'
+  | 'squat'
+  | 'lunge'
+  | 'curl'
+  | 'running'
+  | 'pushup'
+  | 'plank'
+  | 'jumping_jack'
+  | 'overhead_press'
+  | 'deadlift'
+  | 'mountain_climber';
 
 /** Equipamiento declarado por el usuario (`equipment_label`; '' = sin declarar). */
 export type EquipmentLabel = '' | 'bodyweight' | 'barbell' | 'dumbbell' | 'kettlebell' | 'machine' | 'band';
@@ -29,6 +41,8 @@ export const EQUIPMENT_OPTIONS: { value: EquipmentLabel; text: string }[] = [
 export interface ConfigValues {
   apiBase: string;
   videoFilename: string;
+  /** Página de YouTube (watch / shorts / youtu.be); el backend hace streaming sin descargar. */
+  youtubeUrl: string;
   /** Índice OpenCV en el host del API (solo modo cámara servidor). */
   serverCameraDeviceIndex: number;
   /** deviceId vacío = cámara por defecto del navegador. */
@@ -401,6 +415,7 @@ export function ConfigPanel({
                 disabled={running}
               >
                 <option value="file">Vídeo en servidor (gold standard)</option>
+                <option value="youtube">YouTube (URL, en tiempo real)</option>
                 <option value="server_camera">Webcam del servidor (OpenCV en el API)</option>
                 <option value="browser_camera">Webcam de este equipo (navegador)</option>
               </select>
@@ -418,7 +433,9 @@ export function ConfigPanel({
                   ? 'El API debe ejecutarse en el PC donde está la webcam; no sirve si el backend está en la nube sin cámara.'
                   : values.inputSource === 'browser_camera'
                     ? 'El vídeo se captura en tu navegador y se envía al API (válido con servidor local o remoto).'
-                    : 'Lista de archivos bajo la ruta de vídeos gold standard del backend.'}
+                    : values.inputSource === 'youtube'
+                      ? 'Pega un enlace watch/shorts/youtu.be. El servidor extrae el stream H.264 y analiza frame a frame como en vivo; no descarga el MP4.'
+                      : 'Lista de archivos bajo la ruta de vídeos gold standard del backend.'}
               </span>
             </Field>
           ) : (
@@ -477,6 +494,23 @@ export function ConfigPanel({
                 </select>
               </Field>
             </>
+          ) : null}
+
+          {flags.showAdvancedVideoConfig && values.inputSource === 'youtube' ? (
+            <Field
+              label="URL de YouTube"
+              hint="Ej. https://www.youtube.com/watch?v=… o https://youtu.be/…"
+            >
+              <input
+                style={inputStyle}
+                value={values.youtubeUrl}
+                onChange={(e) => onChange('youtubeUrl', e.target.value)}
+                disabled={running}
+                placeholder="https://www.youtube.com/watch?v="
+                autoComplete="off"
+                inputMode="url"
+              />
+            </Field>
           ) : null}
 
           {flags.showAdvancedVideoConfig && values.inputSource === 'server_camera' ? (
@@ -581,6 +615,12 @@ export function ConfigPanel({
               <option value="lunge">lunge</option>
               <option value="curl">curl</option>
               <option value="running">running</option>
+              <option value="pushup">pushup</option>
+              <option value="plank">plank</option>
+              <option value="jumping_jack">jumping_jack</option>
+              <option value="overhead_press">overhead_press</option>
+              <option value="deadlift">deadlift</option>
+              <option value="mountain_climber">mountain_climber</option>
             </select>
           </Field>
           <Field
@@ -627,7 +667,7 @@ export function ConfigPanel({
             label="Preview FPS"
             hint={
               values.inputSource === 'browser_camera'
-                ? 'Solo aplica al flujo pose-stream (archivo / cámara servidor). En modo navegador usa «FPS de envío».'
+                ? 'Solo aplica al flujo pose-stream (archivo / YouTube / cámara servidor). En modo navegador usa «FPS de envío».'
                 : undefined
             }
           >

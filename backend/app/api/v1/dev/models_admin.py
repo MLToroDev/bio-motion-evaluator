@@ -31,10 +31,19 @@ def list_models() -> dict[str, Any]:
                 "created_at": meta.get("created_at"),
                 "note": meta.get("note"),
                 "is_active": key == active,
+                "metrics": meta.get("metrics"),
+                "training_params": meta.get("training_params"),
+                "dataset_snapshot": meta.get("dataset_snapshot"),
+                "role": meta.get("role"),
             }
         )
     items.sort(key=lambda x: str(x.get("key")))
-    return {"active": active, "items": items}
+    return {
+        "active": active,
+        "validator_active": blob.get("validator_active"),
+        "manifest_version": blob.get("manifest_version"),
+        "items": items,
+    }
 
 
 @router.get("/models/{model_key}")

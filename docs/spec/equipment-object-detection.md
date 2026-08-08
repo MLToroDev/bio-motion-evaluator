@@ -5,7 +5,7 @@
 - **Estado:** Activo
 - **Alcance:** Detección open-vocabulary de objetos de gimnasio en el frame, envío en el contrato WS v1 y dibujo de bounding boxes en `appWeb`.
 - **Código:** `backend/vision/equipment_detector.py`, `backend/vision/realtime_engine.py`, `appWeb/src/components/DetectedObjectsCanvas.tsx`
-- **Última revisión:** 2026-08-07
+- **Última revisión:** 2026-08-07 (añadida clase `yoga mat`)
 
 ## Resumen
 
@@ -55,12 +55,13 @@ Campo opcional por frame:
 
 ## Incidencias / decisiones
 
-1. **Open-vocab (YOLO-World)** en lugar de COCO clásico: COCO no tiene clases fiables de mancuerna/barra.
-2. **Stride** por defecto 4 para no hundir el FPS junto a MediaPipe.
-3. Dependencia pesada (`ultralytics` + `torch`): la imagen Docker crece; desactivar con `OBJECT_DETECT_ENABLED=false` si solo se necesita pose.
-4. Precisión variable con tomas lejanas, oclusiones y prompts; no sustituye curación humana para tesis cuantitativa.
-5. **`YOLO_CONFIG_DIR=/tmp/Ultralytics`** en Compose: Ultralytics intenta escribir `settings.yaml` bajo el home del proceso; en contenedor provoca `PermissionError` sin este env.
-6. **CLIP + `git` en imagen:** YOLO-World importa el paquete `clip` de Ultralytics; el `Dockerfile` del backend instala `git` y `git+https://github.com/ultralytics/CLIP.git` en build para no fallar en runtime.
+1. **2026-08-07 — Clase `yoga mat` añadida.** Con la ampliación del catálogo de ejercicios a `plank`/`mountain_climber` (isométricos/suelo), se agregó `"yoga mat"` a `DEFAULT_EQUIPMENT_CLASSES` (`label_es="Colchoneta"`, `equipment_slug="mat"`). Como YOLO-World es open-vocabulary, no requiere reentrenar ni descargar pesos nuevos: solo se amplía la lista de prompts EN pasada al modelo. El resto de clases nuevas de ejercicio (`deadlift`, `overhead_press`, `pushup`, `jumping_jack`) ya quedaban cubiertas por `barbell`/`dumbbell`/`weight plate` existentes.
+2. **Open-vocab (YOLO-World)** en lugar de COCO clásico: COCO no tiene clases fiables de mancuerna/barra.
+3. **Stride** por defecto 4 para no hundir el FPS junto a MediaPipe.
+4. Dependencia pesada (`ultralytics` + `torch`): la imagen Docker crece; desactivar con `OBJECT_DETECT_ENABLED=false` si solo se necesita pose.
+5. Precisión variable con tomas lejanas, oclusiones y prompts; no sustituye curación humana para tesis cuantitativa.
+6. **`YOLO_CONFIG_DIR=/tmp/Ultralytics`** en Compose: Ultralytics intenta escribir `settings.yaml` bajo el home del proceso; en contenedor provoca `PermissionError` sin este env.
+7. **CLIP + `git` en imagen:** YOLO-World importa el paquete `clip` de Ultralytics; el `Dockerfile` del backend instala `git` y `git+https://github.com/ultralytics/CLIP.git` en build para no fallar en runtime.
 
 ## Pruebas manuales
 

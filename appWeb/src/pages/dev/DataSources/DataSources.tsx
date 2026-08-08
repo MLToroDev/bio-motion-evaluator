@@ -7,7 +7,19 @@ import { VideoCard } from './components/VideoCard';
 import { VideoPreviewModal } from './components/VideoPreviewModal';
 import { useDataSources } from './hooks/useDataSources';
 
-const EXERCISE_LABELS = ['idle', 'squat', 'lunge', 'curl', 'running'];
+const EXERCISE_LABELS = [
+  'idle',
+  'squat',
+  'lunge',
+  'curl',
+  'running',
+  'pushup',
+  'plank',
+  'jumping_jack',
+  'overhead_press',
+  'deadlift',
+  'mountain_climber',
+];
 
 export default function DataSources() {
   const {

@@ -1,0 +1,122 @@
+{
+  "created_at": "2026-08-08T00:09:23.933217+00:00",
+  "mode": "kfold",
+  "n_samples": 56326,
+  "n_videos": 172,
+  "n_videos_per_class": {
+    "curl": 12,
+    "deadlift": 17,
+    "idle": 12,
+    "jumping_jack": 17,
+    "lunge": 13,
+    "mountain_climber": 17,
+    "overhead_press": 18,
+    "plank": 15,
+    "pushup": 15,
+    "running": 20,
+    "squat": 16
+  },
+  "classes": [
+    "idle",
+    "squat",
+    "lunge",
+    "curl",
+    "running",
+    "pushup",
+    "plank",
+    "jumping_jack",
+    "overhead_press",
+    "deadlift",
+    "mountain_climber"
+  ],
+  "justification": "GroupKFold media\u00b1std es el n\u00famero a citar en Cap. 6: con pocos v\u00eddeos por clase la varianza entre particiones es alta.",
+  "kfold": {
+    "n_splits": 5,
+    "window_macro_f1": {
+      "mean": 0.2947192362449084,
+      "std": 0.04634668282547289,
+      "values": [
+        0.3652974963133006,
+        0.24590782643821923,
+        0.26561479169056795,
+        0.28507963986902796,
+        0.3116964269134263
+      ]
+    },
+    "window_accuracy": {
+      "mean": 0.33441390906322044,
+      "std": 0.047528856502407096,
+      "values": [
+        0.40961504346283484,
+        0.2824251044537292,
+        0.3125941682176726,
+        0.32369634622206456,
+        0.34373888295980076
+      ]
+    },
+    "window_balanced_accuracy": {
+      "mean": 0.33112241682037263,
+      "std": 0.052124369465675384,
+      "values": [
+        0.3998324115374501,
+        0.27644005104108044,
+        0.3142456804546758,
+        0.2946808106378542,
+        0.37041313043080243
+      ]
+    },
+    "video_macro_f1": {
+      "mean": 0.3927297954570682,
+      "std": 0.05989733276992573,
+      "values": [
+        0.4633866133866134,
+        0.3408369408369408,
+        0.32845336481700116,
+        0.44285714285714284,
+        0.3881149153876427
+      ]
+    },
+    "folds": [
+      {
+        "fold": 0,
+        "n_val": 11274,
+        "n_val_videos": 34,
+        "macro_f1_window": 0.3652974963133006,
+        "macro_f1_video": 0.4633866133866134,
+        "accuracy_window": 0.40961504346283484
+      },
+      {
+        "fold": 1,
+        "n_val": 11249,
+        "n_val_videos": 34,
+        "macro_f1_window": 0.24590782643821923,
+        "macro_f1_video": 0.3408369408369408,
+        "accuracy_window": 0.2824251044537292
+      },
+      {
+        "fold": 2,
+        "n_val": 11283,
+        "n_val_videos": 35,
+        "macro_f1_window": 0.26561479169056795,
+        "macro_f1_video": 0.32845336481700116,
+        "accuracy_window": 0.3125941682176726
+      },
+      {
+        "fold": 3,
+        "n_val": 11276,
+        "n_val_videos": 35,
+        "macro_f1_window": 0.28507963986902796,
+        "macro_f1_video": 0.44285714285714284,
+        "accuracy_window": 0.32369634622206456
+      },
+      {
+        "fold": 4,
+        "n_val": 11244,
+        "n_val_videos": 34,
+        "macro_f1_window": 0.3116964269134263,
+        "macro_f1_video": 0.3881149153876427,
+        "accuracy_window": 0.34373888295980076
+      }
+    ]
+  }
+}

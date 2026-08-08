@@ -29,6 +29,7 @@ DEFAULT_EQUIPMENT_CLASSES: tuple[str, ...] = (
     "treadmill",
     "exercise bike",
     "resistance band",
+    "yoga mat",
 )
 
 LABEL_ES: dict[str, str] = {
@@ -42,6 +43,7 @@ LABEL_ES: dict[str, str] = {
     "treadmill": "Cinta",
     "exercise bike": "Bicicleta",
     "resistance band": "Banda",
+    "yoga mat": "Colchoneta",
 }
 
 # Mapeo a la etiqueta corta de `equipment_label` del contrato WS.
@@ -56,6 +58,7 @@ LABEL_TO_EQUIPMENT: dict[str, str] = {
     "treadmill": "machine",
     "exercise bike": "machine",
     "resistance band": "band",
+    "yoga mat": "mat",
 }
 
 

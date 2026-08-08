@@ -21,7 +21,7 @@ Al cambiar protocolos o comportamiento visible, **actualizar el spec correspondi
 
 | Documento | Descripción |
 |-----------|-------------|
-| [websocket-pose-stream.md](websocket-pose-stream.md) | `/ws/pose-stream`: config inicial, frames JSON, contrato unificado v1, `include_preview` |
+| [websocket-pose-stream.md](websocket-pose-stream.md) | `/ws/pose-stream`: config inicial, frames JSON, contrato unificado v1, `include_preview`, fuente YouTube/RTSP (`source=url`) |
 | [live-camera-analysis.md](live-camera-analysis.md) | `/live-analysis` + `/ws/video`: cámara navegador, espejo selfie, overlay 2D (HU-03) |
 | [live-overlay-inestabilidad-diagnostico.md](live-overlay-inestabilidad-diagnostico.md) | Diagnóstico overlay/motor: doble rAF, `setState`, blend, guía Performance |
 | [flutter-client-websocket.md](flutter-client-websocket.md) | Patrones Flutter/Web (null-safety, hot reload, WS) |
@@ -32,6 +32,8 @@ Al cambiar protocolos o comportamiento visible, **actualizar el spec correspondi
 | [exercise-catalog-external.md](exercise-catalog-external.md) | Catálogo del motor + enriquecimiento UI con hasaneyldrm/exercises-dataset (no es detector de pose) |
 | [equipment-object-detection.md](equipment-object-detection.md) | YOLO-World: cajas de equipamiento en WS + overlay appWeb |
 | [exercise-validator.md](exercise-validator.md) | Teacher/validador 32D: confirm/reject/changed + gate AUTO_COLLECT |
+| [model-validation-methodology.md](model-validation-methodology.md) | Metodología de validación del clasificador RandomForest→ONNX y del validador: métricas, split agrupado por vídeo (data leakage), gaps del pipeline actual con archivo:línea, propuesta de cambios y limitaciones a declarar en la tesis |
+| [data-leakage-findings-2026-08-07.md](data-leakage-findings-2026-08-07.md) | Hallazgo Cap. 6: gap 0.95 row-level vs ~0.24 GroupKFold; decisión F5 no activar; remediación diversidad |
 
 Referencias de arquitectura general: [../arquitectura.md](../arquitectura.md).
 

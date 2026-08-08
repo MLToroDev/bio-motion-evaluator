@@ -135,7 +135,9 @@ class PoseStreamConfig(BaseModel):
     - ``file``: usar ``video_filename`` (solo nombre, p. ej. ``squat_test.mp4``)
       dentro de ``tests/assets/videos/``.
     - ``camera``: índice OpenCV ``device_index``.
-    - ``url``: cadena RTSP/HTTP en ``stream_url``.
+    - ``url``: ``stream_url`` = RTSP/HTTP(S) directo **o** página de YouTube
+      (watch/shorts/youtu.be). YouTube se resuelve con yt-dlp **sin descargar**
+      el archivo; OpenCV lee el stream H.264 frame a frame.
     """
 
     source: Literal["camera", "file", "url"] = "file"
@@ -144,7 +146,13 @@ class PoseStreamConfig(BaseModel):
         description="Nombre de archivo bajo tests/assets/videos (ej. squat_test.mp4)",
     )
     device_index: int = 0
-    stream_url: str | None = None
+    stream_url: str | None = Field(
+        default=None,
+        description=(
+            "RTSP/HTTP(S) o URL de YouTube (watch/shorts/youtu.be). "
+            "YouTube se reproduce como stream; no se guarda MP4 en disco."
+        ),
+    )
     target_fps: float = Field(default=15.0, ge=0.5, le=60.0)
     max_throughput: bool = Field(
         default=False,

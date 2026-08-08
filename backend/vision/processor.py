@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import os
 from typing import Literal
 
 import cv2
@@ -11,6 +12,26 @@ import numpy as np
 log = logging.getLogger(__name__)
 
 SourceType = Literal["camera", "file", "url"]
+
+
+def _open_url_capture(url: str, http_headers: dict[str, str] | None) -> cv2.VideoCapture:
+    """Abre un stream HTTP(S)/RTSP; opcionalmente pasa cabeceras al backend FFmpeg."""
+    if http_headers:
+        header_lines = "".join(f"{k}: {v}\r\n" for k, v in http_headers.items())
+        prev = os.environ.get("OPENCV_FFMPEG_CAPTURE_OPTIONS")
+        os.environ["OPENCV_FFMPEG_CAPTURE_OPTIONS"] = f"headers;{header_lines}"
+        try:
+            cap = cv2.VideoCapture(url, cv2.CAP_FFMPEG)
+        finally:
+            if prev is None:
+                os.environ.pop("OPENCV_FFMPEG_CAPTURE_OPTIONS", None)
+            else:
+                os.environ["OPENCV_FFMPEG_CAPTURE_OPTIONS"] = prev
+        if cap is not None and cap.isOpened():
+            return cap
+        if cap is not None:
+            cap.release()
+    return cv2.VideoCapture(url)
 
 
 class VideoSource:
@@ -28,10 +49,14 @@ class VideoSource:
         device_index: int = 0,
         *,
         loop_file: bool = False,
+        finite: bool = False,
+        http_headers: dict[str, str] | None = None,
     ) -> None:
         self.source_type: SourceType = source_type
         self._loop_file = loop_file
         self._cap: cv2.VideoCapture | None = None
+        #: VOD / archivo: ``get_frame`` → ``None`` significa fin de análisis (no reintento).
+        self.finite: bool = source_type == "file" or (source_type == "url" and finite)
 
         if source_type == "camera":
             self._cap = cv2.VideoCapture(device_index)
@@ -52,8 +77,12 @@ class VideoSource:
         elif source_type == "url":
             if not file_path:
                 raise ValueError("file_path debe ser la URL RTSP/HTTP cuando source_type='url'")
-            self._cap = cv2.VideoCapture(file_path)
-            log.info("VideoSource: URL/stream %s", file_path)
+            self._cap = _open_url_capture(file_path, http_headers)
+            try:
+                self._cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+            except Exception:  # noqa: BLE001
+                pass
+            log.info("VideoSource: URL/stream finite=%s %s", self.finite, file_path[:120])
         else:
             raise ValueError(f"source_type no soportado: {source_type}")
 
@@ -64,9 +93,9 @@ class VideoSource:
         self._native_height = max(0, int(self._cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))
         self._native_fps = float(self._cap.get(cv2.CAP_PROP_FPS))
 
-        #: Número reportado por el códec para `file` (OpenCV). Puede ser 0 o inexacto; `None` si no aplica.
+        #: Número reportado por el códec para `file`/VOD (OpenCV). Puede ser 0 o inexacto; `None` si no aplica.
         self.total_frame_count: int | None = None
-        if source_type == "file":
+        if self.finite:
             reported = float(self._cap.get(cv2.CAP_PROP_FRAME_COUNT))
             if reported > 0.0 and reported < 1e9:
                 self.total_frame_count = int(reported)
@@ -84,14 +113,14 @@ class VideoSource:
         return w, h, fps
 
     def get_frame(self) -> np.ndarray | None:
-        """Lee un frame BGR. Devuelve None si la fuente falla (excepto archivo en loop)."""
+        """Lee un frame BGR. Devuelve None si la fuente falla (o al fin de un VOD/archivo, salvo loop)."""
         if self._cap is None:
             return None
         ok, frame = self._cap.read()
         if ok and frame is not None:
             return frame
 
-        if self.source_type == "file":
+        if self.finite:
             if self._loop_file:
                 self._cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
                 ok2, frame2 = self._cap.read()

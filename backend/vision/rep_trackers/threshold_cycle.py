@@ -140,6 +140,20 @@ def bilateral_elbow_flexion(frame: FeatureFrame) -> float | None:
     return sum(vals) / len(vals) if vals else None
 
 
+def dominant_elbow_flexion(frame: FeatureFrame) -> float | None:
+    """
+    Flexión del codo más activo (máximo L/R).
+
+    Un curl unilateral (mancuerna sentado, un brazo a la vez) diluye el promedio
+    bilateral: el brazo quieto ~0° anula el que flexiona y la FSM no cierra reps.
+    """
+    pair = elbow_flexion_pair(frame)
+    if pair is None:
+        return None
+    vals = [v for v in pair if not math.isnan(v)]
+    return max(vals) if vals else None
+
+
 def elbow_flexion_pair(frame: FeatureFrame) -> tuple[float, float] | None:
     if not frame.pose.landmarks:
         return None
@@ -153,3 +167,53 @@ def elbow_flexion_pair(frame: FeatureFrame) -> tuple[float, float] | None:
         )
     except (TypeError, ValueError):
         return None
+
+
+def hip_flexion_pair(frame: FeatureFrame) -> tuple[float, float] | None:
+    """Flexión de cadera L/R (grados) desde landmarks, para trackers tipo hip-hinge (F3)."""
+    if not frame.pose.landmarks:
+        return None
+    from vision.biomechanics import hip_flexion_angles_from_landmarks
+
+    angles = hip_flexion_angles_from_landmarks(frame.pose.landmarks)
+    try:
+        return (
+            float(angles.get("left_hip_flexion_angle_deg", float("nan"))),
+            float(angles.get("right_hip_flexion_angle_deg", float("nan"))),
+        )
+    except (TypeError, ValueError):
+        return None
+
+
+def bilateral_hip_flexion(frame: FeatureFrame) -> float | None:
+    """Promedio bilateral de flexión de cadera (grados), señal de bisagra de cadera (deadlift)."""
+    pair = hip_flexion_pair(frame)
+    if pair is None:
+        return None
+    vals = [v for v in pair if not math.isnan(v)]
+    return sum(vals) / len(vals) if vals else None
+
+
+def wrist_height_pair(frame: FeatureFrame) -> tuple[float, float] | None:
+    """Altura de muñeca L/R relativa al torso (F4), para trackers de brazos por encima de hombros."""
+    if not frame.pose.landmarks:
+        return None
+    from vision.biomechanics import wrist_relative_heights
+
+    heights = wrist_relative_heights(frame.pose.landmarks)
+    try:
+        return (
+            float(heights.get("left_wrist_relative_height", float("nan"))),
+            float(heights.get("right_wrist_relative_height", float("nan"))),
+        )
+    except (TypeError, ValueError):
+        return None
+
+
+def bilateral_wrist_height(frame: FeatureFrame) -> float | None:
+    """Promedio bilateral de altura relativa de muñecas (0 = cadera, 1 = hombro, >1 = overhead)."""
+    pair = wrist_height_pair(frame)
+    if pair is None:
+        return None
+    vals = [v for v in pair if not math.isnan(v)]
+    return sum(vals) / len(vals) if vals else None

@@ -1,0 +1,47 @@
+{
+  "decided_at": "2026-08-07T23:54:00Z",
+  "criteria_file": "f5_acceptance_criteria.json",
+  "baseline_leaky_holdout": {
+    "model_key": "exercise_rf_ad157f19",
+    "macro_f1": 0.951965
+  },
+  "candidate_classifier": {
+    "model_key": "exercise_rf_1fba912f",
+    "split_strategy": "group_shuffle",
+    "leakage_risk": false,
+    "unreliable_classes": [],
+    "macro_f1": 0.2160544167272317,
+    "balanced_accuracy": 0.3144150097996146,
+    "oob_score": 0.9457815314650209,
+    "oob_score_caveat": "row-level estimate, not leakage-free for grouped/correlated data",
+    "overfit_signal": "train/OOB ~0.95 vs group-val macro-F1 ~0.22 confirms prior leakage"
+  },
+  "group_kfold_cap6": {
+    "window_macro_f1_mean": 0.2419,
+    "window_macro_f1_std": 0.0661,
+    "video_macro_f1_mean": 0.3275,
+    "video_macro_f1_std": 0.1261,
+    "n_splits": 5,
+    "report": "eval_kfold_20260807T235335Z.json"
+  },
+  "candidate_validator": {
+    "model_key": "exercise_validator_e4e12cb2",
+    "macro_f1_approx": 0.22,
+    "set_manifest_active": false,
+    "stable_onnx_restored_from": "exercise_validator_fe345eab.onnx"
+  },
+  "checks": {
+    "split_strategy_ok": true,
+    "leakage_risk_ok": true,
+    "unreliable_empty_ok": true,
+    "min_macro_f1_0_70": false,
+    "min_balanced_accuracy_0_65": false,
+    "min_f1_per_class_0_40": false
+  },
+  "decision": "DO_NOT_ACTIVATE",
+  "active_remains": {
+    "classifier": "exercise_rf_ad157f19",
+    "validator": "exercise_validator_fe345eab"
+  },
+  "rationale": "El candidato cumple integridad de split (group_shuffle, leakage_risk=false, unreliable=[]) pero macro-F1 group-split 0.22 << umbral 0.70 acordado antes del entrenamiento. Activarlo degradaría el producto. Se conserva el modelo leaky-trained en producción con la salvedad metodológica documentada; la métrica a citar en Cap. 6 es GroupKFold 0.242±0.066 (ventana) / 0.328±0.126 (vídeo)."
+}

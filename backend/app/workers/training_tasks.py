@@ -23,7 +23,8 @@ _BACKEND_ROOT = backend_root()
 def _load_approved_arrays(
     db: Session,
     class_list: list[str],
-) -> tuple[np.ndarray, np.ndarray] | None:
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray] | None:
+    """Carga X, y, groups (source_file) y sample_splits desde feature_samples approved."""
     q = (
         db.query(FeatureSampleORM)
         .filter(
@@ -36,6 +37,8 @@ def _load_approved_arrays(
         return None
     xs: list[list[float]] = []
     ys: list[str] = []
+    groups: list[str | None] = []
+    splits: list[str] = []
     for row in q:
         vec = row.feature_vector
         if not isinstance(vec, list) or len(vec) != 32:
@@ -45,9 +48,16 @@ def _load_approved_arrays(
             continue
         xs.append([float(x) for x in vec])
         ys.append(lab)
+        groups.append(row.source_file)
+        splits.append((row.split or "unset").strip().lower())
     if len(xs) < 2:
         return None
-    return np.asarray(xs, dtype=np.float32), np.asarray(ys)
+    return (
+        np.asarray(xs, dtype=np.float32),
+        np.asarray(ys),
+        np.asarray(groups, dtype=object),
+        np.asarray(splits, dtype=object),
+    )
 
 
 @celery_app.task(bind=True, name="train_exercise_classifier")
@@ -77,7 +87,7 @@ def train_exercise_classifier_job(self, job_id_str: str) -> dict[str, Any]:
                 raise ValueError(
                     "No hay muestras aprobadas suficientes para las clases indicadas (mín. 2 filas válidas).",
                 )
-            X, y_str = arr
+            X, y_str, groups, sample_splits = arr
             job.sample_count = int(X.shape[0])
             db.commit()
 
@@ -88,6 +98,8 @@ def train_exercise_classifier_job(self, job_id_str: str) -> dict[str, Any]:
                 y_str,
                 class_list,
                 out_path,
+                groups=groups,
+                sample_splits=sample_splits,
                 test_size=test_size,
                 seed=seed,
                 n_estimators=n_estimators,
@@ -100,6 +112,12 @@ def train_exercise_classifier_job(self, job_id_str: str) -> dict[str, Any]:
                 onnx_rel = out_abs.as_posix()
 
             manifest_path = _BACKEND_ROOT / "vision" / "models" / "manifest.json"
+            training_params = metrics.get("training_params") or {
+                "seed": seed,
+                "n_estimators": n_estimators,
+                "test_size": test_size,
+            }
+            dataset_snapshot = metrics.get("dataset_snapshot")
             merge_manifest(
                 manifest_path,
                 _BACKEND_ROOT,
@@ -109,6 +127,9 @@ def train_exercise_classifier_job(self, job_id_str: str) -> dict[str, Any]:
                 settings.classifier_window_size_frames,
                 set_active=set_active,
                 note=f"Celery train_exercise_classifier job={job_uuid}",
+                metrics=metrics,
+                training_params=training_params,
+                dataset_snapshot=dataset_snapshot,
             )
 
             hf_sha: str | None = None
@@ -119,6 +140,10 @@ def train_exercise_classifier_job(self, job_id_str: str) -> dict[str, Any]:
                     "window_size": settings.classifier_window_size_frames,
                     "feature_vector_dim": 32,
                     "model_key": model_key,
+                    "metrics": {
+                        k: metrics.get(k)
+                        for k in ("accuracy", "macro_f1", "split_strategy", "unreliable_classes")
+                    },
                 }
                 hf_sha = push_exercise_model(
                     onnx_path=out_abs,

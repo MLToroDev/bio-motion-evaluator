@@ -17,7 +17,19 @@ import {
 import { readApiBase, readTargetRepGoal } from '../../lib/prefs';
 import '../../App.css';
 
-export type LiveExerciseMode = 'auto' | 'idle' | 'squat' | 'lunge' | 'curl' | 'running';
+export type LiveExerciseMode =
+  | 'auto'
+  | 'idle'
+  | 'squat'
+  | 'lunge'
+  | 'curl'
+  | 'running'
+  | 'pushup'
+  | 'plank'
+  | 'jumping_jack'
+  | 'overhead_press'
+  | 'deadlift'
+  | 'mountain_climber';
 
 export default function LiveAnalysis() {
   const apiBase = useMemo(() => readApiBase(), []);
@@ -170,6 +182,12 @@ export default function LiveAnalysis() {
                   <option value="lunge">lunge</option>
                   <option value="curl">curl</option>
                   <option value="running">running</option>
+                  <option value="pushup">pushup</option>
+                  <option value="plank">plank</option>
+                  <option value="jumping_jack">jumping_jack</option>
+                  <option value="overhead_press">overhead_press</option>
+                  <option value="deadlift">deadlift</option>
+                  <option value="mountain_climber">mountain_climber</option>
                 </select>
                 {ui.transmitting ? (
                   <span style={{ color: 'var(--bm-text-disabled)', fontSize: '0.75rem' }}>

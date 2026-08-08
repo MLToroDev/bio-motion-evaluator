@@ -41,6 +41,9 @@ class HysteresisClassifier:
         self._stable_label = cfg.unknown_label
         self._candidate: str | None = None
         self._candidate_frames = 0
+        self._unknown_streak = 0
+        # Un curl unilateral en extensión o un squat en lockout parece idle 1–2 s.
+        self._unknown_hold = max(24, int(cfg.hysteresis_frames) * 3)
         self._ema_confidence = 0.0
         self._kalman = ScalarKalman1D(cfg.kalman_process_noise, cfg.kalman_measurement_noise)
 
@@ -48,6 +51,7 @@ class HysteresisClassifier:
         self._stable_label = self._cfg.unknown_label
         self._candidate = None
         self._candidate_frames = 0
+        self._unknown_streak = 0
         self._ema_confidence = 0.0
         self._kalman.reset()
 
@@ -74,7 +78,16 @@ class HysteresisClassifier:
         if new_label == self._stable_label:
             self._candidate = None
             self._candidate_frames = 0
+            self._unknown_streak = 0
+        elif new_label == self._cfg.unknown_label and self._stable_label != self._cfg.unknown_label:
+            self._candidate = None
+            self._candidate_frames = 0
+            self._unknown_streak += 1
+            if self._unknown_streak >= self._unknown_hold:
+                self._stable_label = self._cfg.unknown_label
+                self._unknown_streak = 0
         else:
+            self._unknown_streak = 0
             if self._candidate != new_label:
                 self._candidate = new_label
                 self._candidate_frames = 1
@@ -181,5 +194,46 @@ def _try_onnx_classifier(manifest: ExerciseModelManifest, cfg: ExerciseClassifie
             label = self._classes[idx] if 0 <= idx < len(self._classes) else cfg.unknown_label
             return ClassificationResult(label=label, confidence=confidence, raw_scores=raw)
 
-    return _OnnxCls()
+    return _OnnxWithCurlRescue(_OnnxCls(), cfg)
+
+
+class _OnnxWithCurlRescue:
+    """
+    Rescate de curl (sentado / unilateral): el RF activo se entrenó con curls de pie
+    bilaterales y el vector 32D está dominado por rodilla (0–20). Enter/hold evita
+    soltar ``curl`` en la extensión (codo lento un instante).
+    """
+
+    def __init__(self, inner: ExerciseClassifier, cfg: ExerciseClassifierConfig) -> None:
+        self._inner = inner
+        self._cfg = cfg
+        self._holding_curl = False
+
+    def classify(self, features: np.ndarray, window_full: bool) -> ClassificationResult:
+        from vision.heuristic_exercise_classifier import (
+            CURL_ISOLATION_HOLD,
+            CURL_ISOLATION_MIN,
+            curl_isolation_score,
+        )
+
+        raw = self._inner.classify(features, window_full)
+        if not window_full or features.size < 32:
+            self._holding_curl = False
+            return raw
+        s_curl = curl_isolation_score(features)
+        gate = CURL_ISOLATION_HOLD if self._holding_curl else CURL_ISOLATION_MIN
+        if s_curl < gate:
+            self._holding_curl = False
+            return raw
+        lab = (raw.label or self._cfg.unknown_label).strip().lower()
+        conf = float(raw.confidence)
+        if lab == "curl" and conf >= self._cfg.min_confidence:
+            self._holding_curl = True
+            return raw
+        scores = dict(raw.raw_scores or {})
+        scores["curl"] = max(float(scores.get("curl", 0.0)), s_curl)
+        rescued_conf = max(conf, float(self._cfg.min_confidence), min(0.95, 0.55 + 0.45 * s_curl))
+        self._holding_curl = True
+        return ClassificationResult(label="curl", confidence=rescued_conf, raw_scores=scores or None)
+
 

@@ -25,6 +25,44 @@ function readVideoAnalysisConfigOpen(): boolean {
   }
 }
 
+export function looksLikeYoutubeUrl(raw: string): boolean {
+  const s = raw.trim();
+  if (!s) return false;
+  try {
+    const u = new URL(s);
+    const host = u.hostname.replace(/^www\./i, '').toLowerCase();
+    return (
+      host === 'youtube.com' ||
+      host === 'm.youtube.com' ||
+      host === 'youtu.be' ||
+      host === 'youtube-nocookie.com'
+    );
+  } catch {
+    return false;
+  }
+}
+
+/** Quita ``?si=`` / shorts y deja ``watch?v=`` (misma regla que el backend). */
+export function normalizeYoutubeWatchUrl(raw: string): string {
+  try {
+    const u = new URL(raw.trim());
+    const host = u.hostname.replace(/^www\./i, '').toLowerCase();
+    let vid = '';
+    if (host === 'youtu.be') {
+      vid = u.pathname.replace(/^\//, '').split('/')[0] ?? '';
+    } else if (u.pathname.includes('/shorts/')) {
+      vid = u.pathname.split('/shorts/')[1]?.split('/')[0] ?? '';
+    } else {
+      vid = u.searchParams.get('v') ?? '';
+    }
+    vid = vid.replace(/[^A-Za-z0-9_-]/g, '');
+    if (vid.length < 6) return raw.trim();
+    return `https://www.youtube.com/watch?v=${vid}`;
+  } catch {
+    return raw.trim();
+  }
+}
+
 export function parseFps(t: string): { ok: boolean; value: number; error?: string } {
   const s = t.trim();
   if (!s) return { ok: false, value: 10, error: 'Requerido' };
@@ -58,6 +96,7 @@ export function useVideoAnalysis() {
   const [config, setConfig] = useState<ConfigValues>(() => ({
     apiBase: readApiBase(),
     videoFilename: '',
+    youtubeUrl: '',
     serverCameraDeviceIndex: 0,
     browserCameraDeviceId: '',
     inputSource: 'file',
@@ -127,7 +166,8 @@ export function useVideoAnalysis() {
   const formValid =
     !ui.running &&
     fpsOk &&
-    (config.inputSource !== 'file' || config.videoFilename.trim().length > 0);
+    (config.inputSource !== 'file' || config.videoFilename.trim().length > 0) &&
+    (config.inputSource !== 'youtube' || looksLikeYoutubeUrl(config.youtubeUrl));
   const csvReady = ui.csvText.split('\n').length >= 3;
 
   const progress =
@@ -210,6 +250,22 @@ export function useVideoAnalysis() {
         mode: 'file',
         apiBaseUrl: config.apiBase,
         videoFilename: config.videoFilename.trim(),
+        targetFps,
+        maxThroughput: config.maxThroughput,
+        includePreview: config.includePreview,
+        previewFps: config.previewFps,
+        previewJpegQuality: previewQ,
+        captureOnly,
+        serverDiagnostics: config.serverDiagnostics,
+        streamTuning: config.streamTuningAuto ? 'auto' : 'off',
+        forcedExerciseLabel,
+        equipmentLabel,
+      });
+    } else if (inputSource === 'youtube') {
+      err = await start({
+        mode: 'youtube',
+        apiBaseUrl: config.apiBase,
+        streamUrl: normalizeYoutubeWatchUrl(config.youtubeUrl),
         targetFps,
         maxThroughput: config.maxThroughput,
         includePreview: config.includePreview,

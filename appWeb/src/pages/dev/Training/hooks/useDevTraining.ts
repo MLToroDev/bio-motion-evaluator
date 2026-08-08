@@ -1,7 +1,19 @@
 import { useCallback, useEffect, useState } from 'react';
 import { devApiFetch } from '../../../../lib/devLearningApi';
 
-export const DEFAULT_CLASSES = ['idle', 'squat', 'lunge'];
+export const DEFAULT_CLASSES = [
+  'idle',
+  'squat',
+  'lunge',
+  'curl',
+  'running',
+  'pushup',
+  'plank',
+  'jumping_jack',
+  'overhead_press',
+  'deadlift',
+  'mountain_climber',
+];
 
 export type JobListItem = {
   id: string;
@@ -10,6 +22,12 @@ export type JobListItem = {
   model_key: string | null;
   accuracy: number | null;
   macro_f1: number | null;
+  balanced_accuracy?: number | null;
+  oob_score?: number | null;
+  oob_score_caveat?: string | null;
+  split_strategy?: string | null;
+  leakage_risk?: boolean | null;
+  unreliable_classes?: string[];
   created_at: string | null;
   completed_at: string | null;
   error_message: string | null;
@@ -21,6 +39,16 @@ export type JobDetail = {
     confusion_matrix?: number[][];
     class_names?: string[];
     f1_per_class?: Record<string, number>;
+    balanced_accuracy?: number;
+    oob_score?: number;
+    oob_score_caveat?: string;
+    split_strategy?: string;
+    leakage_risk?: boolean;
+    unreliable_classes?: string[];
+    train_macro_f1?: number;
+    overfit_gap_macro_f1?: number;
+    n_groups_train?: number;
+    n_groups_val?: number;
   };
 };
 

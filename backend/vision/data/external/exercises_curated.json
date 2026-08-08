@@ -182,5 +182,176 @@
     "gif_url": "videos/3470-kMzUs9Y.gif",
     "image": "images/3470-kMzUs9Y.jpg",
     "attribution": "© Gym visual — https://gymvisual.com/"
+  },
+  {
+    "id": "0662",
+    "name": "push-up",
+    "equipment": "body weight",
+    "target": "pectorals",
+    "muscle_group": "chest",
+    "secondary_muscles": [
+      "triceps",
+      "deltoids",
+      "core"
+    ],
+    "instructions": {
+      "es": "Comienza en una posición de plancha alta con las manos un poco más separadas que la anchura de los hombros y los pies juntos. Activa el core y baja el cuerpo hacia el suelo flexionando los codos, manteniendo el cuerpo en línea recta. Haz una pausa cuando el pecho esté justo por encima del suelo y luego empújate de vuelta a la posición inicial estirando los brazos. Repite el número de repeticiones deseado.",
+      "en": "Start in a high plank position with your hands slightly wider than shoulder-width apart and your feet together. Engage your core and lower your body towards the ground by bending your elbows, keeping your body in a straight line. Pause for a moment when your chest is just above the ground, then push yourself back up to the starting position by straightening your arms. Repeat for the desired number of repetitions."
+    },
+    "instruction_steps": {
+      "es": [
+        "Comienza en una posición de plancha alta con las manos un poco más separadas que la anchura de los hombros y los pies juntos.",
+        "Activa el core y baja el cuerpo hacia el suelo flexionando los codos, manteniendo el cuerpo en línea recta.",
+        "Haz una pausa cuando el pecho esté justo por encima del suelo y luego empújate de vuelta a la posición inicial estirando los brazos.",
+        "Repite el número de repeticiones deseado."
+      ],
+      "en": [
+        "Start in a high plank position with your hands slightly wider than shoulder-width apart and your feet together.",
+        "Engage your core and lower your body towards the ground by bending your elbows, keeping your body in a straight line.",
+        "Pause for a moment when your chest is just above the ground, then push yourself back up to the starting position by straightening your arms.",
+        "Repeat for the desired number of repetitions."
+      ]
+    },
+    "gif_url": "videos/0662-I4hDWkc.gif",
+    "image": "images/0662-I4hDWkc.jpg",
+    "attribution": "© Gym visual — https://gymvisual.com/"
+  },
+  {
+    "id": "0032",
+    "name": "barbell deadlift",
+    "equipment": "barbell",
+    "target": "glutes",
+    "muscle_group": "upper legs",
+    "secondary_muscles": [
+      "hamstrings",
+      "lower back"
+    ],
+    "instructions": {
+      "es": "Ponte de pie con los pies separados a la altura de los hombros y la barra en el suelo frente a ti. Flexiona las rodillas y las caderas para bajar el torso y agarra la barra con un agarre pronado, con las manos un poco más separadas que el ancho de los hombros. Mantén la espalda recta y el pecho elevado mientras empujas con los talones para levantar la barra del suelo, extendiendo las caderas y las rodillas. Al ponerte de pie, aprieta los glúteos y mantén el core activado. Baja la barra de vuelta al suelo flexionando las caderas y las rodillas, manteniendo la espalda recta. Repite el número de repeticiones deseado.",
+      "en": "Stand with your feet shoulder-width apart and the barbell on the ground in front of you. Bend your knees and hinge at the hips to lower your torso and grip the barbell with an overhand grip, hands slightly wider than shoulder-width apart. Keep your back straight and chest lifted as you drive through your heels to lift the barbell off the ground, extending your hips and knees. As you stand up straight, squeeze your glutes and keep your core engaged. Lower the barbell back down to the ground by bending at the hips and knees, keeping your back straight. Repeat for the desired number of repetitions."
+    },
+    "instruction_steps": {
+      "es": [
+        "Ponte de pie con los pies separados a la altura de los hombros y la barra en el suelo frente a ti.",
+        "Flexiona las rodillas y las caderas para bajar el torso y agarra la barra con un agarre pronado, con las manos un poco más separadas que el ancho de los hombros.",
+        "Mantén la espalda recta y el pecho elevado mientras empujas con los talones para levantar la barra del suelo, extendiendo las caderas y las rodillas.",
+        "Al ponerte de pie, aprieta los glúteos y mantén el core activado.",
+        "Baja la barra de vuelta al suelo flexionando las caderas y las rodillas, manteniendo la espalda recta.",
+        "Repite el número de repeticiones deseado."
+      ],
+      "en": [
+        "Stand with your feet shoulder-width apart and the barbell on the ground in front of you.",
+        "Bend your knees and hinge at the hips to lower your torso and grip the barbell with an overhand grip, hands slightly wider than shoulder-width apart.",
+        "Keep your back straight and chest lifted as you drive through your heels to lift the barbell off the ground, extending your hips and knees.",
+        "As you stand up straight, squeeze your glutes and keep your core engaged.",
+        "Lower the barbell back down to the ground by bending at the hips and knees, keeping your back straight.",
+        "Repeat for the desired number of repetitions."
+      ]
+    },
+    "gif_url": "videos/0032-ila4NZS.gif",
+    "image": "images/0032-ila4NZS.jpg",
+    "attribution": "© Gym visual — https://gymvisual.com/"
+  },
+  {
+    "id": "0426",
+    "name": "dumbbell standing overhead press",
+    "equipment": "dumbbell",
+    "target": "delts",
+    "muscle_group": "shoulders",
+    "secondary_muscles": [
+      "triceps",
+      "upper back"
+    ],
+    "instructions": {
+      "es": "Ponte de pie con los pies separados a la altura de los hombros, sujetando una mancuerna en cada mano a la altura de los hombros, con las palmas hacia adelante. Presiona las mancuernas hacia arriba hasta que los brazos queden completamente extendidos por encima de la cabeza. Haz una pausa por un momento en la parte superior, luego baja lentamente las mancuernas de vuelta a la altura de los hombros. Repite el número de repeticiones deseado.",
+      "en": "Stand with your feet shoulder-width apart, holding a dumbbell in each hand at shoulder level with your palms facing forward. Press the dumbbells upward until your arms are fully extended overhead. Pause for a moment at the top, then slowly lower the dumbbells back down to shoulder level. Repeat for the desired number of repetitions."
+    },
+    "instruction_steps": {
+      "es": [
+        "Ponte de pie con los pies separados a la altura de los hombros, sujetando una mancuerna en cada mano a la altura de los hombros, con las palmas hacia adelante.",
+        "Presiona las mancuernas hacia arriba hasta que los brazos queden completamente extendidos por encima de la cabeza.",
+        "Haz una pausa por un momento en la parte superior, luego baja lentamente las mancuernas de vuelta a la altura de los hombros.",
+        "Repite el número de repeticiones deseado."
+      ],
+      "en": [
+        "Stand with your feet shoulder-width apart, holding a dumbbell in each hand at shoulder level with your palms facing forward.",
+        "Press the dumbbells upward until your arms are fully extended overhead.",
+        "Pause for a moment at the top, then slowly lower the dumbbells back down to shoulder level.",
+        "Repeat for the desired number of repetitions."
+      ]
+    },
+    "gif_url": "videos/0426-A6wtbuL.gif",
+    "image": "images/0426-A6wtbuL.jpg",
+    "attribution": "© Gym visual — https://gymvisual.com/"
+  },
+  {
+    "id": "0630",
+    "name": "mountain climber",
+    "equipment": "body weight",
+    "target": "cardiovascular system",
+    "muscle_group": "cardio",
+    "secondary_muscles": [
+      "core",
+      "shoulders",
+      "triceps"
+    ],
+    "instructions": {
+      "es": "Comienza en una posición de plancha alta con las manos justo debajo de los hombros y el cuerpo en línea recta. Activa el core y lleva la rodilla derecha hacia el pecho, luego cambia rápidamente y lleva la rodilla izquierda hacia el pecho. Continúa alternando las piernas con un movimiento de carrera, manteniendo las caderas bajas y el core activado. Mantén un ritmo constante y respira de forma regular durante todo el ejercicio. Repite el número de repeticiones deseado.",
+      "en": "Start in a high plank position with your hands directly under your shoulders and your body in a straight line. Engage your core and bring your right knee towards your chest, then quickly switch and bring your left knee towards your chest. Continue alternating legs in a running motion, keeping your hips low and your core engaged. Maintain a steady pace and breathe evenly throughout the exercise. Repeat for the desired number of repetitions."
+    },
+    "instruction_steps": {
+      "es": [
+        "Comienza en una posición de plancha alta con las manos justo debajo de los hombros y el cuerpo en línea recta.",
+        "Activa el core y lleva la rodilla derecha hacia el pecho, luego cambia rápidamente y lleva la rodilla izquierda hacia el pecho.",
+        "Continúa alternando las piernas con un movimiento de carrera, manteniendo las caderas bajas y el core activado.",
+        "Mantén un ritmo constante y respira de forma regular durante todo el ejercicio.",
+        "Repite el número de repeticiones deseado."
+      ],
+      "en": [
+        "Start in a high plank position with your hands directly under your shoulders and your body in a straight line.",
+        "Engage your core and bring your right knee towards your chest, then quickly switch and bring your left knee towards your chest.",
+        "Continue alternating legs in a running motion, keeping your hips low and your core engaged.",
+        "Maintain a steady pace and breathe evenly throughout the exercise.",
+        "Repeat for the desired number of repetitions."
+      ]
+    },
+    "gif_url": "videos/0630-RJgzwny.gif",
+    "image": "images/0630-RJgzwny.jpg",
+    "attribution": "© Gym visual — https://gymvisual.com/"
+  },
+  {
+    "id": "3223",
+    "name": "star jump (male)",
+    "equipment": "body weight",
+    "target": "cardiovascular system",
+    "muscle_group": "cardio",
+    "secondary_muscles": [
+      "quadriceps",
+      "hamstrings",
+      "calves"
+    ],
+    "instructions": {
+      "es": "Ponte de pie con los pies separados a la altura de los hombros y los brazos a los costados. Flexiona ligeramente las rodillas y salta hacia arriba de forma explosiva. Mientras saltas, separa las piernas y extiende los brazos hacia los lados, formando una figura de estrella con tu cuerpo. Aterriza suavemente sobre la punta de los pies con las rodillas ligeramente flexionadas. Repite el número de repeticiones deseado.",
+      "en": "Stand with your feet shoulder-width apart and your arms by your sides. Bend your knees slightly and jump up explosively. As you jump, spread your legs and extend your arms out to the sides, forming a star shape with your body. Land softly on the balls of your feet with your knees slightly bent. Repeat for the desired number of repetitions."
+    },
+    "instruction_steps": {
+      "es": [
+        "Ponte de pie con los pies separados a la altura de los hombros y los brazos a los costados.",
+        "Flexiona ligeramente las rodillas y salta hacia arriba de forma explosiva.",
+        "Mientras saltas, separa las piernas y extiende los brazos hacia los lados, formando una figura de estrella con tu cuerpo.",
+        "Aterriza suavemente sobre la punta de los pies con las rodillas ligeramente flexionadas.",
+        "Repite el número de repeticiones deseado."
+      ],
+      "en": [
+        "Stand with your feet shoulder-width apart and your arms by your sides.",
+        "Bend your knees slightly and jump up explosively.",
+        "As you jump, spread your legs and extend your arms out to the sides, forming a star shape with your body.",
+        "Land softly on the balls of your feet with your knees slightly bent.",
+        "Repeat for the desired number of repetitions."
+      ]
+    },
+    "gif_url": "videos/3223-HtfCpfi.gif",
+    "image": "images/3223-HtfCpfi.jpg",
+    "attribution": "© Gym visual — https://gymvisual.com/"
   }
 ]

@@ -60,6 +60,7 @@ services:
       CELERY_BROKER_URL: redis://redis:6379/0
       CELERY_RESULT_BACKEND: redis://redis:6379/0
       MEDIAPIPE_POSE_MODEL_PATH: models/pose_landmarker_full.task
+      POSE_LANDMARK_MIN_VISIBILITY_RESPONSE: ${POSE_LANDMARK_MIN_VISIBILITY_RESPONSE:-0.25}
       JWT_SECRET: ${JWT_SECRET:-dev-insecure-change-me}
       DEV_API_KEY: ${DEV_API_KEY:-}
       # Aprendizaje continuo (recolecta 32D en feature_samples durante inferencia)

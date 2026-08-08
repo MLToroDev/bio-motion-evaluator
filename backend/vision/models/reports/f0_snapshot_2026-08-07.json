@@ -1,0 +1,81 @@
+{
+  "captured_at": "2026-08-07T23:49:00.661764+00:00",
+  "baseline_kind": "baseline_leaky_holdout",
+  "min_videos_per_class_confirmed": 3,
+  "active": "exercise_rf_ad157f19",
+  "validator_active": "exercise_validator_fe345eab",
+  "classifier": {
+    "model_key": "exercise_rf_ad157f19",
+    "sample_count": 43120,
+    "n_train": 34496,
+    "n_val": 8624,
+    "accuracy": 0.945849,
+    "macro_f1": 0.951965,
+    "f1_per_class": {
+      "curl": 0.9769427839453458,
+      "idle": 0.9868995633187773,
+      "lunge": 0.9840510366826156,
+      "plank": 0.7933070866141733,
+      "squat": 0.9706129303106633,
+      "pushup": 0.9773123909249564,
+      "running": 0.9658444022770398,
+      "deadlift": 0.9735294117647059,
+      "jumping_jack": 0.9315789473684211,
+      "overhead_press": 0.9572167371885284,
+      "mountain_climber": 0.9543147208121827
+    },
+    "split_note": "row-level stratified train_test_split (data leakage by video)"
+  },
+  "validator": {
+    "model_key": "exercise_validator_fe345eab",
+    "macro_f1_approx_from_docs": 0.9517,
+    "n_estimators": 40,
+    "note": "metrics not in training_jobs table"
+  },
+  "videos_per_class": {
+    "curl": {
+      "n_videos": 9,
+      "n_windows": 2965
+    },
+    "deadlift": {
+      "n_videos": 17,
+      "n_windows": 6911
+    },
+    "idle": {
+      "n_videos": 7,
+      "n_windows": 1739
+    },
+    "jumping_jack": {
+      "n_videos": 12,
+      "n_windows": 4034
+    },
+    "lunge": {
+      "n_videos": 7,
+      "n_windows": 3170
+    },
+    "mountain_climber": {
+      "n_videos": 13,
+      "n_windows": 4625
+    },
+    "overhead_press": {
+      "n_videos": 14,
+      "n_windows": 5515
+    },
+    "plank": {
+      "n_videos": 11,
+      "n_windows": 4047
+    },
+    "pushup": {
+      "n_videos": 13,
+      "n_windows": 4369
+    },
+    "running": {
+      "n_videos": 8,
+      "n_windows": 2708
+    },
+    "squat": {
+      "n_videos": 9,
+      "n_windows": 3037
+    }
+  }
+}

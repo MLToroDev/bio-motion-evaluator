@@ -93,7 +93,9 @@ def load_jsonl(path: Path) -> tuple[np.ndarray, np.ndarray]:
     return np.asarray(xs, dtype=np.float32), np.asarray(ys)
 
 
-def _load_from_db(class_list: list[str]) -> tuple[np.ndarray, np.ndarray]:
+def _load_from_db(
+    class_list: list[str],
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     from app.db.models import FeatureSampleORM
     from app.db.session import SessionLocal, engine_configured
 
@@ -102,6 +104,8 @@ def _load_from_db(class_list: list[str]) -> tuple[np.ndarray, np.ndarray]:
 
     xs: list[list[float]] = []
     ys: list[str] = []
+    groups: list[str | None] = []
+    splits: list[str] = []
     with SessionLocal() as db:
         rows = (
             db.query(FeatureSampleORM)
@@ -120,11 +124,18 @@ def _load_from_db(class_list: list[str]) -> tuple[np.ndarray, np.ndarray]:
                 continue
             xs.append([float(x) for x in vec])
             ys.append(lab)
+            groups.append(row.source_file)
+            splits.append((row.split or "unset").strip().lower())
     if len(xs) < 2:
         raise SystemExit(
             "No hay suficientes muestras approved (min. 2) para las clases indicadas.",
         )
-    return np.asarray(xs, dtype=np.float32), np.asarray(ys)
+    return (
+        np.asarray(xs, dtype=np.float32),
+        np.asarray(ys),
+        np.asarray(groups, dtype=object),
+        np.asarray(splits, dtype=object),
+    )
 
 
 def main() -> None:
@@ -167,11 +178,13 @@ def main() -> None:
         print("Faltan sklearn/skl2onnx. pip install -r requirements.txt", file=sys.stderr)
         raise SystemExit(1) from exc
 
+    groups = None
+    sample_splits = None
     if args.from_db:
         class_list = [c.strip().lower() for c in args.classes.split(",") if c.strip()]
         if len(class_list) < 2:
             raise SystemExit("--from-db requiere --classes con al menos 2 etiquetas")
-        X, y_str = _load_from_db(class_list)
+        X, y_str, groups, sample_splits = _load_from_db(class_list)
     elif args.csv is not None:
         csv_path = _require_file(args.csv, "CSV")
         X, y_str = load_csv(csv_path, args.label_column)
@@ -207,18 +220,22 @@ def main() -> None:
     if out_dir is not None and not out_dir.is_absolute():
         out_dir = (_BACKEND / out_dir).resolve()
 
+    set_active = not args.no_set_manifest_active
     metrics = train_validator_export_onnx(
         X,
         y_str,
         class_list,
         _BACKEND,
+        groups=groups,
+        sample_splits=sample_splits,
         out_dir=out_dir,
         test_size=args.test_size,
         seed=args.seed,
         n_estimators=args.n_estimators,
         window_size=args.window_size,
-        set_manifest_active=not args.no_set_manifest_active,
-        write_stable_copy=True,
+        set_manifest_active=set_active,
+        # No pisar exercise_validator.onnx estable si no se activa el teacher
+        write_stable_copy=set_active,
     )
     printable = {
         k: v
