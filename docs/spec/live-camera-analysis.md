@@ -75,7 +75,7 @@ Las métricas del panel (`ui`: rodillas, ejercicio, reps) se actualizan en `onme
 | Bucle de captura | `setInterval(1000/CAPTURE_HZ)` con `CAPTURE_HZ=30` | Desacoplado del rAF del overlay; menos contención en el hilo principal |
 | `MAX_IN_FLIGHT` | `3` | Backpressure: no envía si `rttQueueRef.length >= 3` |
 | `blobPendingRef` | boolean | Si `toBlob` tarda, ticks del intervalo retornan sin enviar (no encolan) |
-| `JPEG_QUALITY` | `0.6` | Payload JPEG en `/ws/video` |
+| `JPEG_QUALITY` | `0.82` | Payload JPEG en `/ws/video` (MediaPipe necesita más detalle que 0,6) |
 | Overlay `landmarksRef` | `useRef` en hook | Escritura en `onmessage`; sin re-render de `LiveAnalysis` por landmarks |
 | Blend overlay | `adaptiveBlendMs ≈ 0.9 × intervalo` entre poses (mín. 80 ms) | Completa antes de la siguiente muestra WS típica |
 | Estilos esqueleto | Cache al montar (`--bm-skeleton-*`) | Sin `getComputedStyle` en el hot path de pintura |
@@ -132,6 +132,15 @@ El contenedor del preview puede tener relación de aspecto distinta al stream. `
 | INC-OVERLAY-004 | Blend 100 ms vs RX/s | `adaptiveBlendMsRef` según intervalo entre poses |
 
 Diagnóstico previo y verificación post-fix: [`live-overlay-inestabilidad-diagnostico.md`](live-overlay-inestabilidad-diagnostico.md).
+
+## Incidencias 2026-08-07 (IMG_4544 / captura en vivo)
+
+| ID | Síntoma | Mitigación |
+|----|---------|------------|
+| INC-LIVE-HDR | HEVC 4K HDR (iPhone) → MediaPipe “sin pose” | Tone-map SDR+CLAHE si `max(w,h) ≥ 3000` (`mediapipe.py`, `/ws/pose-stream`) |
+| INC-LIVE-VIS | Esqueleto desalineado / brazos fantasma | Overlay `MIN_VIS=0.35` (antes 0,12) |
+| INC-LIVE-DEADLIFT | De pie quieto etiquetado `deadlift` | `idle_still_score` + `_OnnxWithPostureRescue` |
+| INC-LIVE-JPEG | Pose inestable a 640×480 JPEG 0,6 | Captura ideal 1280×720, JPEG 0,82 |
 
 ## Pruebas manuales
 

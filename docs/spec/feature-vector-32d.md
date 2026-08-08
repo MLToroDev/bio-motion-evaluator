@@ -62,7 +62,7 @@ Convenciones:
 |-------|------|
 | Construcción del vector | `backend/vision/feature_engine.py` — `build_feature_vector`, `_posture_series` |
 | Funciones biomecánicas F1-F4 | `backend/vision/biomechanics.py` — `trunk_inclination_angle_deg`, `base_of_support_ratio`, `hip_flexion_angles_from_landmarks`, `wrist_relative_heights` |
-| Consumo heurístico | `backend/vision/heuristic_exercise_classifier.py` — `IDX_TRUNK_MEAN`, `IDX_BASE_RATIO`, `curl_isolation_score` (F4/F5) |
+| Consumo heurístico | `backend/vision/heuristic_exercise_classifier.py` — `IDX_TRUNK_MEAN`, `IDX_BASE_RATIO`, `curl_isolation_score`, `idle_still_score` (F4/F5) |
 | Export a CSV | `backend/scripts/export_features_from_video.py` |
 | Persistencia DB | `backend/app/services/feature_sample_persist.py` (`feature_samples.feature_vector`) |
 
@@ -70,7 +70,8 @@ Convenciones:
 
 - **2026-08-07 — F1-F5 en slots de padding:** se eligió rellenar los índices 21-31 en lugar de ampliar la dimensión para no romper la forma de entrada `[1, 32]` del runtime ONNX (`backend/vision/exercise_classifier.py`). El modelo activo previo (`exercise_rf_a0eac3d7`, 1 clase) era degenerado, por lo que el impacto de valores no nulos en sus pesos es irrelevante; aun así, el flujo correcto es re-exportar dataset y reentrenar.
 - La heurística usa F1/F2 con pesos bajos (0.08-0.12) y valor neutro 0.5 cuando la feature llega en 0.0 (datasets legados), para no desestabilizar el comportamiento previo.
-- **2026-08-07 — Curl sentado vs squat:** el vector 0–20 está dominado por rodilla. Un curl sentado deja flexión ~90° **fija** (ROM y velocidad de rodilla bajos) y codo rápido (índice 31). `curl_isolation_score` + rescate en el wrapper ONNX (`_OnnxWithCurlRescue`, enter 0,55 / hold 0,38) evitan etiquetar squat/idle. Curl **unilateral**: muñeca y codo del lado activo (max L/R), no promedio. El RF activo no se reentrena aquí (F5).
+- **2026-08-07 — Curl sentado vs squat:** el vector 0–20 está dominado por rodilla. Un curl sentado deja flexión ~90° **fija** (ROM y velocidad de rodilla bajos) y codo rápido (índice 31). `curl_isolation_score` + rescate en el wrapper ONNX (`_OnnxWithPostureRescue`, enter 0,55 / hold 0,38) evitan etiquetar squat/idle. Curl **unilateral**: muñeca y codo del lado activo (max L/R), no promedio. El RF activo no se reentrena aquí (F5).
+- **2026-08-07 — Idle vs deadlift:** de pie quieto (rodillas extendidas, ROM/velocidad bajas, tronco erguido) se etiqueta `idle` si `idle_still_score` ≥ 0,62 y no hay curl. El RF leaky suele devolver `deadlift` en esa postura.
 
 ## Pruebas manuales
 

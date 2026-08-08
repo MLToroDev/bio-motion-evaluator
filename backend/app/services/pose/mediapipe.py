@@ -47,6 +47,9 @@ def reset_pose_video_timestamp_anchor() -> None:
 
 # Reducción de resolución para acelerar MediaPipe sin perder demasiada precisión.
 _TARGET_MAX_DIM = 640
+# iPhone HEVC HDR 4K (HLG / Dolby Vision): OpenCV entrega BGR “lavado”; MediaPipe espera SDR.
+# 1080p/1440p SDR (YouTube) no debe pasar por CLAHE.
+_HDR_TONEMAP_MIN_SIDE = 3000
 
 
 @dataclass
@@ -143,6 +146,36 @@ def _pose_result_from_detection(result: Any) -> PoseResult:
     return PoseResult(ok=True, landmarks=landmarks, world_landmarks=world, note=None)
 
 
+def _sdr_tonemap_rgb(rgb: np.ndarray) -> np.ndarray:
+    """Normaliza luminancia + CLAHE (YUV) para frames HDR decodificados como SDR crudo."""
+    yuv = cv2.cvtColor(rgb, cv2.COLOR_RGB2YUV)
+    y, u, v = cv2.split(yuv)
+    y = cv2.normalize(y, None, 0, 255, cv2.NORM_MINMAX)
+    y = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8)).apply(y)
+    return cv2.cvtColor(cv2.merge([y, u, v]), cv2.COLOR_YUV2RGB)
+
+
+def sdr_tonemap_bgr(bgr: np.ndarray) -> np.ndarray:
+    """Tone-map SDR sobre un frame BGR (OpenCV) ya downscaleado."""
+    rgb = cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)
+    return cv2.cvtColor(_sdr_tonemap_rgb(rgb), cv2.COLOR_RGB2BGR)
+
+
+def _prepare_rgb_for_pose(rgb: np.ndarray) -> np.ndarray:
+    """Downscale a ``_TARGET_MAX_DIM`` y tone-map si el frame venía de 4K/HDR."""
+    h, w = rgb.shape[:2]
+    max_dim = max(h, w)
+    apply_hdr = max_dim >= _HDR_TONEMAP_MIN_SIDE
+    if max_dim > _TARGET_MAX_DIM:
+        scale = _TARGET_MAX_DIM / max_dim
+        new_w = max(1, int(round(w * scale)))
+        new_h = max(1, int(round(h * scale)))
+        rgb = cv2.resize(rgb, (new_w, new_h), interpolation=cv2.INTER_AREA)
+    if apply_hdr:
+        rgb = _sdr_tonemap_rgb(rgb)
+    return rgb
+
+
 def analyze_frame_rgb(rgb: np.ndarray, model_path: Path) -> PoseResult:
     """
     Ejecuta Pose Landmarker sobre un frame RGB (uint8, forma H×W×3).
@@ -152,14 +185,7 @@ def analyze_frame_rgb(rgb: np.ndarray, model_path: Path) -> PoseResult:
     if rgb is None or rgb.size == 0:
         return PoseResult(ok=False, landmarks=[], world_landmarks=[], note="Frame vacío")
 
-    # Downscale para acelerar el infer (MediaPipe cuelga mucho de la resolución).
-    h, w = rgb.shape[:2]
-    max_dim = max(h, w)
-    if max_dim > _TARGET_MAX_DIM:
-        scale = _TARGET_MAX_DIM / max_dim
-        new_w = max(1, int(round(w * scale)))
-        new_h = max(1, int(round(h * scale)))
-        rgb = cv2.resize(rgb, (new_w, new_h), interpolation=cv2.INTER_AREA)
+    rgb = _prepare_rgb_for_pose(rgb)
     try:
         import mediapipe as mp
 
@@ -189,15 +215,7 @@ def analyze_frame_bgr_video(bgr: np.ndarray, model_path: Path, timestamp_ms: int
     """
     if bgr is None or bgr.size == 0:
         return PoseResult(ok=False, landmarks=[], world_landmarks=[], note="Frame vacío")
-    rgb = cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)
-
-    h, w = rgb.shape[:2]
-    max_dim = max(h, w)
-    if max_dim > _TARGET_MAX_DIM:
-        scale = _TARGET_MAX_DIM / max_dim
-        new_w = max(1, int(round(w * scale)))
-        new_h = max(1, int(round(h * scale)))
-        rgb = cv2.resize(rgb, (new_w, new_h), interpolation=cv2.INTER_AREA)
+    rgb = _prepare_rgb_for_pose(cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB))
 
     try:
         import mediapipe as mp
@@ -255,6 +273,7 @@ def analyze_image_bytes(image_bytes: bytes, model_path: Path) -> PoseResult:
     rgb = _jpeg_bytes_to_rgb(image_bytes)
     if rgb is None:
         return PoseResult(ok=False, landmarks=[], world_landmarks=[], note="No se pudo decodificar la imagen")
+    rgb = _prepare_rgb_for_pose(rgb)
     try:
         import mediapipe as mp
 

@@ -40,7 +40,7 @@ from app.models.schemas import PoseStreamConfig
 from app.paths import backend_root
 from app.services.equipment_detect_factory import build_optional_equipment_detector
 from app.services.feature_sample_persist import build_optional_feature_collector
-from app.services.pose.mediapipe import reset_pose_video_timestamp_anchor
+from app.services.pose.mediapipe import reset_pose_video_timestamp_anchor, sdr_tonemap_bgr
 from app.services.video.downloader import (
     download_video,
     is_youtube_page_url,
@@ -350,6 +350,9 @@ async def pose_stream(ws: WebSocket) -> None:
                     if decode_max_side
                     else frame
                 )
+                # 4K HDR (iPhone HEVC): tone-map tras downscale; MediaPipe espera SDR.
+                if max(nw, nh) >= 3000:
+                    frame_work = sdr_tonemap_bgr(frame_work)
 
                 t_before_process = time.perf_counter()
                 payload: dict = await asyncio.to_thread(engine.process_bgr, frame_work, frame_index, ts_ms)

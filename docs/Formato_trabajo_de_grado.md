@@ -582,7 +582,7 @@ Fuente: Elaboración propia (2026).
 
 ## Detalle de historias de usuario: reglas de negocio del motor, criterios de aceptación verificables y flujos alternativos
 
-Las reglas del motor están alineadas al contrato WebSocket unificado (`schema_version`, `pose_ok`, `landmarks`, `knees`, `quality_flags`, etc.) y al filtrado por visibilidad en `docs/spec/websocket-pose-stream.md` (umbral `POSE_LANDMARK_MIN_VISIBILITY_RESPONSE`, defecto **0,25**): un landmark solo se incluye en el arreglo `landmarks` enviado al cliente si su `visibility` ≥ **0,25** (salvo umbral 0). El overlay `appWeb` dibuja con `MIN_VIS=0.12`. El cliente debe dibujar el esqueleto **únicamente** con los puntos recibidos y **no** inventar conexiones para índices ausentes.
+Las reglas del motor están alineadas al contrato WebSocket unificado (`schema_version`, `pose_ok`, `landmarks`, `knees`, `quality_flags`, etc.) y al filtrado por visibilidad en `docs/spec/websocket-pose-stream.md` (umbral `POSE_LANDMARK_MIN_VISIBILITY_RESPONSE`, defecto **0,25**): un landmark solo se incluye en el arreglo `landmarks` enviado al cliente si su `visibility` ≥ **0,25** (salvo umbral 0). El overlay `appWeb` dibuja con `MIN_VIS=0.35` (evita brazos fantasma). El cliente debe dibujar el esqueleto **únicamente** con los puntos recibidos y **no** inventar conexiones para índices ausentes.
 
 ### HU-01 — Disponibilidad del backend antes de analizar
 
@@ -1301,6 +1301,20 @@ Las entradas nuevas se añaden **al inicio** de la lista (más reciente arriba),
 
 ## Entradas
 
+### 2026-08-07 — Cierre de jornada: validación honesta, YouTube-en-vivo y mitigaciones de pose/clasificador
+
+- **Ámbito:** `backend` · `appWeb` · `docs` · `tests` · `infra`
+- **Tipo:** gobernanza documental + decisión arquitectónica + incidencias / mitigación
+- **Descripción:** Síntesis del trabajo del 2026-08-07 para Cap. 6 (detalle en las entradas siguientes). **Validación:** se implementó split por vídeo (`GroupShuffleSplit` / GroupKFold), `manifest_version: 2` y criterio F5 (macro-F1 ≥ 0,70); el candidato GroupSplit (~0,22) **no se activó**; el número honesto es GroupKFold (ventana ~0,24 → ~0,30 tras diversidad; vídeo ~0,33 → ~0,39), no el ~0,95 row-level. Activos: `exercise_rf_ad157f19` / `exercise_validator_fe345eab`. **Datos:** ingesta YouTube diversa + grabaciones propias etiquetadas; ~5461 clips en `Media/` pendientes. **Producto:** análisis de YouTube en `/ws/pose-stream` sin descarga (yt-dlp H.264 + fallback a disco); curl sentado/unilateral (`curl_isolation_score`, codo dominante); idle vs deadlift (`idle_still_score`); overlay `MIN_VIS=0.35`; captura viva 720p JPEG 0,82; tone-map SDR en HEVC HDR 4K. Docker: backend no bind-mounta el código → `docker compose cp` + restart tras cambios Python.
+- **Trazabilidad:** `docs/spec/model-validation-methodology.md`, `docs/spec/data-leakage-findings-2026-08-07.md`, `docs/spec/websocket-pose-stream.md`, `docs/spec/live-camera-analysis.md`, `docs/spec/feature-vector-32d.md`, `docs/arquitectura.md`, `backend/vision/model_validation.py`, `backend/app/services/video/downloader.py`, `backend/vision/heuristic_exercise_classifier.py`, `backend/vision/exercise_classifier.py` (`_OnnxWithPostureRescue`), `appWeb/src/pages/VideoAnalysis/`, `appWeb/src/hooks/useLiveAnalysisSession.ts`
+
+### 2026-08-07 — Overlay “volando” + deadlift de pie (IMG_4544 / análisis en vivo)
+
+- **Ámbito:** `backend` · `appWeb` · `docs`
+- **Tipo:** incidencia / mitigación
+- **Descripción:** Una grabación de pantalla de Análisis en vivo (`IMG_4544.MOV`) mostraba esqueleto desalineado (landmarks de visibilidad baja) y etiqueta `deadlift` ~70 % estando de pie quieto. El RF leaky confunde bipedestación con peso muerto. Se subió `MIN_VIS` del overlay a 0,35, se añadió rescate heurístico `idle_still_score` (prioridad sobre deadlift/squat si no hay curl), captura JPEG 0,82 a 720p, y tone-map SDR+CLAHE para HEVC HDR 4K de iPhone (no aplica a YouTube 1080p).
+- **Trazabilidad:** `backend/vision/heuristic_exercise_classifier.py`, `backend/vision/exercise_classifier.py` (`_OnnxWithPostureRescue`), `backend/app/services/pose/mediapipe.py`, `appWeb/src/components/PoseSkeletonCanvas.tsx`, `appWeb/src/hooks/useLiveAnalysisSession.ts`, `docs/spec/live-camera-analysis.md`
+
 ### 2026-08-07 — youtu.be?si= no se abría (OpenCV vs página HTML)
 
 - **Ámbito:** `backend` · `docs` · `tests`
@@ -1312,15 +1326,15 @@ Las entradas nuevas se añaden **al inicio** de la lista (más reciente arriba),
 
 - **Ámbito:** `backend` · `appWeb` · `docs`
 - **Tipo:** incidencia / mitigación
-- **Descripción:** En curl sentado unilateral el esqueleto solo mostraba un brazo (visibilidad MediaPipe del otro < 0,5/0,4) y la etiqueta `curl` aparecía al inicio y luego caía: el tracker promediaba L/R (brazo quieto diluye la flexión) y la histéresis soltaba a `unknown` en la extensión. Se bajó el umbral de landmarks (servidor 0,25 / canvas 0,12), el tracker usa el codo dominante, y hay hold de etiqueta (~24 frames) + enter/hold del rescate heurístico.
+- **Descripción:** En curl sentado unilateral el esqueleto solo mostraba un brazo (visibilidad MediaPipe del otro < 0,5/0,4) y la etiqueta `curl` aparecía al inicio y luego caía: el tracker promediaba L/R (brazo quieto diluye la flexión) y la histéresis soltaba a `unknown` en la extensión. Se bajó el umbral de landmarks (servidor 0,25 / canvas 0,35; 0,12 generaba brazos fantasma), el tracker usa el codo dominante, y hay hold de etiqueta (~24 frames) + enter/hold del rescate heurístico.
 - **Trazabilidad:** `backend/vision/rep_trackers/elbow_curl.py`, `backend/vision/rep_trackers/threshold_cycle.py` (`dominant_elbow_flexion`), `backend/vision/exercise_classifier.py`, `appWeb/src/components/PoseSkeletonCanvas.tsx`, `docs/spec/websocket-pose-stream.md`
 
 ### 2026-08-07 — Curl sentado no clasificado (rescate heurístico + ingesta)
 
 - **Ámbito:** `backend` · `docs` · `tests`
 - **Tipo:** incidencia / mitigación
-- **Descripción:** El vídeo [CURL DE BICEPS CON MANCUERNA SENTADO](https://www.youtube.com/watch?v=96O5mvyblQM) no se etiquetaba como `curl`: el vector 32D está dominado por rodilla (0–20) y el RF activo se entrenó sobre todo con curls de pie; rodillas ~90° fijas se parecen a squat/idle. Se añadió `curl_isolation_score` (codo rápido, rodilla quieta, tronco erguido) y un wrapper ONNX que rescata `curl` si el score ≥ 0.70. No se activa un modelo GroupSplit nuevo (F5). Se ingesta el clip como muestra `curl` y se amplían queries de curl sentado en el catálogo.
-- **Trazabilidad:** `backend/vision/heuristic_exercise_classifier.py`, `backend/vision/exercise_classifier.py` (`_OnnxWithCurlRescue`), `tests/test_heuristic_curl_isolation.py`, `backend/vision/data/exercise_catalog.json`, `docs/spec/feature-vector-32d.md`
+- **Descripción:** El vídeo [CURL DE BICEPS CON MANCUERNA SENTADO](https://www.youtube.com/watch?v=96O5mvyblQM) no se etiquetaba como `curl`: el vector 32D está dominado por rodilla (0–20) y el RF activo se entrenó sobre todo con curls de pie; rodillas ~90° fijas se parecen a squat/idle. Se añadió `curl_isolation_score` (codo rápido, rodilla quieta, tronco erguido) y un wrapper ONNX que rescata `curl` (enter 0,55 / hold 0,38). No se activa un modelo GroupSplit nuevo (F5). Se ingesta el clip como muestra `curl` y se amplían queries de curl sentado en el catálogo.
+- **Trazabilidad:** `backend/vision/heuristic_exercise_classifier.py`, `backend/vision/exercise_classifier.py` (`_OnnxWithPostureRescue`), `tests/test_heuristic_curl_isolation.py`, `backend/vision/data/exercise_catalog.json`, `docs/spec/feature-vector-32d.md`
 
 ### 2026-08-07 — Análisis YouTube en vivo sin descarga (pose-stream)
 

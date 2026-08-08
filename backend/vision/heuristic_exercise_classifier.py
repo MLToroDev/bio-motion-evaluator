@@ -30,6 +30,8 @@ IDX_ELBOW_SPEED_MAX = 31
 # evita soltar la etiqueta a mitad de serie.
 CURL_ISOLATION_MIN = 0.55
 CURL_ISOLATION_HOLD = 0.38
+# De pie quieto (no deadlift/squat): ROM y velocidades bajas, tronco erguido.
+IDLE_STILL_MIN = 0.62
 
 
 def _sigmoid(x: float) -> float:
@@ -72,6 +74,39 @@ def curl_isolation_score(features: np.ndarray) -> float:
         + 0.12 * s_elbow_vs_knee
     )
     return float(base * s_trunk_gate)
+
+
+def idle_still_score(features: np.ndarray) -> float:
+    """
+    Puntuación 0–1 de bipedestación quieta (``idle``).
+
+    El RF leaky etiqueta de pie + ruido de cadera como ``deadlift``. Señal: rodillas
+    casi extendidas y estáticas, brazos quietos, tronco erguido, periodicidad baja.
+    """
+    if features.size < 32:
+        return 0.0
+    knee_mean = 0.5 * (float(features[IDX_MEAN_L]) + float(features[IDX_MEAN_R]))
+    rom_mean = 0.5 * (float(features[IDX_ROM_L]) + float(features[IDX_ROM_R]))
+    per = float(features[IDX_PERIODICITY])
+    trunk = float(features[IDX_TRUNK_MEAN])
+    knee_spd = max(float(features[IDX_KNEE_SPEED_MEAN]), float(features[IDX_KNEE_SPEED_MAX]))
+    elbow_spd = float(features[IDX_ELBOW_SPEED_MAX])
+
+    s_knee_ext = _sigmoid((38.0 - knee_mean) / 10.0)
+    s_rom = _sigmoid((12.0 - rom_mean) / 5.0)
+    s_knee_slow = _sigmoid((18.0 - knee_spd) / 8.0)
+    s_elbow_quiet = _sigmoid((22.0 - elbow_spd) / 10.0)
+    s_per = _sigmoid((0.10 - per) / 0.04)
+    s_trunk = _sigmoid((22.0 - trunk) / 8.0) if trunk > 0.0 else 0.65
+    # El codo quieto pesa más: un curl de pie no debe pasar el umbral idle.
+    return float(
+        0.16 * s_knee_ext
+        + 0.14 * s_rom
+        + 0.12 * s_knee_slow
+        + 0.36 * s_elbow_quiet
+        + 0.12 * s_per
+        + 0.10 * s_trunk
+    )
 
 
 class HeuristicExerciseClassifier:
@@ -143,6 +178,10 @@ class HeuristicExerciseClassifier:
                 float(self._cfg.min_confidence),
                 min(0.95, 0.55 + 0.45 * s_curl),
             )
+        s_still = idle_still_score(features) if features.size >= 32 else 0.0
+        if s_still >= IDLE_STILL_MIN and s_still > s_curl:
+            best = "idle"
+            confidence = max(confidence, float(self._cfg.min_confidence), 0.80)
         return ClassificationResult(
             label=best,
             confidence=confidence,

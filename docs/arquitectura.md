@@ -41,13 +41,13 @@ flowchart TD
 
 1. **Captura**: IoT, cámara del cliente, archivo gold en el servidor, o **stream YouTube/RTSP** (`/ws/pose-stream`, `source=url`; YouTube se resuelve con yt-dlp **sin descargar** el MP4).
 2. **Transporte**: WebSocket JSON (`/ws/pose-stream`) o JPEG binario (`/ws/video`) según la fuente.
-3. **Inferencia**: MediaPipe Pose Landmarker en el backend; modelos HF opcionales para tareas de clasificación.
+3. **Inferencia**: MediaPipe Pose Landmarker en el backend (downscale + tone-map SDR si el frame nativo es HEVC HDR 4K); modelos HF opcionales para tareas de clasificación.
 4. **Presentación**: **`appWeb/`** (React) muestra resultados y métricas al usuario.
 
 ### Motor de análisis (visión)
 
 - **Vector de features 32D** (`vision/feature_engine.py`): rodilla (0-20), postura de ventana F1-F4 — tronco, base de apoyo, cadera, muñecas — (21-28) y velocidad angular de ventana F5 (29-31). Layout: [`docs/spec/feature-vector-32d.md`](spec/feature-vector-32d.md).
-- **Clasificador** (`vision/exercise_classifier.py`): ONNX activo según `vision/models/manifest.json` (`manifest_version: 2`, multi-clase, **11 clases**: idle / squat / lunge / curl / running / pushup / plank / jumping_jack / overhead_press / deadlift / mountain_climber) con fallback heurístico; envoltura de histéresis + EMA.
+- **Clasificador** (`vision/exercise_classifier.py`): ONNX activo según `vision/models/manifest.json` (`manifest_version: 2`, multi-clase, **11 clases**: idle / squat / lunge / curl / running / pushup / plank / jumping_jack / overhead_press / deadlift / mountain_climber) con fallback heurístico; envoltura de histéresis + EMA y rescates `_OnnxWithPostureRescue` (`idle` de pie quieto vs deadlift leaky; `curl` sentado/unilateral).
 - **Validación de entrenamiento** (`vision/model_validation.py`): split por vídeo (`GroupShuffleSplit` / holdout congelado con herencia de `split`), MetricsBundle (macro-F1, balanced accuracy, OOB con caveat no leakage-free, ROC/PR-AUC, `unreliable_classes` si `<3` vídeos/clase). Evaluación Cap. 6: `scripts/evaluate_exercise_classifier.py` (GroupKFold media±std). Spec: [`docs/spec/model-validation-methodology.md`](spec/model-validation-methodology.md).
 - **Validador / teacher** (`vision/exercise_validator.py`, opcional): segunda etapa sobre el mismo 32D (`confirm` / `reject` / `changed` / `uncertain`); teacher preferido **ONNX RF** (`vision/models/exercise_validator.onnx`, entrenable con `scripts/train_exercise_validator.py` desde muestras approved); fallback heurístico/margen. Campo WS `exercise_validation`; puede gatear `AUTO_COLLECT` (`auto_validated`). Spec: [`docs/spec/exercise-validator.md`](spec/exercise-validator.md).
 - **Catálogo UI** (`GET /api/v1/exercises/catalog`): enriquecimiento con [exercises-dataset](https://github.com/hasaneyldrm/exercises-dataset) (nombre ES, equipo, GIF CDN). No detecta pose; solo presenta la etiqueta del motor.

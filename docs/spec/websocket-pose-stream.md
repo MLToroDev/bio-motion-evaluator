@@ -68,7 +68,7 @@ Campos habituales:
 | `frame_index` | number | Índice entero del frame |
 | `pose_ok` | bool | Resultado de detección (ver `PoseResult` en servicio MediaPipe) |
 | `note` | string \| null | Nota humana (p. ej. sin pose) |
-| `landmarks` | array \| null | **Subconjunto** de puntos detectados con `visibility` suficiente: `{ index, x, y, z, visibility? }`. No se garantizan 33 entradas; el cliente debe usar `index` (p. ej. `PoseSkeletonCanvas` en `appWeb`). Umbral servidor: `pose_landmark_min_visibility_response` / env `POSE_LANDMARK_MIN_VISIBILITY_RESPONSE` (**defecto 0,25**; 0 = sin filtro). Overlay `appWeb` dibuja con `MIN_VIS=0.12`. |
+| `landmarks` | array \| null | **Subconjunto** de puntos detectados con `visibility` suficiente: `{ index, x, y, z, visibility? }`. No se garantizan 33 entradas; el cliente debe usar `index` (p. ej. `PoseSkeletonCanvas` en `appWeb`). Umbral servidor: `pose_landmark_min_visibility_response` / env `POSE_LANDMARK_MIN_VISIBILITY_RESPONSE` (**defecto 0,25**; 0 = sin filtro). Overlay `appWeb` dibuja con `MIN_VIS=0.35`. |
 | `world_landmarks` | array \| null | Misma política: solo índices presentes en `landmarks` filtrados. |
 | `knees` | object \| null | Ángulos; p. ej. `left_knee_flexion_angle_deg`, `right_knee_flexion_angle_deg` (grados) |
 | `exercise_label` | string | Clasificación actual (`unknown` en Fase 1 sin ONNX) |
@@ -133,11 +133,16 @@ Puede incluir **`error`** (string), p. ej. `sin_frame`, o cierre con código HTT
 5. **2026-08-07 — Esqueleto a un brazo + curl unilateral que se “suelta”**  
    - **Causa overlay:** umbral de visibilidad 0,5 (servidor) + 0,4 (canvas) ocultaba el brazo ocluido/lejos en curl sentado.  
    - **Causa etiqueta/reps:** promedio bilateral de codo + histéresis corta: al extender un brazo la señal cae y el clasificador pasa a `unknown`/`idle`.  
-   - **Mitigación:** `POSE_LANDMARK_MIN_VISIBILITY_RESPONSE=0.25`, `PoseSkeletonCanvas` `MIN_VIS=0.12`, `dominant_elbow_flexion` en `ElbowCurlRepTracker`, hold de `unknown` (~24 frames) y enter/hold de `curl_isolation_score` (0,55 / 0,38) con compuerta de tronco (no confundir push-up).
+   - **Mitigación:** `POSE_LANDMARK_MIN_VISIBILITY_RESPONSE=0.25`, `PoseSkeletonCanvas` `MIN_VIS=0.35` (0,12 generaba brazos fantasma en vivo), `dominant_elbow_flexion` en `ElbowCurlRepTracker`, hold de `unknown` (~24 frames) y enter/hold de `curl_isolation_score` (0,55 / 0,38) con compuerta de tronco (no confundir push-up).
 
 6. **2026-08-07 — `youtu.be?si=` no abre en OpenCV**  
    - **Causa:** el contenedor recargó código viejo (`VideoSource("url", file_path=página HTML)`). OpenCV no lee `youtu.be?si=…`.  
    - **Mitigación:** `normalize_youtube_url` → `watch?v=`; stream yt-dlp; si falla, descarga H.264 a `data/downloads`.
+
+7. **2026-08-07 — Overlay desalineado + `deadlift` de pie (grabación de Análisis en vivo)**  
+   - **Causa overlay:** `MIN_VIS=0.12` dibujaba landmarks de visibilidad baja (muñeca/cabeza “volando”).  
+   - **Causa etiqueta:** RF leaky etiqueta bipedestación quieta como `deadlift`.  
+   - **Mitigación:** overlay `MIN_VIS=0.35`; `idle_still_score` + wrapper `_OnnxWithPostureRescue`; JPEG vivo 0,82 / 720p; tone-map SDR+CLAHE en HEVC HDR 4K (`max(w,h) ≥ 3000`).
 
 ## Pruebas manuales sugeridas
 

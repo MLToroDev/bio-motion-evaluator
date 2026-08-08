@@ -19,7 +19,7 @@ import { buildVideoWebSocketUri, normalizeApiBaseUrl } from '../lib/wsUri';
 const MAX_SERIES = 30;
 /** Máximo de JPEG enviados sin respuesta JSON aún (backpressure). */
 const MAX_IN_FLIGHT = 3;
-const JPEG_QUALITY = 0.6;
+const JPEG_QUALITY = 0.82;
 /** Captura JPEG desacoplada del rAF del overlay (~30 intentos/s). */
 const CAPTURE_HZ = 30;
 
@@ -136,7 +136,7 @@ export function useLiveAnalysisSession(
     setUi((p) => ({ ...p, error: null }));
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
+        video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
         audio: false,
       });
       streamRef.current = stream;

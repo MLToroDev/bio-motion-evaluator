@@ -194,14 +194,15 @@ def _try_onnx_classifier(manifest: ExerciseModelManifest, cfg: ExerciseClassifie
             label = self._classes[idx] if 0 <= idx < len(self._classes) else cfg.unknown_label
             return ClassificationResult(label=label, confidence=confidence, raw_scores=raw)
 
-    return _OnnxWithCurlRescue(_OnnxCls(), cfg)
+    return _OnnxWithPostureRescue(_OnnxCls(), cfg)
 
 
-class _OnnxWithCurlRescue:
+class _OnnxWithPostureRescue:
     """
-    Rescate de curl (sentado / unilateral): el RF activo se entrenó con curls de pie
-    bilaterales y el vector 32D está dominado por rodilla (0–20). Enter/hold evita
-    soltar ``curl`` en la extensión (codo lento un instante).
+    Rescates heurísticos sobre el RF leaky:
+
+    - ``idle``: de pie quieto (el ONNX suele devolver deadlift).
+    - ``curl``: sentado / unilateral (rodillas fijas ~90° o un solo codo activo).
     """
 
     def __init__(self, inner: ExerciseClassifier, cfg: ExerciseClassifierConfig) -> None:
@@ -213,24 +214,40 @@ class _OnnxWithCurlRescue:
         from vision.heuristic_exercise_classifier import (
             CURL_ISOLATION_HOLD,
             CURL_ISOLATION_MIN,
+            IDLE_STILL_MIN,
             curl_isolation_score,
+            idle_still_score,
         )
 
         raw = self._inner.classify(features, window_full)
         if not window_full or features.size < 32:
             self._holding_curl = False
             return raw
+
         s_curl = curl_isolation_score(features)
+        s_idle = idle_still_score(features)
+        lab = (raw.label or self._cfg.unknown_label).strip().lower()
+        conf = float(raw.confidence)
+        scores = dict(raw.raw_scores or {})
+
+        if s_idle >= IDLE_STILL_MIN and s_idle > s_curl:
+            self._holding_curl = False
+            if lab == "idle" and conf >= self._cfg.min_confidence:
+                return raw
+            scores["idle"] = max(float(scores.get("idle", 0.0)), s_idle)
+            return ClassificationResult(
+                label="idle",
+                confidence=max(conf, float(self._cfg.min_confidence), 0.80),
+                raw_scores=scores or None,
+            )
+
         gate = CURL_ISOLATION_HOLD if self._holding_curl else CURL_ISOLATION_MIN
         if s_curl < gate:
             self._holding_curl = False
             return raw
-        lab = (raw.label or self._cfg.unknown_label).strip().lower()
-        conf = float(raw.confidence)
         if lab == "curl" and conf >= self._cfg.min_confidence:
             self._holding_curl = True
             return raw
-        scores = dict(raw.raw_scores or {})
         scores["curl"] = max(float(scores.get("curl", 0.0)), s_curl)
         rescued_conf = max(conf, float(self._cfg.min_confidence), min(0.95, 0.55 + 0.45 * s_curl))
         self._holding_curl = True

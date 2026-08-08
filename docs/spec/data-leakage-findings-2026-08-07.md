@@ -51,6 +51,18 @@ Interpretación: mejora real y menor varianza entre folds, pero **sigue por deba
 
 Reportes: `eval_kfold_20260808T000930Z.json`, `own_recordings_manifest.ingest_report.json`.
 
+## Mitigaciones operativas (sin reentrenar el RF)
+
+Mientras F5 no se cumple, el wrapper `_OnnxWithPostureRescue` corrige fallos visibles del modelo leaky **sin activar un ONNX nuevo**:
+
+| Postura observada | Etiqueta leaky típica | Rescate |
+|-------------------|----------------------|---------|
+| De pie quieto | `deadlift` | `idle_still_score` ≥ 0,62 y mayor que curl |
+| Curl sentado / unilateral | `squat` / `idle` / `unknown` | `curl_isolation_score` enter 0,55 / hold 0,38 |
+| Push-up (tronco alto + codo rápido) | riesgo `curl` | compuerta de tronco en `curl_isolation_score` |
+
+Esto es **heurística de producto**, no evidencia de generalización. Cap. 6 debe citar GroupKFold, no estas reglas.
+
 ## Trazabilidad código
 
 - `backend/vision/model_validation.py`

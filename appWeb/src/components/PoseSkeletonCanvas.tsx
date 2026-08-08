@@ -3,8 +3,11 @@ import { lerpLandmarksInto } from '../lib/landmarkInterpolation';
 import { POSE_CONNECTIONS } from '../lib/poseTopology';
 import type { LandmarkMap } from '../lib/poseWsPayload';
 
-/** Dibuja brazos con visibilidad MediaPipe baja (curl unilateral / oclusión). */
-const MIN_VIS = 0.12;
+/**
+ * No dibujar puntos con visibilidad MediaPipe baja: a 0.12 el esqueleto “vuela”
+ * (brazos fantasma). 0.35 muestra oclusión leve sin basura.
+ */
+const MIN_VIS = 0.35;
 
 const SKELETON_TOKEN_FALLBACKS = {
   line: '#00e676',

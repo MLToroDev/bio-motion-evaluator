@@ -85,10 +85,10 @@ flowchart TB
 | Constante | Archivo | Valor | Efecto |
 |-----------|---------|-------|--------|
 | `MAX_IN_FLIGHT` | `useLiveAnalysisSession.ts` | `3` | No envía JPEG si hay ≥3 RTT pendientes |
-| `JPEG_QUALITY` | idem | `0.6` | Tamaño de payload |
+| `JPEG_QUALITY` | idem | `0.82` | Tamaño de payload (calidad suficiente para MediaPipe) |
 | `MAX_SERIES` | idem | `30` | Copia de arrays en cada RX con ambas rodillas |
 | `BLEND_MS` | `PoseSkeletonCanvas.tsx` | `100` | Duración objetivo del blend entre poses |
-| `MIN_VIS` | idem | `0.12` | Landmarks con visibilidad muy baja no se dibujan (curl unilateral / oclusión) |
+| `MIN_VIS` | idem | `0.35` | Landmarks de baja visibilidad no se dibujan (evita esqueleto “volando”) |
 | HUD `displayRxPerSec` | hook | intervalo **1000 ms** | Contador de respuestas JSON/s, no FPS de captura ni de overlay |
 
 ### 1.4 Separación overlay / motor (diseño intencional)
