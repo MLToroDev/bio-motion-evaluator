@@ -1085,8 +1085,8 @@ Explain difficult concepts by making analogies.
 **URL Validation:** https://ui-patterns.com/patterns/ContinuousScrolling
 
 ### Problem Summary
-The user needs to view a subset of data that is not easily displayed on a single page
-
+The user needs to view a subset of data that is not easily displayed on a single page
+
 Content needs to be presented to users as a subset of a much larger seemingly endless set, in a way that will aid them in consuming content without effort.
 
 ### Solution
@@ -1185,8 +1185,8 @@ The endowment effect can be described as the divergence between willingness to b
 **URL Validation:** https://ui-patterns.com/patterns/EventCalendar
 
 ### Problem Summary
-The user wants to find events of interest happening in a certain period of time.
-
+The user wants to find events of interest happening in a certain period of time.
+
 Events need to be presented to users in a visually concise model that abstracts date and time.
 
 ### Solution

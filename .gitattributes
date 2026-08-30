@@ -1,0 +1,87 @@
+# Normalización de fin de línea — Bio-Motion Evaluator
+#
+# El repositorio almacena SIEMPRE LF. Cada plataforma recibe en el árbol de
+# trabajo el final de línea que le corresponde. Sin este archivo, un clon en
+# Windows (autocrlf=true) y otro en macOS/Linux ven todo el repositorio como
+# modificado, impidiendo distinguir cambios reales.
+
+# Regla por defecto: git detecta texto vs binario y normaliza a LF.
+* text=auto
+
+# --- Código fuente y configuración (LF explícito) ---
+*.py      text eol=lf
+*.dart    text eol=lf
+*.ts      text eol=lf
+*.tsx     text eol=lf
+*.js      text eol=lf
+*.jsx     text eol=lf
+*.mjs     text eol=lf
+*.css     text eol=lf
+*.html    text eol=lf
+*.json    text eol=lf
+*.md      text eol=lf
+*.mdc     text eol=lf
+*.txt     text eol=lf
+*.csv     text eol=lf
+*.svg     text eol=lf
+*.xml     text eol=lf
+*.yaml    text eol=lf
+*.yml     text eol=lf
+*.toml    text eol=lf
+*.ini     text eol=lf
+*.cfg     text eol=lf
+*.mako    text eol=lf
+*.properties text eol=lf
+*.gitignore  text eol=lf
+*.gitkeep    text eol=lf
+*.example    text eol=lf
+*.lock       text eol=lf
+
+# --- Plataformas móviles ---
+*.kt      text eol=lf
+*.kts     text eol=lf
+*.java    text eol=lf
+*.gradle  text eol=lf
+*.swift   text eol=lf
+*.h       text eol=lf
+*.cpp     text eol=lf
+*.plist   text eol=lf
+*.storyboard      text eol=lf
+*.xcconfig        text eol=lf
+*.xcsettings      text eol=lf
+*.xcscheme        text eol=lf
+*.xcworkspacedata text eol=lf
+*.pbxproj         text eol=lf
+*.metadata        text eol=lf
+
+# --- Scripts nativos de Windows: requieren CRLF en el árbol de trabajo ---
+*.ps1     text eol=crlf
+*.bat     text eol=crlf
+*.cmd     text eol=crlf
+*.bas     text eol=crlf
+
+# --- Binarios: sin conversión ni diff de texto ---
+*.png     binary
+*.jpg     binary
+*.jpeg    binary
+*.gif     binary
+*.ico     binary
+*.webp    binary
+*.pdf     binary
+*.mp4     binary
+*.mov     binary
+*.avi     binary
+*.mp3     binary
+*.wav     binary
+*.onnx    binary
+*.task    binary
+*.tflite  binary
+*.ttf     binary
+*.otf     binary
+*.woff    binary
+*.woff2   binary
+*.zip     binary
+*.jar     binary
+*.keystore binary
+*.docx    binary
+*.xlsx    binary
