@@ -1,0 +1,754 @@
+{
+  "procedencia_codigo": {
+    "commit": "3c84893",
+    "arbol_de_trabajo": "con cambios sin confirmar",
+    "sha256_biomechanics": "9a5ee3cab546",
+    "sha256_pose_extractor": "5411bf06bb65",
+    "sha256_mediapipe_service": "a812ba09a084"
+  },
+  "parametros": {
+    "max_frames": 4000,
+    "umbral_visibilidad": 0.5,
+    "techo_flexion_plausible_deg": 150.0,
+    "ventana_cuasi_estatica": 5,
+    "umbral_cuasi_estatico_deg": 1.5,
+    "ventana_savgol": 9,
+    "orden_savgol": 2
+  },
+  "videos": [
+    {
+      "metadatos": {
+        "archivo": "5-00 por milha → 3-06-km.Agora olha o que acontece quando a gente mexe só em UMA variável- A CAD.mp4",
+        "identificador": "5_00_por_milha_3_06_km_Agora_olha_o_que_acontece_quando_a_ge",
+        "regimen": "marcha_carrera",
+        "ancho": 720,
+        "alto": 1280,
+        "fps": 30.0,
+        "frames_contenedor": 921,
+        "frames_procesados": 921,
+        "recortado": false,
+        "duracion_procesada_s": 30.7,
+        "plano_camara": "sagital",
+        "plano_camara_detalle": "lateral, cinta; video editado con cortes",
+        "cortes_de_plano": 3,
+        "frames_de_corte": [
+          34,
+          670,
+          768
+        ]
+      },
+      "tasa_deteccion_pose_pct": 97.07,
+      "tasa_angulos_validos_pct": 97.07,
+      "tasa_angulos_validos_vis05_pct": 94.9,
+      "caida_por_umbral_pp": 2.17,
+      "visibilidad_min_mediana": 0.717,
+      "visibilidad_min_p05": 0.597,
+      "landmark_limitante_dominante": "right_knee",
+      "landmark_limitante_dominante_pct": 94.63,
+      "rom": {
+        "izquierda": {
+          "min_deg": 16.2,
+          "max_deg": 137.57,
+          "recorrido_deg": 121.36,
+          "mediana_deg": 63.94
+        },
+        "derecha": {
+          "min_deg": 0.29,
+          "max_deg": 122.86,
+          "recorrido_deg": 122.57,
+          "mediana_deg": 29.77
+        }
+      },
+      "jitter": {
+        "izquierda": {
+          "n_diferencias": 890,
+          "jitter_std_diff_deg_frame": 18.953,
+          "jitter_std_diff_deg_s": 568.6,
+          "salto_mediano_abs_deg": 11.392,
+          "salto_p95_abs_deg": 40.57,
+          "ruido_alta_frecuencia_rms_deg": 11.406
+        },
+        "derecha": {
+          "n_diferencias": 890,
+          "jitter_std_diff_deg_frame": 15.948,
+          "jitter_std_diff_deg_s": 478.44,
+          "salto_mediano_abs_deg": 8.493,
+          "salto_p95_abs_deg": 31.28,
+          "ruido_alta_frecuencia_rms_deg": 9.746
+        },
+        "izquierda_cuasi_estatico": {
+          "n_diferencias": 29,
+          "jitter_std_diff_deg_frame": 0.159,
+          "jitter_std_diff_deg_s": 4.76,
+          "salto_mediano_abs_deg": 0.046,
+          "salto_p95_abs_deg": 0.322,
+          "ruido_alta_frecuencia_rms_deg": 0.072
+        },
+        "derecha_cuasi_estatico": {
+          "n_diferencias": 29,
+          "jitter_std_diff_deg_frame": 0.124,
+          "jitter_std_diff_deg_s": 3.72,
+          "salto_mediano_abs_deg": 0.07,
+          "salto_p95_abs_deg": 0.273,
+          "ruido_alta_frecuencia_rms_deg": 0.065
+        }
+      },
+      "asimetria": {
+        "n_frames": 894,
+        "mediana_deg": 34.5,
+        "p95_deg": 82.8,
+        "max_deg": 116.36
+      },
+      "cuasi_estatico": {
+        "n_frames": 30,
+        "porcentaje_del_video": 3.26,
+        "asimetria_mediana_deg": 2.11,
+        "asimetria_p95_deg": 3.04
+      },
+      "variantes": {
+        "produccion": {
+          "n_valores": 1788,
+          "mediana_flexion_deg": 43.41,
+          "p95_flexion_deg": 102.64,
+          "max_flexion_deg": 137.57,
+          "pct_implausible_mayor_150": 0.0,
+          "ruido_alta_frecuencia_rms_deg": 10.576,
+          "discrepancia_mediana_deg": 0.0,
+          "discrepancia_p95_deg": 0.0,
+          "discrepancia_max_deg": 0.0
+        },
+        "world_xyz": {
+          "n_valores": 1788,
+          "mediana_flexion_deg": 43.41,
+          "p95_flexion_deg": 102.64,
+          "max_flexion_deg": 137.57,
+          "pct_implausible_mayor_150": 0.0,
+          "ruido_alta_frecuencia_rms_deg": 10.576,
+          "discrepancia_mediana_deg": 0.0,
+          "discrepancia_p95_deg": 0.0,
+          "discrepancia_max_deg": 0.0
+        },
+        "imagen_xyz_isotropico": {
+          "n_valores": 1788,
+          "mediana_flexion_deg": 47.56,
+          "p95_flexion_deg": 101.67,
+          "max_flexion_deg": 174.18,
+          "pct_implausible_mayor_150": 0.06,
+          "ruido_alta_frecuencia_rms_deg": 11.936,
+          "discrepancia_mediana_deg": 5.95,
+          "discrepancia_p95_deg": 21.23,
+          "discrepancia_max_deg": 102.9
+        },
+        "imagen_xy_isotropico": {
+          "n_valores": 1788,
+          "mediana_flexion_deg": 45.05,
+          "p95_flexion_deg": 105.69,
+          "max_flexion_deg": 174.91,
+          "pct_implausible_mayor_150": 0.22,
+          "ruido_alta_frecuencia_rms_deg": 13.899,
+          "discrepancia_mediana_deg": 6.78,
+          "discrepancia_p95_deg": 23.39,
+          "discrepancia_max_deg": 133.34
+        },
+        "imagen_xyz_normalizado": {
+          "n_valores": 1788,
+          "mediana_flexion_deg": 56.76,
+          "p95_flexion_deg": 115.94,
+          "max_flexion_deg": 174.33,
+          "pct_implausible_mayor_150": 0.06,
+          "ruido_alta_frecuencia_rms_deg": 13.438,
+          "discrepancia_mediana_deg": 13.23,
+          "discrepancia_p95_deg": 41.4,
+          "discrepancia_max_deg": 103.04
+        }
+      },
+      "referencia_visual": {},
+      "inferencia": {
+        "media_ms": 7.04,
+        "mediana_ms": 6.77,
+        "p95_ms": 7.18
+      }
+    },
+    {
+      "metadatos": {
+        "archivo": "CintaRunning.mp4",
+        "identificador": "CintaRunning",
+        "regimen": "marcha_carrera",
+        "ancho": 640,
+        "alto": 360,
+        "fps": 29.98,
+        "frames_contenedor": 2449,
+        "frames_procesados": 2449,
+        "recortado": false,
+        "duracion_procesada_s": 81.69,
+        "plano_camara": "frontal",
+        "plano_camara_detalle": "de frente, cinta",
+        "cortes_de_plano": 0,
+        "frames_de_corte": []
+      },
+      "tasa_deteccion_pose_pct": 100.0,
+      "tasa_angulos_validos_pct": 100.0,
+      "tasa_angulos_validos_vis05_pct": 100.0,
+      "caida_por_umbral_pp": 0.0,
+      "visibilidad_min_mediana": 0.816,
+      "visibilidad_min_p05": 0.741,
+      "landmark_limitante_dominante": "right_ankle",
+      "landmark_limitante_dominante_pct": 57.74,
+      "rom": {
+        "izquierda": {
+          "min_deg": 9.85,
+          "max_deg": 97.37,
+          "recorrido_deg": 87.52,
+          "mediana_deg": 34.13
+        },
+        "derecha": {
+          "min_deg": 10.28,
+          "max_deg": 88.78,
+          "recorrido_deg": 78.5,
+          "mediana_deg": 29.45
+        }
+      },
+      "jitter": {
+        "izquierda": {
+          "n_diferencias": 2448,
+          "jitter_std_diff_deg_frame": 9.315,
+          "jitter_std_diff_deg_s": 279.27,
+          "salto_mediano_abs_deg": 4.369,
+          "salto_p95_abs_deg": 20.629,
+          "ruido_alta_frecuencia_rms_deg": 4.072
+        },
+        "derecha": {
+          "n_diferencias": 2448,
+          "jitter_std_diff_deg_frame": 9.236,
+          "jitter_std_diff_deg_s": 276.89,
+          "salto_mediano_abs_deg": 3.796,
+          "salto_p95_abs_deg": 21.36,
+          "ruido_alta_frecuencia_rms_deg": 5.268
+        },
+        "izquierda_cuasi_estatico": {},
+        "derecha_cuasi_estatico": {}
+      },
+      "asimetria": {
+        "n_frames": 2449,
+        "mediana_deg": 26.26,
+        "p95_deg": 56.16,
+        "max_deg": 67.97
+      },
+      "cuasi_estatico": {
+        "n_frames": 0,
+        "porcentaje_del_video": 0.0,
+        "asimetria_mediana_deg": NaN,
+        "asimetria_p95_deg": NaN
+      },
+      "variantes": {
+        "produccion": {
+          "n_valores": 4898,
+          "mediana_flexion_deg": 31.98,
+          "p95_flexion_deg": 78.16,
+          "max_flexion_deg": 97.37,
+          "pct_implausible_mayor_150": 0.0,
+          "ruido_alta_frecuencia_rms_deg": 4.67,
+          "discrepancia_mediana_deg": 0.0,
+          "discrepancia_p95_deg": 0.0,
+          "discrepancia_max_deg": 0.0
+        },
+        "world_xyz": {
+          "n_valores": 4898,
+          "mediana_flexion_deg": 31.98,
+          "p95_flexion_deg": 78.16,
+          "max_flexion_deg": 97.37,
+          "pct_implausible_mayor_150": 0.0,
+          "ruido_alta_frecuencia_rms_deg": 4.67,
+          "discrepancia_mediana_deg": 0.0,
+          "discrepancia_p95_deg": 0.0,
+          "discrepancia_max_deg": 0.0
+        },
+        "imagen_xyz_isotropico": {
+          "n_valores": 4898,
+          "mediana_flexion_deg": 81.0,
+          "p95_flexion_deg": 132.78,
+          "max_flexion_deg": 154.74,
+          "pct_implausible_mayor_150": 0.29,
+          "ruido_alta_frecuencia_rms_deg": 10.822,
+          "discrepancia_mediana_deg": 48.17,
+          "discrepancia_p95_deg": 65.68,
+          "discrepancia_max_deg": 78.97
+        },
+        "imagen_xy_isotropico": {
+          "n_valores": 4898,
+          "mediana_flexion_deg": 4.38,
+          "p95_flexion_deg": 17.53,
+          "max_flexion_deg": 53.63,
+          "pct_implausible_mayor_150": 0.0,
+          "ruido_alta_frecuencia_rms_deg": 2.261,
+          "discrepancia_mediana_deg": 28.2,
+          "discrepancia_p95_deg": 65.86,
+          "discrepancia_max_deg": 87.84
+        },
+        "imagen_xyz_normalizado": {
+          "n_valores": 4898,
+          "mediana_flexion_deg": 60.33,
+          "p95_flexion_deg": 110.77,
+          "max_flexion_deg": 137.43,
+          "pct_implausible_mayor_150": 0.0,
+          "ruido_alta_frecuencia_rms_deg": 8.049,
+          "discrepancia_mediana_deg": 26.75,
+          "discrepancia_p95_deg": 39.42,
+          "discrepancia_max_deg": 50.84
+        }
+      },
+      "referencia_visual": {},
+      "inferencia": {
+        "media_ms": 6.64,
+        "mediana_ms": 6.6,
+        "p95_ms": 6.85
+      }
+    },
+    {
+      "metadatos": {
+        "archivo": "Running.mp4",
+        "identificador": "Running",
+        "regimen": "marcha_carrera",
+        "ancho": 640,
+        "alto": 360,
+        "fps": 29.986,
+        "frames_contenedor": 1029,
+        "frames_procesados": 1029,
+        "recortado": false,
+        "duracion_procesada_s": 34.32,
+        "plano_camara": "posterior-oblicuo",
+        "plano_camara_detalle": "corriendo alejandose",
+        "cortes_de_plano": 0,
+        "frames_de_corte": []
+      },
+      "tasa_deteccion_pose_pct": 100.0,
+      "tasa_angulos_validos_pct": 100.0,
+      "tasa_angulos_validos_vis05_pct": 99.9,
+      "caida_por_umbral_pp": 0.1,
+      "visibilidad_min_mediana": 0.794,
+      "visibilidad_min_p05": 0.671,
+      "landmark_limitante_dominante": "left_knee",
+      "landmark_limitante_dominante_pct": 72.98,
+      "rom": {
+        "izquierda": {
+          "min_deg": 2.81,
+          "max_deg": 133.8,
+          "recorrido_deg": 130.99,
+          "mediana_deg": 46.35
+        },
+        "derecha": {
+          "min_deg": 10.07,
+          "max_deg": 159.27,
+          "recorrido_deg": 149.2,
+          "mediana_deg": 55.1
+        }
+      },
+      "jitter": {
+        "izquierda": {
+          "n_diferencias": 1028,
+          "jitter_std_diff_deg_frame": 29.488,
+          "jitter_std_diff_deg_s": 884.23,
+          "salto_mediano_abs_deg": 12.61,
+          "salto_p95_abs_deg": 73.132,
+          "ruido_alta_frecuencia_rms_deg": 18.267
+        },
+        "derecha": {
+          "n_diferencias": 1028,
+          "jitter_std_diff_deg_frame": 32.194,
+          "jitter_std_diff_deg_s": 965.36,
+          "salto_mediano_abs_deg": 13.384,
+          "salto_p95_abs_deg": 78.24,
+          "ruido_alta_frecuencia_rms_deg": 18.335
+        },
+        "izquierda_cuasi_estatico": {},
+        "derecha_cuasi_estatico": {}
+      },
+      "asimetria": {
+        "n_frames": 1029,
+        "mediana_deg": 57.91,
+        "p95_deg": 109.99,
+        "max_deg": 138.05
+      },
+      "cuasi_estatico": {
+        "n_frames": 0,
+        "porcentaje_del_video": 0.0,
+        "asimetria_mediana_deg": NaN,
+        "asimetria_p95_deg": NaN
+      },
+      "variantes": {
+        "produccion": {
+          "n_valores": 2058,
+          "mediana_flexion_deg": 51.45,
+          "p95_flexion_deg": 125.65,
+          "max_flexion_deg": 159.27,
+          "pct_implausible_mayor_150": 0.05,
+          "ruido_alta_frecuencia_rms_deg": 18.301,
+          "discrepancia_mediana_deg": 0.0,
+          "discrepancia_p95_deg": 0.0,
+          "discrepancia_max_deg": 0.0
+        },
+        "world_xyz": {
+          "n_valores": 2058,
+          "mediana_flexion_deg": 51.45,
+          "p95_flexion_deg": 125.65,
+          "max_flexion_deg": 159.27,
+          "pct_implausible_mayor_150": 0.05,
+          "ruido_alta_frecuencia_rms_deg": 18.301,
+          "discrepancia_mediana_deg": 0.0,
+          "discrepancia_p95_deg": 0.0,
+          "discrepancia_max_deg": 0.0
+        },
+        "imagen_xyz_isotropico": {
+          "n_valores": 2058,
+          "mediana_flexion_deg": 75.28,
+          "p95_flexion_deg": 135.81,
+          "max_flexion_deg": 165.3,
+          "pct_implausible_mayor_150": 0.68,
+          "ruido_alta_frecuencia_rms_deg": 14.688,
+          "discrepancia_mediana_deg": 27.76,
+          "discrepancia_p95_deg": 62.34,
+          "discrepancia_max_deg": 86.61
+        },
+        "imagen_xy_isotropico": {
+          "n_valores": 2058,
+          "mediana_flexion_deg": 46.4,
+          "p95_flexion_deg": 138.25,
+          "max_flexion_deg": 173.92,
+          "pct_implausible_mayor_150": 0.92,
+          "ruido_alta_frecuencia_rms_deg": 21.444,
+          "discrepancia_mediana_deg": 9.1,
+          "discrepancia_p95_deg": 27.43,
+          "discrepancia_max_deg": 74.65
+        },
+        "imagen_xyz_normalizado": {
+          "n_valores": 2058,
+          "mediana_flexion_deg": 62.68,
+          "p95_flexion_deg": 126.94,
+          "max_flexion_deg": 154.85,
+          "pct_implausible_mayor_150": 0.24,
+          "ruido_alta_frecuencia_rms_deg": 15.973,
+          "discrepancia_mediana_deg": 15.6,
+          "discrepancia_p95_deg": 35.04,
+          "discrepancia_max_deg": 55.97
+        }
+      },
+      "referencia_visual": {},
+      "inferencia": {
+        "media_ms": 6.94,
+        "mediana_ms": 6.7,
+        "p95_ms": 7.61
+      }
+    },
+    {
+      "metadatos": {
+        "archivo": "Running2.mp4",
+        "identificador": "Running2",
+        "regimen": "marcha_carrera",
+        "ancho": 640,
+        "alto": 360,
+        "fps": 29.975,
+        "frames_contenedor": 3295,
+        "frames_procesados": 3295,
+        "recortado": false,
+        "duracion_procesada_s": 109.92,
+        "plano_camara": "sagital",
+        "plano_camara_detalle": "lateral, con paneo",
+        "cortes_de_plano": 0,
+        "frames_de_corte": []
+      },
+      "tasa_deteccion_pose_pct": 99.7,
+      "tasa_angulos_validos_pct": 99.7,
+      "tasa_angulos_validos_vis05_pct": 99.7,
+      "caida_por_umbral_pp": 0.0,
+      "visibilidad_min_mediana": 0.832,
+      "visibilidad_min_p05": 0.757,
+      "landmark_limitante_dominante": "left_knee",
+      "landmark_limitante_dominante_pct": 92.79,
+      "rom": {
+        "izquierda": {
+          "min_deg": 0.57,
+          "max_deg": 147.3,
+          "recorrido_deg": 146.72,
+          "mediana_deg": 55.46
+        },
+        "derecha": {
+          "min_deg": 0.39,
+          "max_deg": 161.29,
+          "recorrido_deg": 160.91,
+          "mediana_deg": 52.45
+        }
+      },
+      "jitter": {
+        "izquierda": {
+          "n_diferencias": 3280,
+          "jitter_std_diff_deg_frame": 31.407,
+          "jitter_std_diff_deg_s": 941.41,
+          "salto_mediano_abs_deg": 14.822,
+          "salto_p95_abs_deg": 76.622,
+          "ruido_alta_frecuencia_rms_deg": 19.264
+        },
+        "derecha": {
+          "n_diferencias": 3280,
+          "jitter_std_diff_deg_frame": 32.495,
+          "jitter_std_diff_deg_s": 974.03,
+          "salto_mediano_abs_deg": 15.289,
+          "salto_p95_abs_deg": 81.345,
+          "ruido_alta_frecuencia_rms_deg": 19.702
+        },
+        "izquierda_cuasi_estatico": {},
+        "derecha_cuasi_estatico": {}
+      },
+      "asimetria": {
+        "n_frames": 3285,
+        "mediana_deg": 62.33,
+        "p95_deg": 113.84,
+        "max_deg": 144.92
+      },
+      "cuasi_estatico": {
+        "n_frames": 0,
+        "porcentaje_del_video": 0.0,
+        "asimetria_mediana_deg": NaN,
+        "asimetria_p95_deg": NaN
+      },
+      "variantes": {
+        "produccion": {
+          "n_valores": 6570,
+          "mediana_flexion_deg": 53.75,
+          "p95_flexion_deg": 124.47,
+          "max_flexion_deg": 161.29,
+          "pct_implausible_mayor_150": 0.17,
+          "ruido_alta_frecuencia_rms_deg": 19.483,
+          "discrepancia_mediana_deg": 0.0,
+          "discrepancia_p95_deg": 0.0,
+          "discrepancia_max_deg": 0.0
+        },
+        "world_xyz": {
+          "n_valores": 6570,
+          "mediana_flexion_deg": 53.75,
+          "p95_flexion_deg": 124.47,
+          "max_flexion_deg": 161.29,
+          "pct_implausible_mayor_150": 0.17,
+          "ruido_alta_frecuencia_rms_deg": 19.483,
+          "discrepancia_mediana_deg": 0.0,
+          "discrepancia_p95_deg": 0.0,
+          "discrepancia_max_deg": 0.0
+        },
+        "imagen_xyz_isotropico": {
+          "n_valores": 6570,
+          "mediana_flexion_deg": 65.46,
+          "p95_flexion_deg": 133.03,
+          "max_flexion_deg": 167.58,
+          "pct_implausible_mayor_150": 0.46,
+          "ruido_alta_frecuencia_rms_deg": 18.355,
+          "discrepancia_mediana_deg": 15.64,
+          "discrepancia_p95_deg": 46.48,
+          "discrepancia_max_deg": 84.3
+        },
+        "imagen_xy_isotropico": {
+          "n_valores": 6570,
+          "mediana_flexion_deg": 53.95,
+          "p95_flexion_deg": 132.5,
+          "max_flexion_deg": 179.93,
+          "pct_implausible_mayor_150": 0.47,
+          "ruido_alta_frecuencia_rms_deg": 20.127,
+          "discrepancia_mediana_deg": 8.83,
+          "discrepancia_p95_deg": 25.67,
+          "discrepancia_max_deg": 91.53
+        },
+        "imagen_xyz_normalizado": {
+          "n_valores": 6570,
+          "mediana_flexion_deg": 54.52,
+          "p95_flexion_deg": 130.34,
+          "max_flexion_deg": 171.3,
+          "pct_implausible_mayor_150": 0.23,
+          "ruido_alta_frecuencia_rms_deg": 19.745,
+          "discrepancia_mediana_deg": 10.46,
+          "discrepancia_p95_deg": 30.67,
+          "discrepancia_max_deg": 96.72
+        }
+      },
+      "referencia_visual": {},
+      "inferencia": {
+        "media_ms": 6.79,
+        "mediana_ms": 6.63,
+        "p95_ms": 7.55
+      }
+    },
+    {
+      "metadatos": {
+        "archivo": "SentadillaProfunda.mp4",
+        "identificador": "SentadillaProfunda",
+        "regimen": "bilateral_simetrico",
+        "ancho": 1920,
+        "alto": 1080,
+        "fps": 25.065,
+        "frames_contenedor": 183,
+        "frames_procesados": 183,
+        "recortado": false,
+        "duracion_procesada_s": 7.3,
+        "plano_camara": "frontal",
+        "plano_camara_detalle": "de frente; corte de plano hacia el final del clip",
+        "cortes_de_plano": 1,
+        "frames_de_corte": [
+          86
+        ]
+      },
+      "tasa_deteccion_pose_pct": 100.0,
+      "tasa_angulos_validos_pct": 100.0,
+      "tasa_angulos_validos_vis05_pct": 53.01,
+      "caida_por_umbral_pp": 46.99,
+      "visibilidad_min_mediana": 0.667,
+      "visibilidad_min_p05": 0.318,
+      "landmark_limitante_dominante": "left_knee",
+      "landmark_limitante_dominante_pct": 54.1,
+      "rom": {
+        "izquierda": {
+          "min_deg": 5.61,
+          "max_deg": 135.31,
+          "recorrido_deg": 129.7,
+          "mediana_deg": 88.86
+        },
+        "derecha": {
+          "min_deg": 2.99,
+          "max_deg": 133.83,
+          "recorrido_deg": 130.84,
+          "mediana_deg": 92.83
+        }
+      },
+      "jitter": {
+        "izquierda": {
+          "n_diferencias": 181,
+          "jitter_std_diff_deg_frame": 2.643,
+          "jitter_std_diff_deg_s": 66.25,
+          "salto_mediano_abs_deg": 1.148,
+          "salto_p95_abs_deg": 5.497,
+          "ruido_alta_frecuencia_rms_deg": 0.77
+        },
+        "derecha": {
+          "n_diferencias": 181,
+          "jitter_std_diff_deg_frame": 2.649,
+          "jitter_std_diff_deg_s": 66.41,
+          "salto_mediano_abs_deg": 1.086,
+          "salto_p95_abs_deg": 5.819,
+          "ruido_alta_frecuencia_rms_deg": 0.739
+        },
+        "izquierda_cuasi_estatico": {
+          "n_diferencias": 46,
+          "jitter_std_diff_deg_frame": 0.55,
+          "jitter_std_diff_deg_s": 13.79,
+          "salto_mediano_abs_deg": 0.257,
+          "salto_p95_abs_deg": 1.128,
+          "ruido_alta_frecuencia_rms_deg": 0.242
+        },
+        "derecha_cuasi_estatico": {
+          "n_diferencias": 46,
+          "jitter_std_diff_deg_frame": 0.417,
+          "jitter_std_diff_deg_s": 10.44,
+          "salto_mediano_abs_deg": 0.21,
+          "salto_p95_abs_deg": 0.94,
+          "ruido_alta_frecuencia_rms_deg": 0.253
+        }
+      },
+      "asimetria": {
+        "n_frames": 183,
+        "mediana_deg": 4.92,
+        "p95_deg": 13.38,
+        "max_deg": 15.12
+      },
+      "cuasi_estatico": {
+        "n_frames": 53,
+        "porcentaje_del_video": 28.96,
+        "asimetria_mediana_deg": 3.67,
+        "asimetria_p95_deg": 14.48
+      },
+      "variantes": {
+        "produccion": {
+          "n_valores": 366,
+          "mediana_flexion_deg": 90.4,
+          "p95_flexion_deg": 132.04,
+          "max_flexion_deg": 135.31,
+          "pct_implausible_mayor_150": 0.0,
+          "ruido_alta_frecuencia_rms_deg": 0.754,
+          "discrepancia_mediana_deg": 0.0,
+          "discrepancia_p95_deg": 0.0,
+          "discrepancia_max_deg": 0.0
+        },
+        "world_xyz": {
+          "n_valores": 366,
+          "mediana_flexion_deg": 90.4,
+          "p95_flexion_deg": 132.04,
+          "max_flexion_deg": 135.31,
+          "pct_implausible_mayor_150": 0.0,
+          "ruido_alta_frecuencia_rms_deg": 0.754,
+          "discrepancia_mediana_deg": 0.0,
+          "discrepancia_p95_deg": 0.0,
+          "discrepancia_max_deg": 0.0
+        },
+        "imagen_xyz_isotropico": {
+          "n_valores": 366,
+          "mediana_flexion_deg": 108.11,
+          "p95_flexion_deg": 141.46,
+          "max_flexion_deg": 148.54,
+          "pct_implausible_mayor_150": 0.0,
+          "ruido_alta_frecuencia_rms_deg": 1.403,
+          "discrepancia_mediana_deg": 13.86,
+          "discrepancia_p95_deg": 55.31,
+          "discrepancia_max_deg": 76.24
+        },
+        "imagen_xy_isotropico": {
+          "n_valores": 366,
+          "mediana_flexion_deg": 88.27,
+          "p95_flexion_deg": 139.26,
+          "max_flexion_deg": 144.63,
+          "pct_implausible_mayor_150": 0.0,
+          "ruido_alta_frecuencia_rms_deg": 0.442,
+          "discrepancia_mediana_deg": 10.18,
+          "discrepancia_p95_deg": 19.65,
+          "discrepancia_max_deg": 27.16
+        },
+        "imagen_xyz_normalizado": {
+          "n_valores": 366,
+          "mediana_flexion_deg": 96.88,
+          "p95_flexion_deg": 137.44,
+          "max_flexion_deg": 144.37,
+          "pct_implausible_mayor_150": 0.0,
+          "ruido_alta_frecuencia_rms_deg": 1.098,
+          "discrepancia_mediana_deg": 8.84,
+          "discrepancia_p95_deg": 32.32,
+          "discrepancia_max_deg": 46.63
+        }
+      },
+      "referencia_visual": {
+        "frame_index": 70,
+        "descripcion": "el sujeto esta de pie, completamente erguido, con los pies separados (toma frontal)",
+        "lecturas": {
+          "produccion": {
+            "izquierda_deg": 17.25,
+            "derecha_deg": 13.84
+          },
+          "world_xyz": {
+            "izquierda_deg": 17.25,
+            "derecha_deg": 13.84
+          },
+          "imagen_xyz_isotropico": {
+            "izquierda_deg": 59.1,
+            "derecha_deg": 54.98
+          },
+          "imagen_xy_isotropico": {
+            "izquierda_deg": 0.98,
+            "derecha_deg": 0.99
+          },
+          "imagen_xyz_normalizado": {
+            "izquierda_deg": 37.49,
+            "derecha_deg": 35.19
+          }
+        }
+      },
+      "inferencia": {
+        "media_ms": 8.0,
+        "mediana_ms": 7.6,
+        "p95_ms": 8.46
+      }
+    }
+  ]
+}

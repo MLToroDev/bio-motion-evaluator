@@ -1,0 +1,584 @@
+===== pesado_fps8_preview =====
+# Perfil /ws/pose-stream
+- URL: ws://127.0.0.1:8077/ws/pose-stream
+- Vídeo: SentadillaProfunda.mp4 | target_fps=8.0 | preview=True | capture_only=True
+- Frames recibidos (válidos): 183
+- Warmup descartado: primeros 5 frames
+- Frames en agregados: 178
+- Intervalo entre mensajes (cliente, ms): n=179 mean=127.71 p50=121.49 p95=137.57 p99=138.51 max=138.80 >100ms=179
+
+## consumer_timing_ms (servidor)
+| métrica | n | mean | p50 | p95 | p99 | max | >100ms |
+|---------|---|------|-----|-----|-----|-----|------|
+| frame_budget_ms | 178 | 125.00 | 125.00 | 125.00 | 125.00 | 125.00 | 178 |
+| jpeg_encode_ms | 178 | 0.58 | 0.55 | 0.77 | 0.88 | 1.15 | 0 |
+| max_throughput | 178 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+| process_bgr_ms | 178 | 4.62 | 4.34 | 9.60 | 10.68 | 11.47 | 0 |
+| queue_wait_ms | 178 | 0.00 | 0.00 | 0.01 | 0.01 | 0.01 | 0 |
+| residual_before_send_ms | 178 | 3.18 | 3.13 | 3.27 | 3.91 | 6.18 | 0 |
+| scheduled_sleep_ms | 178 | 116.63 | 115.30 | 121.28 | 121.31 | 121.34 | 178 |
+| wall_before_send_ms | 178 | 8.37 | 9.70 | 13.34 | 14.56 | 15.39 | 0 |
+
+## pipeline_ms (motor)
+| métrica | n | mean | p50 | p95 | p99 | max | >100ms |
+|---------|---|------|-----|-----|-----|-----|------|
+| classify | 178 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+| extract | 178 | 4.50 | 4.14 | 9.46 | 10.55 | 11.33 | 0 |
+| feature | 178 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+| total | 178 | 4.50 | 4.15 | 9.47 | 10.55 | 11.34 | 0 |
+| track | 178 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+
+Interpretación rápida:
+- ``p99`` resume la cola sin depender de un único ``max``; la columna ``>umbral`` cuenta outliers (``--outlier-ms``).
+- ``--warmup-frames`` evita mezclar arranque/GC con el régimen estable.
+- ``process_bgr_ms`` ≈ costo total del hilo del motor (MediaPipe + análisis si aplica).
+- ``pipeline_ms.extract`` desglosa la etapa de extracción dentro del motor.
+- ``jpeg_encode_ms`` sube con preview ON y calidad/resolución.
+- ``scheduled_sleep_ms`` es el throttle a ``target_fps``; si suele ~0, el cuello es CPU.
+
+
+===== pesado_fps10_preview =====
+# Perfil /ws/pose-stream
+- URL: ws://127.0.0.1:8077/ws/pose-stream
+- Vídeo: SentadillaProfunda.mp4 | target_fps=10.0 | preview=True | capture_only=True
+- Frames recibidos (válidos): 183
+- Warmup descartado: primeros 5 frames
+- Frames en agregados: 178
+- Intervalo entre mensajes (cliente, ms): n=179 mean=103.35 p50=96.86 p95=126.94 p99=129.96 max=131.28 >100ms=89
+
+## consumer_timing_ms (servidor)
+| métrica | n | mean | p50 | p95 | p99 | max | >100ms |
+|---------|---|------|-----|-----|-----|-----|------|
+| frame_budget_ms | 178 | 100.00 | 100.00 | 100.00 | 100.00 | 100.00 | 0 |
+| jpeg_encode_ms | 178 | 0.84 | 0.85 | 1.18 | 1.71 | 1.78 | 0 |
+| max_throughput | 178 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+| process_bgr_ms | 178 | 7.20 | 4.23 | 21.05 | 21.79 | 22.79 | 0 |
+| queue_wait_ms | 178 | 0.01 | 0.01 | 0.01 | 0.02 | 0.02 | 0 |
+| residual_before_send_ms | 178 | 4.19 | 3.47 | 7.31 | 8.67 | 9.32 | 0 |
+| scheduled_sleep_ms | 178 | 87.77 | 89.45 | 96.28 | 96.32 | 96.33 | 0 |
+| wall_before_send_ms | 178 | 12.23 | 10.55 | 28.02 | 30.78 | 32.09 | 0 |
+
+## pipeline_ms (motor)
+| métrica | n | mean | p50 | p95 | p99 | max | >100ms |
+|---------|---|------|-----|-----|-----|-----|------|
+| classify | 178 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+| extract | 178 | 7.02 | 3.99 | 20.84 | 21.50 | 22.56 | 0 |
+| feature | 178 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+| total | 178 | 7.02 | 4.00 | 20.84 | 21.50 | 22.56 | 0 |
+| track | 178 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+
+Interpretación rápida:
+- ``p99`` resume la cola sin depender de un único ``max``; la columna ``>umbral`` cuenta outliers (``--outlier-ms``).
+- ``--warmup-frames`` evita mezclar arranque/GC con el régimen estable.
+- ``process_bgr_ms`` ≈ costo total del hilo del motor (MediaPipe + análisis si aplica).
+- ``pipeline_ms.extract`` desglosa la etapa de extracción dentro del motor.
+- ``jpeg_encode_ms`` sube con preview ON y calidad/resolución.
+- ``scheduled_sleep_ms`` es el throttle a ``target_fps``; si suele ~0, el cuello es CPU.
+
+
+===== pesado_fps12_preview =====
+# Perfil /ws/pose-stream
+- URL: ws://127.0.0.1:8077/ws/pose-stream
+- Vídeo: SentadillaProfunda.mp4 | target_fps=12.0 | preview=True | capture_only=True
+- Frames recibidos (válidos): 183
+- Warmup descartado: primeros 5 frames
+- Frames en agregados: 178
+- Intervalo entre mensajes (cliente, ms): n=179 mean=87.18 p50=78.99 p95=111.76 p99=113.00 max=115.20 >100ms=75
+
+## consumer_timing_ms (servidor)
+| métrica | n | mean | p50 | p95 | p99 | max | >100ms |
+|---------|---|------|-----|-----|-----|-----|------|
+| frame_budget_ms | 178 | 83.33 | 83.33 | 83.33 | 83.33 | 83.33 | 0 |
+| jpeg_encode_ms | 178 | 1.03 | 1.04 | 1.38 | 1.73 | 1.86 | 0 |
+| max_throughput | 178 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+| process_bgr_ms | 178 | 9.30 | 4.25 | 21.40 | 21.94 | 22.39 | 0 |
+| queue_wait_ms | 178 | 0.01 | 0.01 | 0.01 | 0.01 | 0.02 | 0 |
+| residual_before_send_ms | 178 | 4.83 | 4.34 | 7.32 | 8.33 | 9.21 | 0 |
+| scheduled_sleep_ms | 178 | 68.16 | 72.17 | 78.91 | 79.62 | 79.64 | 0 |
+| wall_before_send_ms | 178 | 15.17 | 11.16 | 28.84 | 29.73 | 31.94 | 0 |
+
+## pipeline_ms (motor)
+| métrica | n | mean | p50 | p95 | p99 | max | >100ms |
+|---------|---|------|-----|-----|-----|-----|------|
+| classify | 178 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+| extract | 178 | 9.10 | 3.97 | 21.16 | 21.68 | 22.14 | 0 |
+| feature | 178 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+| total | 178 | 9.11 | 3.98 | 21.16 | 21.69 | 22.14 | 0 |
+| track | 178 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+
+Interpretación rápida:
+- ``p99`` resume la cola sin depender de un único ``max``; la columna ``>umbral`` cuenta outliers (``--outlier-ms``).
+- ``--warmup-frames`` evita mezclar arranque/GC con el régimen estable.
+- ``process_bgr_ms`` ≈ costo total del hilo del motor (MediaPipe + análisis si aplica).
+- ``pipeline_ms.extract`` desglosa la etapa de extracción dentro del motor.
+- ``jpeg_encode_ms`` sube con preview ON y calidad/resolución.
+- ``scheduled_sleep_ms`` es el throttle a ``target_fps``; si suele ~0, el cuello es CPU.
+
+
+===== pesado_fps15_preview =====
+# Perfil /ws/pose-stream
+- URL: ws://127.0.0.1:8077/ws/pose-stream
+- Vídeo: SentadillaProfunda.mp4 | target_fps=15.0 | preview=True | capture_only=True
+- Frames recibidos (válidos): 183
+- Warmup descartado: primeros 5 frames
+- Frames en agregados: 178
+- Intervalo entre mensajes (cliente, ms): n=179 mean=69.43 p50=60.63 p95=87.15 p99=89.61 max=97.21 >100ms=0
+
+## consumer_timing_ms (servidor)
+| métrica | n | mean | p50 | p95 | p99 | max | >100ms |
+|---------|---|------|-----|-----|-----|-----|------|
+| frame_budget_ms | 178 | 66.67 | 66.67 | 66.67 | 66.67 | 66.67 | 0 |
+| jpeg_encode_ms | 178 | 0.39 | 0.25 | 0.90 | 1.01 | 1.07 | 0 |
+| max_throughput | 178 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+| process_bgr_ms | 178 | 7.38 | 4.15 | 17.10 | 18.99 | 21.49 | 0 |
+| queue_wait_ms | 178 | 0.01 | 0.01 | 0.01 | 0.01 | 0.03 | 0 |
+| residual_before_send_ms | 178 | 5.57 | 6.05 | 7.32 | 7.89 | 8.09 | 0 |
+| scheduled_sleep_ms | 178 | 53.32 | 56.75 | 61.68 | 63.40 | 63.47 | 0 |
+| wall_before_send_ms | 178 | 13.35 | 9.92 | 22.84 | 24.95 | 30.66 | 0 |
+
+## pipeline_ms (motor)
+| métrica | n | mean | p50 | p95 | p99 | max | >100ms |
+|---------|---|------|-----|-----|-----|-----|------|
+| classify | 178 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+| extract | 178 | 7.25 | 4.00 | 16.89 | 18.79 | 21.20 | 0 |
+| feature | 178 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+| total | 178 | 7.25 | 4.00 | 16.89 | 18.80 | 21.20 | 0 |
+| track | 178 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+
+Interpretación rápida:
+- ``p99`` resume la cola sin depender de un único ``max``; la columna ``>umbral`` cuenta outliers (``--outlier-ms``).
+- ``--warmup-frames`` evita mezclar arranque/GC con el régimen estable.
+- ``process_bgr_ms`` ≈ costo total del hilo del motor (MediaPipe + análisis si aplica).
+- ``pipeline_ms.extract`` desglosa la etapa de extracción dentro del motor.
+- ``jpeg_encode_ms`` sube con preview ON y calidad/resolución.
+- ``scheduled_sleep_ms`` es el throttle a ``target_fps``; si suele ~0, el cuello es CPU.
+
+
+===== pesado_fps10_sinpreview =====
+# Perfil /ws/pose-stream
+- URL: ws://127.0.0.1:8077/ws/pose-stream
+- Vídeo: SentadillaProfunda.mp4 | target_fps=10.0 | preview=False | capture_only=True
+- Frames recibidos (válidos): 183
+- Warmup descartado: primeros 5 frames
+- Frames en agregados: 178
+- Intervalo entre mensajes (cliente, ms): n=179 mean=102.34 p50=95.82 p95=126.73 p99=127.63 max=129.89 >100ms=89
+
+## consumer_timing_ms (servidor)
+| métrica | n | mean | p50 | p95 | p99 | max | >100ms |
+|---------|---|------|-----|-----|-----|-----|------|
+| frame_budget_ms | 178 | 100.00 | 100.00 | 100.00 | 100.00 | 100.00 | 0 |
+| jpeg_encode_ms | 178 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+| max_throughput | 178 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+| process_bgr_ms | 178 | 9.27 | 4.25 | 21.55 | 21.90 | 23.19 | 0 |
+| queue_wait_ms | 178 | 0.01 | 0.01 | 0.01 | 0.02 | 0.02 | 0 |
+| residual_before_send_ms | 178 | 5.05 | 4.48 | 7.56 | 8.72 | 9.14 | 0 |
+| scheduled_sleep_ms | 178 | 85.67 | 90.61 | 96.60 | 96.79 | 96.82 | 0 |
+| wall_before_send_ms | 178 | 14.33 | 9.39 | 28.56 | 29.25 | 31.20 | 0 |
+
+## pipeline_ms (motor)
+| métrica | n | mean | p50 | p95 | p99 | max | >100ms |
+|---------|---|------|-----|-----|-----|-----|------|
+| classify | 178 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+| extract | 178 | 9.04 | 4.00 | 21.29 | 21.64 | 22.87 | 0 |
+| feature | 178 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+| total | 178 | 9.05 | 4.01 | 21.29 | 21.65 | 22.88 | 0 |
+| track | 178 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+
+Interpretación rápida:
+- ``p99`` resume la cola sin depender de un único ``max``; la columna ``>umbral`` cuenta outliers (``--outlier-ms``).
+- ``--warmup-frames`` evita mezclar arranque/GC con el régimen estable.
+- ``process_bgr_ms`` ≈ costo total del hilo del motor (MediaPipe + análisis si aplica).
+- ``pipeline_ms.extract`` desglosa la etapa de extracción dentro del motor.
+- ``jpeg_encode_ms`` sube con preview ON y calidad/resolución.
+- ``scheduled_sleep_ms`` es el throttle a ``target_fps``; si suele ~0, el cuello es CPU.
+
+
+===== pesado_fps15_sinpreview =====
+# Perfil /ws/pose-stream
+- URL: ws://127.0.0.1:8077/ws/pose-stream
+- Vídeo: SentadillaProfunda.mp4 | target_fps=15.0 | preview=False | capture_only=True
+- Frames recibidos (válidos): 183
+- Warmup descartado: primeros 5 frames
+- Frames en agregados: 178
+- Intervalo entre mensajes (cliente, ms): n=179 mean=68.79 p50=60.18 p95=92.25 p99=95.15 max=96.29 >100ms=0
+
+## consumer_timing_ms (servidor)
+| métrica | n | mean | p50 | p95 | p99 | max | >100ms |
+|---------|---|------|-----|-----|-----|-----|------|
+| frame_budget_ms | 178 | 66.67 | 66.67 | 66.67 | 66.67 | 66.67 | 0 |
+| jpeg_encode_ms | 178 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+| max_throughput | 178 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+| process_bgr_ms | 178 | 8.62 | 5.53 | 21.17 | 24.54 | 25.02 | 0 |
+| queue_wait_ms | 178 | 0.01 | 0.01 | 0.02 | 0.02 | 0.02 | 0 |
+| residual_before_send_ms | 178 | 4.95 | 4.48 | 7.23 | 7.58 | 8.07 | 0 |
+| scheduled_sleep_ms | 178 | 53.09 | 55.39 | 62.99 | 63.19 | 63.22 | 0 |
+| wall_before_send_ms | 178 | 13.58 | 11.28 | 27.53 | 31.23 | 31.70 | 0 |
+
+## pipeline_ms (motor)
+| métrica | n | mean | p50 | p95 | p99 | max | >100ms |
+|---------|---|------|-----|-----|-----|-----|------|
+| classify | 178 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+| extract | 178 | 8.43 | 5.32 | 20.94 | 24.32 | 24.80 | 0 |
+| feature | 178 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+| total | 178 | 8.43 | 5.33 | 20.94 | 24.32 | 24.80 | 0 |
+| track | 178 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+
+Interpretación rápida:
+- ``p99`` resume la cola sin depender de un único ``max``; la columna ``>umbral`` cuenta outliers (``--outlier-ms``).
+- ``--warmup-frames`` evita mezclar arranque/GC con el régimen estable.
+- ``process_bgr_ms`` ≈ costo total del hilo del motor (MediaPipe + análisis si aplica).
+- ``pipeline_ms.extract`` desglosa la etapa de extracción dentro del motor.
+- ``jpeg_encode_ms`` sube con preview ON y calidad/resolución.
+- ``scheduled_sleep_ms`` es el throttle a ``target_fps``; si suele ~0, el cuello es CPU.
+
+
+===== pesado_fps10_q76 =====
+# Perfil /ws/pose-stream
+- URL: ws://127.0.0.1:8077/ws/pose-stream
+- Vídeo: SentadillaProfunda.mp4 | target_fps=10.0 | preview=True | capture_only=True
+- Frames recibidos (válidos): 183
+- Warmup descartado: primeros 5 frames
+- Frames en agregados: 178
+- Intervalo entre mensajes (cliente, ms): n=179 mean=103.61 p50=95.20 p95=127.82 p99=129.86 max=130.81 >100ms=89
+
+## consumer_timing_ms (servidor)
+| métrica | n | mean | p50 | p95 | p99 | max | >100ms |
+|---------|---|------|-----|-----|-----|-----|------|
+| frame_budget_ms | 178 | 100.00 | 100.00 | 100.00 | 100.00 | 100.00 | 0 |
+| jpeg_encode_ms | 178 | 1.09 | 1.05 | 1.67 | 2.10 | 4.04 | 0 |
+| max_throughput | 178 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+| process_bgr_ms | 178 | 10.10 | 5.02 | 22.06 | 24.12 | 25.07 | 0 |
+| queue_wait_ms | 178 | 0.01 | 0.01 | 0.01 | 0.02 | 0.02 | 0 |
+| residual_before_send_ms | 178 | 4.77 | 4.22 | 7.36 | 8.88 | 9.00 | 0 |
+| scheduled_sleep_ms | 178 | 84.02 | 87.93 | 95.35 | 95.56 | 95.68 | 0 |
+| wall_before_send_ms | 178 | 15.98 | 12.07 | 29.03 | 30.70 | 33.31 | 0 |
+
+## pipeline_ms (motor)
+| métrica | n | mean | p50 | p95 | p99 | max | >100ms |
+|---------|---|------|-----|-----|-----|-----|------|
+| classify | 178 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+| extract | 178 | 9.85 | 4.76 | 21.78 | 23.83 | 24.81 | 0 |
+| feature | 178 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+| total | 178 | 9.85 | 4.77 | 21.78 | 23.83 | 24.81 | 0 |
+| track | 178 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+
+Interpretación rápida:
+- ``p99`` resume la cola sin depender de un único ``max``; la columna ``>umbral`` cuenta outliers (``--outlier-ms``).
+- ``--warmup-frames`` evita mezclar arranque/GC con el régimen estable.
+- ``process_bgr_ms`` ≈ costo total del hilo del motor (MediaPipe + análisis si aplica).
+- ``pipeline_ms.extract`` desglosa la etapa de extracción dentro del motor.
+- ``jpeg_encode_ms`` sube con preview ON y calidad/resolución.
+- ``scheduled_sleep_ms`` es el throttle a ``target_fps``; si suele ~0, el cuello es CPU.
+
+
+===== pesado_fps10_q90 =====
+# Perfil /ws/pose-stream
+- URL: ws://127.0.0.1:8077/ws/pose-stream
+- Vídeo: SentadillaProfunda.mp4 | target_fps=10.0 | preview=True | capture_only=True
+- Frames recibidos (válidos): 183
+- Warmup descartado: primeros 5 frames
+- Frames en agregados: 178
+- Intervalo entre mensajes (cliente, ms): n=179 mean=103.98 p50=97.02 p95=127.95 p99=129.56 max=134.41 >100ms=89
+
+## consumer_timing_ms (servidor)
+| métrica | n | mean | p50 | p95 | p99 | max | >100ms |
+|---------|---|------|-----|-----|-----|-----|------|
+| frame_budget_ms | 178 | 100.00 | 100.00 | 100.00 | 100.00 | 100.00 | 0 |
+| jpeg_encode_ms | 178 | 1.11 | 1.08 | 1.79 | 2.16 | 2.19 | 0 |
+| max_throughput | 178 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+| process_bgr_ms | 178 | 9.69 | 4.29 | 22.40 | 24.26 | 31.50 | 0 |
+| queue_wait_ms | 178 | 0.01 | 0.01 | 0.01 | 0.01 | 0.02 | 0 |
+| residual_before_send_ms | 178 | 4.04 | 3.33 | 7.10 | 8.07 | 8.46 | 0 |
+| scheduled_sleep_ms | 178 | 85.15 | 89.56 | 95.65 | 96.25 | 96.28 | 0 |
+| wall_before_send_ms | 178 | 14.85 | 10.44 | 28.67 | 30.32 | 35.53 | 0 |
+
+## pipeline_ms (motor)
+| métrica | n | mean | p50 | p95 | p99 | max | >100ms |
+|---------|---|------|-----|-----|-----|-----|------|
+| classify | 178 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+| extract | 178 | 9.48 | 4.07 | 22.15 | 24.04 | 31.28 | 0 |
+| feature | 178 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+| total | 178 | 9.48 | 4.08 | 22.15 | 24.05 | 31.28 | 0 |
+| track | 178 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+
+Interpretación rápida:
+- ``p99`` resume la cola sin depender de un único ``max``; la columna ``>umbral`` cuenta outliers (``--outlier-ms``).
+- ``--warmup-frames`` evita mezclar arranque/GC con el régimen estable.
+- ``process_bgr_ms`` ≈ costo total del hilo del motor (MediaPipe + análisis si aplica).
+- ``pipeline_ms.extract`` desglosa la etapa de extracción dentro del motor.
+- ``jpeg_encode_ms`` sube con preview ON y calidad/resolución.
+- ``scheduled_sleep_ms`` es el throttle a ``target_fps``; si suele ~0, el cuello es CPU.
+
+
+===== pesado_fps12_pf8 =====
+# Perfil /ws/pose-stream
+- URL: ws://127.0.0.1:8077/ws/pose-stream
+- Vídeo: SentadillaProfunda.mp4 | target_fps=12.0 | preview=True | capture_only=True
+- Frames recibidos (válidos): 183
+- Warmup descartado: primeros 5 frames
+- Frames en agregados: 178
+- Intervalo entre mensajes (cliente, ms): n=179 mean=86.29 p50=77.21 p95=110.58 p99=113.53 max=120.43 >100ms=80
+
+## consumer_timing_ms (servidor)
+| métrica | n | mean | p50 | p95 | p99 | max | >100ms |
+|---------|---|------|-----|-----|-----|-----|------|
+| frame_budget_ms | 178 | 83.33 | 83.33 | 83.33 | 83.33 | 83.33 | 0 |
+| jpeg_encode_ms | 178 | 0.46 | 0.24 | 1.06 | 1.25 | 1.34 | 0 |
+| max_throughput | 178 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+| process_bgr_ms | 178 | 9.08 | 4.10 | 21.39 | 23.40 | 23.88 | 0 |
+| queue_wait_ms | 178 | 0.01 | 0.01 | 0.01 | 0.01 | 0.02 | 0 |
+| residual_before_send_ms | 178 | 4.54 | 3.47 | 7.26 | 7.67 | 15.79 | 0 |
+| scheduled_sleep_ms | 178 | 69.25 | 73.84 | 79.95 | 80.04 | 80.12 | 0 |
+| wall_before_send_ms | 178 | 14.08 | 9.50 | 27.25 | 29.31 | 32.23 | 0 |
+
+## pipeline_ms (motor)
+| métrica | n | mean | p50 | p95 | p99 | max | >100ms |
+|---------|---|------|-----|-----|-----|-----|------|
+| classify | 178 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+| extract | 178 | 8.88 | 3.88 | 21.19 | 23.15 | 23.52 | 0 |
+| feature | 178 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+| total | 178 | 8.88 | 3.89 | 21.19 | 23.16 | 23.52 | 0 |
+| track | 178 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+
+Interpretación rápida:
+- ``p99`` resume la cola sin depender de un único ``max``; la columna ``>umbral`` cuenta outliers (``--outlier-ms``).
+- ``--warmup-frames`` evita mezclar arranque/GC con el régimen estable.
+- ``process_bgr_ms`` ≈ costo total del hilo del motor (MediaPipe + análisis si aplica).
+- ``pipeline_ms.extract`` desglosa la etapa de extracción dentro del motor.
+- ``jpeg_encode_ms`` sube con preview ON y calidad/resolución.
+- ``scheduled_sleep_ms`` es el throttle a ``target_fps``; si suele ~0, el cuello es CPU.
+
+
+===== pesado_fps12_pf12 =====
+# Perfil /ws/pose-stream
+- URL: ws://127.0.0.1:8077/ws/pose-stream
+- Vídeo: SentadillaProfunda.mp4 | target_fps=12.0 | preview=True | capture_only=True
+- Frames recibidos (válidos): 183
+- Warmup descartado: primeros 5 frames
+- Frames en agregados: 178
+- Intervalo entre mensajes (cliente, ms): n=179 mean=87.06 p50=80.64 p95=109.60 p99=111.07 max=112.60 >100ms=72
+
+## consumer_timing_ms (servidor)
+| métrica | n | mean | p50 | p95 | p99 | max | >100ms |
+|---------|---|------|-----|-----|-----|-----|------|
+| frame_budget_ms | 178 | 83.33 | 83.33 | 83.33 | 83.33 | 83.33 | 0 |
+| jpeg_encode_ms | 178 | 1.01 | 1.01 | 1.43 | 1.93 | 2.27 | 0 |
+| max_throughput | 178 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+| process_bgr_ms | 178 | 8.90 | 4.22 | 22.12 | 23.27 | 24.54 | 0 |
+| queue_wait_ms | 178 | 0.01 | 0.01 | 0.01 | 0.01 | 0.04 | 0 |
+| residual_before_send_ms | 178 | 4.37 | 3.43 | 7.12 | 7.37 | 8.98 | 0 |
+| scheduled_sleep_ms | 178 | 69.06 | 73.05 | 79.04 | 79.53 | 79.61 | 0 |
+| wall_before_send_ms | 178 | 14.28 | 10.28 | 27.09 | 28.28 | 29.16 | 0 |
+
+## pipeline_ms (motor)
+| métrica | n | mean | p50 | p95 | p99 | max | >100ms |
+|---------|---|------|-----|-----|-----|-----|------|
+| classify | 178 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+| extract | 178 | 8.70 | 3.95 | 21.91 | 23.03 | 24.24 | 0 |
+| feature | 178 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+| total | 178 | 8.70 | 3.96 | 21.91 | 23.03 | 24.24 | 0 |
+| track | 178 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+
+Interpretación rápida:
+- ``p99`` resume la cola sin depender de un único ``max``; la columna ``>umbral`` cuenta outliers (``--outlier-ms``).
+- ``--warmup-frames`` evita mezclar arranque/GC con el régimen estable.
+- ``process_bgr_ms`` ≈ costo total del hilo del motor (MediaPipe + análisis si aplica).
+- ``pipeline_ms.extract`` desglosa la etapa de extracción dentro del motor.
+- ``jpeg_encode_ms`` sube con preview ON y calidad/resolución.
+- ``scheduled_sleep_ms`` es el throttle a ``target_fps``; si suele ~0, el cuello es CPU.
+
+
+===== pesado_fps10_analisis_completo =====
+# Perfil /ws/pose-stream
+- URL: ws://127.0.0.1:8077/ws/pose-stream
+- Vídeo: SentadillaProfunda.mp4 | target_fps=10.0 | preview=True | capture_only=False
+- Frames recibidos (válidos): 183
+- Warmup descartado: primeros 5 frames
+- Frames en agregados: 178
+- Intervalo entre mensajes (cliente, ms): n=179 mean=103.63 p50=95.31 p95=127.34 p99=129.23 max=130.15 >100ms=89
+
+## consumer_timing_ms (servidor)
+| métrica | n | mean | p50 | p95 | p99 | max | >100ms |
+|---------|---|------|-----|-----|-----|-----|------|
+| frame_budget_ms | 178 | 100.00 | 100.00 | 100.00 | 100.00 | 100.00 | 0 |
+| jpeg_encode_ms | 178 | 1.17 | 1.10 | 1.83 | 3.22 | 3.38 | 0 |
+| max_throughput | 178 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+| process_bgr_ms | 178 | 10.48 | 5.16 | 24.74 | 26.44 | 27.24 | 0 |
+| queue_wait_ms | 178 | 0.01 | 0.01 | 0.01 | 0.02 | 0.03 | 0 |
+| residual_before_send_ms | 178 | 4.47 | 3.69 | 7.06 | 7.77 | 9.98 | 0 |
+| scheduled_sleep_ms | 178 | 83.87 | 87.68 | 94.99 | 95.84 | 95.96 | 0 |
+| wall_before_send_ms | 178 | 16.13 | 12.32 | 29.81 | 31.60 | 33.18 | 0 |
+
+## pipeline_ms (motor)
+| métrica | n | mean | p50 | p95 | p99 | max | >100ms |
+|---------|---|------|-----|-----|-----|-----|------|
+| classify | 178 | 0.02 | 0.02 | 0.03 | 0.04 | 0.23 | 0 |
+| extract | 178 | 9.80 | 4.17 | 24.05 | 25.73 | 26.29 | 0 |
+| feature | 178 | 0.35 | 0.33 | 0.56 | 0.61 | 0.69 | 0 |
+| total | 178 | 10.24 | 4.74 | 24.49 | 26.16 | 26.83 | 0 |
+| track | 178 | 0.06 | 0.07 | 0.09 | 0.09 | 0.12 | 0 |
+
+Interpretación rápida:
+- ``p99`` resume la cola sin depender de un único ``max``; la columna ``>umbral`` cuenta outliers (``--outlier-ms``).
+- ``--warmup-frames`` evita mezclar arranque/GC con el régimen estable.
+- ``process_bgr_ms`` ≈ costo total del hilo del motor (MediaPipe + análisis si aplica).
+- ``pipeline_ms.extract`` desglosa la etapa de extracción dentro del motor.
+- ``jpeg_encode_ms`` sube con preview ON y calidad/resolución.
+- ``scheduled_sleep_ms`` es el throttle a ``target_fps``; si suele ~0, el cuello es CPU.
+
+
+===== ligero_fps10_preview =====
+# Perfil /ws/pose-stream
+- URL: ws://127.0.0.1:8077/ws/pose-stream
+- Vídeo: Running.mp4 | target_fps=10.0 | preview=True | capture_only=True
+- Frames recibidos (válidos): 150
+- Warmup descartado: primeros 5 frames
+- Frames en agregados: 145
+- Intervalo entre mensajes (cliente, ms): n=145 mean=104.12 p50=104.57 p95=108.38 p99=111.98 max=112.82 >100ms=132
+
+## consumer_timing_ms (servidor)
+| métrica | n | mean | p50 | p95 | p99 | max | >100ms |
+|---------|---|------|-----|-----|-----|-----|------|
+| frame_budget_ms | 145 | 100.00 | 100.00 | 100.00 | 100.00 | 100.00 | 0 |
+| jpeg_encode_ms | 145 | 0.87 | 0.88 | 1.00 | 1.06 | 1.10 | 0 |
+| max_throughput | 145 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+| process_bgr_ms | 145 | 17.96 | 17.80 | 22.46 | 24.46 | 24.82 | 0 |
+| queue_wait_ms | 145 | 0.01 | 0.01 | 0.01 | 0.01 | 0.01 | 0 |
+| residual_before_send_ms | 145 | 0.08 | 0.08 | 0.11 | 0.11 | 0.16 | 0 |
+| scheduled_sleep_ms | 145 | 81.08 | 81.26 | 85.42 | 88.07 | 89.44 | 0 |
+| wall_before_send_ms | 145 | 18.92 | 18.74 | 23.51 | 25.51 | 25.98 | 0 |
+
+## pipeline_ms (motor)
+| métrica | n | mean | p50 | p95 | p99 | max | >100ms |
+|---------|---|------|-----|-----|-----|-----|------|
+| classify | 145 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+| extract | 145 | 17.74 | 17.61 | 22.22 | 24.24 | 24.59 | 0 |
+| feature | 145 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+| total | 145 | 17.74 | 17.61 | 22.22 | 24.24 | 24.59 | 0 |
+| track | 145 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+
+Interpretación rápida:
+- ``p99`` resume la cola sin depender de un único ``max``; la columna ``>umbral`` cuenta outliers (``--outlier-ms``).
+- ``--warmup-frames`` evita mezclar arranque/GC con el régimen estable.
+- ``process_bgr_ms`` ≈ costo total del hilo del motor (MediaPipe + análisis si aplica).
+- ``pipeline_ms.extract`` desglosa la etapa de extracción dentro del motor.
+- ``jpeg_encode_ms`` sube con preview ON y calidad/resolución.
+- ``scheduled_sleep_ms`` es el throttle a ``target_fps``; si suele ~0, el cuello es CPU.
+
+
+===== ligero_fps15_preview =====
+# Perfil /ws/pose-stream
+- URL: ws://127.0.0.1:8077/ws/pose-stream
+- Vídeo: Running.mp4 | target_fps=15.0 | preview=True | capture_only=True
+- Frames recibidos (válidos): 150
+- Warmup descartado: primeros 5 frames
+- Frames en agregados: 145
+- Intervalo entre mensajes (cliente, ms): n=145 mean=69.63 p50=69.66 p95=73.75 p99=74.48 max=74.88 >100ms=0
+
+## consumer_timing_ms (servidor)
+| métrica | n | mean | p50 | p95 | p99 | max | >100ms |
+|---------|---|------|-----|-----|-----|-----|------|
+| frame_budget_ms | 145 | 66.67 | 66.67 | 66.67 | 66.67 | 66.67 | 0 |
+| jpeg_encode_ms | 145 | 0.37 | 0.00 | 0.83 | 0.88 | 0.88 | 0 |
+| max_throughput | 145 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+| process_bgr_ms | 145 | 13.75 | 13.75 | 15.50 | 16.30 | 16.45 | 0 |
+| queue_wait_ms | 145 | 0.01 | 0.01 | 0.01 | 0.02 | 0.02 | 0 |
+| residual_before_send_ms | 145 | 0.09 | 0.07 | 0.11 | 0.15 | 1.30 | 0 |
+| scheduled_sleep_ms | 145 | 52.45 | 52.52 | 54.17 | 55.42 | 57.46 | 0 |
+| wall_before_send_ms | 145 | 14.22 | 14.14 | 16.28 | 16.83 | 16.86 | 0 |
+
+## pipeline_ms (motor)
+| métrica | n | mean | p50 | p95 | p99 | max | >100ms |
+|---------|---|------|-----|-----|-----|-----|------|
+| classify | 145 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+| extract | 145 | 13.59 | 13.57 | 15.32 | 16.11 | 16.31 | 0 |
+| feature | 145 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+| total | 145 | 13.59 | 13.58 | 15.33 | 16.12 | 16.31 | 0 |
+| track | 145 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+
+Interpretación rápida:
+- ``p99`` resume la cola sin depender de un único ``max``; la columna ``>umbral`` cuenta outliers (``--outlier-ms``).
+- ``--warmup-frames`` evita mezclar arranque/GC con el régimen estable.
+- ``process_bgr_ms`` ≈ costo total del hilo del motor (MediaPipe + análisis si aplica).
+- ``pipeline_ms.extract`` desglosa la etapa de extracción dentro del motor.
+- ``jpeg_encode_ms`` sube con preview ON y calidad/resolución.
+- ``scheduled_sleep_ms`` es el throttle a ``target_fps``; si suele ~0, el cuello es CPU.
+
+
+===== ligero_fps15_sinpreview =====
+# Perfil /ws/pose-stream
+- URL: ws://127.0.0.1:8077/ws/pose-stream
+- Vídeo: Running.mp4 | target_fps=15.0 | preview=False | capture_only=True
+- Frames recibidos (válidos): 150
+- Warmup descartado: primeros 5 frames
+- Frames en agregados: 145
+- Intervalo entre mensajes (cliente, ms): n=145 mean=68.91 p50=68.95 p95=70.88 p99=71.92 max=72.00 >100ms=0
+
+## consumer_timing_ms (servidor)
+| métrica | n | mean | p50 | p95 | p99 | max | >100ms |
+|---------|---|------|-----|-----|-----|-----|------|
+| frame_budget_ms | 145 | 66.67 | 66.67 | 66.67 | 66.67 | 66.67 | 0 |
+| jpeg_encode_ms | 145 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+| max_throughput | 145 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+| process_bgr_ms | 145 | 14.07 | 14.19 | 15.87 | 16.28 | 16.46 | 0 |
+| queue_wait_ms | 145 | 0.01 | 0.01 | 0.01 | 0.01 | 0.03 | 0 |
+| residual_before_send_ms | 145 | 0.07 | 0.07 | 0.09 | 0.11 | 0.12 | 0 |
+| scheduled_sleep_ms | 145 | 52.52 | 52.40 | 54.31 | 57.50 | 58.31 | 0 |
+| wall_before_send_ms | 145 | 14.15 | 14.27 | 15.96 | 16.37 | 16.55 | 0 |
+
+## pipeline_ms (motor)
+| métrica | n | mean | p50 | p95 | p99 | max | >100ms |
+|---------|---|------|-----|-----|-----|-----|------|
+| classify | 145 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+| extract | 145 | 13.91 | 14.05 | 15.69 | 16.09 | 16.31 | 0 |
+| feature | 145 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+| total | 145 | 13.91 | 14.05 | 15.69 | 16.09 | 16.31 | 0 |
+| track | 145 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+
+Interpretación rápida:
+- ``p99`` resume la cola sin depender de un único ``max``; la columna ``>umbral`` cuenta outliers (``--outlier-ms``).
+- ``--warmup-frames`` evita mezclar arranque/GC con el régimen estable.
+- ``process_bgr_ms`` ≈ costo total del hilo del motor (MediaPipe + análisis si aplica).
+- ``pipeline_ms.extract`` desglosa la etapa de extracción dentro del motor.
+- ``jpeg_encode_ms`` sube con preview ON y calidad/resolución.
+- ``scheduled_sleep_ms`` es el throttle a ``target_fps``; si suele ~0, el cuello es CPU.
+
+
+===== ligero_fps30_preview =====
+# Perfil /ws/pose-stream
+- URL: ws://127.0.0.1:8077/ws/pose-stream
+- Vídeo: Running.mp4 | target_fps=30.0 | preview=True | capture_only=True
+- Frames recibidos (válidos): 150
+- Warmup descartado: primeros 5 frames
+- Frames en agregados: 145
+- Intervalo entre mensajes (cliente, ms): n=145 mean=35.85 p50=35.54 p95=38.36 p99=38.64 max=38.86 >100ms=0
+
+## consumer_timing_ms (servidor)
+| métrica | n | mean | p50 | p95 | p99 | max | >100ms |
+|---------|---|------|-----|-----|-----|-----|------|
+| frame_budget_ms | 145 | 33.33 | 33.33 | 33.33 | 33.33 | 33.33 | 0 |
+| jpeg_encode_ms | 145 | 0.20 | 0.00 | 0.61 | 0.62 | 0.63 | 0 |
+| max_throughput | 145 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+| process_bgr_ms | 145 | 9.62 | 9.76 | 10.40 | 10.69 | 10.73 | 0 |
+| queue_wait_ms | 145 | 0.01 | 0.01 | 0.01 | 0.02 | 0.03 | 0 |
+| residual_before_send_ms | 145 | 0.06 | 0.06 | 0.08 | 0.08 | 0.10 | 0 |
+| scheduled_sleep_ms | 145 | 23.45 | 23.44 | 24.88 | 25.60 | 26.00 | 0 |
+| wall_before_send_ms | 145 | 9.89 | 9.89 | 10.91 | 11.19 | 11.37 | 0 |
+
+## pipeline_ms (motor)
+| métrica | n | mean | p50 | p95 | p99 | max | >100ms |
+|---------|---|------|-----|-----|-----|-----|------|
+| classify | 145 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+| extract | 145 | 9.50 | 9.64 | 10.29 | 10.51 | 10.61 | 0 |
+| feature | 145 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+| total | 145 | 9.50 | 9.64 | 10.29 | 10.51 | 10.62 | 0 |
+| track | 145 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0 |
+
+Interpretación rápida:
+- ``p99`` resume la cola sin depender de un único ``max``; la columna ``>umbral`` cuenta outliers (``--outlier-ms``).
+- ``--warmup-frames`` evita mezclar arranque/GC con el régimen estable.
+- ``process_bgr_ms`` ≈ costo total del hilo del motor (MediaPipe + análisis si aplica).
+- ``pipeline_ms.extract`` desglosa la etapa de extracción dentro del motor.
+- ``jpeg_encode_ms`` sube con preview ON y calidad/resolución.
+- ``scheduled_sleep_ms`` es el throttle a ``target_fps``; si suele ~0, el cuello es CPU.
+
