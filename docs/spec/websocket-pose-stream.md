@@ -57,7 +57,7 @@ Campos habituales:
 | `note` | string \| null | Nota humana (p. ej. sin pose) |
 | `landmarks` | array \| null | **Subconjunto** de puntos detectados con `visibility` suficiente: `{ index, x, y, z, visibility? }`. No se garantizan 33 entradas; el cliente debe usar `index` (p. ej. `PoseSkeletonCanvas` en `appWeb`). Umbral servidor: `pose_landmark_min_visibility_response` / env `POSE_LANDMARK_MIN_VISIBILITY_RESPONSE` (0 = sin filtro, comportamiento anterior). |
 | `world_landmarks` | array \| null | Misma política: solo índices presentes en `landmarks` filtrados. |
-| `knees` | object \| null | Ángulos; p. ej. `left_knee_flexion_angle_deg`, `right_knee_flexion_angle_deg` (grados) |
+| `knees` | object \| null | Ángulos; p. ej. `left_knee_flexion_angle_deg`, `right_knee_flexion_angle_deg` (grados). **Calculados sobre `world_landmarks` métricos**, no sobre los landmarks normalizados del propio payload — ver nota abajo |
 | `exercise_label` | string | Clasificación actual (`unknown` en Fase 1 sin ONNX) |
 | `exercise_confidence` | number | Confianza 0–1 (suavizada EMA en servidor) |
 | `rep_phase` | string | `idle` \| `eccentric` \| `concentric` \| `hold` (según `RepTracker` activo) |
@@ -67,6 +67,22 @@ Campos habituales:
 | `total_frames` | number \| null | Total de fotogramas del vídeo cuando `source=file` y OpenCV reporta `CAP_PROP_FRAME_COUNT` fiable; si no aplica, puede ser `null` (cámara, URL o códec sin metadatos). |
 | `server_ts_ms` | number | Marca de tiempo del servidor (epoch ms) al enviar el mensaje; útil para estimar latencia red + procesamiento. |
 | `preview_jpeg_base64` | string | Presente solo si `include_preview` era truthy en la config; JPEG en Base64 |
+
+### Espacio de coordenadas de `knees` (importante para el cliente)
+
+Los ángulos de `knees` **no se calculan sobre el arreglo `landmarks`** que viaja en el
+mismo mensaje. Se calculan sobre los `world_landmarks` métricos de MediaPipe.
+
+El motivo es geométrico: los landmarks normalizados traen `x` dividido por el ancho de la
+imagen e `y` por el alto, de modo que **no son isótropos** y el ángulo medido sobre ellos
+queda deformado (error medio de ~14 grados y máximo de ~32 grados en vídeo 16:9, con la
+cámara perfectamente alineada). Ver `docs/spec/goniometria-espacio-de-coordenadas.md`.
+
+**Consecuencia para el cliente:** un cliente que quiera recalcular el ángulo por su cuenta
+a partir del arreglo `landmarks` **obtendrá un valor distinto del que envía el servidor**.
+Si necesita hacerlo, debe corregir antes la relación de aspecto multiplicando cada `y` por
+`alto / ancho`. El uso recomendado es consumir `knees` tal cual y reservar `landmarks`
+para el dibujo del esqueleto, que sí ocurre en el espacio de imagen.
 
 ### Fin de stream (`source=file`)
 
@@ -91,6 +107,16 @@ Puede incluir **`error`** (string), p. ej. `sin_frame`, o cierre con código HTT
 | Pantalla de análisis | `app/lib/screens/video_analysis/video_analysis_screen.dart` |
 
 ## Incidencias y decisiones
+
+### 2026-08-29 — Corrección del espacio de coordenadas de `knees`
+
+Los ángulos se calculaban sobre landmarks normalizados anisótropos, lo que introducía un
+sesgo sistemático de hasta 32 grados (nulo en 90 grados de flexión y creciente hacia los
+extremos del rango). Se corrige calculando sobre `world_landmarks`. Cambia el **valor**
+de `knees`, no su **forma**: no hay ruptura de contrato estructural, pero los umbrales de
+la interfaz calibrados sobre los valores anteriores deben revisarse.
+Detalle y demostración en `docs/spec/goniometria-espacio-de-coordenadas.md`.
+
 
 1. **Pydantic rechazaba `include_preview: null`**  
    - **Causa:** tipo `bool` estricto sin aceptar JSON `null`.  

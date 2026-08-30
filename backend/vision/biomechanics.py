@@ -1,4 +1,20 @@
-"""Cálculos biomecánicos a partir de landmarks MediaPipe Pose (índices estándar)."""
+"""
+Cálculos biomecánicos a partir de landmarks MediaPipe Pose (índices estándar).
+
+.. warning::
+   **Espacio de coordenadas.** Un ángulo solo es invariante en un espacio *isótropo*
+   (misma unidad en los tres ejes). Los *landmarks normalizados* de MediaPipe **no lo
+   son**: ``x`` se divide por el ancho de la imagen y ``y`` por el alto, de modo que en
+   vídeo 16:9 el eje vertical queda estirado un factor 1,778 respecto del horizontal.
+   Calcular el ángulo sobre esas coordenadas introduce un error sistemático de hasta
+   ~32 grados, incluso con la cámara perfectamente alineada.
+
+   Por eso las funciones de este módulo **asumen coordenadas isótropas**. Para obtenerlas
+   usa :func:`angulos_rodilla`, que resuelve la fuente correcta, en lugar de llamar
+   directamente a :func:`knee_angles_from_landmarks` con landmarks normalizados.
+
+   Ver ``docs/spec/goniometria-espacio-de-coordenadas.md``.
+"""
 
 from __future__ import annotations
 
@@ -94,6 +110,57 @@ def knee_angles_from_landmarks(landmarks: list[dict[str, Any]]) -> KneeAnglesPay
         "left_knee_flexion_angle_deg": flex(int_l),
         "right_knee_flexion_angle_deg": flex(int_r),
     }
+
+
+def escalar_a_isotropico(
+    landmarks: list[dict[str, Any]],
+    relacion_aspecto: float,
+) -> list[dict[str, Any]]:
+    """
+    Reescala ``y`` para dejar las tres coordenadas en unidades homogéneas.
+
+    Los landmarks normalizados de MediaPipe traen ``x`` dividido por el ancho de la imagen
+    y ``y`` por el alto; ``z`` usa aproximadamente la misma escala que ``x``. Multiplicar
+    ``y`` por ``alto / ancho`` deja los tres ejes en unidades de *ancho de imagen*, que es
+    condición necesaria para que el ángulo calculado sea el ángulo real.
+
+    :param relacion_aspecto: cociente ``alto / ancho`` de la imagen de origen.
+    """
+    if relacion_aspecto <= 0.0:
+        return landmarks
+    return [{**p, "y": float(p["y"]) * relacion_aspecto} for p in landmarks]
+
+
+def angulos_rodilla(
+    landmarks: list[dict[str, Any]] | None,
+    world_landmarks: list[dict[str, Any]] | None = None,
+    relacion_aspecto: float | None = None,
+) -> KneeAnglesPayload | None:
+    """
+    Ángulos de rodilla resolviendo la fuente de coordenadas **correcta**.
+
+    Orden de preferencia:
+
+    1. ``world_landmarks`` — salida métrica del modelo (metros, origen en el punto medio
+       de las caderas). Es isótropa por construcción y constituye la estimación 3D
+       propiamente dicha, por lo que además es invariante a la oblicuidad de la cámara.
+    2. ``landmarks`` **corregidos** por ``relacion_aspecto``, cuando no hay
+       ``world_landmarks`` pero sí se conoce la geometría de la imagen.
+    3. ``landmarks`` tal cual, **solo** como último recurso. Esta rama es geométricamente
+       incorrecta y se conserva únicamente para no dejar al sistema sin medida; su sesgo
+       está documentado en ``docs/spec/goniometria-espacio-de-coordenadas.md``.
+
+    Devuelve ``None`` si no hay ninguna fuente utilizable.
+    """
+    if world_landmarks:
+        resultado = knee_angles_from_landmarks(world_landmarks)
+        if resultado is not None:
+            return resultado
+    if not landmarks:
+        return None
+    if relacion_aspecto is not None:
+        return knee_angles_from_landmarks(escalar_a_isotropico(landmarks, relacion_aspecto))
+    return knee_angles_from_landmarks(landmarks)
 
 
 def _elbow_flex_for_side(

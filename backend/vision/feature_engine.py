@@ -12,7 +12,7 @@ import numpy as np
 from app.models.schemas import ExerciseClassifierConfig
 from vision.biomechanics import (
     elbow_flex_angles_from_landmarks,
-    knee_angles_from_landmarks,
+    angulos_rodilla,
     shoulder_width_proxy,
 )
 from vision.types import FeatureFrame, PoseFrame
@@ -47,7 +47,7 @@ def _knee_flex_pair(pose: PoseFrame) -> tuple[float, float]:
 def _ensure_knees_on_pose(pose: PoseFrame) -> PoseFrame:
     if pose.knees or not pose.landmarks or not pose.ok:
         return pose
-    k = knee_angles_from_landmarks(pose.landmarks)
+    k = angulos_rodilla(pose.landmarks, pose.world_landmarks)
     if not k:
         return pose
     return PoseFrame(
