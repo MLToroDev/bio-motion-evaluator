@@ -1,0 +1,413 @@
+/* ───────────────────────────────────────────────────────────────
+   Interfaz de sustentación — tema claro, mínimo y de alta lectura.
+
+   Objetivo: proyectarse bien en un aula con luz ambiente. Las
+   interfaces oscuras se lavan en proyectores de brillo medio; esta
+   usa fondo claro, alto contraste y tipografía grande para que las
+   cifras se lean desde el fondo del salón.
+
+   Todo va bajo `.sus` para no interferir con la interfaz existente.
+   ─────────────────────────────────────────────────────────────── */
+
+.sus {
+  /* Superficies */
+  --sus-bg: #fbfbfd;
+  --sus-surface: #ffffff;
+  --sus-border: #e4e4e7;
+  --sus-border-strong: #d4d4d8;
+
+  /* Texto */
+  --sus-text: #18181b;
+  --sus-text-soft: #52525b;
+  --sus-text-faint: #a1a1aa;
+
+  /* Acento */
+  --sus-accent: #2563eb;
+  --sus-accent-dark: #1d4ed8;
+  --sus-accent-soft: #eff6ff;
+
+  /* Estados de medida */
+  --sus-good: #059669;
+  --sus-warn: #d97706;
+  --sus-bad: #dc2626;
+
+  --sus-radius: 12px;
+  --sus-font: 'DM Sans', system-ui, -apple-system, sans-serif;
+  --sus-mono: 'DM Mono', ui-monospace, 'SF Mono', monospace;
+
+  min-height: 100vh;
+  background: var(--sus-bg);
+  color: var(--sus-text);
+  font-family: var(--sus-font);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Cabecera ─── */
+.sus__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 0.85rem 2rem;
+  background: var(--sus-surface);
+  border-bottom: 1px solid var(--sus-border);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.sus__brand {
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+  color: var(--sus-text);
+  text-decoration: none;
+}
+
+.sus__brand span {
+  color: var(--sus-accent);
+}
+
+.sus__nav {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.sus__nav a {
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--sus-text-soft);
+  text-decoration: none;
+  transition: background 140ms ease, color 140ms ease;
+}
+
+.sus__nav a:hover {
+  background: #f4f4f5;
+  color: var(--sus-text);
+}
+
+.sus__nav a.is-active {
+  background: var(--sus-accent-soft);
+  color: var(--sus-accent-dark);
+  font-weight: 600;
+}
+
+.sus__exit {
+  font-size: 0.8rem;
+  color: var(--sus-text-faint);
+  text-decoration: none;
+}
+
+.sus__exit:hover { color: var(--sus-text-soft); }
+
+/* ─── Contenedor ─── */
+.sus__main {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 2.5rem 2rem 4rem;
+}
+
+.sus__main--wide { max-width: 1240px; }
+
+/* ─── Tipografía ─── */
+.sus-h1 {
+  font-size: clamp(1.9rem, 3.6vw, 2.75rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin: 0 0 1rem;
+}
+
+.sus-h2 {
+  font-size: 1.35rem;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  margin: 0 0 0.75rem;
+}
+
+.sus-eyebrow {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--sus-accent);
+  margin: 0 0 0.85rem;
+}
+
+.sus-lead {
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  color: var(--sus-text-soft);
+  margin: 0 0 1rem;
+  max-width: 62ch;
+}
+
+.sus-note {
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--sus-text-faint);
+  margin: 0;
+}
+
+/* ─── Pregunta de investigación ─── */
+.sus-question {
+  background: var(--sus-surface);
+  border: 1px solid var(--sus-border);
+  border-left: 3px solid var(--sus-accent);
+  border-radius: var(--sus-radius);
+  padding: 1.75rem 2rem;
+  margin: 2rem 0;
+}
+
+.sus-question p {
+  font-size: clamp(1.05rem, 1.8vw, 1.3rem);
+  line-height: 1.6;
+  margin: 0;
+  color: var(--sus-text);
+}
+
+.sus-question strong { color: var(--sus-accent-dark); }
+
+/* ─── Tarjetas ─── */
+.sus-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.sus-card {
+  background: var(--sus-surface);
+  border: 1px solid var(--sus-border);
+  border-radius: var(--sus-radius);
+  padding: 1.35rem 1.5rem;
+}
+
+.sus-card__label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--sus-text-faint);
+  margin: 0 0 0.6rem;
+}
+
+.sus-card__value {
+  font-family: var(--sus-mono);
+  font-size: clamp(1.6rem, 3vw, 2.1rem);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.5rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.sus-card__unit {
+  font-family: var(--sus-font);
+  font-size: 0.5em;
+  font-weight: 600;
+  letter-spacing: 0;
+  margin-left: 0.28em;
+  color: var(--sus-text-soft);
+}
+
+.sus-card__foot {
+  font-size: 0.83rem;
+  line-height: 1.55;
+  color: var(--sus-text-soft);
+  margin: 0;
+}
+
+.sus-card--good .sus-card__value { color: var(--sus-good); }
+.sus-card--warn .sus-card__value { color: var(--sus-warn); }
+.sus-card--pending { border-style: dashed; background: #fafafa; }
+.sus-card--pending .sus-card__value { color: var(--sus-text-faint); font-size: 1.15rem; }
+
+/* ─── Demostración ─── */
+.sus-demo {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(280px, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .sus-demo { grid-template-columns: 1fr; }
+}
+
+.sus-stage {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  max-height: 62vh;
+  background: #1a1a1f;
+  border: 1px solid var(--sus-border-strong);
+  border-radius: var(--sus-radius);
+  overflow: hidden;
+}
+
+.sus-stage--live { border-color: var(--sus-accent); box-shadow: 0 0 0 3px var(--sus-accent-soft); }
+
+.sus-stage__idle {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  background: var(--sus-surface);
+  padding: 2rem;
+  text-align: center;
+}
+
+.sus-stage__idle p {
+  margin: 0;
+  color: var(--sus-text-soft);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  max-width: 34ch;
+}
+
+/* ─── Lectura angular grande (legible a distancia) ─── */
+.sus-readout {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.sus-angle {
+  background: var(--sus-surface);
+  border: 1px solid var(--sus-border);
+  border-radius: var(--sus-radius);
+  padding: 1.1rem 1.35rem;
+}
+
+.sus-angle__side {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--sus-text-faint);
+  margin: 0 0 0.35rem;
+}
+
+.sus-angle__deg {
+  font-family: var(--sus-mono);
+  font-size: clamp(2.4rem, 6vw, 3.4rem);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  color: var(--sus-text);
+  margin: 0;
+}
+
+.sus-angle__deg.is-empty { color: var(--sus-text-faint); font-size: 2rem; }
+.sus-angle--good .sus-angle__deg { color: var(--sus-good); }
+.sus-angle--warn .sus-angle__deg { color: var(--sus-warn); }
+.sus-angle--bad  .sus-angle__deg { color: var(--sus-bad); }
+
+.sus-asym {
+  background: var(--sus-accent-soft);
+  border: 1px solid #dbeafe;
+  border-radius: var(--sus-radius);
+  padding: 1rem 1.35rem;
+}
+
+.sus-asym__value {
+  font-family: var(--sus-mono);
+  font-size: 1.85rem;
+  font-weight: 500;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--sus-accent-dark);
+  margin: 0 0 0.35rem;
+}
+
+/* ─── Botones ─── */
+.sus-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.5rem;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  font-family: var(--sus-font);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 140ms ease, border-color 140ms ease, color 140ms ease;
+}
+
+.sus-btn--primary { background: var(--sus-accent); color: #fff; }
+.sus-btn--primary:hover { background: var(--sus-accent-dark); }
+
+.sus-btn--outline {
+  background: var(--sus-surface);
+  border-color: var(--sus-border-strong);
+  color: var(--sus-text);
+}
+.sus-btn--outline:hover { border-color: var(--sus-text-faint); }
+
+.sus-btn--wide { width: 100%; }
+.sus-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* ─── Telemetría discreta ─── */
+.sus-telemetry {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  font-family: var(--sus-mono);
+  font-size: 0.78rem;
+  color: var(--sus-text-faint);
+  margin: 0.9rem 0 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.sus-error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+  border-radius: 8px;
+  padding: 0.8rem 1.1rem;
+  font-size: 0.9rem;
+  margin: 0 0 1.25rem;
+}
+
+/* ─── Tabla sobria ─── */
+.sus-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  background: var(--sus-surface);
+  border: 1px solid var(--sus-border);
+  border-radius: var(--sus-radius);
+  overflow: hidden;
+}
+
+.sus-table th {
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.76rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--sus-text-faint);
+  padding: 0.8rem 1.1rem;
+  border-bottom: 1px solid var(--sus-border);
+  background: #fafafa;
+}
+
+.sus-table td {
+  padding: 0.8rem 1.1rem;
+  border-bottom: 1px solid #f4f4f5;
+  color: var(--sus-text-soft);
+  vertical-align: top;
+}
+
+.sus-table tr:last-child td { border-bottom: none; }
+.sus-table .num { font-family: var(--sus-mono); font-variant-numeric: tabular-nums; color: var(--sus-text); }
+
+.sus-divider { height: 1px; background: var(--sus-border); border: 0; margin: 2.75rem 0; }

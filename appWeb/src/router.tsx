@@ -11,6 +11,10 @@ import Profile from './pages/Profile';
 import SessionsHistory from './pages/SessionsHistory';
 import VideoAnalysis from './pages/VideoAnalysis';
 import VideoDownload from './pages/VideoDownload';
+import Demo from './pages/sustentacion/Demo';
+import Portada from './pages/sustentacion/Portada';
+import Resultados from './pages/sustentacion/Resultados';
+import SustentacionLayout from './pages/sustentacion/SustentacionLayout';
 import Catalog from './pages/dev/Catalog';
 import Dataset from './pages/dev/Dataset';
 import DataSources from './pages/dev/DataSources';
@@ -44,6 +48,18 @@ const router = createBrowserRouter([
       { path: 'dev/training', element: dev(<Training />) },
       { path: 'dev/models', element: dev(<Models />) },
       { path: 'dev/sources', element: dev(<DataSources />) },
+    ],
+  },
+  {
+    // Interfaz de sustentación: tema claro y mínimo, pensada para
+    // proyectarse en aula. Convive con la interfaz completa sin
+    // sustituirla; ver appWeb/src/pages/sustentacion/.
+    path: '/sustentacion',
+    element: <SustentacionLayout />,
+    children: [
+      { index: true, element: <Portada /> },
+      { path: 'demo', element: <Demo /> },
+      { path: 'resultados', element: <Resultados /> },
     ],
   },
 ]);

@@ -9,6 +9,9 @@ export type NavLinkDef = {
 
 const CORE_LINKS: NavLinkDef[] = [
   { to: '/', label: 'Inicio', end: true, tier: 'core' },
+  // Interfaz de sustentación (tema claro, mínima). Vive fuera de este layout
+  // y tiene su propia navegación; ver src/pages/sustentacion/.
+  { to: '/sustentacion', label: 'Modo sustentación', tier: 'core' },
   { to: '/live-analysis', label: 'Análisis en vivo', tier: 'core' },
   { to: '/video-analysis', label: 'Análisis de video', tier: 'core' },
   { to: '/backend-status', label: 'Diagnóstico', tier: 'core' },
