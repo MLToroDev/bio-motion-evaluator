@@ -38,7 +38,29 @@ flowchart TD
 1. **Captura**: IoT o cámara del cliente obtiene frames.
 2. **Transporte**: WebSocket binario o HTTP multipart según el caso.
 3. **Inferencia**: MediaPipe Pose Landmarker en el backend; modelos HF opcionales para tareas de clasificación.
-4. **Presentación**: **`appWeb/`** (React) muestra resultados y métricas al usuario.
+4. **Goniometría**: cálculo del ángulo articular a partir de la pose estimada.
+5. **Presentación**: **`appWeb/`** (React) muestra resultados y métricas al usuario.
+
+> **Espacio de coordenadas (etapa 4).** El cálculo angular se realiza sobre los
+> `world_landmarks` **métricos**, no sobre los landmarks normalizados que viajan en el
+> payload. Los normalizados son anisótropos (`x` entre el ancho, `y` entre el alto) y
+> deforman el ángulo hasta ~32° en vídeo 16:9. Ver
+> [`spec/goniometria-espacio-de-coordenadas.md`](spec/goniometria-espacio-de-coordenadas.md).
+
+### Evaluación experimental (`validacion/`)
+
+Módulo independiente del tiempo de ejecución: no participa en el flujo de datos, sino
+que **mide** el sistema para responder la pregunta de investigación del trabajo de grado.
+
+- `validacion/experimentos/` — experimentos ejecutables y reproducibles: verificación
+  geométrica del cálculo angular, sensibilidad a la oblicuidad de cámara, caracterización
+  empírica sobre vídeo real y perfilado de latencia por etapas.
+- `validacion/analisis/` — estadística de acuerdo (MAE, RMSE, sesgo, Bland-Altman,
+  ICC(2,1), error por tramo angular) y exportación de series para comparación manual.
+- `validacion/resultados/` — datos crudos en CSV, figuras e informes generados.
+
+Protocolo de la validación física en
+[`guias/protocolo_validacion_exactitud.md`](guias/protocolo_validacion_exactitud.md).
 
 ### Aprendizaje continuo (administración)
 

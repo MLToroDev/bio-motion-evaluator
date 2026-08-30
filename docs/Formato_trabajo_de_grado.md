@@ -26,17 +26,17 @@ Medellín, Colombia.
 
 # RESUMEN
 
-El presente trabajo de grado describe el diseño y desarrollo de **Bio-Motion Evaluator**, un sistema de software multiplataforma que automatiza la valoración de la movilidad articular y la detección de asimetrías físicas en usuarios de entrenamiento de fuerza. El problema central radica en que las evaluaciones biomecánicas de calidad —como el Functional Movement Screen (FMS)— son costosas, subjetivas y dependen de profesionales especializados, lo que las hace inaccesibles para el deportista promedio.
+Este trabajo de grado desarrolla y **evalúa** **Bio-Motion Evaluator**, un sistema web cliente-servidor de **goniometría digital de rodilla** basado en estimación de pose sin sensores físicos. El problema de partida es que la valoración biomecánica de calidad resulta costosa, subjetiva y dependiente de profesionales especializados. Ahora bien, antes de proponer visión artificial como alternativa accesible es necesario responder una pregunta previa y verificable: **¿con qué exactitud mide, y a qué velocidad responde?** Esa es la pregunta que el trabajo aborda, delimitada a una articulación —la rodilla— para poder responderla con rigor en lugar de describir un sistema sin medirlo.
 
-La solución propuesta integra tres capas tecnológicas: un frontend **multiplataforma** inicialmente unificado en **Flutter** (Android e iOS, y exploración en web), complementado en la capa **web operativa** por **React** tras constatarse **limitaciones técnicas de Flutter Web** que afectaron la visualización estable de la captura y la retroalimentación de movimiento; un backend asíncrono basado en **FastAPI** (Python) que concentra la **inferencia con MediaPipe BlazePose**; y la integración opcional de dispositivos IoT como fuente de video. El modelo detecta 33 puntos clave del cuerpo humano y permite la goniometría digital sin sensores físicos, **ejecutándose de forma fiable en el servidor** mientras los clientes se encargan de captura, transmisión de fotogramas y renderizado del esqueleto.
+La solución implementa una arquitectura cliente-servidor con separación estricta entre captura, inferencia y visualización: un cliente web **React 19 + TypeScript**, un backend **FastAPI** que concentra la inferencia con **MediaPipe BlazePose**, y comunicación por **WebSocket** con contratos versionados. La capa web se implementó inicialmente en **Flutter** y migró a **React** tras constatarse limitaciones de Flutter Web en la vista previa de alta frecuencia. El núcleo biomecánico se mantuvo desacoplado de la capa de transporte, decisión que resultó determinante para poder someterlo después a verificación analítica aislada.
 
-La comunicación entre el frontend y el backend se realiza mediante el protocolo **WebSocket**, lo que posibilita el streaming bidireccional de métricas biomecánicas (ángulos de rodilla, estado de detección de pose, marcas de tiempo) con una latencia mínima. El sistema implementa la arquitectura cliente-servidor con separación clara de responsabilidades: el backend realiza la inferencia con MediaPipe y expone los resultados como mensajes JSON por fotograma, mientras que el frontend renderiza la superposición del esqueleto de pose y el panel de métricas en tiempo real.
+La evaluación se diseñó por **niveles de evidencia**, de modo que cada nivel aísle una fuente de error distinta y sea interpretable por sí mismo. Los resultados son los siguientes. Primero, el **cálculo angular no aporta error medible**: frente a ángulos de verdad conocida el error es de 6,3 × 10⁻¹³ grados en el barrido y de 6,0 × 10⁻⁷ grados en el peor caso sondeado, lo que permite atribuir íntegramente el error del sistema a la estimación de pose. Segundo, el diseño experimental **reveló un defecto sistemático que la operación normal no mostraba**: el ángulo se calculaba sobre coordenadas anisótropas, con un sesgo de hasta 32 grados que se anulaba justo en 90 grados de flexión; el sistema producía valores plausibles y estables, y solo el contraste con verdad conocida lo delató. Tercero, se determinó la **tolerancia de alineación de cámara** (≤ 20 grados de azimut) y el **piso de ruido de la asimetría bilateral** (≈ 5 grados), por debajo del cual la medida no es interpretable. Cuarto, la **caracterización de latencia** muestra que la inferencia de pose consume el 93,4 % del pipeline, que la capacidad sostenida es de 126 fotogramas por segundo y que el retraso percibido procedía del regulador de ritmo configurado, no de falta de cómputo.
 
-Los primeros sprints de desarrollo validaron la viabilidad técnica del sistema, logrando el análisis en vivo desde cámara, el análisis de videos previamente grabados (gold standard), y la visualización de ángulos de flexión de rodilla con indicadores semánticos de estado (dentro de rango, límite, compensación). En **Flutter Web** se observaron **limitaciones** que incluyeron **pantallazos negros** en la vista previa y **ausencia de compatibilidad práctica** con un despliegue estable de **MediaPipe** en el cliente comparable al del servidor, lo que motivó adoptar **React** para la web manteniendo **MediaPipe** en **FastAPI**. El producto se evalúa bajo los atributos de calidad definidos por la norma **ISO/IEC 25010**, con énfasis en usabilidad, mantenibilidad y escalabilidad.
+El contraste con un método de referencia externo queda **diseñado, instrumentado y pendiente de ejecución**, y así se declara: el trabajo no afirma exactitud que no midió. Su aportación es la **descomposición del error** entre cálculo angular y estimación de pose, y la constatación de que una decisión aparentemente inocua sobre el espacio de coordenadas puede introducir un sesgo de decenas de grados en un sistema que aparenta funcionar. El producto se evalúa conforme a la norma **ISO/IEC 25010**, con la eficiencia de desempeño respaldada por medición y no por estimación.
 
 # PALABRAS CLAVE
 
-Visión artificial, estimación de pose, MediaPipe BlazePose, movilidad articular, goniometría digital, Flutter, React, migración de frontend, FastAPI, WebSocket, biomecánica, análisis en tiempo real, ISO/IEC 25010, Functional Movement Screen (FMS), entrenamiento de fuerza, detección de asimetrías.
+Visión artificial, estimación de pose, MediaPipe BlazePose, goniometría digital, validación metrológica, descomposición del error, exactitud angular, caracterización de latencia, arquitectura cliente-servidor, FastAPI, React, WebSocket, biomecánica, análisis en tiempo real, ISO/IEC 25010, entrenamiento de fuerza, asimetría bilateral.
 
 # TABLA DE CONTENIDO
 
@@ -194,7 +194,7 @@ Visión artificial, estimación de pose, MediaPipe BlazePose, movilidad articula
 
 # INTRODUCCIÓN
 
-El crecimiento sostenido de la industria del fitness y el entrenamiento de fuerza ha traído consigo un incremento paralelo en la incidencia de lesiones músculo-esqueléticas asociadas a patrones de movimiento deficientes. La biomecánica del ejercicio establece que la falta de movilidad articular en tobillos, caderas y zona torácica, así como las asimetrías corporales no detectadas, son precursores directos de compensaciones lesivas que derivan en lesiones crónicas (Cook et al., 2006). Sin embargo, las herramientas de evaluación funcional validadas —como el Functional Movement Screen (FMS)— permanecen fuera del alcance de la mayoría de los deportistas por su costo elevado y su dependencia de profesionales certificados.
+En el ámbito del fitness y el entrenamiento de fuerza existe un interés sostenido por identificar limitaciones de movilidad, asimetrías y alteraciones de los patrones de movimiento que puedan guardar relación con el riesgo de lesión. El **Functional Movement Screen** (FMS), propuesto por Cook et al. (2006), es uno de los protocolos más difundidos para esa evaluación; ahora bien, la evidencia sobre su capacidad para **predecir** lesiones es heterogénea y no permite establecer una relación causal general (Bunn et al., 2019; Moore et al., 2019; Trinidad-Fernández et al., 2019). Con independencia de ese debate clínico, la aplicación de estos protocolos exige una atención presencial y la intervención de un profesional, lo que introduce una barrera de acceso para el usuario habitual de gimnasio.
 
 La irrupción de la inteligencia artificial en el campo de la visión por computador, y en particular el desarrollo de arquitecturas de estimación de pose como **MediaPipe BlazePose** (Google, 2020), ha abierto una ventana de oportunidad para democratizar el acceso a este tipo de valoraciones. Estos modelos permiten detectar con precisión los puntos clave del cuerpo humano directamente desde la cámara de un dispositivo móvil, sin necesidad de sensores físicos ni equipamiento especializado, habilitando la goniometría digital en tiempo real.
 
@@ -202,7 +202,7 @@ La irrupción de la inteligencia artificial en el campo de la visión por comput
 
 La arquitectura del sistema prioriza la comunicación en tiempo real mediante el protocolo **WebSocket**, lo que permite transmitir métricas de ángulos articulares fotograma a fotograma con latencia mínima. El backend extrae los landmarks del cuerpo del usuario, calcula los rangos de movimiento (ROM) de las articulaciones de interés —comenzando por la rodilla como articulación pivote en el squat— y los envía al frontend, donde se visualizan sobre la imagen del usuario junto con indicadores semánticos de calidad del movimiento.
 
-El presente documento detalla el proceso completo de ingeniería del sistema: desde la definición del problema y la revisión de antecedentes, pasando por la arquitectura de la solución y la metodología ágil empleada, hasta los resultados de cada sprint de desarrollo y la evaluación del producto bajo la norma **ISO/IEC 25010**. Se espera que este trabajo represente un aporte tanto al campo de la ingeniería de software aplicada a la salud deportiva, como a la comunidad académica del Tecnológico de Antioquia, posicionándose como un referente en la integración de computación visual e interfaces móviles para la prevención de lesiones.
+El presente documento detalla el proceso completo de ingeniería del sistema: desde la definición del problema y la revisión de antecedentes, pasando por la arquitectura de la solución y la metodología ágil empleada, hasta los resultados de cada sprint de desarrollo y la evaluación del producto bajo la norma **ISO/IEC 25010**. Se espera que este trabajo represente un aporte tanto al campo de la ingeniería de software aplicada a la salud deportiva, como a la comunidad académica del Tecnológico de Antioquia, posicionándose como un referente en la integración de computación visual e interfaces web para la **medición objetiva del movimiento humano**. El trabajo no evalúa efectos clínicos ni sobre la incidencia de lesiones: su aportación es determinar con qué exactitud y a qué velocidad puede medirse.
 
 # MARCO DEL PROYECTO
 
@@ -210,18 +210,30 @@ En este apartado se contextualiza la problemática que motiva el desarrollo del 
 
 # DEFINICIÓN DEL PROBLEMA
 
-En el contexto actual del fitness y el entrenamiento de fuerza de alta intensidad, se ha evidenciado un incremento en las lesiones músculo-esqueléticas debido a la ejecución de patrones de movimiento disfuncionales. La literatura biomecánica establece que la falta de movilidad articular (en tobillos, cadera y zona torácica) y las asimetrías corporales son los principales precursores de compensaciones lesivas.
+En el contexto del fitness y el entrenamiento de fuerza existe interés en identificar limitaciones de movilidad, asimetrías y patrones de movimiento que puedan estar relacionados con el riesgo de lesión. El **Functional Movement Screen** (FMS) se ha utilizado ampliamente para evaluar estas características, aunque la evidencia sobre su capacidad predictiva presenta resultados heterogéneos: revisiones sistemáticas con metaanálisis encuentran asociaciones entre determinados resultados del FMS y la incidencia de lesiones, pero califican el nivel de evidencia como **bajo** y advierten que la heterogeneidad impide concluir que una puntuación baja prediga lesiones (Bunn et al., 2019; Trinidad-Fernández et al., 2019), con efectos que además varían según edad, sexo y deporte (Moore et al., 2019).
 
-A pesar de existir protocolos validados como el Functional Movement Screen (FMS), la implementación de estas evaluaciones enfrenta tres barreras críticas:
+Este trabajo, por tanto, **no asume una relación causal** entre limitaciones de movilidad o asimetrías y la aparición de lesiones. Trata esas variables como **indicadores funcionales susceptibles de medición**, y se ocupa del problema previo y estrictamente de ingeniería: si tales indicadores se van a usar para algo, primero hay que saber con qué fidelidad pueden medirse.
 
-- **Costo y Accesibilidad:** Una valoración funcional profesional requiere la contratación de un fisioterapeuta o un profesional certificado, lo que supone un costo elevado y recurrente para el usuario promedio de gimnasio.
-- **Subjetividad del Observador:** La evaluación manual depende del "ojo humano", lo que introduce un margen de error significativo y variabilidad entre diferentes evaluadores (falta de precisión cuantitativa).
-- **Desconexión de los Datos:** El deportista común suele omitir la fase de valoración y realiza calentamientos genéricos que no abordan sus limitaciones específicas, debido a que no tiene herramientas que traduzcan sus deficiencias biomecánicas en planes de acción inmediatos.
+Con independencia de ese debate sobre su valor predictivo, la aplicación práctica de estos protocolos enfrenta tres barreras:
 
-Desde la perspectiva de la Ingeniería de Software, el problema radica en la ausencia de herramientas tecnológicas accesibles y automatizadas que utilicen visión por computador para objetivizar la medición del rango de movimiento (ROM) en tiempo real. Actualmente, los usuarios cuentan con aplicaciones de rutinas, pero no con sistemas de "diagnóstico preventivo" basados en datos biométricos precisos que permitan una prescripción personalizada del ejercicio.
+- **Costo y accesibilidad:** una valoración funcional realizada por un profesional implica atención presencial y un costo económico. Como referencia del contexto local, los servicios de fisioterapia publicados en Medellín muestran tarifas de consulta que varían según el profesional y el tipo de atención, con valores desde aproximadamente **46 000 COP** y superiores a **100 000 COP** en distintos servicios (Doctoralia, 2026). Se trata de una **referencia de mercado**, no de evidencia científica: aquí se considera una **barrera potencial de acceso**, sin afirmar que la valoración profesional sea universalmente inaccesible.
+- **Variabilidad de la medición manual:** la goniometría manual tiene un error de medición propio y una concordancia entre evaluadores limitada. Con goniómetro universal se reporta un error típico de medición (SEM) del orden de **3,4°** en flexión de rodilla (Mehta et al., 2017); con otros instrumentos, los límites de acuerdo entre evaluadores llegan a superar los **18°**. Esta variabilidad es un dato relevante en dos sentidos: motiva la búsqueda de métodos automatizados y, a la vez, **acota lo que cualquier validación contra ese método puede concluir** (§ 7.6).
+- **Ausencia de una medida objetiva a mano:** sin un instrumento accesible, quien entrena carece de una magnitud propia y repetible sobre la que apoyar cualquier decisión, y depende del juicio cualitativo de un tercero o de ninguno. Esta barrera es la que aborda directamente el presente trabajo: **producir la medida y establecer cuánto puede confiarse en ella**, con independencia del uso que después se le dé.
+
+Desde la perspectiva de la Ingeniería de Software, existe una oportunidad para desarrollar herramientas accesibles que automaticen determinadas mediciones funcionales mediante visión por computador. Este trabajo **no pretende demostrar la inexistencia de soluciones comerciales** —de hecho el capítulo de antecedentes documenta varias, incluidas soluciones locales de captura sin marcadores—, sino **evaluar técnicamente** una implementación concreta de goniometría digital de rodilla basada en estimación de pose, sobre hardware de consumo y con la evidencia de esa evaluación publicada junto al código.
+
+**Delimitación del problema abordado.** El problema general —automatizar la valoración funcional completa— excede lo que puede resolverse y, sobre todo, **verificarse** en un trabajo de grado individual. Este proyecto lo acota a la unidad mínima sobre la que descansa cualquier valoración posterior: **la medición angular de una articulación**. Se elige la **rodilla**, y conviene ser explícito sobre el criterio, porque **no es la articulación más lesionada**. La revisión sistemática de Keogh y Winwood (2017) sobre los deportes de fuerza sitúa la rodilla en cuarto lugar (**9 %** de las lesiones), por detrás del hombro (**36 %**), la zona lumbar (**24 %**) y el codo (**11 %**). La elección responde a un criterio de **tratabilidad metrológica**, no de prioridad clínica:
+
+- **Es una articulación de tipo bisagra.** Su movimiento principal se aproxima a un solo grado de libertad en el plano sagital, de modo que un ángulo escalar medido desde una cámara la describe de forma significativa. El hombro —la articulación más lesionada— es una enartrosis con tres grados de libertad y rotación axial, que un único ángulo no captura y una cámara monocular no puede desambiguar. La articulación más relevante clínicamente es, precisamente, la menos medible con esta tecnología.
+- **Su terna anatómica presenta alta visibilidad.** Medido sobre los vídeos de referencia del proyecto (749 fotogramas con pose válida), la visibilidad mínima de la terna cadera–rodilla–tobillo tiene mediana **0,828** y supera el umbral de 0,5 en el **92,8 %** de los fotogramas, frente a **0,519** (51,5 %) de la terna de codo y **0,540** (54,3 %) de la de hombro. Además, sus puntos están muy separados entre sí, lo que reduce la sensibilidad del ángulo al temblor de los landmarks. *Matiz necesario:* la terna de tobillo alcanza cifras equivalentes a la de rodilla, de modo que **no es la única con esa propiedad**; y la medición procede de clips centrados en tren inferior, lo que favorece esa región. La cifra sirve para descartar el tren superior como candidato, no para afirmar una superioridad absoluta de la rodilla.
+- **Permite contraste bilateral directo**, condición necesaria para el análisis de asimetría que el sistema incorpora.
+
+Esta elección se declara como **limitación de alcance**: el trabajo valida la tecnología sobre la articulación donde la medida es más tratable, no sobre la de mayor carga lesional. Extender el método al hombro exigiría resolver antes la estimación de rotación axial, un problema abierto en visión monocular. La pregunta no es, por tanto, *si es posible construir* el sistema —lo es, y se construyó—, sino **cuánto puede confiarse en lo que mide y a qué velocidad responde**, que es la condición previa para cualquier uso posterior de esos datos.
 
 **Pregunta Problema:**  
-¿Cómo automatizar la valoración de la movilidad articular y la detección de asimetrías mediante técnicas de visión por computador para generar recomendaciones personalizadas de preparación al movimiento en usuarios de entrenamiento de fuerza?
+¿Con qué exactitud, frente a métodos de referencia de medición angular, y bajo qué latencia extremo a extremo puede una arquitectura cliente-servidor con inferencia de pose en el servidor estimar el ángulo de flexión de rodilla y la asimetría bilateral en tiempo real sobre hardware de consumo?
+
+Se trata de una pregunta **verificable**: su respuesta no es una descripción del sistema, sino un conjunto de magnitudes medidas —error angular en grados, límites de acuerdo, latencia por etapa en milisegundos— que pueden contrastarse, reproducirse y refutarse.
 
 # JUSTIFICACIÓN
 
@@ -229,7 +241,7 @@ La realización de este proyecto se justifica desde tres dimensiones fundamental
 
 1 Relevancia Social y en Salud:
 
-La prevención de lesiones es un tema de salud pública en el ámbito deportivo. Al democratizar el acceso a valoraciones biomecánicas a través de un smartphone, se empodera al usuario para que conozca sus limitaciones antes de cargar peso, reduciendo el riesgo de lesiones crónicas y mejorando la longevidad en la práctica física.
+La relevancia de este proyecto radica en explorar la **viabilidad técnica** de automatizar una medición angular utilizada en la valoración del movimiento mediante visión por computador. En lugar de asumir que dicha automatización reduce la incidencia de lesiones —cadena causal que exigiría investigaciones adicionales sobre la relación entre medida, intervención y desenlace—, el trabajo se concentra en determinar **la exactitud de la medición y el comportamiento temporal del sistema**, estableciendo una base técnica para investigaciones posteriores que evalúen su utilidad clínica o deportiva.
 
 2 Innovación Tecnológica (Ingeniería de Software):
 
@@ -265,15 +277,17 @@ Tras una revisión en el repositorio institucional del Tecnológico de Antioquia
 
 # OBJETIVO GENERAL
 
-Desarrollar un sistema de software basado en visión artificial para la valoración automática de la movilidad articular y detección de asimetrías físicas, que permita la generación de reportes biomecánicos y la prescripción personalizada de rutinas de preparación al movimiento para usuarios de entrenamiento de fuerza.
+Desarrollar y evaluar un sistema web cliente-servidor de goniometría digital de rodilla basado en estimación de pose (MediaPipe BlazePose), determinando su exactitud frente a métodos de referencia de medición angular y su latencia extremo a extremo, con el fin de establecer su viabilidad como herramienta de valoración objetiva del rango de movimiento sobre hardware de consumo.
 
 # OBJETIVOS ESPECÍFICOS
 
-- 1. Levantamiento y Análisis: Definir los requerimientos funcionales y técnicos del sistema, integrando protocolos biomecánicos validados (como el FMS o goniometría digital) para establecer los parámetros de medición de movilidad en los principales complejos articulares (tobillo, cadera y hombro).
-  - Diseño de Arquitectura: Diseñar la arquitectura del software y la interfaz de usuario (UI/UX) bajo estándares de usabilidad, asegurando un flujo de captura de video intuitivo que facilite la obtención de datos precisos en entornos de gimnasio.
-  - Desarrollo del Módulo de Inteligencia: Implementar un núcleo de procesamiento de imágenes utilizando algoritmos de estimación de pose (Pose Estimation) para la extracción de coordenadas articulares y el cálculo de rangos de movimiento (ROM) en tiempo real.
-  - Lógica de Prescripción: Construir un motor de inferencia que interprete los hallazgos biomecánicos (como falta de rango o asimetrías bilaterales) para asignar automáticamente ejercicios correctivos específicos desde una base de datos técnica.
-  - Validación y Calidad: Validar la precisión de las mediciones del software mediante pruebas comparativas con métodos tradicionales (goniometría manual) y evaluar la calidad del producto final bajo la norma ISO/IEC 25010.
+1. **Especificación y delimitación de la medida.** Definir los requerimientos funcionales y el contrato de datos del sistema, delimitando la métrica objeto de estudio —ángulo de flexión de rodilla bilateral e índice de asimetría— y formalizando su convención anatómica de cálculo.
+2. **Diseño de la arquitectura.** Diseñar e implementar una arquitectura cliente-servidor desacoplada, con captura en el cliente e inferencia de pose en el servidor, comunicada mediante contratos versionados REST y WebSocket, bajo estándares de usabilidad y mantenibilidad.
+3. **Implementación del módulo de goniometría digital.** Implementar el núcleo de procesamiento que estime los puntos anatómicos y calcule en tiempo real el ángulo de flexión de rodilla bilateral y el índice de asimetría, con superposición del esqueleto y panel de métricas.
+5. **Validación de la exactitud.** Diseñar y ejecutar un protocolo de validación de la exactitud de la medición angular frente a métodos de referencia, descomponiendo el error del sistema en sus fuentes y reportando error absoluto, sesgo, límites de acuerdo e índices de concordancia.
+6. **Caracterización del rendimiento y calidad.** Caracterizar la latencia extremo a extremo y el reparto de tiempos por etapa del pipeline bajo distintas configuraciones de captura, y evaluar la calidad del producto conforme a la norma ISO/IEC 25010.
+
+Los objetivos 1 a 3 corresponden a la **construcción** del sistema y se abordan en los sprints 1 a 4. Los objetivos 4 y 5 constituyen la **evaluación** que responde la pregunta de investigación y se abordan en el sprint 5.
 
 # MARCO METODOLÓGICO
 
@@ -298,31 +312,113 @@ El proyecto adopta la metodología ágil **Scrum** como marco de trabajo, dado q
 - **Documentación continua:** Especificaciones técnicas en `docs/spec/` (contratos de API, decisiones, incidencias); guías operativas en `docs/guias/`; planificación en `docs/planificacion/`; bitácora de decisiones en este documento (**BITÁCORA DE DESARROLLO Y DECISIONES**). Todo ello en paralelo al código para trazabilidad con el Capítulo 6.
 - **Pruebas:** Vídeos de referencia (*gold standard*) almacenados en `tests/assets/videos/`, usados para validación reproducible del pipeline de análisis.
 
+## Diseño de la evaluación experimental
+
+La metodología no es únicamente de desarrollo: la pregunta de investigación exige un
+componente **experimental** con diseño propio. Se adopta un enfoque de **validación por
+niveles de evidencia**, en el que cada nivel aísla una fuente de error distinta y puede
+interpretarse por sí mismo aunque los siguientes no lleguen a ejecutarse.
+
+| Nivel | Qué aísla | Verdad de referencia | Dependencia externa |
+|-------|-----------|----------------------|---------------------|
+| **N1.** Verificación geométrica | Error del **cálculo angular** | Ángulos construidos analíticamente | Ninguna |
+| **N2.** Sensibilidad de proyección | Error por **oblicuidad de cámara** | Modelo geométrico proyectado | Ninguna |
+| **N3.** Caracterización empírica | **Ruido y detección** sobre vídeo real | No aplica (no mide exactitud) | Vídeos de referencia |
+| **N4.** Contraste con referencia | Error de **estimación de pose** | Patrón físico y medición manual | Instrumental y operador |
+
+Esta estratificación responde a una restricción metodológica real y se declara como tal:
+al no disponer de goniómetro clínico ni de una muestra poblacional, un diseño de un solo
+nivel dependiente de instrumental externo habría dejado el trabajo sin ninguna evidencia.
+La estratificación garantiza que los niveles N1 a N3 —que no dependen de nada externo—
+produzcan resultados verificables, y sitúa a N4 como el nivel que **acota el error total**
+una vez disponibles los medios.
+
+**Descomposición del error.** El error total del sistema frente a un método de referencia
+se descompone en dos sumandos independientes:
+
+```
+error_total  =  error_estimacion_pose  +  error_calculo_angular
+```
+
+El nivel N1 mide directamente el segundo sumando. Si resulta despreciable frente a la
+resolución del método de referencia, entonces todo error observado en N4 es atribuible a
+la estimación de pose, que es la conclusión de interés para valorar la tecnología. Esta
+descomposición es lo que permite extraer una conclusión sobre BlazePose y no meramente
+sobre esta implementación concreta.
+
+**Reproducibilidad.** Todo experimento se implementa como *script* ejecutable bajo
+`validacion/experimentos/`, con semilla fija donde interviene aleatoriedad, y exporta sus
+datos crudos a CSV bajo `validacion/resultados/`. El análisis estadístico se aísla en el
+módulo `validacion/analisis/acuerdo.py`, verificado con pruebas unitarias contra casos de
+propiedades conocidas (`tests/test_acuerdo.py`). Los criterios de aceptación se fijan
+**antes** de medir, en `docs/guias/protocolo_validacion_exactitud.md`.
+
 # DEFINICIÓN DEL ALCANCE
 
-El sistema **Bio-Motion Evaluator** abarca, dentro del presente trabajo de grado, las siguientes funcionalidades:
+El alcance se organiza en tres niveles. Esta separación es deliberada y responde a una
+distinción metodológica: **no todo lo que se construye se evalúa**. El trabajo de grado
+compromete evidencia verificable únicamente sobre el núcleo; el resto del software
+existe porque fue necesario para llegar hasta él, y se documenta como tal.
 
-**Dentro del alcance:**
+## Nivel 1 — Núcleo evaluado (compromete la respuesta a la pregunta de investigación)
 
-- **Clientes de presentación:** aplicación **Flutter** (`app/`) para **Android**, **iOS** y exploración web; aplicación **React 19 + Vite + TypeScript** (`appWeb/`) como **cliente web principal** para análisis en vivo y por archivo (mitigación de limitaciones de Flutter Web con vista previa JPEG de alta frecuencia, documentada en el Capítulo 6).
-- Módulo de **análisis en vivo** desde la cámara del navegador o del dispositivo: envío de fotogramas al backend, estimación de pose con **MediaPipe BlazePose** y visualización de ángulos y esqueleto sobre la imagen.
-- Módulo de **análisis de video pregrabado** (*gold standard*): listado de videos en servidor, reproducción/análisis por fotograma, resumen de sesión, registro de frames y herramientas de inspección (incl. vistas **2D/3D** del esqueleto en el cliente web).
-- Cálculo de **ángulos de flexión de rodilla** (bilateral) como métrica principal de la primera fase; comparación bilateral para **asimetría** en tiempo real.
-- **Superposición de esqueleto** y panel de **métricas** con estados semánticos (bueno / advertencia / crítico).
-- Comunicación mediante **WebSocket** (`/ws/pose-stream`, `/ws/video` según flujo) y **REST** versionada (`/api/v1/...`), con especificación en `docs/spec/`.
-- Backend **FastAPI** con fuentes de video: cámara del servidor, archivo, URL (RTSP/HTTP) y envío cliente; vista previa **JPEG** opcional (`include_preview`).
-- **Persistencia experimental:** **PostgreSQL** + **SQLAlchemy** + **Alembic** para usuarios, sesiones con métricas muestreadas y jobs de descarga; **JWT** para autenticación (modo desarrollo con usuario anónimo configurable).
-- **Cola de trabajos:** **Celery** + **Redis** para descarga asíncrona de videos hacia biblioteca local.
-- Módulo de **descarga de video** desde URL y **historial de sesiones** en cliente.
-- **Prototipos IoT** en repositorio (**ESP32-CAM**, **Raspberry Pi**) como fuentes de video externas (integración en campo objeto de sprint actual).
-- Pantalla de **diagnóstico de conexión** y configuración de URL del backend.
-- **Motor de visión avanzado (en evolución):** capas para extracción de características, clasificador de ejercicio (Hugging Face / ONNX según configuración), seguimiento de repeticiones — habilitación progresiva según flags y planes en `docs/planificacion/bio_motion_plan_v2.md`.
+Sobre estas funcionalidades se reportan mediciones de exactitud y latencia:
 
-**Fuera del alcance (versión actual del trabajo de grado):**
+- **Goniometría digital de rodilla:** cálculo del **ángulo de flexión bilateral** a partir
+  de la terna anatómica cadera–rodilla–tobillo estimada con **MediaPipe BlazePose**, y del
+  **índice de asimetría** como diferencia absoluta entre lados. Ángulos en grados, rango
+  `[0, 180]`, convención documentada en `backend/vision/biomechanics.py`.
+- **Análisis en vivo** desde la cámara del navegador: captura de fotogramas en el cliente,
+  inferencia en el servidor y retorno de ángulos y esqueleto para superposición.
+- **Análisis de vídeo pregrabado** (*gold standard*) sobre el conjunto de referencia de
+  `tests/assets/videos/`, que permite medición reproducible sobre los mismos fotogramas.
+- **Arquitectura cliente-servidor** con contratos versionados: **WebSocket**
+  (`/ws/pose-stream`, `/ws/video`) y **REST** (`/api/v1/...`), especificados en `docs/spec/`.
+- **Superposición de esqueleto** y panel de métricas con estados semánticos
+  (bueno / advertencia / crítico) sobre umbrales explícitos.
+- **Instrumentación de rendimiento:** medición de tiempos por etapa del pipeline
+  (`pipeline_ms`, `consumer_timing_ms`) y perfilado extremo a extremo.
 
-- Evaluación automática de articulaciones más allá del enfoque rodilla/sentadilla en producción (otras articulaciones y batería FMS completa quedan como **extensión** o trabajo futuro).
-- **Motor de prescripción** automática de rutinas correctivas (recomendaciones clínicas cerradas).
-- **Despliegue productivo** en nube con hardening de seguridad y escalado (el alcance académico privilegia demostración, reproducibilidad y validación técnica).
+## Nivel 2 — Infraestructura de soporte (construida, documentada, no evaluada)
+
+Componentes desarrollados para hacer viable el núcleo o para habilitar su continuidad.
+Se documentan como **decisiones de ingeniería** en el Capítulo 6, con su justificación
+y sus incidencias, pero **no se les exige evidencia experimental** ni sostienen ninguna
+afirmación de los resultados:
+
+- **Cliente web `appWeb/`** (React 19 + Vite + TypeScript) como capa de presentación
+  vigente, y **cliente Flutter `app/`** conservado como referencia histórica de la
+  migración documentada en § 6.7.
+- **Persistencia** con PostgreSQL, SQLAlchemy y Alembic (usuarios, sesiones, métricas
+  muestreadas) y **autenticación JWT**, que permiten registrar sesiones de medición.
+- **Cola de trabajos** Celery + Redis para descarga e ingesta asíncrona de vídeo.
+- **Módulo de aprendizaje continuo** (`/dev/*`): catálogo de ejercicios, recolección de
+  vectores de características, ingesta de vídeo y entrenamiento de un clasificador ONNX.
+  Su finalidad es **la construcción del conjunto de datos** que haría posible extender el
+  sistema a más ejercicios; el clasificador resultante **no interviene en la medición
+  angular** ni condiciona ningún resultado reportado.
+- **Vistas 2D/3D** del esqueleto y herramientas de inspección de sesión.
+- **Prototipos IoT** (ESP32-CAM, Raspberry Pi) como fuentes de vídeo alternativas.
+
+## Nivel 3 — Fuera del alcance
+
+Delimitaciones explícitas de este trabajo de grado:
+
+- **Motor de prescripción automática** de rutinas correctivas. Requiere criterios
+  clínicos validados por profesionales del movimiento, un dominio ajeno a la Ingeniería
+  de Software y no verificable con los recursos de este trabajo. Se traslada a
+  recomendaciones futuras.
+- **Cobertura articular más allá de la rodilla** (tobillo, cadera, hombro, tronco) y la
+  **batería FMS completa**. La extensión es arquitectónicamente directa —el cálculo
+  angular es genérico sobre ternas de puntos—, pero cada articulación exigiría su propia
+  validación de exactitud, que es precisamente el trabajo costoso.
+- **Validación clínica con muestra poblacional** y patrón de oro instrumental. La
+  validación de este trabajo es **técnica y de muestra reducida**; sus límites se
+  declaran en § 7 y en el protocolo de `docs/guias/protocolo_validacion_exactitud.md`.
+- **Integración IoT en campo** con medición de latencia en condiciones reales de
+  gimnasio. Los prototipos existen; su caracterización queda como trabajo futuro.
+- **Despliegue productivo** en nube con endurecimiento de seguridad, observabilidad y
+  escalado horizontal.
 
 # RECURSOS
 
@@ -372,7 +468,7 @@ El sistema **Bio-Motion Evaluator** abarca, dentro del presente trabajo de grado
 
 # CRONOGRAMA DE ACTIVIDADES
 
-La siguiente tabla relaciona **fases**, **sprints** y **estado** respecto al desarrollo del repositorio a la fecha de actualización de este documento (abril de 2026). Las fechas de inicio/cierre por sprint pueden completarse con el calendario académico oficial.
+La siguiente tabla relaciona **fases**, **sprints** y **estado** respecto al desarrollo del repositorio a la fecha de actualización de este documento (agosto de 2026). Las fechas de inicio/cierre por sprint pueden completarse con el calendario académico oficial.
 
 
 | Fase                                    | Actividades principales                                                                                  | Sprint(s) | Estado       |
@@ -381,9 +477,9 @@ La siguiente tabla relaciona **fases**, **sprints** y **estado** respecto al des
 | **Infraestructura base**                | Monorepo, FastAPI, salud REST, WebSocket pose-stream, cliente Flutter navegación y config                | 1         | Completado   |
 | **Pipeline de pose y análisis en vivo** | MediaPipe, ángulos de rodilla, streaming, overlay y métricas (Flutter y luego React web)                 | 2         | Completado   |
 | **Análisis por archivo y cliente web**  | Gold standard, `stream_done`, UI análisis de video; **React `appWeb/`** por decisión técnica Flutter Web | 3         | Completado   |
-| **Plataforma, datos y colas**           | Auth JWT, PostgreSQL/Alembic, sesiones y métricas, descargas Celery+Redis, paridad funcional appWeb      | 4         | **En curso** |
-| **IoT y validación en campo**           | Pruebas ESP32-CAM / RPi, latencia, estabilidad con backend real                                          | 5         | Planificado  |
-| **Cierre académico**                    | Pruebas funcionales/usabilidad, contraste con goniometría, memoria final, ISO                            | 6         | Planificado  |
+| **Plataforma, datos y colas**           | Auth JWT, PostgreSQL/Alembic, sesiones y métricas, descargas Celery+Redis, consolidación de `appWeb`     | 4         | Completado   |
+| **Evaluación experimental**             | Validación de exactitud angular, caracterización de latencia por etapas, matriz de pruebas               | 5         | **En curso** |
+| **Cierre académico**                    | Manuales, discusión frente a antecedentes, argumentario ISO/IEC 25010, memoria final                     | 6         | Planificado  |
 
 
 # MARCO CONCEPTUAL
@@ -400,7 +496,7 @@ Este capítulo presenta los conceptos y tecnologías fundamentales sobre los que
 
 **Functional Movement Screen (FMS):** Protocolo de evaluación funcional del movimiento desarrollado por Cook et al. (2006), compuesto por siete pruebas estandarizadas que identifican limitaciones de movilidad, asimetrías y patrones de movimiento disfuncionales en individuos activos. Constituye el referente biomecánico más validado en el ámbito del fitness de rendimiento y sirve como marco conceptual para los parámetros de evaluación de este sistema.
 
-**Asimetría Bilateral:** Diferencia significativa (generalmente > 10–15%) en el ROM o la fuerza entre el hemicuerpo derecho e izquierdo. Las asimetrías son predictoras de lesión y, en el contexto de este sistema, se detectan comparando los ángulos calculados para articulaciones homólogas (rodilla izquierda vs. rodilla derecha).
+**Asimetría bilateral:** diferencia en el ROM o la fuerza entre el hemicuerpo derecho e izquierdo. En este sistema se calcula como la **diferencia absoluta en grados** entre los ángulos de articulaciones homólogas (rodilla izquierda frente a derecha). Se trata de un **indicador funcional medible**, no de un predictor de lesión: la evidencia sobre el valor predictivo de las asimetrías es heterogénea (Moore et al., 2019) y este trabajo no la evalúa. Su interpretación está además acotada por el **piso de ruido del propio estimador**, medido en ~5° (§ 7.2.4): por debajo de esa cota la asimetría no es distinguible del ruido.
 
 ## 5.2 Visión por Computador e Inteligencia Artificial
 
@@ -444,9 +540,9 @@ Este capítulo presenta los conceptos y tecnologías fundamentales sobre los que
 
 El área de intervención es el **sector fitness y de entrenamiento de fuerza**, específicamente el proceso de preparación pre-entrenamiento que actualmente se realiza de forma genérica y sin información biomecánica personalizada. El contexto se enmarca en los gimnasios y espacios de entrenamiento donde los usuarios realizan ejercicios de alta carga (sentadillas, peso muerto, press, etc.) sin una valoración previa de su movilidad articular y sin herramientas que les permitan conocer sus restricciones específicas antes de cargar peso.
 
-Desde una visión holística, el proceso de entrenamiento se compone de tres fases: **valoración funcional** (diagnóstico de movilidad), **preparación al movimiento** (calentamiento dirigido) y **ejecución del entrenamiento**. Actualmente, la primera fase —que es la más crítica para la prevención de lesiones— es omitida por la mayoría de los usuarios debido a su alto costo y complejidad. Bio-Motion Evaluator interviene precisamente en esta brecha, digitalizando y automatizando la fase de valoración funcional mediante visión artificial, de forma que sea accesible, objetiva y ejecutable en cualquier momento sin la presencia de un profesional.
+Desde una visión holística, el proceso de entrenamiento se compone de tres fases: **valoración funcional** (medición de movilidad), **preparación al movimiento** (calentamiento dirigido) y **ejecución del entrenamiento**. La primera fase suele omitirse por su costo y por requerir la presencia de un profesional. Bio-Motion Evaluator interviene precisamente en esta brecha, digitalizando y automatizando la fase de valoración funcional mediante visión artificial, de forma que sea accesible, objetiva y ejecutable en cualquier momento sin la presencia de un profesional.
 
-La solución no reemplaza al fisioterapeuta ni al entrenador certificado; actúa como una herramienta de **diagnóstico preventivo de primera línea**, similar a como una pulsera de actividad física complementa (sin reemplazar) la consulta médica. Su propósito es informar al usuario sobre sus limitaciones del día para que pueda adaptar su calentamiento y ejecución con base en datos reales.
+La solución no reemplaza al fisioterapeuta ni al entrenador certificado, ni emite juicio clínico alguno: actúa como un **instrumento de medición angular automatizada**, del mismo modo que una pulsera de actividad registra magnitudes sin diagnosticar. Su propósito es entregar al usuario una **medida objetiva y repetible** de su rango de movimiento, cuya interpretación corresponde a quien tenga la competencia para hacerla.
 
 # Áreas por Intervenir
 
@@ -471,7 +567,7 @@ El sistema interviene en el siguiente proceso de negocio:
         ↓
 [Frontend muestra ángulos articulares y estado semántico]
         ↓
-[Usuario recibe diagnóstico: ROM, asimetrías, alertas]
+[Usuario recibe las mediciones: ROM, asimetría, estados de calidad]
         ↓
 [Decisión: adaptar calentamiento según hallazgos]
 ```
@@ -550,7 +646,7 @@ La siguiente **Tabla 1** reproduce la **plantilla institucional** del product ba
 
 **Nota sobre Sprint:** en el borrador compartido, la primera fila mostraba Sprint «2» para la historia de salud del backend; en el **cronograma técnico del repositorio** esa capacidad corresponde al **Sprint 1** (junto con la configuración de URL). Si la facultad exige otro criterio de asignación de sprint, ajusta solo esa columna manteniendo la trazabilidad en «Observación».
 
-**Tabla 1.** *Product backlog: historias de usuario, estimación y ejecución (plantilla institucional; abril de 2026).*
+**Tabla 1.** *Product backlog: historias de usuario, estimación y ejecución (plantilla institucional; agosto de 2026).*
 
 
 | Historias de usuario | Estimación (horas)                                                                   | Ejecución | Observación |                |                |             |             |              |                            |                                                                                                                          |
@@ -560,19 +656,21 @@ La siguiente **Tabla 1** reproduce la **plantilla institucional** del product ba
 | HU-02                | Como usuario quiero configurar la URL base del servidor                              | 1         | Alta        | 4              | 12             | 4           | 20          | 06/02/2026   | 12/02/2026                 | `ConnectionConfigPage` / Flutter `connection_config_screen.dart`                                                         |
 | HU-03                | Como usuario quiero analizar mi movimiento en vivo con retroalimentación de rodillas | 2         | Alta        | 12             | 56             | 16          | 84          | 14/02/2026   | 08/03/2026                 | `LiveAnalysisPage` / `live_analysis_screen.dart`; WebSocket `/ws/pose-stream`; `docs/spec/websocket-pose-stream.md`      |
 | HU-04                | Como investigador quiero analizar un video *gold standard* con resumen por sesión    | 3         | Alta        | 10             | 44             | 14          | 68          | 10/03/2026   | 28/03/2026                 | `VideoAnalysisPage`; API `gold_standard_videos`; mensaje `stream_done`; acumulador `VideoAnalysisAccumulator` (`appWeb`) |
-| HU-05                | Como laboratorio quiero usar cámara IoT frente al backend                            | 5         | Media       | 8              | 36             | 12          | 56          | 01/04/2026   | 26/04/2026                 | `iot/esp32-cam`, `iot/raspberry-pi/stream.py`                                                                            |
-| HU-06                | Como evaluador quiero validar ángulos frente a goniometría manual                    | 6         | Alta        | 14             | 8              | 24          | 46          | 02/05/2026   | 20/05/2026                 | Protocolo y anexo; **sin estadísticos de acuerdo cámara–goniómetro consolidados en esta versión del documento**          |
-| HU-07                | Como autor quiero cerrar manuales y evaluación ISO 25010                             | 6         | Alta        | 20             | 10             | 18          | 48          | 15/05/2026   | 30/05/2026                 | § 6.8–6.9; bitácora; manuales alineados a `docs/guias/SETUP.md`                                                          |
+| HU-05                | Como laboratorio quiero usar cámara IoT frente al backend                            | —         | Baja        | 8              | 36             | 12          | 56          | —            | —                          | **Trasladada a trabajo futuro** (Nivel 3 del alcance). Prototipos en `iot/esp32-cam` y `iot/raspberry-pi/stream.py`; sin caracterización en campo |
+| HU-06                | Como evaluador quiero conocer la exactitud y la latencia de la medición angular      | 5         | Alta        | 14             | 20             | 36          | 70          | 01/06/2026   | 29/08/2026                 | **Núcleo de la evaluación.** Instrumentos en `validacion/`; protocolo en `docs/guias/protocolo_validacion_exactitud.md`; resultados en § 7 |
+| HU-07                | Como autor quiero cerrar manuales y evaluación ISO 25010                             | 6         | Alta        | 20             | 10             | 18          | 48          | —            | —                          | § 6.8–6.9; bitácora; manuales alineados a `docs/guias/SETUP.md`                                                          |
 
 
-**Total estimado supuesto (suma de «Hrs totales», HU-01–HU-07):** 340 h.
+**Total estimado supuesto (suma de «Hrs totales», HU-01–HU-07):** 364 h, de las cuales 56 h corresponden a **HU-05**, trasladada a trabajo futuro.
+
+**Nota sobre el alcance del backlog:** tras la delimitación del problema (§ 3.2), **HU-06** deja de ser una verificación final de trámite y pasa a ser el **núcleo del trabajo**: es la historia que responde la pregunta de investigación. **HU-05** se traslada a trabajo futuro por no ser necesaria para responderla.
 
 **Tabla 2.** *Backlog técnico (BH): tareas de ingeniería sin formato de historia de usuario.*
 
 | Id BH | Descripción (valor para el equipo, no para el usuario final) | Sprint | Criterio de cierre (binario) |
 | ----- | -------------------------------------------------------------- | ------ | ---------------------------- |
 | BH-01 | Configurar monorepo, dependencias y guía `SETUP.md` | 1 | Estructura `app/`, `backend/`, `docs/`, `tests/`, `iot/` clonable; backend responde en local según guía |
-| BH-02 | Ejecutar matriz de pruebas funcionales y registrar evidencias (§ 6.8) | 6 | Matriz § 6.8.1 con resultado **Pasa/No pasa** por caso; anexos B–C actualizados |
+| BH-02 | Ejecutar matriz de pruebas funcionales y registrar evidencias (§ 6.8) | 5 | Matriz § 6.8.1 con resultado **Pasa/No pasa** por caso; anexos B–C actualizados |
 
 *Nota:* Las antiguas redacciones tipo «Configurar el entorno base del proyecto» o «Ejecución de pruebas del sistema» **no** son historias de usuario; quedan como **BH-01** y **BH-02**. Las **HU** de la Tabla 1 describen capacidades visibles para deportista, investigador o evaluador.
 
@@ -631,16 +729,35 @@ Las reglas del motor están alineadas al contrato WebSocket unificado (`schema_v
 - **Criterios (binarios):** (1) Con dispositivo configurado (`iot/esp32-cam` o `iot/raspberry-pi/stream.py`), el backend recibe al menos un fotograma en 60 s de prueba documentada. (2) Ante pérdida de WiFi, el log o la UI muestran error/recuperación sin reiniciar todo el servidor.
 - **Errores:** URL de stream inválida; timeout de dispositivo; documentación de latencia en anexo C actualizada.
 
-### HU-06 — Validación frente a goniómetro manual
+### HU-06 — Exactitud y latencia de la medición angular
 
-- **Narrativa:** Como evaluador quiero contrastar los ángulos de rodilla del sistema con medición manual para estimar error y acuerdo.
-- **Alcance:** protocolo, registro de datos crudos y análisis estadístico acordados con la directoría (**pendiente de ejecución y de informe en esta memoria**).
-- **Criterios de cierre (binarios):** (1) Protocolo firmado o anexo con posturas, *n* y criterio de inclusión. (2) Tabla publicada con al menos error medio absoluto o límites de acuerdo Bland–Altman para rodilla izquierda y derecha. (3) Referencia explícita a literatura de validación visión–goniómetro (p. ej. Örücü et al., 2025; Sabo et al., 2023).
+- **Narrativa:** Como evaluador quiero conocer el error de la medición angular del sistema
+  y su latencia de respuesta, para decidir si los valores que entrega son utilizables.
+- **Alcance:** es la historia que **responde la pregunta de investigación**. Comprende la
+  descomposición del error del sistema en sus fuentes, la caracterización del efecto de la
+  oblicuidad de cámara, la caracterización empírica sobre vídeo real, el contraste con un
+  método de referencia y el perfilado de latencia por etapas.
+- **Criterios de cierre (binarios):**
+  1. **Descomposición del error:** se reporta el error del cálculo angular frente a ángulos
+     de verdad conocida, de modo que el error residual del sistema sea atribuible a la
+     estimación de pose y no a la aritmética.
+  2. **Tolerancia de captura:** se publica el azimut máximo de cámara admisible para
+     mantener el error por debajo del umbral de acuerdo adoptado, y esa cifra se incorpora
+     al protocolo de captura.
+  3. **Contraste con referencia:** se publica al menos error medio absoluto **y** límites de
+     acuerdo de Bland–Altman para rodilla izquierda y derecha, con el tamaño muestral
+     declarado.
+  4. **Latencia:** se publica el reparto de tiempos por etapa del pipeline con percentiles
+     50 y 95, indicando el hardware de medición.
+  5. **Trazabilidad:** referencia explícita a la literatura de validación visión–goniómetro
+     (Örücü et al., 2025; Sabo et al., 2023) y contraste de los resultados propios con ella.
+- **Limitación declarada de antemano:** la validación es **técnica y de muestra reducida**,
+  no un estudio clínico. Se reporta como tal en § 7 y en las amenazas a la validez.
 
 ### HU-07 — Cierre de manuales y evaluación ISO/IEC 25010
 
 - **Narrativa:** Como autor del trabajo de grado quiero entregar manuales y evaluación de calidad alineados al producto desplegable.
-- **Criterios (binarios):** (1) Manual de usuario § 6.9.1 describe flujos reales de `appWeb/` (no solo Flutter). (2) Matriz § 6.8.1 con ≥ 80 % de casos críticos en estado **Pasa** o justificación documentada. (3) Tabla ISO/IEC 25010 § 6.9.3 sin contradicciones con el estado de **HU-06** (goniómetro pendiente).
+- **Criterios (binarios):** (1) Manual de usuario § 6.9.1 describe flujos reales de `appWeb/` (no solo Flutter). (2) Matriz § 6.8.1 con ≥ 80 % de casos críticos en estado **Pasa** o justificación documentada. (3) Tabla ISO/IEC 25010 § 6.9.3 coherente con los resultados de exactitud y latencia reportados en **HU-06**, sin atribuir al sistema propiedades no medidas.
 
 ### Extensiones en código (trazabilidad Sprint 4 y posteriores)
 
@@ -742,58 +859,90 @@ Los criterios binarios y flujos alternativos completos figuran en § *Detalle de
 
 
 
-# Planificación del sprint 4 (en curso)
+# Planificación del sprint 4 (completado)
 
 ## Objetivo del sprint
 
-**Plataforma integrada:** autenticación **JWT**, **PostgreSQL** (sesiones y métricas), **Celery + Redis** (descargas), refinamiento **2D/3D** y paridad razonable Flutter / React.
+**Plataforma integrada:** autenticación **JWT**, **PostgreSQL** (sesiones y métricas),
+**Celery + Redis** (descargas e ingesta), refinamiento **2D/3D** y consolidación del
+cliente **React** como capa de presentación vigente.
 
 ## Historias de usuario incluidas
 
-**Extensiones de producto** (Tabla 1, nota final): sesiones PostgreSQL, JWT, descarga Celery, vistas 2D/3D y paridad `appWeb` / Flutter según hitos del Sprint 4.
+**Extensiones de producto** (Tabla 1, nota final), correspondientes al **Nivel 2 —
+infraestructura de soporte** de la definición del alcance.
 
-## Estado a abril de 2026
+## Revisión del sprint (resultados)
 
-- **ORM:** `UserORM`, `SessionORM`, `SessionMetricORM`, `VideoDownloadJobORM`; migraciones **Alembic**; routers `auth`, `sessions`, `download`.
-- **Clientes:** login, perfil, historial, descarga de video; en web, toolbar de capas, estadísticas, `PoseSkeleton3DScene` y topología `poseTopology`.
-- **Motor (paralelo):** paquete `backend/vision/` (extractor, *features*, clasificador, *rep trackers*) según `docs/planificacion/bio_motion_plan_v2.md`.
+- **ORM:** `UserORM`, `SessionORM`, `SessionMetricORM`, `VideoDownloadJobORM`,
+  `FeatureSampleORM`, `TrainingJobORM`, `IngestJobORM`; migraciones **Alembic**;
+  routers `auth`, `sessions`, `download` y `dev/*`.
+- **Clientes:** login, perfil, historial, descarga de vídeo; en web, barra de capas,
+  estadísticas de sesión, `PoseSkeleton3DScene` y topología `poseTopology`.
+- **Motor:** paquete `backend/vision/` con las cinco capas del plan
+  (`pose_extractor`, `feature_engine`, `exercise_classifier`, `rep_tracker`,
+  `realtime_engine`) según `docs/planificacion/bio_motion_plan_v2.md`.
+- **Modo demo (MVP):** banderas `VITE_MVP_*` y `MvpRouteGuard` para acotar la interfaz
+  de sustentación al núcleo evaluado, sin eliminar rutas.
 
-## Criterios para cerrar el sprint
+## Cierre del sprint
 
-- Login y **sesiones** persistidas de forma coherente en ambos clientes.
-- **Job** de descarga observable desde UI y alineado con biblioteca de videos.
-- Estabilidad del análisis de video en **React** sin regresiones mayores.
-- Specs y `docs/arquitectura.md` al día con REST v1 y colas.
+El sprint se da por cerrado al quedar la plataforma en estado estable y trazable.
+La **evaluación experimental** de lo construido no forma parte de este sprint: se
+concentra en el sprint 5, que responde la pregunta de investigación.
 
-# Planificación del sprint 5 (planificado)
+# Planificación del sprint 5 (sprint de evaluación)
 
 ## Objetivo del sprint
 
-**IoT en campo:** ESP32-CAM y/o Raspberry Pi, medición de **latencia** y documentación de limitaciones.
+**Responder la pregunta de investigación.** Determinar la **exactitud** de la medición
+angular frente a métodos de referencia y **caracterizar la latencia** extremo a extremo
+del sistema. Es el sprint que convierte el software construido en evidencia verificable.
 
-## Historias de usuario incluidas
+## Historias de usuario y backlog técnico
 
-**HU-05** (Tabla 1).
+- **HU-06** (Tabla 1): validación de la medición contra un método de referencia.
+- **BH-02** (Tabla 2): ejecución y registro de la matriz de pruebas funcionales.
+
+## Estrategia de validación adoptada
+
+Ante la ausencia de goniómetro clínico y de acceso a una muestra poblacional, la
+validación se estructura en niveles de exigencia creciente, de modo que cada nivel
+aporte evidencia interpretable por sí mismo:
+
+1. **Verificación geométrica del cálculo angular.** Se somete la función de cálculo a
+   ángulos construidos con verdad conocida, para acotar el error atribuible a la
+   aritmética y poder **descomponer el error total** del sistema en sus dos fuentes:
+   estimación de pose y cálculo angular.
+2. **Sensibilidad a la oblicuidad de cámara.** Se cuantifica, por proyección geométrica,
+   el error introducido por la desalineación de la cámara respecto al plano sagital, y
+   se deriva de ahí una tolerancia operativa para el protocolo de captura.
+3. **Caracterización empírica sobre vídeo real.** Tasa de detección, ruido temporal y
+   piso de ruido de la asimetría sobre el conjunto de referencia.
+4. **Contraste con método de referencia.** Patrón físico de ángulo conocido y
+   video-goniometría manual, según
+   `docs/guias/protocolo_validacion_exactitud.md`.
 
 ## Entregas previstas
 
-- Evidencias (logs o capturas) de streaming IoT al backend.
-- Anexo o tabla de latencia en § **7**; actualización de `docs/spec/` pertinente.
+- Instrumentos ejecutables y reproducibles en `validacion/`.
+- Resultados numéricos y figuras en `validacion/resultados/`.
+- Tablas de exactitud y de latencia en § **7**, con sus limitaciones declaradas.
+- Matriz de pruebas § 6.8.1 con resultados **Pasa / No pasa**.
 
 # Planificación del sprint 6 (planificado)
 
 ## Objetivo del sprint
 
-**Cierre académico:** matriz de pruebas (§ 6.8, **BH-02**), contraste con **goniometría** (**HU-06**), manuales y argumentario **ISO/IEC 25010** (**HU-07**).
-
-## Historias de usuario y backlog técnico
-
-- **HU-06, HU-07** (Tabla 1).
-- **BH-02** (Tabla 2): ejecución y registro de la matriz de pruebas funcionales.
+**Cierre académico:** manuales, argumentario **ISO/IEC 25010** consolidado, discusión
+de resultados frente a la literatura, conclusiones y recomendaciones.
 
 ## Entregas previstas
 
-- Matriz § 6.8.1 con resultados **Pasa/No pasa**; manuales § 6.9 alineados con `docs/guias/SETUP.md` y flujos de `appWeb/`; conclusiones y recomendaciones.
+- Manuales § 6.9 alineados con `docs/guias/SETUP.md` y con los flujos de `appWeb/`.
+- Discusión de los resultados de exactitud y latencia frente a los antecedentes
+  (Örücü et al., 2025; Sabo et al., 2023).
+- Conclusiones, recomendaciones y anexos definitivos.
 
 # Diseño del sistema
 
@@ -1079,7 +1228,7 @@ La validación funcional se ejecutó sobre el stack activo (`appWeb` + `backend`
 
 | ID    | Caso de prueba                         | Entrada/escenario                                        | Resultado esperado                                                        | Evidencia                                                                      |
 | ----- | -------------------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| PF-01 | Salud del backend                      | `GET /api/v1/health` desde `backend-status`              | Respuesta 200 y payload de estado                                         | `backend/app/api/v1/health.py`, `appWeb/src/pages/BackendStatus.tsx`           |
+| PF-01 | Salud del backend                      | `GET /api/v1/health` desde `backend-status`              | Respuesta 200 y payload de estado                                         | `backend/app/api/v1/health.py`, `appWeb/src/pages/BackendStatus/BackendStatus.tsx`           |
 | PF-02 | Streaming WS por archivo               | Config `source=file` con `video_filename` válido         | Frames con `frame_index`, `knees`, `landmarks` y cierre con `stream_done` | `backend/app/api/websocket/live_pose.py`, `docs/spec/websocket-pose-stream.md` |
 | PF-03 | Análisis en vivo navegador             | Cámara del navegador + `target_fps`                      | Métricas en tiempo real, overlay estable, eventos de reconexión           | `appWeb/src/hooks/useLiveAnalysisSession.ts`                                   |
 | PF-04 | Auth y sesiones                        | `POST /api/v1/auth/token`, creación/cierre de sesión     | Token JWT válido y persistencia de sesión por usuario                     | `backend/app/api/v1/auth.py`, `backend/app/api/v1/sessions.py`                 |
@@ -1089,11 +1238,36 @@ La validación funcional se ejecutó sobre el stack activo (`appWeb` + `backend`
 | PF-08 | Cálculo de rodilla y robustez de rutas | Pruebas unitarias de biomecánica y path safety           | Cálculo consistente y bloqueo de rutas no seguras                         | `tests/test_biomechanics.py`, `tests/test_paths_suffix.py`                     |
 
 
-**Criterio de aceptación global:** se considera aprobado cuando los ocho casos reportan el resultado esperado sin error bloqueante y con evidencia trazable en código o test automatizado.
+| PF-09 | Exactitud del cálculo angular | Ángulos sintéticos de verdad conocida, barrido 0-180 grados | Error despreciable frente a la resolución del método de referencia | `validacion/experimentos/exp1_verificacion_geometrica.py` |
+| PF-10 | Isotropía del espacio de coordenadas | Landmarks normalizados de vídeo 16:9 | El ángulo se calcula sobre coordenadas isótropas; corrección de aspecto reproducible | `tests/test_goniometria_espacio_coordenadas.py` |
+| PF-11 | Estadística de acuerdo | Series con sesgo y ruido de propiedades conocidas | MAE, sesgo, límites de acuerdo e ICC coinciden con los valores esperados | `tests/test_acuerdo.py` |
+| PF-12 | Latencia por etapa del pipeline | Vídeo de referencia, matriz de configuraciones | Reparto por etapa con percentiles 50 y 95; sin degradación inesperada | `validacion/experimentos/exp4a_latencia_etapas.py` |
+| PF-13 | Latencia extremo a extremo | Backend real, `/ws/pose-stream`, presets de ritmo | Entrega sostenida sin acumulación de retraso; desglose del consumidor | `validacion/resultados/exp4_latencia.md` |
+
+
+**Resultados de la ejecución (agosto de 2026).**
+
+| Caso | Resultado | Nota |
+|------|-----------|------|
+| PF-01 a PF-08 | **Pasa** | Cobertura previa, con 47 pruebas automatizadas en verde |
+| PF-09 | **Pasa** | Error máximo 6,29 × 10⁻¹³ grados |
+| PF-10 | **Pasa** | Detectó y ahora protege contra el defecto de anisotropía (§ 7.2.2) |
+| PF-11 | **Pasa** | 20 pruebas; ICC contrastado contra implementación ANOVA independiente |
+| PF-12 | **Pasa** | Inferencia 93,4 % del pipeline; capacidad 126 fotogramas/s |
+| PF-13 | **Pasa con reserva** | Entrega sostenida sin acumulación de retraso; el desglose por etapa es válido, pero **no se obtiene una cifra única de latencia extremo a extremo** por incoherencia de marcas de tiempo entre etapas (§ 7.3.2) |
+
+**Criterio de aceptación global:** los trece casos reportan el resultado esperado sin error
+bloqueante y con evidencia trazable en código o prueba automatizada. Se cumple el criterio
+de cierre de **BH-02**.
+
+**Nota metodológica.** PF-10 nació *de* un fallo: el Experimento 2 detectó el defecto de
+anisotropía y el caso de prueba se añadió después para impedir su regreso. Se documenta
+así deliberadamente, porque una matriz de pruebas que solo contiene casos que siempre
+pasaron no aporta información sobre la calidad del sistema.
 
 ## Pruebas de usabilidad
 
-Se aplicó evaluación heurística y prueba de tareas guiadas con usuarios de contexto fitness, enfocada en comprender si el flujo permite obtener diagnóstico en menos de 5 minutos sin asistencia técnica.
+Se aplicó evaluación heurística y prueba de tareas guiadas con usuarios de contexto fitness, enfocada en comprender si el flujo permite completar una medición en menos de 5 minutos sin asistencia técnica.
 
 
 | Métrica                                                 | Objetivo           | Resultado observado (iteración actual)          |
@@ -1196,78 +1370,499 @@ Para la entrega académica se recomienda ejecución en red local controlada: `ap
 | **SEGURIDAD** — Garantiza autenticidad, confidencialidad e integridad de la información incorporando niveles de acceso que permiten el uso de los datos acorde a los perfiles definidos.                                    | El sistema implementa autenticación JWT (`/api/v1/auth/token`) y autorización por usuario para sesiones. Se soporta configuración CORS y posibilidad de despliegue con TLS/WSS. El manejo de datos se limita a correo técnico y métricas de sesión, evitando información clínica sensible en esta fase académica.                                                                                                                                                                                                                                                                                                                                                                                                       |
 | **USABILIDAD** — El software es fácil de ejecutar, brindando accesibilidad, navegabilidad y comprensión para la operatividad de la herramienta.                                                                             | La interfaz implementa el **sistema de diseño Bio-Motion**: paleta oscura biomédica con contraste WCAG AA, tipografía DM Sans para etiquetas y DM Mono para valores numéricos (legibilidad en entornos de gimnasio con luz variable), indicadores semánticos de color (verde/amarillo/rojo) para estados biomecánicos legibles de un vistazo. La navegación es lineal y de máximo 2 niveles de profundidad desde la pantalla principal. El indicador de conexión al backend en la barra superior informa permanentemente el estado del servidor. Los errores de conectividad se presentan con guías de resolución expandibles.                                                                                          |
 | **MANTENIBILIDAD** — Fácil de modificar para corregir errores y mejorar el rendimiento. Requiere un patrón de diseño que garantice la modularidad de los componentes.                                                       | El código fuente sigue la convención de separación por responsabilidad: `Screen` (estado y lógica de negocio) → `Panel` (orquestación de tabs) → `Widget` (presentación atómica). Los **specs técnicos** bajo `docs/spec/` documentan los contratos de API, decisiones de arquitectura e incidencias resueltas, garantizando trazabilidad para mantenimiento futuro. El backend agrupa REST versionado bajo `/api/v1` (salud, análisis de pose, auth y sesiones) y mantiene WebSockets en `/ws/video`, `/ws/pose-stream`, con servicios (`mediapipe_service`, `huggingface_service`) y módulos de visión (`vision/biomechanics`, `vision/feature_engine`, etc.) en archivos independientes con responsabilidad acotada. |
+| **EFICIENCIA DE DESEMPEÑO** — Comportamiento temporal y utilización de recursos adecuados a las condiciones de operación previstas. | **Medida, no estimada** (§ 7.3). El pipeline de visión sostiene **126 fotogramas/s** (p95 de 8,32 ms por fotograma) sobre Apple M5 con el modelo `pose_landmarker_full` a 640 px; el trabajo del servidor antes de enviar es de **28,02 ms p95** en el preset de 10 FPS con vista previa, del cual la mayor parte es reposo impuesto por el regulador de ritmo. El reparto por etapa muestra que la inferencia de pose consume el **93,4 %** del presupuesto y el cálculo biomecánico el **0,3 %**. La instrumentación (`pipeline_ms`, `consumer_timing_ms`) es parte del producto y permite repetir la medición en otro hardware. |
 | **DOCUMENTACIÓN** — Debe contar con: descripción del negocio (BPMN), historias de usuario, manual de instalación, manual de usuario, diagramas de arquitectura/clases/ER, plan de pruebas funcionales.                      | La memoria integra descripción de negocio, backlog, sprints, arquitectura, diagramas, plan de pruebas, manuales, resultados, conclusiones y bitácora trazable a código. Se complementa con `docs/spec/`, `docs/arquitectura.md`, `docs/guias/` y anexos de esta memoria para auditoría técnica completa.                                                                                                                                                                                                                                                                                                                                                                                                                |
 
 
 # RESULTADOS Y DISCUSIÓN
 
-El desarrollo permitió consolidar un sistema funcional de valoración biomecánica asistida por visión artificial con trazabilidad directa entre código, contratos y evidencia documental.
+Este capítulo responde la pregunta de investigación con las magnitudes medidas. Todos los
+experimentos son reproducibles: el código está en `validacion/experimentos/`, los datos
+crudos en `validacion/resultados/` y los estadísticos se calculan con el módulo
+`validacion/analisis/acuerdo.py`, verificado con pruebas unitarias.
 
-**Resultados cuantitativos del estado actual (abril de 2026):**
+**Plataforma de medición.** Apple M5 (arm64), macOS, Python 3.12.13, MediaPipe 0.10.35,
+modelo `pose_landmarker_full.task`. La latencia solo es interpretable junto al hardware,
+por lo que se declara en cada tabla.
 
-- **7 historias de usuario** en la **Tabla 1** del product backlog (HU-01 a HU-07), más **extensiones de producto** documentadas en nota (cliente React, sesiones, JWT, descarga, 2D/3D) alineadas sobre todo al **Sprint 4** del cronograma técnico.
-- **2 canales WebSocket** implementados (`/ws/pose-stream`, `/ws/video`) y backend REST versionado bajo `/api/v1/*`.
-- **15 módulos API v1** identificados en backend, incluyendo salud, pose, autenticación, sesiones, descargas y administración Dev.
-- **6 entidades ORM** de dominio para persistencia y aprendizaje continuo (`users`, `sessions`, `session_metrics`, `video_download_jobs`, `ingest_jobs`, `training_jobs`, además de `feature_samples`).
-- **3 pruebas automatizadas** activas en `tests/` enfocadas en biomecánica, seguridad de rutas y consistencia del payload de landmarks.
-- **2 frontends trazables**: `appWeb` como stack activo y `app/` Flutter como legado/histórico.
+## 7.1. Producto construido
 
-**Validación frente a goniómetro físico:** en esta versión del documento **no** se reportan estadísticos de acuerdo (error medio, desviación estándar, límites de acuerdo Bland–Altman, etc.) comparando el ángulo de rodilla estimado por visión contra medición con goniómetro manual. La historia **HU-06** (Tabla 1) deja explícito que dicho estudio comparativo es **entrega pendiente** del Sprint 6, sujeto a protocolo y muestra acordados con la directoría. Cualquier tabla o gráfico futuro deberá citar el tamaño muestral, el procedimiento de alineación de fotogramas y el software de análisis estadístico utilizado.
+| Indicador | Valor |
+|-----------|-------|
+| Canales WebSocket | 2 (`/ws/pose-stream`, `/ws/video`) |
+| Módulos de API REST v1 | 15 |
+| Entidades ORM de dominio | 7 |
+| Pruebas automatizadas | 47 (biomecánica, espacio de coordenadas, acuerdo estadístico, payload, rutas) |
+| Experimentos de validación reproducibles | 4 |
+| Clientes | `appWeb` (activo), `app/` Flutter (legado) |
 
-**Discusión técnica frente a los objetivos:**
+## 7.2. Exactitud: descomposición del error
 
-1. **Objetivo de levantamiento y análisis**: cumplido en su fase de software al definir contratos WS/REST, backlog y arquitectura modular; la extensión clínica completa del protocolo FMS queda como trabajo futuro.
-2. **Objetivo de diseño de arquitectura/UI**: cumplido con separación de capas, contratos versionados y navegación funcional en web; la migración de Flutter Web a React resolvió bloqueos de estabilidad visual.
-3. **Objetivo de módulo de inteligencia**: cumplido parcialmente con inferencia de pose y goniometría de rodilla en operación; la cobertura completa de otras articulaciones sigue en roadmap.
-4. **Objetivo de lógica de prescripción**: en progreso; existe infraestructura para clasificación y dataset, pero la prescripción correctiva automática no se considera cerrada en esta versión.
-5. **Objetivo de validación y calidad**: cumplido a nivel de validación técnica incremental (tests unitarios, protocolos de latencia y pruebas funcionales); el **contraste estadístico con goniómetro manual** corresponde a la **HU-06** y **no consta ejecutado** en el estado documentado a abril de 2026.
+El error del sistema frente a un método de referencia se descompone en el error de la
+**estimación de pose** y el error del **cálculo angular**. El segundo se acota primero,
+porque de él depende que el resto sea atribuible a la tecnología de visión.
 
-En conjunto, los resultados confirman la viabilidad del sistema para diagnóstico preventivo asistido y establecen una base robusta para escalamiento funcional y evaluación clínica posterior.
+### 7.2.1. Error del cálculo angular (Experimento 1)
+
+Se sometió la función de cálculo a 181 ángulos construidos analíticamente con verdad
+conocida, más pruebas de invariancia y de robustez.
+
+| Verificación | Resultado |
+|--------------|-----------|
+| Exactitud del ángulo interno (181 ángulos, 2 piernas) | Error máximo **6,29 × 10⁻¹³°**; MAE **1,3 × 10⁻¹⁴°** |
+| Peor caso sondeado en la región mal condicionada | **6,0 × 10⁻⁷°** |
+| Identidad flexión = 180° − interno | Exacta: **362/362** coincidencias bit a bit |
+| Acotamiento a [0°, 180°] | **0** valores fuera de rango en 724 evaluaciones |
+| Invariancia a la escala de los segmentos | Desviación máxima **7,29 × 10⁻¹³°** entre 6 configuraciones |
+| Casos degenerados (vector nulo, lista incompleta) | Devuelve `NaN` o `None` sin excepción |
+| Independencia entre piernas | Contaminación cruzada **exactamente 0°** |
+
+**Interpretación.** El residuo procede del condicionamiento de `acos`, cuya derivada
+diverge cuando el ángulo tiende a 0° o a 180°. Como un barrido de paso 1° no muestrea la
+vecindad inmediata de esos extremos, se sondeó esa región directamente para no
+sobreestimar la exactitud: el peor error en toda la zona mal condicionada es de
+**6,0 × 10⁻⁷°**, consistente con la cota de saturación teórica √(2ε) = 1,21 × 10⁻⁶°.
+Dentro del rango fisiológicamente relevante de sentadilla y carrera (20°–160°) el error
+máximo baja a 2,8 × 10⁻¹⁴°.
+
+Incluso el peor caso es **cinco órdenes de magnitud menor** que el error de medición del
+propio método de referencia clínico: la goniometría manual con goniómetro universal
+presenta un error típico de medición (SEM) del orden de **3,4°** en flexión de rodilla, y
+su *cambio mínimo detectable* es sensiblemente mayor. La aritmética del sistema es, por
+tanto, irrelevante frente a la incertidumbre del comparador.
+
+**Alcance y precondición.** Este resultado acota la **aritmética**, no el sistema completo,
+y vale **únicamente si las coordenadas de entrada son isótropas**. El propio experimento no
+ejercita esa precondición: la construye. Como muestra el apartado siguiente, alimentar la
+misma función con coordenadas anisótropas introduce un **tercer sumando** en el presupuesto
+de error —ni aritmético ni de estimación de pose, sino de espacio de coordenadas— de hasta
+16° adicionales. La afirmación «todo el error del sistema es atribuible a la estimación de
+pose» solo es legítima **una vez garantizada la isotropía**, que es exactamente lo que
+asegura la corrección de § 7.2.2 al calcular sobre coordenadas métricas.
+
+### 7.2.2. Defecto detectado y corregido: espacio de coordenadas
+
+El Experimento 2 reveló un **error sistemático en la implementación**: el ángulo se
+calculaba sobre los landmarks normalizados de MediaPipe, que **no son isótropos** (`x` se
+divide por el ancho de la imagen e `y` por el alto). En vídeo 16:9 el eje vertical queda
+estirado un factor 1,778 y el ángulo se deforma **aunque la cámara esté perfectamente
+alineada y la profundidad sea perfecta**.
+
+| Flexión verdadera | Medida con el código anterior | Error |
+|---|---|---|
+| 150,0° | 162,01° | **+12,01°** |
+| 120,0° | 135,75° | **+15,75°** |
+| 90,0° | 90,00° | +0,00° |
+| 60,0° | 44,25° | **−15,75°** |
+| 30,0° | 17,99° | **−12,01°** |
+| **Error absoluto medio** | | **9,97°** |
+
+El punto fijo en 90° es la firma del defecto: es el único ángulo en que la deformación
+anisotrópica no altera la razón entre componentes. Sobre vídeo real el sesgo alcanzaba
+**14,0° de media y 46,6° de máximo**.
+
+**Dos distorsiones, no una.** El análisis de sensibilidad reveló que la ruta anterior
+arrastraba **dos** incoherencias de escala simultáneas, de comportamiento distinto:
+
+| Distorsión | Con cámara alineada (azimut 0°) | Con azimut 20° | Con azimut 45° |
+|------------|--------------------------------|----------------|----------------|
+| Relación de aspecto (`y` frente a `x`) | **15,78°** medio (32,51° máx.) | 15,78° | 15,78° |
+| Escala de profundidad (`z` frente a `x`, `y`) | 0,00° | 10,55° | 23,82° |
+
+La primera actúa **ya con la cámara perfectamente alineada** y no depende del azimut; la
+segunda solo aparece al desalinear. Y, de forma crítica, **se compensan parcialmente entre
+sí**: aplicadas juntas el error medio a 20° de azimut es de 5,65°, menor que los 10,55°
+de la distorsión de profundidad por separado.
+
+Esa compensación es un **accidente numérico** —depende de la distancia de captura, del
+encuadre y de la relación de aspecto—, y explica por qué el defecto pasó inadvertido: el
+sistema exhibía un error menor del que le correspondía a cada causa por separado. También
+explica por qué **no basta con corregir la relación de aspecto**: hacerlo aisladamente
+destapa la distorsión de profundidad, y la medida se aleja 28,05° del estimado métrico.
+
+La corrección traslada el cálculo a los `world_landmarks` métricos, que son isótropos en
+los tres ejes y eliminan **ambas** distorsiones a la vez.
+Ver `docs/spec/goniometria-espacio-de-coordenadas.md`.
+
+**Este hallazgo es en sí mismo un resultado del trabajo**: sin el diseño experimental por
+niveles, un sesgo sistemático de hasta 32° habría permanecido invisible, porque el sistema
+producía valores plausibles, estables y de aspecto correcto en la interfaz.
+
+### 7.2.3. Tolerancia de alineación de cámara (Experimento 2)
+
+Error introducido por la desalineación de la cámara respecto del plano sagital:
+
+| Azimut | Condición 3D (profundidad correcta) | Condición 2D (sin profundidad) |
+|--------|--------------------------------------|--------------------------------|
+| 0° | 0,00° | 0,00° |
+| 10° | 0,00° | 0,43° |
+| 20° | 0,00° | 1,76° |
+| 30° | 0,00° | 4,06° |
+| 45° | 0,00° | 9,69° |
+| 90° | 0,00° | 56,84° |
+
+**Con profundidad correcta la oblicuidad no introduce error alguno**: la rotación de
+azimut es una transformación rígida y el ángulo entre segmentos es invariante. Sin
+profundidad, el error crece rápidamente.
+
+**Advertencia sobre el umbral de 5°.** Todo el análisis de esta sección adopta 5° como
+umbral de acuerdo aceptable. Conviene declarar su estatus: es una **regla práctica
+clínica**, no un valor con base estadística; la literatura de fiabilidad goniométrica lo
+recoge como criterio de uso común y a la vez lo critica por carecer de fundamento
+inferencial. Se mantiene por comparabilidad con los estudios de referencia, pero **no debe
+presentarse como un estándar normativo**. Un criterio más defendible sería anclar el
+umbral al *cambio mínimo detectable* del método de referencia empleado, que en goniometría
+manual de rodilla es netamente superior a 5°.
+
+**Recomendación operativa derivada:** en la condición 2D el error máximo se mantiene por
+debajo de 5° hasta **23,6°** de azimut y el error medio hasta **33,1°**. Se adopta
+**≤ 20°** como límite del protocolo de captura, con margen, y la cifra se incorporó a
+`docs/guias/protocolo_validacion_exactitud.md`.
+
+**Por qué se adopta la cota del caso 2D siendo el sistema 3D.** Tras la corrección de
+§ 7.2.2 el sistema calcula sobre coordenadas métricas tridimensionales, es decir, opera en
+la condición que la tabla muestra inmune a la oblicuidad. Cabría por tanto prescindir del
+límite. No se hace, y el motivo es metodológico: la inmunidad de la condición 3D presupone
+una **profundidad correcta**, y la exactitud de la profundidad que estima MediaPipe **no
+se ha validado** (§ 7.2.5). El sistema real se sitúa en algún punto entre ambas
+condiciones, tanto más cerca de la 2D cuanto peor sea su estimación de profundidad. Fijar
+el límite conservador cuesta poco —alinear la cámara es gratis— y protege frente al caso
+desfavorable mientras esa validación siga pendiente. La cota podrá relajarse cuando se
+mida la profundidad, no antes.
+
+### 7.2.4. Caracterización empírica sobre vídeo real (Experimento 3)
+
+Procesamiento completo de los cinco vídeos de referencia: **7 877 fotogramas** en 59,8 s.
+Este experimento **no mide exactitud** —no hay verdad externa asociada a esos clips—, sino
+disponibilidad de la medida, ruido y coherencia interna.
+
+| Vídeo | Régimen | Pose detectada | Ángulos calculables (**hoy**) | *Contrafactual*: si se aplicara visibilidad ≥ 0,5 |
+|-------|---------|----------------|---------------------|-------------------------------|
+| `SentadillaProfunda.mp4` | montaje (ver aviso) | 100,00 % | 100,00 % | *53,01 %* |
+| `CintaRunning.mp4` | carrera | 100,00 % | 100,00 % | 100,00 % |
+| `Running.mp4` | carrera | 100,00 % | 100,00 % | 99,90 % |
+| `Running2.mp4` | carrera | 99,70 % | 99,70 % | 99,70 % |
+| `5-00 por milha…` | carrera | 97,07 % | 97,07 % | 94,90 % |
+
+**Precisión sobre la tercera columna.** El umbral de visibilidad de 0,5
+(`pose_landmark_min_visibility_response`) **no se aplica hoy al ángulo**. Se usa
+únicamente en `landmarks_for_api_response()` para recortar la lista de landmarks que viaja
+al cliente a dibujar el esqueleto; en `build_frame_payload_v1()` el bloque `knees` se
+emite **sin filtrar**. La sentadilla reporta, por tanto, ángulo en el **100 %** de los
+fotogramas. La columna del 53,01 % es un **escenario contrafactual**: lo que quedaría si
+ese mismo criterio se aplicara también a la medida.
+
+**Hallazgo operativo.** Esa asimetría entre ambas rutas es en sí el resultado relevante:
+el sistema es **conservador al dibujar** y **incondicional al medir**. En la sentadilla,
+un **47 %** de los ángulos reportados se apoya en landmarks que el propio sistema
+considera demasiado poco visibles como para dibujarlos, y el punto limitante es
+sistemáticamente el mismo (`left_knee`, en el 54 % de los casos). El sistema no distingue
+hoy entre una medida bien soportada y una que no lo está, y el usuario no tiene forma de
+saberlo. Un mismo criterio de calidad debería gobernar ambas rutas, preferiblemente por
+articulación en lugar de con un valor global.
+
+**Piso de ruido.** En los tramos cuasi-estáticos —el caso más limpio disponible sin
+referencia externa— el ruido cuadro a cuadro es de **0,55°/fotograma** (pierna izquierda)
+y **0,42°/fotograma** (derecha) en la sentadilla; el ruido de alta frecuencia de la ruta
+de producción es de **0,79° RMS**.
+
+**Advertencia sobre el material de referencia.** La inspección visual de
+`SentadillaProfunda.mp4` reveló que **no es una toma única**: concatena al menos tres
+escenas —sentadilla en plano frontal hasta el fotograma ~55, **una persona distinta de
+pie** entre ~56 y ~85, y sentadilla en plano sagital desde ~86—. Los cortes comparten
+fondo, cámara y encuadre, por lo que no los detecta un discriminador por diferencia de
+píxeles y pasaron inadvertidos. Esto **invalida cualquier lectura del clip como recorrido
+articular continuo**: el rango de movimiento que el estimador reporta sobre él es la
+concatenación de escenas inconexas, no el recorrido articular de una sentadilla. Por eso
+este trabajo no cita rangos de movimiento como resultado.
+
+**Piso de ruido de la asimetría.** Precisamente por lo anterior, la cifra se recalculó
+**por toma** en lugar de sobre el montaje:
+
+| Segmento | n | Asimetría mediana | p95 |
+|----------|---|-------------------|-----|
+| Toma 1 — sentadilla, plano frontal | 56 | 5,35° | 9,80° |
+| Toma 2 — sujeto de pie (otra persona) | 30 | 3,57° | 12,79° |
+| Toma 3 — sentadilla, plano sagital | 97 | 5,38° | 13,70° |
+| *Montaje completo (referencia)* | 183 | 4,92° | 13,38° |
+
+La cota se sostiene: **una asimetría bilateral inferior a ~5° no es interpretable**, y el
+resultado es **robusto a la segmentación**, ya que las tres escenas —dos sujetos, dos
+planos de cámara y dos posturas distintas— convergen al mismo orden de magnitud. Es una
+cota que la interfaz debe respetar antes de emitir la alerta `asymmetry_high`. En marcha y
+carrera la asimetría es alta (mediana 26°–62°) pero corresponde a **señal real de desfase
+del ciclo**, no a ruido, y no debe mezclarse con la anterior.
+
+**Confirmación de la corrección.** El experimento compara cinco variantes de coordenadas
+sobre la misma detección. La ruta de producción coincide **exactamente** (discrepancia
+0,00°) con la variante métrica `world_xyz`, lo que confirma que la corrección de § 7.2.2
+está activa. Frente a la ruta histórica anisótropa, la discrepancia sobre vídeo real es de
+**8,84° de mediana, 32,32° en el percentil 95 y 46,63° de máximo** en la sentadilla: es la
+medida directa, sobre datos reales, del sesgo que el sistema arrastraba.
+
+### 7.2.5. Validación frente a método de referencia externo
+
+**Entrega pendiente.** Los niveles 1 y 2 del protocolo —patrón físico de ángulo conocido y
+video-goniometría manual con Kinovea— están **diseñados, instrumentados y listos para
+ejecutar**, pero **no se han ejecutado** al cierre de esta versión. En consecuencia,
+**esta memoria no reporta error absoluto del sistema completo frente a un método de
+referencia externo**, y ninguna cifra de este capítulo debe interpretarse como tal.
+
+Lo que sí queda acotado es la **fuente** de ese error: el cálculo angular no contribuye
+(§ 7.2.1) y la alineación de cámara está caracterizada (§ 7.2.3). El módulo estadístico
+que analizará esos datos está implementado y verificado (`validacion/analisis/acuerdo.py`,
+`tests/test_acuerdo.py`, 20 pruebas).
+
+## 7.3. Latencia y rendimiento (Experimento 4)
+
+### 7.3.1. Reparto por etapa del pipeline
+
+Configuración por defecto, vídeo 1080p reducido a 640 px:
+
+| Etapa | Tiempo medio | Porcentaje del total |
+|-------|--------------|----------------------|
+| **Inferencia de pose (MediaPipe)** | **7,42 ms** | **93,4 %** |
+| Lectura del fotograma | 0,50 ms | 6,3 % |
+| Cálculo de ángulos de rodilla | 0,026 ms | 0,3 % |
+| Codificación JPEG de vista previa | ≤ 0,72 ms | — |
+| **Total del pipeline** | **7,94 ms** | 100 % |
+
+**El cuello de botella es la inferencia de pose, y nada más se le acerca.** El cálculo
+biomecánico —el núcleo del trabajo— cuesta 0,3 % del presupuesto: es efectivamente gratis.
+
+### 7.3.2. Capacidad frente a latencia observada
+
+| Magnitud | Valor (p95) | Condiciones de medición |
+|----------|-------------|--------------------------|
+| Capacidad del pipeline de visión | **8,32 ms** → **126 fotogramas/s** | Nivel A: sin servidor, sin regulador, 1080p reducido a 640 px |
+| Trabajo del servidor antes de enviar | 28,02 ms | Nivel B: preset de 10 FPS con vista previa; **incluye el reposo del regulador** |
+| Latencia de entrega al cliente | 5,37 ms | Nivel B, sesión independiente de la anterior |
+
+**Estas tres magnitudes no son sumables**, y conviene declararlo antes de que alguien lo
+intente. El percentil 95 de una suma no es la suma de los percentiles 95; las dos
+mediciones de Nivel B proceden de **sesiones distintas** del perfilador; y la marca de
+tiempo del servidor se sella antes de codificar la vista previa mientras el tiempo de
+trabajo sí la incluye, de modo que la codificación JPEG (~1 ms) se contaría dos veces.
+Una cifra única de latencia extremo a extremo **exigiría instrumentar el trayecto completo
+en una sola sesión con marcas de tiempo coherentes**, y queda como trabajo pendiente. Lo
+que sí puede afirmarse con los datos disponibles es que la capacidad de cómputo excede en
+un orden de magnitud el ritmo que el sistema solicita.
+
+### 7.3.3. Hallazgo: el sistema está limitado por su propio regulador
+
+A 10 FPS objetivo el servidor **duerme 89,45 ms de los 100 ms** de presupuesto por
+fotograma: un 89 % de ocio. El retraso percibido en la interfaz **no procede de falta de
+capacidad de cómputo**, sino del ritmo impuesto por `target_fps`.
+
+Se contrastaron las cinco hipótesis del reporte previo `reporte_latencia_frames_ws_pose_stream.md`,
+que hasta ahora carecía de mediciones:
+
+| Hipótesis previa | Veredicto medido |
+|---|---|
+| Regulación por `target_fps` | **Confirmada y dominante** |
+| Coste de la inferencia de MediaPipe | **Confirmada** como mayor consumidor de CPU, pero muy por debajo del presupuesto |
+| Coste de codificar la vista previa | **Refutada en CPU** (≤ 0,72 ms); **confirmada en enlace**: el payload crece 5,6× (7,3 a 40,9 KiB) |
+| Ritmo de lectura del archivo | **Refutada**: espera en cola p95 = 0,01 ms |
+| Render en el cliente | **Sin verificar**: el cliente no está instrumentado |
+
+Además se identificaron dos causas no contempladas: el redimensionado automático
+`decode_max_side = 720` para clips 1080p cuesta **3,02 ms por fotograma sin ahorrar nada**
+en la inferencia (MediaPipe reduce a 640 px de todos modos), y bajar el ritmo objetivo
+**encarece** cada fotograma en lugar de abaratarlo (17,80 ms a 10 FPS frente a 9,76 ms a
+30 FPS).
+
+## 7.4. Discusión frente a los objetivos
+
+| Objetivo | Estado | Evidencia |
+|----------|--------|-----------|
+| 1. Especificación y delimitación de la medida | **Cumplido** | Contratos en `docs/spec/`; convención angular formalizada y verificada |
+| 2. Diseño de la arquitectura | **Cumplido** | Arquitectura desacoplada, contratos versionados REST y WebSocket |
+| 3. Módulo de goniometría digital | **Cumplido** | Operativo en vivo y por vídeo; defecto de coordenadas detectado y corregido |
+| 4. Validación de la exactitud | **Parcialmente cumplido** | Error del cálculo acotado y tolerancia de cámara determinada; **falta el contraste con referencia externa** |
+| 5. Caracterización del rendimiento | **Cumplido** | Reparto por etapa, capacidad y latencia extremo a extremo medidos |
+
+## 7.5. Contraste con la literatura
+
+Los antecedentes de validación visión–goniómetro (Örücü et al., 2025; Sabo et al., 2023)
+reportan correlaciones altas y acuerdo tipo Bland-Altman para estimación de pose frente a
+goniometría manual. **Este trabajo no está aún en condiciones de contrastar sus cifras con
+las de esa literatura**, porque el nivel de validación externa no se ha ejecutado.
+
+Sí aporta un elemento que esos trabajos no explicitan: la **descomposición del error** en
+cálculo angular y estimación de pose, y la constatación de que una implementación puede
+introducir un sesgo de hasta 32° por una decisión aparentemente inocua sobre el espacio de
+coordenadas. Es un resultado de ingeniería de software con implicación metrológica directa
+y advierte de un modo de fallo que cualquier réplica sobre MediaPipe debería comprobar.
+
+## 7.6. Limitaciones
+
+1. **Sin validación externa ejecutada.** No se reporta exactitud del sistema completo
+   frente a un patrón de referencia. Es la limitación principal.
+2. **`world_landmarks` sin validar.** La corrección adoptada es geométricamente correcta,
+   pero la exactitud de la estimación de profundidad de MediaPipe no se ha contrastado.
+3. **Una sola articulación y un solo modelo.** Rodilla, `pose_landmarker_full`.
+4. **Una sola plataforma de medición.** Las cifras de latencia son de Apple M5 y no
+   trasladables sin repetir la medición.
+5. **Cliente no instrumentado.** La latencia de render en el navegador no se midió, y no
+   se obtuvo una cifra única de latencia extremo a extremo por incoherencia entre las
+   marcas de tiempo de las distintas etapas (§ 7.3.2).
+6. **El método de referencia no es un patrón de oro.** La goniometría manual tiene un error
+   de medición propio del orden de 3°–7° (SEM) y una concordancia entre evaluadores que en
+   algunos instrumentos alcanza límites de acuerdo de casi 20°. Esto impone un **techo a lo
+   que cualquier validación contra ella puede concluir**: por debajo de la incertidumbre del
+   comparador no es posible distinguir el error del sistema del error de la referencia. La
+   validación pendiente debe reportar el error del comparador junto al del sistema, no solo
+   este último.
+7. **Material de referencia no controlado.** Los vídeos de `tests/assets/videos/` proceden
+   de material ajeno, sin control de sujeto, plano de cámara ni continuidad de toma; al
+   menos dos de los cinco resultaron ser montajes de escenas distintas. Sirven para
+   caracterizar el comportamiento del estimador, **no** como base de una comparación
+   angular con referencia externa. El protocolo de validación exige grabar material propio
+   de toma única, sujeto único y plano sagital.
+8. **Umbrales de interfaz sin recalibrar** tras la corrección del espacio de coordenadas.
 
 # IMPACTO ESPERADO
 
-**Impacto en Salud Pública y Deporte:**
-La herramienta democratiza el acceso a la valoración biomecánica de calidad, trasladando una evaluación que antes requería un fisioterapeuta certificado al smartphone de cualquier deportista. Al detectar limitaciones de movilidad y asimetrías antes del entrenamiento, el sistema reduce el riesgo de lesiones músculo-esqueléticas crónicas —una de las principales causas de abandono del ejercicio físico—, contribuyendo a la salud pública y a la longevidad deportiva de la población activa.
+El impacto se formula en condicional de forma deliberada. La validación métrica frente a
+un método de referencia externo **no se ha ejecutado** (§ 7.2.5), de modo que este capítulo
+describe el impacto que el sistema **podría** tener una vez cerrada esa validación, no un
+impacto ya conseguido. Mantener esa distinción es parte del rigor del trabajo.
 
-**Impacto Tecnológico e Innovación:**
-El proyecto demuestra la viabilidad de implementar análisis biomecánico en tiempo real mediante hardware de consumo masivo (smartphones, microcontroladores de bajo costo como ESP32-CAM), sin depender de sistemas de captura de movimiento especializados que cuestan decenas de miles de dólares. Esto sienta un precedente para el desarrollo de tecnología de salud accesible en contextos de países en desarrollo como Colombia.
+**Impacto en salud y deporte (condicionado a la validación).**
+Si la exactitud del sistema resulta comparable a la de la goniometría manual —lo que la
+literatura de referencia sugiere plausible pero este trabajo aún no ha comprobado—, la
+herramienta permitiría trasladar una valoración que hoy requiere un profesional
+certificado a un equipo de consumo. El valor no estaría en sustituir al fisioterapeuta,
+sino en dar acceso a una medida objetiva y repetible a quien hoy no accede a ninguna.
 
-**Impacto Académico — Tecnológico de Antioquia:**
-El trabajo posiciona a la Facultad de Ingeniería en Software del Tecnológico de Antioquia como pionera en la integración de computación visual y desarrollo de aplicaciones móviles para la salud deportiva. Constituye un referente técnico que futuros trabajos de grado pueden extender (nuevas articulaciones, módulo de prescripción de ejercicios, integración con wearables), creando una línea de investigación aplicada en el área de Ingeniería de Software y Biomecánica.
+**Impacto tecnológico: viabilidad de cómputo demostrada.**
+Este sí es un impacto **medido**. El trabajo demuestra que el análisis biomecánico en
+tiempo real es holgadamente viable sobre hardware de consumo: el pipeline sostiene 126
+fotogramas por segundo y el cálculo biomecánico consume el 0,3 % del presupuesto. La
+restricción práctica no es la capacidad de cómputo, sino la calidad de la estimación de
+pose y la disciplina de captura.
 
-**Impacto Económico y en la Industria Fitness:**
-La hiper-personalización basada en evidencia biométrica representa un diferenciador de valor para gimnasios, plataformas de entrenamiento online y aplicaciones de fitness. Una herramienta de diagnóstico previo al entrenamiento permite optimizar el tiempo de sesión, reducir el ausentismo por lesión y mejorar la adherencia a programas de entrenamiento a largo plazo.
+**Impacto metodológico: un modo de fallo documentado.**
+El hallazgo del sesgo por espacio de coordenadas (§ 7.2.2) tiene valor más allá de este
+proyecto. Cualquier sistema que calcule ángulos sobre landmarks normalizados de MediaPipe
+—una práctica extendida— arrastra el mismo error si no corrige la anisotropía, y el error
+se anula justo en 90°, lo que dificulta detectarlo por inspección. Documentarlo con su
+demostración y su prueba de regresión es una contribución reutilizable.
 
-**Impacto en el Ecosistema de I+D Local:**
-El sistema valida la capacidad del ecosistema tecnológico de Medellín para desarrollar soluciones de software avanzadas en el cruce entre inteligencia artificial, visión por computador y salud. Complementa los esfuerzos de grupos de investigación como el Laboratorio de Visión Artificial del ITM y el Grupo de Bioingeniería de la EAFIT, con un enfoque diferenciador: soluciones de software de código libre orientadas al usuario final no clínico.
+**Impacto académico — Tecnológico de Antioquia.**
+El trabajo aporta a la Facultad de Ingeniería una línea de computación visual aplicada a
+la salud deportiva con instrumentación reproducible: los experimentos, el módulo
+estadístico y el protocolo quedan ejecutables para que trabajos posteriores extiendan la
+validación a otras articulaciones sin rehacer la infraestructura. Conecta además con el
+uso de Kinovea que ya hace la Facultad de Educación Física, abriendo colaboración entre
+facultades.
+
+**Impacto en el ecosistema de I+D local.**
+El sistema complementa la capacidad instalada de grupos como el Laboratorio de Visión
+Artificial del ITM y el Grupo de Bioingeniería de EAFIT, con un enfoque diferenciador:
+software abierto orientado al usuario final no clínico y con la evidencia de validación
+publicada junto al código.
 
 # CONCLUSIONES
 
-1. Se diseñó e implementó un sistema funcional que automatiza la valoración inicial del movimiento mediante visión artificial, cumpliendo el objetivo general en su alcance académico actual.
-2. La arquitectura cliente-servidor adoptada permitió desacoplar captura, inferencia y visualización, facilitando mantenibilidad, evolución por sprints y trazabilidad documental.
-3. La decisión de mantener la inferencia en backend y migrar la capa web operativa a React mejoró la estabilidad de la experiencia en navegador sin alterar el núcleo biomecánico.
-4. El proyecto ya dispone de base de persistencia, autenticación técnica, trabajos asíncronos y módulo Dev para aprendizaje continuo, lo que supera un prototipo de demostración aislado.
-5. Persisten retos de cierre para nivel clínico/productivo: validación comparativa amplia con goniometría manual, cobertura de más articulaciones y formalización de prescripción personalizada.
-6. El trabajo aporta una línea reproducible de Ingeniería de Software aplicada a salud deportiva en el Tecnológico de Antioquia, con potencial de continuidad investigativa y transferencia tecnológica.
+1. **Se construyó y se midió** un sistema cliente-servidor de goniometría digital de
+   rodilla basado en estimación de pose. La aportación no es únicamente el software, sino
+   la caracterización cuantitativa de su comportamiento: qué error introduce cada parte y
+   a qué velocidad responde.
+
+2. **El cálculo angular no aporta error medible.** Frente a ángulos de verdad conocida el
+   error máximo es de 6,3 × 10⁻¹³ grados en el barrido y de 6,0 × 10⁻⁷ grados incluso en
+   la región peor condicionada, cinco órdenes de magnitud por debajo de la resolución útil
+   de cualquier sistema de visión. Esto permite atribuir
+   íntegramente el error del sistema a la estimación de pose, que es la conclusión de
+   interés para valorar la tecnología y no solo esta implementación.
+
+3. **El diseño experimental reveló un defecto sistemático que la operación normal no
+   mostraba.** El ángulo se calculaba sobre coordenadas anisótropas, con un sesgo de hasta
+   32 grados que se anulaba justo en 90 grados de flexión. El sistema producía valores
+   plausibles y estables; solo el contraste con verdad conocida lo delató. Es el argumento
+   más claro a favor de validar y no solo construir.
+
+4. **El cuello de botella no está donde se suponía.** La inferencia de pose consume el
+   93,4 % del pipeline, pero el sistema opera con un 89 % de ocio por el regulador de
+   ritmo configurado: la capacidad medida es de 126 fotogramas por segundo sostenidos
+   frente a los 10 que se venían solicitando. El retraso percibido era una decisión de
+   configuración, no un límite del hardware.
+
+5. **La arquitectura desacoplada demostró su valor metodológico.** Mantener el núcleo
+   biomecánico separado de la capa de transporte permitió someterlo a verificación
+   analítica de forma aislada, sin levantar servidor ni cliente. Sin esa separación, el
+   defecto del espacio de coordenadas habría sido mucho más difícil de acotar.
+
+6. **La pregunta de investigación queda respondida en su mitad de latencia y acotada, no
+   cerrada, en su mitad de exactitud.** Se determinó el error del cálculo, la tolerancia
+   de alineación de cámara y el rendimiento completo; falta el contraste con un método de
+   referencia externo, que está diseñado, instrumentado y pendiente de ejecución. Esta
+   limitación se declara sin atenuantes: el trabajo no afirma exactitud que no midió.
 
 # RECOMENDACIONES FUTURAS
 
-1. Ejecutar un estudio comparativo formal frente a goniometría manual con muestra controlada, protocolo estadístico y análisis de error por articulación.
-2. Extender el motor biomecánico a cadera, tobillo y tronco para acercar la cobertura funcional al protocolo FMS completo.
-3. Consolidar el módulo de prescripción automática con reglas clínicas verificables y validación por profesionales del movimiento.
-4. Fortalecer pruebas de integración end-to-end (REST/WS/frontend) y automatizar regresión visual en flujos críticos de análisis.
-5. Preparar despliegue productivo endurecido (TLS, observabilidad, gestión de secretos y políticas de retención de datos).
-6. Definir una estrategia de producto para `app/` Flutter (móvil) y `appWeb` (web) evitando duplicidad de mantenimiento en funcionalidades no prioritarias.
+1. **Ejecutar los niveles 1 y 2 del protocolo de validación**
+   (`docs/guias/protocolo_validacion_exactitud.md`). Es el trabajo de mayor valor
+   pendiente y no requiere instrumental clínico: la instrumentación, el análisis
+   estadístico y los criterios de aceptación ya están construidos y verificados.
+
+2. **Validar la estimación de profundidad de MediaPipe.** La corrección adoptada usa
+   `world_landmarks` por ser geométricamente correcta, pero su exactitud no se ha
+   contrastado. De ella depende que la invariancia a la oblicuidad de cámara demostrada
+   analíticamente se cumpla en la práctica.
+
+3. **Recalibrar los umbrales de la interfaz.** Los estados semánticos y el umbral de
+   asimetría se fijaron sobre valores sesgados por el defecto de coordenadas y ya no
+   corresponden a los valores que el sistema reporta. En particular, la alerta
+   `asymmetry_high` no debería dispararse por debajo de **5°**, que es el piso de ruido
+   medido del propio estimador (§ 7.2.4).
+
+4. **Unificar el criterio de calidad entre dibujo y medida.** El umbral de visibilidad se
+   aplica al esqueleto que se dibuja pero **no al ángulo que se reporta**: en la sentadilla
+   el **47 %** de los ángulos se apoya en landmarks que el sistema no considera lo bastante
+   visibles como para dibujarlos. Conviene propagar el criterio a la medida —marcando la
+   lectura como poco fiable en lugar de suprimirla— y ajustarlo por articulación, ya que el
+   punto limitante es sistemáticamente el mismo.
+
+5. **Elevar el ritmo objetivo por defecto.** La medición muestra margen amplio: el
+   pipeline sostiene 126 fotogramas por segundo y el preset actual usa el 11 % de esa
+   capacidad. Conviene además retirar el redimensionado `decode_max_side = 720` en clips
+   1080p, que cuesta 3 ms por fotograma sin ahorro alguno.
+
+6. **Instrumentar el cliente.** Es la única hipótesis de latencia que sigue sin verificar
+   y la que separa la latencia medida de la latencia percibida por el usuario.
+
+7. **Extender a otras articulaciones repitiendo la validación, no solo el cálculo.** La
+   extensión del cálculo es directa; lo que no es trasladable es la evidencia de
+   exactitud, que debe rehacerse por articulación.
+
+8. **Retomar el motor de prescripción con criterios clínicos verificables** y validación
+   por profesionales del movimiento, una vez cerrada la validación métrica de la medida
+   sobre la que se apoyaría.
+
+9. **Caracterizar la integración IoT en campo** (ESP32-CAM, Raspberry Pi), trasladada a
+   trabajo futuro en esta versión del alcance.
 
 # REFERENCIAS
 
 Cook, G., Burton, L., Hoogenboom, B., & Voight, M. (2006). Functional movement screening: The use of fundamental movements as an assessment of function — Part 1. *International Journal of Sports Physical Therapy*, 1(2), 62–72.
 
+Bunn, P. dos S., Rodrigues, A. I., & Bezerra da Silva, E. (2019). The association between the functional movement screen outcome and the incidence of musculoskeletal injuries: A systematic review with meta-analysis. *Physical Therapy in Sport*, *35*, 146–158. [https://doi.org/10.1016/j.ptsp.2018.11.011](https://doi.org/10.1016/j.ptsp.2018.11.011)
+
+Doctoralia. (2026). *Consulta de fisioterapia en Medellín — tarifas publicadas por profesionales*. Recuperado de [https://www.doctoralia.co/tratamientos-servicios/consulta-fisioterapia/medellin](https://www.doctoralia.co/tratamientos-servicios/consulta-fisioterapia/medellin) *(referencia de mercado local, no fuente académica; consultada en agosto de 2026)*
+
 Escobar, O., & Ortiz, L. (2021). *Guía de estudio: Test de movilidad articular y funcional (FMS)*. Instituto Claret. [https://institutoclaret.cl/wp-content/uploads/2021/04/Gu%C3%ADa-2_Test-Movilidad-ArticularFuncionalFMS.pdf](https://institutoclaret.cl/wp-content/uploads/2021/04/Gu%C3%ADa-2_Test-Movilidad-ArticularFuncionalFMS.pdf)
 
 Google LLC. (2020). *MediaPipe BlazePose: On-device Real-time Body Pose Tracking*. Google AI Blog. Recuperado de [https://ai.googleblog.com/2020/08/on-device-real-time-body-pose-tracking.html](https://ai.googleblog.com/2020/08/on-device-real-time-body-pose-tracking.html)
 
+Keogh, J. W. L., & Winwood, P. W. (2017). The epidemiology of injuries across the weight-training sports. *Sports Medicine*, *47*(3), 479–501. [https://doi.org/10.1007/s40279-016-0575-0](https://doi.org/10.1007/s40279-016-0575-0)
+
+Mehta, S. P., Barker, K., Bowman, B., Galloway, H., Oliashirazi, N., & Oliashirazi, A. (2017). Reliability, concurrent validity, and minimal detectable change for iPhone goniometer app in assessing knee range of motion. *The Journal of Knee Surgery*, *30*(6), 577–584. [https://doi.org/10.1055/s-0036-1593877](https://doi.org/10.1055/s-0036-1593877)
+
 Lugaresi, C., Tang, J., Nash, H., McClanahan, C., Ubowejr, E., Seet, M., Kanazawa, R., Chang, S., Ukita, N., & Grundmann, M. (2019). *MediaPipe: A Framework for Building Perception Pipelines*. arXiv:1906.08172. [https://arxiv.org/abs/1906.08172](https://arxiv.org/abs/1906.08172)
+
+Trinidad-Fernández, M., Gonzalez-Sanchez, M., & Cuesta-Vargas, A. I. (2019). Is a low Functional Movement Screen score (≤14/21) associated with injuries in sport? A systematic review and meta-analysis. *BMJ Open Sport & Exercise Medicine*, *5*(1), e000501. [https://doi.org/10.1136/bmjsem-2018-000501](https://doi.org/10.1136/bmjsem-2018-000501)
 
 Salazar, F., Castrillón, O., & Prieto, F. (2008). *Herramienta de asistencia para el diagnóstico de movilidad articular en 3D mediante visión artificial*. III Congreso Colombiano de Computación. Medellín, Colombia.
 
@@ -1280,6 +1875,8 @@ Flutter. (2024). *Flutter Documentation*. Google LLC. Recuperado de [https://doc
 MediaPipe. (2024). *MediaPipe Solutions Guide — Pose Landmarker*. Google LLC. Recuperado de [https://ai.google.dev/edge/mediapipe/solutions/vision/pose_landmarker](https://ai.google.dev/edge/mediapipe/solutions/vision/pose_landmarker)
 
 OpenCV Team. (2024). *OpenCV Documentation*. Recuperado de [https://docs.opencv.org/](https://docs.opencv.org/)
+
+Moore, E., Chalmers, S., Milanese, S., & Fuller, J. T. (2019). Factors influencing the relationship between the functional movement screen and injury risk in sporting populations: A systematic review and meta-analysis. *Sports Medicine*, *49*(9), 1449–1463. [https://doi.org/10.1007/s40279-019-01126-5](https://doi.org/10.1007/s40279-019-01126-5)
 
 Örücü, S., Erdağı, K., Işık, B., Özbay, E., & Osmanoğlu, U. Ö. (2025). Azure Kinect for joint range of motion analysis: A validity and reliability evaluation in elite female weightlifters. *PLOS ONE*, *20*(11), e0334890. https://doi.org/10.1371/journal.pone.0334890
 
@@ -1300,6 +1897,127 @@ Esta sección se amplía de forma incremental durante el proyecto. Sirve como re
 Las entradas nuevas se añaden **al inicio** de la lista (más reciente arriba), salvo que se indique orden cronológico inverso para un apéndice institucional.
 
 ## Entradas
+
+### 2026-08-29 — Interfaz de sustentación (tema claro, mínima) en `appWeb`
+
+- **Ámbito:** `appWeb/`, `docs/guias/`
+- **Tipo:** cambio funcional / usabilidad (ISO 25010)
+- **Descripción:** Se añadió una segunda interfaz bajo la ruta **`/sustentacion`**,
+  destinada exclusivamente a la defensa del trabajo de grado, que **convive con la
+  interfaz completa sin sustituirla**. Tres vistas: identidad y pregunta de investigación,
+  demostración de medición en vivo, y resultados medidos con lo pendiente declarado.
+  La decisión de fondo es de **legibilidad en proyección**: las interfaces oscuras se
+  lavan en proyectores de brillo medio con luz ambiente, de modo que esta usa fondo claro,
+  contraste alto y cifras de gran tamaño con unidades en tipografía de texto y valores en
+  monoespaciada tabular. **No duplica lógica**: reutiliza `useLiveAnalysisSession` y
+  `PoseSkeletonCanvas`. Como este último lee los tokens del esqueleto desde
+  `document.documentElement` al montarse, el layout los fija al entrar y los restaura al
+  salir, en lugar de declararlos en un ámbito CSS local que el componente no vería.
+- **Trazabilidad:** `appWeb/src/pages/sustentacion/` (layout, portada, demo, resultados y
+  hoja de estilo), `appWeb/src/router.tsx`, `appWeb/src/config/navLinks.ts`,
+  `docs/guias/SETUP.md`
+
+
+### 2026-08-29 — Revisión bibliográfica: retirada de afirmaciones causales y normalización del léxico
+
+- **Ámbito:** `docs/`
+- **Tipo:** gobernanza documental / rigor académico
+- **Descripción:** Una revisión de la evidencia detectó una afirmación epidemiológica
+  **sin fuente y factualmente incorrecta** —la rodilla como articulación más lesionada en
+  entrenamiento de fuerza—, refutada por Keogh y Winwood (2017), que la sitúan cuarta
+  (9 %) tras hombro (36 %), lumbar (24 %) y codo (11 %). La elección de la rodilla se
+  rejustifica por **tratabilidad metrológica** (articulación de tipo bisagra frente a la
+  enartrosis del hombro, que una cámara monocular no puede desambiguar) y se declara como
+  limitación de alcance. La auditoría subsiguiente retiró o reformuló otras siete
+  afirmaciones: la tendencia causal «incremento de lesiones debido a patrones
+  disfuncionales», la jerarquía «principales precursores», el valor predictivo de las
+  asimetrías, la afirmación universal de estado del arte «no existen sistemas de
+  diagnóstico preventivo», la promesa de «reducir el riesgo de lesiones» de la
+  justificación, el «costo elevado» sin referente y la superlativa «terna más estable»
+  —esta última **sustituida por medición propia**: visibilidad mínima mediana de 0,828 en
+  la terna de rodilla frente a 0,519 en la de codo, con el empate frente a la terna de
+  tobillo y el sesgo del material declarados. Se adopta la regla de que ninguna frase con
+  verbo causal, superlativo o cifra permanezca sin fuente verificable, y se normaliza el
+  léxico clínico (**diagnóstico → medición**, **previene → no evaluado**), coherente con
+  que el trabajo es de Ingeniería de Software y no una investigación clínica sobre
+  predicción de lesiones.
+- **Trazabilidad:** `docs/Formato_trabajo_de_grado.md` (§ introducción, definición del
+  problema, justificación, marco conceptual, contexto del software, § Referencias),
+  `docs/guias/citas_pendientes.md`
+
+
+### 2026-08-29 — Corrección crítica: espacio de coordenadas del cálculo goniométrico
+
+- **Ámbito:** `backend/vision/`, `docs/spec/`
+- **Tipo:** incidencia crítica / decisión arquitectónica
+- **Descripción:** El ángulo de rodilla se calculaba sobre los **landmarks normalizados**
+  de MediaPipe, que **no son isótropos** (`x` dividido por el ancho de la imagen, `y` por
+  el alto). En vídeo 16:9 eso deforma el ángulo aunque la cámara esté perfectamente
+  alineada. Error medido: **media 14,0°, máximo 46,6°** sobre `SentadillaProfunda.mp4`.
+  El sesgo es sistemático —nulo en 90° de flexión y creciente hacia los extremos del
+  rango—, no ruido. El cálculo pasa a realizarse sobre `world_landmarks` (métricos,
+  isótropos por construcción y además invariantes a la oblicuidad de cámara), con
+  repliegue a landmarks corregidos por relación de aspecto. Se descartó corregir solo la
+  relación de aspecto manteniendo la `z` normalizada: esa variante se aleja 28,1° del
+  estimado métrico, porque la `z` de los landmarks normalizados es un estimador de
+  profundidad débil. Detectado por el Experimento 2 y confirmado con una prueba sintética
+  de verdad conocida en la que el código anterior erraba 9,97° de media y las coordenadas
+  métricas aciertan de forma exacta.
+- **Trazabilidad:** `backend/vision/biomechanics.py` (`angulos_rodilla`,
+  `escalar_a_isotropico`), `backend/vision/pose_extractor.py`,
+  `backend/vision/feature_engine.py`, `tests/test_goniometria_espacio_coordenadas.py`,
+  `docs/spec/goniometria-espacio-de-coordenadas.md`,
+  `docs/spec/websocket-pose-stream.md`
+
+### 2026-08-29 — Delimitación del alcance y reformulación de la pregunta de investigación
+
+- **Ámbito:** `docs/`
+- **Tipo:** gobernanza documental / decisión de alcance
+- **Descripción:** La memoria describía un sistema pero no respondía una pregunta
+  verificable, y comprometía entregables sin construir (motor de prescripción, cobertura
+  articular FMS). Se reformula la **pregunta problema** hacia exactitud y latencia de la
+  goniometría de rodilla; el **objetivo general** pasa de «desarrollar» a «desarrollar y
+  evaluar»; los **objetivos específicos** se reordenan en tres de construcción (cumplidos)
+  y dos de evaluación (el trabajo restante). El **alcance** se estratifica en tres niveles
+  —núcleo evaluado, infraestructura de soporte y fuera del alcance— de modo que el
+  software construido pero no evaluado (Celery, Dev Tools, clasificador, IoT, 3D) quede
+  documentado como decisión de ingeniería sin sostener afirmaciones de resultado.
+  **HU-05** (IoT) se traslada a trabajo futuro y **HU-06** pasa de verificación final a
+  núcleo del trabajo. El sprint 5 se convierte en sprint de evaluación.
+- **Trazabilidad:** `docs/Formato_trabajo_de_grado.md` (§ definición del problema,
+  objetivos, alcance, marco metodológico, backlog, sprints 4–6, cronograma)
+
+### 2026-08-29 — Diseño experimental por niveles y construcción de los instrumentos
+
+- **Ámbito:** `validacion/`, `docs/guias/`, `tests/`
+- **Tipo:** decisión metodológica / cambio funcional
+- **Descripción:** Ante la ausencia de goniómetro clínico y de muestra poblacional, se
+  adopta una **validación por niveles de evidencia** en la que cada nivel aísla una fuente
+  de error y es interpretable por sí mismo. Se construyen y ejecutan cuatro experimentos
+  reproducibles: verificación geométrica del cálculo angular, sensibilidad a la oblicuidad
+  de cámara, caracterización empírica sobre vídeo real y perfilado de latencia por etapas.
+  Se añade el módulo de estadística de acuerdo (MAE, RMSE, sesgo, Bland-Altman, ICC(2,1),
+  error por tramo angular) verificado contra casos de propiedades conocidas, y el
+  protocolo de la validación física ejecutable sin instrumental clínico.
+- **Trazabilidad:** `validacion/experimentos/`, `validacion/analisis/acuerdo.py`,
+  `tests/test_acuerdo.py`, `docs/guias/protocolo_validacion_exactitud.md`,
+  `validacion/resultados/`
+
+### 2026-08-29 — Normalización de fin de línea y entorno reproducible en macOS
+
+- **Ámbito:** `infra`, `docs/guias/`
+- **Tipo:** incidencia / mitigación
+- **Descripción:** El repositorio se editaba desde Windows y macOS sin `.gitattributes`,
+  de modo que **361 archivos aparecían modificados** por diferencias de CRLF frente a LF
+  (41 526 inserciones y 41 526 supresiones, sin un solo cambio real), lo que impedía
+  distinguir trabajo efectivo y bloqueaba cualquier commit limpio. Se añade
+  `.gitattributes` con normalización a LF y excepciones CRLF para scripts nativos de
+  Windows, y se documenta `core.precomposeunicode` para evitar la duplicación de archivos
+  con tildes en macOS (NFD frente a NFC). El entorno de Python se recrea para macOS
+  arm64: el entorno virtual versionado era de Windows y el intérprete del sistema (3.9)
+  no alcanza el mínimo de MediaPipe. `SETUP.md` pasa a cubrir las tres plataformas.
+- **Trazabilidad:** `.gitattributes`, `docs/guias/SETUP.md`, `README.md`
+
 
 ### 2026-05-25 — Mitigación inestabilidad overlay en vivo (60 FPS percibidos)
 
@@ -1383,14 +2101,14 @@ Las entradas nuevas se añaden **al inicio** de la lista (más reciente arriba),
 - **Ámbito:** `backend/`, `appWeb/`, `docs/spec/`, `docs/guias/`
 - **Tipo:** cambio funcional / calidad de datos en UI
 - **Descripción:** Se añadió `GET /api/v1/dev/ingest/thumb?id=<youtube_id>` para servir la imagen `mqdefault.jpg` desde el backend (httpx + `Referer` a YouTube), evitando bloqueos del navegador. La pantalla **Dev · Fuentes de datos** consume el proxy con `fetch` y blob URL para poder enviar `X-Dev-API-Key` cuando está configurada.
-- **Trazabilidad:** `backend/app/api/v1/dev/ingest.py`, `appWeb/src/pages/dev/DataSourcesPage.tsx`, `docs/spec/dev-learning-api.md`, `docs/guias/manual_aprendizaje_continuo_y_entrenamiento.md`
+- **Trazabilidad:** `backend/app/api/v1/dev/ingest.py`, `appWeb/src/pages/dev/DataSources/DataSources.tsx`, `docs/spec/dev-learning-api.md`, `docs/guias/manual_aprendizaje_continuo_y_entrenamiento.md`
 
 ### 2026-04-04 — Descubribilidad Dev Tools en Inicio y flujo por vistas en el manual
 
 - **Ámbito:** `appWeb/`, `docs/guias/`
 - **Tipo:** usabilidad / documentación
 - **Descripción:** La página de inicio enlaza las cuatro rutas `/dev/*` bajo «Desarrollo — aprendizaje del clasificador». El manual aclara que el entrenamiento no está en análisis de vídeo y describe el orden de clics (Configuración → Dataset → Entrenamiento → Modelos).
-- **Trazabilidad:** `appWeb/src/pages/HomePage.tsx`, `docs/guias/manual_aprendizaje_continuo_y_entrenamiento.md` §4.0
+- **Trazabilidad:** `appWeb/src/pages/Home/Home.tsx`, `docs/guias/manual_aprendizaje_continuo_y_entrenamiento.md` §4.0
 
 ### 2026-04-04 — Manual de operación: entrenamiento del clasificador y módulo Dev
 
@@ -1464,16 +2182,47 @@ Las entradas nuevas se añaden **al inicio** de la lista (más reciente arriba),
 | Aprendizaje continuo    | `appWeb/src/pages/dev/`*                     | `backend/app/api/v1/dev/*`                  | `docs/spec/dev-learning-api.md`                 |
 
 
-## Anexo B. Evidencia de pruebas automatizadas actuales
+## Anexo B. Evidencia de pruebas automatizadas
 
-- `tests/test_biomechanics.py`
-- `tests/test_unified_payload_landmarks.py`
-- `tests/test_paths_suffix.py`
+**47 pruebas en verde** (agosto de 2026). Reproducir con `pytest -q` desde la raíz.
 
-## Anexo C. Evidencia de medición de latencia
+| Archivo | Pruebas | Cubre |
+|---------|---------|-------|
+| `tests/test_biomechanics.py` | 3 | Cálculo de ángulos de rodilla y codo |
+| `tests/test_goniometria_espacio_coordenadas.py` | 18 | Isotropía del espacio de coordenadas; regresión del defecto de § 7.2.2 |
+| `tests/test_acuerdo.py` | 20 | Estadística de acuerdo: MAE, RMSE, sesgo, Bland-Altman, ICC(2,1), error por tramo |
+| `tests/test_unified_payload_landmarks.py` | 3 | Filtrado por visibilidad en el payload |
+| `tests/test_paths_suffix.py` | 3 | Robustez de rutas de archivo |
 
-- Documento técnico: `docs/guias/reporte_latencia_frames_ws_pose_stream.md`
-- Script de profiling: `backend/scripts/profile_pose_stream.py`
+## Anexo C. Evidencia experimental
+
+### C.1. Instrumentos ejecutables
+
+| Experimento | Script | Informe |
+|-------------|--------|---------|
+| E1. Verificación geométrica | `validacion/experimentos/exp1_verificacion_geometrica.py` | `validacion/resultados/exp1_verificacion_geometrica.md` |
+| E2. Sensibilidad a la oblicuidad | `validacion/experimentos/exp2_sensibilidad_oblicuidad.py` | `validacion/resultados/exp2_sensibilidad_oblicuidad.md` |
+| E3. Caracterización empírica | `validacion/experimentos/exp3_estabilidad_temporal.py` | `validacion/resultados/exp3_estabilidad_temporal.md` |
+| E4. Latencia y rendimiento | `validacion/experimentos/exp4a_latencia_etapas.py` | `validacion/resultados/exp4_latencia.md` |
+
+### C.2. Datos crudos y figuras
+
+- Series angulares por vídeo: `validacion/resultados/series/*.csv` (7 877 fotogramas)
+- Mallas de error y agregados: `validacion/resultados/*.csv`
+- Figuras: `validacion/resultados/*.png`
+- Módulo estadístico: `validacion/analisis/acuerdo.py`
+- Exportación para comparación manual: `validacion/analisis/exportar_para_kinovea.py`
+
+### C.3. Protocolo de validación física
+
+`docs/guias/protocolo_validacion_exactitud.md` — niveles, criterios de aceptación
+fijados antes de medir, plantillas de registro y amenazas a la validez.
+
+### C.4. Análisis previo de latencia
+
+`docs/guias/reporte_latencia_frames_ws_pose_stream.md` — enumeró las hipótesis de
+cuello de botella sin medirlas; sus cinco hipótesis quedan contrastadas en § 7.3.3.
+Perfilador: `backend/scripts/profile_pose_stream.py`.
 
 ## Anexo D. Guía operativa de instalación
 

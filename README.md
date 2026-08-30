@@ -18,6 +18,17 @@ Bio-Motion Evaluator integra:
 
 La inferencia corre en el **servidor**; los clientes capturan fotogramas, envían por WebSocket y renderizan el esqueleto y las métricas en tiempo real. Evaluación de calidad alineada con **ISO/IEC 25010** (usabilidad, mantenibilidad, escalabilidad).
 
+### Pregunta de investigación
+
+> ¿Con qué **exactitud**, frente a métodos de referencia de medición angular, y bajo qué
+> **latencia** extremo a extremo puede una arquitectura cliente-servidor con inferencia de
+> pose en el servidor estimar el ángulo de flexión de rodilla y la asimetría bilateral en
+> tiempo real sobre hardware de consumo?
+
+El trabajo no se limita a construir el sistema: lo **mide**. Los instrumentos de validación
+son ejecutables y reproducibles y viven en [`validacion/`](validacion/); el protocolo de
+medición está en [`docs/guias/protocolo_validacion_exactitud.md`](docs/guias/protocolo_validacion_exactitud.md).
+
 Documentación de tesis y specs: [`docs/`](docs/README.md) · Arquitectura: [`docs/arquitectura.md`](docs/arquitectura.md) · Borrador académico: [`docs/Formato_trabajo_de_grado.md`](docs/Formato_trabajo_de_grado.md)
 
 ---
@@ -160,12 +171,25 @@ Pruebas alineadas al spec: [`docs/spec/live-camera-analysis.md`](docs/spec/live-
 Repositorio/
 ├── appWeb/          # Cliente React (frontend activo)
 ├── backend/         # FastAPI + visión + workers
+├── validacion/      # Experimentos de exactitud y latencia (evidencia de la tesis)
+│   ├── experimentos/   # Scripts ejecutables y reproducibles
+│   ├── analisis/       # Estadística de acuerdo (MAE, Bland-Altman, ICC)
+│   └── resultados/     # CSV, figuras e informes generados
 ├── app/             # Flutter (legado)
 ├── iot/             # Firmware / notas IoT
 ├── docs/            # Tesis, specs, guías, arquitectura
 ├── tests/           # Pruebas y assets de vídeo (MP4 en .gitignore)
 └── scripts/         # Atajos PowerShell (backend, publish)
 ```
+
+### Reproducir la validación
+
+```bash
+cd backend && PYTHONPATH=. python ../validacion/experimentos/exp1_verificacion_geometrica.py
+cd backend && PYTHONPATH=. python ../validacion/experimentos/exp3_estabilidad_temporal.py
+```
+
+Los informes y datos crudos se regeneran en `validacion/resultados/`.
 
 ---
 
@@ -197,6 +221,8 @@ Ver [`iot/README.md`](iot/README.md).
 | [`docs/spec/live-camera-analysis.md`](docs/spec/live-camera-analysis.md) | Análisis en vivo (cámara + `/ws/video`) |
 | [`docs/spec/websocket-pose-stream.md`](docs/spec/websocket-pose-stream.md) | Streaming pose por archivo/cámara servidor |
 | [`docs/spec/api-v1-rest.md`](docs/spec/api-v1-rest.md) | API REST v1 |
+| [`docs/guias/protocolo_validacion_exactitud.md`](docs/guias/protocolo_validacion_exactitud.md) | Protocolo de validación de exactitud (niveles, criterios, amenazas a la validez) |
+| [`validacion/resultados/`](validacion/resultados/) | Resultados numéricos, figuras e informes de los experimentos |
 | [`presentacion.md`](presentacion.md) | Guion de sustentación (si aplica) |
 
 ---
@@ -217,6 +243,6 @@ Pendiente de definición según política institucional del trabajo de grado. Co
 
 ## Referencia académica (extracto)
 
-> *Bio-Motion Evaluator automatiza la valoración de movilidad articular y la detección de asimetrías en entrenamiento de fuerza, integrando visión artificial (MediaPipe), comunicación WebSocket en tiempo real y arquitectura cliente-servidor con separación entre captura, inferencia y visualización.*
+> *Bio-Motion Evaluator implementa y **evalúa** la goniometría digital de rodilla mediante visión artificial (MediaPipe BlazePose) sobre una arquitectura cliente-servidor con inferencia en servidor, separando captura, inferencia y visualización. El trabajo caracteriza la exactitud de la medición angular frente a métodos de referencia y su latencia extremo a extremo sobre hardware de consumo.*
 
 Palabras clave: visión artificial, estimación de pose, goniometría digital, FastAPI, React, WebSocket, biomecánica, ISO/IEC 25010.

@@ -1,68 +1,256 @@
-# Configuración del entorno (Windows)
+# Configuración del entorno de desarrollo
 
-## GitHub CLI (`gh`)
+Guía de instalación del monorepo **Bio-Motion Evaluator** en **Windows**, **macOS** y **Linux**.
 
-1. Instalación (elige uno):
-   - **winget:** `winget install --id GitHub.cli -e --accept-package-agreements`
-   - **Descarga:** [https://cli.github.com/](https://cli.github.com/)
-2. Cierra y vuelve a abrir la terminal para refrescar el `PATH`.
-3. Autenticación (interactiva):
-   ```bash
-   gh auth login
-   ```
+> El cliente web activo es [`appWeb/`](../../appWeb/) (React 19 + Vite). La carpeta
+> [`app/`](../../app/) (Flutter) es **legado**: solo instala Flutter si vas a trabajar
+> el histórico móvil.
 
-## Flutter
+---
 
-1. Descarga el SDK desde [Install Flutter on Windows](https://docs.flutter.dev/get-started/install/windows).
-2. Extrae el SDK y añade `flutter\bin` al **PATH** del sistema (o de usuario).
-3. Ejecuta:
-   ```bash
-   flutter doctor
-   ```
-4. En este monorepo, dentro de `app/`:
-   ```bash
-   cd app
-   flutter create . --platforms=web,android,ios --project-name bio_motion_app
-   flutter pub get
-   ```
+## 0. Requisitos previos
 
-## Crear el repositorio remoto y subir código
+| Componente | Versión | Necesario para |
+|------------|---------|----------------|
+| **Python** | 3.10 – 3.12 | Backend, motor de visión, experimentos de validación |
+| **Node.js** | 20+ | Cliente web `appWeb/` |
+| **Git** | Reciente | Control de versiones |
+| PostgreSQL | 15+ | *Opcional* — auth, sesiones, aprendizaje continuo |
+| Redis | 7.x | *Opcional* — Celery (descargas, entrenamiento, ingesta) |
+| Flutter | 3.x | *Solo* para el legado en `app/` |
 
-Desde la raíz del monorepo (donde está `README.md`):
+**Python 3.13 aún no está soportado** por las ruedas (*wheels*) de MediaPipe 0.10.x.
+Usa 3.11 o 3.12.
 
-**PowerShell (Windows):** tras `gh auth login`, puedes ejecutar [`scripts/publish-github.ps1`](../../scripts/publish-github.ps1).
+---
 
-```bash
-git add .
-git commit -m "chore: estructura inicial monorepo bio-motion-evaluator"
-gh repo create bio-motion-evaluator --public --source=. --remote=origin --push
-```
+## 1. Finales de línea (importante en equipos mixtos)
 
-Si el remoto ya existe:
+El repositorio almacena **LF** y define las reglas en [`.gitattributes`](../../.gitattributes).
+Esto es obligatorio porque el proyecto se edita desde Windows y desde macOS: sin esa
+normalización, un clon en cada sistema ve *el repositorio entero* como modificado y
+resulta imposible distinguir los cambios reales.
+
+Tras clonar, verifica que la copia de trabajo está limpia:
 
 ```bash
-git remote add origin https://github.com/TU_USUARIO/bio-motion-evaluator.git
-git push -u origin main
+git status --short     # no debe listar cientos de archivos modificados
 ```
 
-**(Nota)** Si la rama por defecto es `master`, usa `git branch -M main` antes del push.
+Si aparecen cientos de archivos modificados sin que hayas tocado nada:
 
-## MediaPipe (backend)
+```bash
+git config core.autocrlf false
+git config core.precomposeunicode true   # macOS: acentos en nombres de archivo (NFD/NFC)
+git add --renormalize .
+git status --short                        # ahora debe estar limpio
+```
 
-Tras `pip install -r requirements.txt`, descarga el modelo de pose:
+`core.precomposeunicode` evita que macOS duplique archivos con tildes o eñes en el
+nombre (por ejemplo `EstandarDiseño.md`), que de otro modo aparecen como archivos
+nuevos sin serlo.
+
+---
+
+## 2. Backend (FastAPI + MediaPipe)
+
+### 2.1. Entorno virtual
+
+**Windows (PowerShell):**
+
+```powershell
+cd backend
+python -m venv .venv
+.venv\Scripts\activate
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+**macOS / Linux:**
 
 ```bash
 cd backend
-python scripts/download_models.py
+python3.12 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+pip install -r requirements.txt
 ```
 
-Por defecto se descarga **pose_landmarker_full.task** (más preciso). Para **lite** (más FPS): `python scripts/download_models.py lite` y `MEDIAPIPE_POSE_MODEL_PATH=models/pose_landmarker_lite.task` en `.env`.
+> **macOS con el repositorio en un disco montado** (macFUSE, NTFS, unidad de red):
+> crea el entorno virtual **fuera** del punto de montaje. Un `venv` son decenas de
+> miles de archivos pequeños y los montajes síncronos lo hacen extremadamente lento:
+>
+> ```bash
+> python3.12 -m venv ~/.venvs/biomotion
+> ~/.venvs/biomotion/bin/pip install -r backend/requirements.txt
+> ```
+>
+> Un entorno creado en Windows **no es reutilizable** en macOS: contiene
+> `Scripts/` y `Lib/` en lugar de `bin/` y `lib/`. Hay que recrearlo.
 
-La ruta del modelo se puede configurar con `MEDIAPIPE_POSE_MODEL_PATH` en `.env` (ver `backend/.env.example`).
+### 2.2. Modelo de pose
 
-## Desarrollo con recarga activa
+```bash
+cd backend
+python scripts/download_models.py          # descarga pose_landmarker_full.task
+```
 
-- **FastAPI:** usa siempre `uvicorn ... --reload`, que reinicia el servidor al guardar cambios en `.py`. Script: [`scripts/start-dev-backend.ps1`](../../scripts/start-dev-backend.ps1) desde la raíz.
-- **Flutter:** el comando `flutter run` se queda en ejecución; en la misma terminal **r** = hot reload, **R** = hot restart. Script: [`scripts/start-dev-flutter.ps1`](../../scripts/start-dev-flutter.ps1).
-- Mantén **dos procesos** en paralelo (dos terminales o dos tareas): API + app.
+Para priorizar FPS sobre precisión: `python scripts/download_models.py lite` y
+`MEDIAPIPE_POSE_MODEL_PATH=models/pose_landmarker_lite.task` en `.env`
+(ver [`backend/.env.example`](../../backend/.env.example)).
 
+### 2.3. Levantar el API
+
+```bash
+cd backend
+uvicorn app.main:app --reload --port 8000
+```
+
+Comprobación: `curl http://127.0.0.1:8000/api/v1/health` → `200`.
+Documentación interactiva en `http://127.0.0.1:8000/docs`.
+
+En Windows existe el atajo [`scripts/start-dev-backend.ps1`](../../scripts/start-dev-backend.ps1).
+
+### 2.4. Dependencias de entrenamiento (opcional)
+
+Solo si vas a usar el módulo de aprendizaje continuo (`/dev/*`):
+
+```bash
+pip install -r requirements-train.txt
+```
+
+---
+
+## 3. Cliente web `appWeb/` (React + Vite)
+
+```bash
+cd appWeb
+npm install
+cp .env.example .env.local     # Windows: copy .env.example .env.local
+npm run dev
+```
+
+> **`node_modules` no es portable entre sistemas.** Igual que el entorno virtual de
+> Python, contiene **binarios nativos** compilados para una plataforma concreta
+> (`@rolldown/binding-win32-x64-msvc` frente a `binding-darwin-arm64`). Si el
+> repositorio se comparte entre Windows y macOS a través de un disco montado, el
+> `build` fallará con `MODULE_NOT_FOUND` en el sistema que no coincida. La solución
+> es volver a ejecutar `npm install` al cambiar de sistema operativo.
+
+Abre `http://localhost:5173`. La URL del backend se ajusta en
+**Configuración → Conexión** o mediante las variables de
+[`appWeb/.env.example`](../../appWeb/.env.example).
+
+Las variables `VITE_MVP_*` controlan qué se muestra en la interfaz. Para desarrollo
+con la UI completa: `VITE_MVP_DEMO_MODE=false`.
+
+### Interfaz de sustentación
+
+Ruta **`/sustentacion`** — interfaz de tema claro, mínima, pensada para proyectarse en
+aula durante la defensa del trabajo de grado. Convive con la interfaz completa sin
+sustituirla y no depende de las banderas `VITE_MVP_*`.
+
+| Vista | Ruta | Contenido |
+|-------|------|-----------|
+| Inicio | `/sustentacion` | Identidad del trabajo y pregunta de investigación |
+| Demostración | `/sustentacion/demo` | Medición angular en vivo desde la cámara |
+| Resultados | `/sustentacion/resultados` | Cifras medidas y lo que queda pendiente |
+
+Reutiliza el mismo `useLiveAnalysisSession` y el mismo `PoseSkeletonCanvas` que la
+interfaz principal: no duplica la lógica de captura ni de WebSocket.
+
+---
+
+## 4. Pruebas
+
+```bash
+# Desde la raíz del repositorio, con el entorno virtual activo
+pytest -q
+```
+
+`pytest.ini` fija `pythonpath=backend` y `testpaths=tests`, de modo que las pruebas
+importan el motor de visión sin instalación adicional.
+
+Si usas un entorno virtual fuera del repositorio:
+
+```bash
+~/.venvs/biomotion/bin/python -m pytest -q
+```
+
+---
+
+## 5. Servicios opcionales
+
+### PostgreSQL (sesiones, autenticación, dataset)
+
+```bash
+# Ajusta DATABASE_URL en backend/.env
+cd backend
+alembic upgrade head
+```
+
+Sin PostgreSQL el análisis en vivo y por vídeo funcionan igual; lo que se desactiva
+es la persistencia de sesiones y el módulo `/dev/*`.
+
+### Redis + Celery (descargas, entrenamiento, ingesta)
+
+```bash
+cd backend
+celery -A app.workers.celery_app worker --loglevel=info
+```
+
+---
+
+## 6. Flutter (solo legado `app/`)
+
+1. SDK desde [docs.flutter.dev/get-started/install](https://docs.flutter.dev/get-started/install).
+2. Añade `flutter/bin` al `PATH` y ejecuta `flutter doctor`.
+3. En el monorepo:
+
+```bash
+cd app
+flutter pub get
+flutter run
+```
+
+No añadas funcionalidad nueva aquí: ver la regla de alcance en
+[`.cursorrules`](../../.cursorrules).
+
+---
+
+## 7. GitHub CLI (`gh`)
+
+| Sistema | Instalación |
+|---------|-------------|
+| Windows | `winget install --id GitHub.cli -e` |
+| macOS | `brew install gh` |
+| Linux | Ver [cli.github.com](https://cli.github.com/) |
+
+```bash
+gh auth login
+```
+
+---
+
+## 8. Verificación de extremo a extremo
+
+Comprobación rápida de que el motor de visión funciona sobre un vídeo de referencia:
+
+```bash
+cd backend
+PYTHONPATH=. python -c "
+import cv2
+from pathlib import Path
+from vision.pose_extractor import extract_pose_bgr_video
+cap = cv2.VideoCapture('../tests/assets/videos/SentadillaProfunda.mp4')
+ret, frame = cap.read()
+pf = extract_pose_bgr_video(frame, Path('models/pose_landmarker_full.task'), 0)
+print('pose detectada:', pf.ok, '| rodillas:', pf.knees)
+cap.release()
+"
+```
+
+Debe imprimir `pose detectada: True` y los cuatro ángulos de rodilla en grados.
+
+MediaPipe escribe líneas informativas en `stderr` al inicializar el contexto gráfico
+(`I0000 ... gl_context.cc`). **No son errores.**
