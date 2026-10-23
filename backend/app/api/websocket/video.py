@@ -56,7 +56,7 @@ def _maybe_log_pose_timing(frame_idx: int, payload: dict) -> None:
 @router.websocket("/ws/video")
 async def video_stream(ws: WebSocket) -> None:
     """
-    Recibe fotogramas binarios (JPEG) desde cliente o IoT.
+    Recibe fotogramas binarios (JPEG) desde el cliente.
 
     **Protocolo recomendado (análisis en vivo):**
     1. Primer mensaje **texto** JSON: ``{"analyze_pose": true}``

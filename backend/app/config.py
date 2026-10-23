@@ -81,7 +81,7 @@ class Settings(BaseSettings):
 
     @staticmethod
     def repo_root() -> Path:
-        """Raíz del monorepo (directorio que contiene `app/`, `backend/`, `tests/`)."""
+        """Raíz del repositorio (directorio que contiene `appWeb/`, `backend/`, `tests/`)."""
         return Path(__file__).resolve().parents[2]
 
     @classmethod

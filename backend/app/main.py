@@ -24,7 +24,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title=settings.app_name, version=settings.app_version, lifespan=lifespan)
 
 # CORS: con allow_credentials=True no puede usarse allow_origins=["*"] (el navegador bloquea).
-# Flutter web usa puertos aleatorios en localhost; el regex cubre cualquier puerto en dev.
+# El cliente web (Vite) puede servirse en distintos puertos de localhost; el regex cubre cualquier puerto en dev.
 _cors_kw = {"allow_methods": ["*"], "allow_headers": ["*"]}
 _origins = settings.cors_origins_list
 if _origins == ["*"]:
