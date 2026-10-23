@@ -7,7 +7,6 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
 from app.config import settings
 from app.paths import backend_root
-from app.services.feature_sample_persist import build_optional_feature_collector
 from vision.realtime_engine import RealtimeEngineSession
 
 log = logging.getLogger(__name__)
@@ -108,7 +107,6 @@ async def video_stream(ws: WebSocket) -> None:
                         inference_stride=settings.pose_inference_stride,
                         analysis_enabled=not capture_only,
                         forced_exercise_label=forced_exercise_label,
-                        feature_collector=build_optional_feature_collector(),
                     )
                 payload = await asyncio.to_thread(_process_jpeg_frame, engine, chunk, frame_idx)
                 _maybe_log_pose_timing(frame_idx, payload)
@@ -135,7 +133,6 @@ async def video_stream(ws: WebSocket) -> None:
                             inference_stride=settings.pose_inference_stride,
                             analysis_enabled=not capture_only,
                             forced_exercise_label=forced_exercise_label,
-                            feature_collector=build_optional_feature_collector(),
                         )
                     payload = await asyncio.to_thread(_process_jpeg_frame, engine, chunk, frame_idx)
                     _maybe_log_pose_timing(frame_idx, payload)

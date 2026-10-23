@@ -9,7 +9,6 @@ import numpy as np
 
 from app.models.schemas import ExerciseClassifierConfig
 from vision.exercise_classifier import build_classifier
-from vision.feature_collector import FeatureCollector
 from vision.feature_engine import FeatureEngine
 from vision.model_registry import ModelRegistry
 from vision.pipeline_timer import StageTimer
@@ -29,7 +28,6 @@ class RealtimeEngineSession:
         inference_stride: int = 1,
         analysis_enabled: bool = True,
         forced_exercise_label: str | None = None,
-        feature_collector: FeatureCollector | None = None,
     ) -> None:
         self._model_path = model_path
         self._cfg = classifier_cfg or ExerciseClassifierConfig()
@@ -37,7 +35,6 @@ class RealtimeEngineSession:
         self._analysis_enabled = bool(analysis_enabled)
         raw_forced = (forced_exercise_label or "").strip()
         self._forced_exercise_label: str | None = raw_forced.lower() if raw_forced else None
-        self._feature_collector = feature_collector
         self._last_pose: PoseFrame | None = None
         if self._analysis_enabled:
             self._features = FeatureEngine(self._cfg)
@@ -122,15 +119,6 @@ class RealtimeEngineSession:
         ff = self._features.build_feature_frame(pose, frame_index, c.label, c.confidence)
         r = self._router.update(ff)
         st.mark_track()
-        if self._feature_collector is not None:
-            self._feature_collector.maybe_collect(
-                vec,
-                window_full=self._features.window_full(),
-                label=c.label,
-                confidence=float(c.confidence),
-                pose_ok=bool(pose.ok),
-                forced_label=bool(self._forced_exercise_label),
-            )
         return build_frame_payload_v1(
             frame_index, pose, c.label, float(c.confidence), r, st.finish().as_dict()
         )

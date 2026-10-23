@@ -4,7 +4,7 @@ export type NavLinkDef = {
   to: string;
   label: string;
   end?: boolean;
-  tier: 'core' | 'sprint4' | 'dev';
+  tier: 'core' | 'sprint4';
 };
 
 const CORE_LINKS: NavLinkDef[] = [
@@ -25,23 +25,10 @@ const SPRINT4_LINKS: NavLinkDef[] = [
   { to: '/profile', label: 'Perfil', tier: 'sprint4' },
 ];
 
-const DEV_LINKS: NavLinkDef[] = [
-  { to: '/dev/sources', label: 'Dev · Fuentes de datos', tier: 'dev' },
-  { to: '/dev/catalog', label: 'Dev · Catálogo', tier: 'dev' },
-  { to: '/dev/dataset', label: 'Dev · Dataset', tier: 'dev' },
-  { to: '/dev/training', label: 'Dev · Entrenamiento', tier: 'dev' },
-  { to: '/dev/models', label: 'Dev · Modelos', tier: 'dev' },
-];
-
 export function getSidebarLinks(sprint4UiEnabled: boolean): NavLinkDef[] {
   const out: NavLinkDef[] = [...CORE_LINKS];
   if (flags.showSprint4 && sprint4UiEnabled) out.push(...SPRINT4_LINKS);
   return out;
 }
 
-export function getDevSidebarLinks(): NavLinkDef[] {
-  return flags.showDevTools ? DEV_LINKS : [];
-}
-
 export const SPRINT4_PATHS = new Set(SPRINT4_LINKS.map((l) => l.to));
-export const DEV_PATH_PREFIX = '/dev/';

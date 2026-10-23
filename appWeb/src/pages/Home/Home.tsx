@@ -104,48 +104,6 @@ export default function Home() {
         </>
       ) : null}
 
-      {flags.showDevTools ? (
-        <>
-          <SectionHeader>Desarrollo — aprendizaje del clasificador</SectionHeader>
-          <p className="bm-caption" style={{ marginBottom: 8, maxWidth: 520 }}>
-            No forma parte del flujo de análisis clínico: dataset, entrenamiento ONNX y manifest. También en el menú lateral
-            bajo «Dev Tools».
-          </p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <NavCard
-              title="Dev · Fuentes de datos"
-              subtitle="Buscar vídeos YouTube e ingestar muestras automáticamente."
-              icon="🔍"
-              onClick={() => navigate('/dev/sources')}
-            />
-            <NavCard
-              title="Dev · Catálogo"
-              subtitle="Ejercicios y conteo de muestras por etiqueta."
-              icon="📚"
-              onClick={() => navigate('/dev/catalog')}
-            />
-            <NavCard
-              title="Dev · Dataset"
-              subtitle="Revisar y aprobar muestras 32D antes de entrenar."
-              icon="🗃️"
-              onClick={() => navigate('/dev/dataset')}
-            />
-            <NavCard
-              title="Dev · Entrenamiento"
-              subtitle="Encolar job Celery (requiere worker + requirements-train)."
-              icon="🧠"
-              onClick={() => navigate('/dev/training')}
-            />
-            <NavCard
-              title="Dev · Modelos"
-              subtitle="Activar versión ONNX en manifest.json."
-              icon="⚙️"
-              onClick={() => navigate('/dev/models')}
-            />
-          </div>
-        </>
-      ) : null}
-
       <SectionHeader>Diagnóstico</SectionHeader>
       <NavCard
         title="Conexión al servidor"

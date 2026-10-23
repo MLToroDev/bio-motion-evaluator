@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
-import { getDevSidebarLinks, getSidebarLinks } from '../config/navLinks';
+import { getSidebarLinks } from '../config/navLinks';
 import { useSprint4Availability } from '../hooks/useSprint4Availability';
 import { readApiBase } from '../lib/prefs';
 import './AppLayout.css';
@@ -19,7 +19,6 @@ export default function AppLayout() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(readSidebarCollapsed);
   const { sprint4UiEnabled } = useSprint4Availability(readApiBase());
   const links = getSidebarLinks(sprint4UiEnabled);
-  const devLinks = getDevSidebarLinks();
 
   const toggleSidebar = useCallback(() => {
     setSidebarCollapsed((prev) => {
@@ -54,26 +53,6 @@ export default function AppLayout() {
             {label}
           </NavLink>
         ))}
-        {devLinks.length > 0 ? (
-          <>
-            <div
-              style={{
-                margin: '0.75rem 0.6rem',
-                fontSize: '0.65rem',
-                textTransform: 'uppercase',
-                letterSpacing: '0.06em',
-                opacity: 0.45,
-              }}
-            >
-              Dev Tools
-            </div>
-            {devLinks.map(({ to, label }) => (
-              <NavLink key={to} to={to} className={({ isActive }) => (isActive ? 'active' : '')}>
-                {label}
-              </NavLink>
-            ))}
-          </>
-        ) : null}
       </aside>
 
       {sidebarCollapsed && (

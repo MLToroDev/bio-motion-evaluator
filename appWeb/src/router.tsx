@@ -15,18 +15,9 @@ import Demo from './pages/sustentacion/Demo';
 import Portada from './pages/sustentacion/Portada';
 import Resultados from './pages/sustentacion/Resultados';
 import SustentacionLayout from './pages/sustentacion/SustentacionLayout';
-import Catalog from './pages/dev/Catalog';
-import Dataset from './pages/dev/Dataset';
-import DataSources from './pages/dev/DataSources';
-import Models from './pages/dev/Models';
-import Training from './pages/dev/Training';
 
 function sprint4(el: ReactNode) {
   return <MvpRouteGuard kind="sprint4">{el}</MvpRouteGuard>;
-}
-
-function dev(el: ReactNode) {
-  return <MvpRouteGuard kind="dev">{el}</MvpRouteGuard>;
 }
 
 const router = createBrowserRouter([
@@ -43,11 +34,6 @@ const router = createBrowserRouter([
       { path: 'profile', element: sprint4(<Profile />) },
       { path: 'video-download', element: sprint4(<VideoDownload />) },
       { path: 'settings/connection', element: <ConnectionConfig /> },
-      { path: 'dev/catalog', element: dev(<Catalog />) },
-      { path: 'dev/dataset', element: dev(<Dataset />) },
-      { path: 'dev/training', element: dev(<Training />) },
-      { path: 'dev/models', element: dev(<Models />) },
-      { path: 'dev/sources', element: dev(<DataSources />) },
     ],
   },
   {

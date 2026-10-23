@@ -17,7 +17,6 @@ Copia las variables de [`.env.example`](.env.example) a `.env.local` (o exporta 
 
 ```env
 VITE_MVP_DEMO_MODE=true
-VITE_MVP_SHOW_DEV=false
 VITE_MVP_SHOW_SPRINT4=false
 VITE_MVP_SHOW_3D=false
 VITE_MVP_SHOW_ADV_VIDEO=false
@@ -32,7 +31,7 @@ npm run build
 npm run preview
 ```
 
-En modo demo se muestran **Inicio**, **Análisis en vivo**, **Análisis de video** (solo gold standard), **Diagnóstico** y **Configuración**. Las rutas `/dev/*`, login, sesiones y descarga remota permanecen en el código pero no aparecen en el menú; el acceso directo por URL redirige a `/`.
+En modo demo se muestran **Inicio**, **Análisis en vivo**, **Análisis de video** (solo gold standard), **Diagnóstico** y **Configuración**. Login, sesiones y descarga remota permanecen en el código pero no aparecen en el menú; el acceso directo por URL redirige a `/`.
 
 Si PostgreSQL y auth están operativos el día de la sustentación, puedes activar Sprint 4 en la demo:
 
@@ -55,7 +54,6 @@ VITE_MVP_DEMO_MODE=false
 | Variable | Efecto |
 |----------|--------|
 | `VITE_MVP_DEMO_MODE` | Activa perfil demo y defaults HU-04 (`captureOnly: false`, fuente `file`). |
-| `VITE_MVP_SHOW_DEV` | Menú y rutas `/dev/*`. |
 | `VITE_MVP_SHOW_SPRINT4` | Login, perfil, historial, descarga de video. |
 | `VITE_MVP_SHOW_3D` | Panel Three.js en análisis por archivo. |
 | `VITE_MVP_SHOW_ADV_VIDEO` | Fuentes alternativas y toggles de ingeniería en video. |

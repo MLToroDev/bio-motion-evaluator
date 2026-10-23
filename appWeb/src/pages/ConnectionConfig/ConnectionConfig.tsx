@@ -4,7 +4,7 @@ import { BmInput } from '../../components/BmInput';
 import { useConnectionConfig } from './hooks/useConnectionConfig';
 
 export default function ConnectionConfig() {
-  const { base, setBase, goal, setGoal, devKey, setDevKey, save } = useConnectionConfig();
+  const { base, setBase, goal, setGoal, save } = useConnectionConfig();
 
   return (
     <div style={{ maxWidth: 480 }}>
@@ -22,15 +22,6 @@ export default function ConnectionConfig() {
           value={goal}
           onChange={(e) => setGoal(e.target.value)}
           inputMode="numeric"
-        />
-      ) : null}
-      {flags.showDevTools ? (
-        <BmInput
-          label="X-Dev-API-Key (opcional)"
-          hint="Solo si el backend tiene DEV_API_KEY para /api/v1/dev/*"
-          value={devKey}
-          onChange={(e) => setDevKey(e.target.value)}
-          autoComplete="off"
         />
       ) : null}
       <BmButton variant="primary" onClick={save}>

@@ -1,5 +1,0 @@
-[
-  { "start_sec": 0, "end_sec": 4.5, "label": "idle" },
-  { "start_sec": 4.5, "end_sec": 22, "label": "squat" },
-  { "start_sec": 22, "end_sec": 40, "label": "lunge" }
-]

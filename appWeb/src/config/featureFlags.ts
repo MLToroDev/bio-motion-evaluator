@@ -14,8 +14,6 @@ const mvpDemoMode = import.meta.env.VITE_MVP_DEMO_MODE === 'true';
 export const flags = {
   /** Modo demo jurado: defaults HU-03/04 y UI simplificada. */
   mvpDemoMode,
-  /** Herramientas /dev/* en menú e inicio. */
-  showDevTools: mvpDemoMode ? envFlag('VITE_MVP_SHOW_DEV', false) : envFlag('VITE_MVP_SHOW_DEV', true),
   /** Login, perfil, historial, descarga remota. */
   showSprint4: mvpDemoMode ? envFlag('VITE_MVP_SHOW_SPRINT4', false) : envFlag('VITE_MVP_SHOW_SPRINT4', true),
   /** Panel PoseSkeleton3D en análisis por video. */

@@ -3,7 +3,6 @@ from fastapi import APIRouter, File, HTTPException, UploadFile
 from app.config import settings
 from app.models.schemas import LandmarkPoint, PoseAnalysisResponse
 from app.paths import backend_root
-from app.services.feature_sample_persist import build_optional_feature_collector
 from app.services.inference.huggingface import run_optional_inference
 from vision.realtime_engine import RealtimeEngineSession
 
@@ -25,7 +24,6 @@ async def analyze_pose(file: UploadFile = File(...)) -> PoseAnalysisResponse:
         model_path,
         settings.exercise_classifier_config(),
         inference_stride=settings.pose_inference_stride,
-        feature_collector=build_optional_feature_collector(),
     )
     try:
         payload = session.process_jpeg(data, frame_index=0)

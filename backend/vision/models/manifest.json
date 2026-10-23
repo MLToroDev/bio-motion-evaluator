@@ -1,30 +1,6 @@
 {
   "active": "exercise_rf_a0eac3d7",
   "models": {
-    "exercise_classifier_stub": {
-      "path": "models/exercise_classifier_stub.onnx",
-      "classes": [
-        "unknown",
-        "squat",
-        "shoulder_press",
-        "bench_press",
-        "triceps_extension"
-      ],
-      "window_size": 45,
-      "feature_vector_dim": 32,
-      "created_at": "2025-01-01",
-      "note": "Stub de referencia. Sin active o Nop activo, el runtime usa el clasificador heur\u00edstico Fase A."
-    },
-    "exercise_rf_0d15c60e": {
-      "path": "vision/models/exercise_rf_0d15c60e.onnx",
-      "classes": [
-        "squat"
-      ],
-      "window_size": 45,
-      "feature_vector_dim": 32,
-      "created_at": "2026-04-05",
-      "note": "Celery train_exercise_classifier job=0d15c60e-12e0-43a9-b067-d5cdc408a49c"
-    },
     "exercise_rf_a0eac3d7": {
       "path": "vision/models/exercise_rf_a0eac3d7.onnx",
       "classes": [

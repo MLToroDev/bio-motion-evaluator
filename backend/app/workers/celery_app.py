@@ -8,7 +8,7 @@ celery_app = Celery(
     "video_worker",
     broker=settings.celery_broker_url,
     backend=settings.celery_result_backend,
-    include=["app.workers.tasks", "app.workers.training_tasks", "app.workers.ingest_tasks"],
+    include=["app.workers.tasks"],
 )
 
 celery_app.conf.update(

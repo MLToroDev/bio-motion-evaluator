@@ -27,14 +27,6 @@ class Settings(BaseSettings):
 
     hf_api_token: str | None = None
     hf_inference_url: str | None = None
-    hf_model_repo_id: str | None = None  # Repo HF Hub para artefactos ONNX (opcional)
-
-    # Aprendizaje continuo: guardar ventanas 32D durante inferencia (requiere DATABASE_URL).
-    auto_collect_enabled: bool = False
-    auto_collect_min_confidence: float = 0.85
-
-    # Si se define, las rutas /api/v1/dev/* exigen cabecera X-Dev-API-Key con este valor.
-    dev_api_key: str | None = None
 
     # Clasificador / motor (env opcional; ver ExerciseClassifierConfig)
     classifier_min_confidence: float = 0.72
