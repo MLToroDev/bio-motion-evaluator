@@ -1,10 +1,9 @@
 # Configuración del entorno de desarrollo
 
-Guía de instalación del monorepo **Bio-Motion Evaluator** en **Windows**, **macOS** y **Linux**.
+Guía de instalación del repositorio **Bio-Motion Evaluator** en **Windows**, **macOS** y **Linux**.
 
-> El cliente web activo es [`appWeb/`](../../appWeb/) (React 19 + Vite). La carpeta
-> [`app/`](../../app/) (Flutter) es **legado**: solo instala Flutter si vas a trabajar
-> el histórico móvil.
+> El cliente web es [`appWeb/`](../../appWeb/) (React 19 + Vite) y el servidor de análisis
+> es [`backend/`](../../backend/) (FastAPI + MediaPipe).
 
 ---
 
@@ -15,9 +14,8 @@ Guía de instalación del monorepo **Bio-Motion Evaluator** en **Windows**, **ma
 | **Python** | 3.10 – 3.12 | Backend, motor de visión, experimentos de validación |
 | **Node.js** | 20+ | Cliente web `appWeb/` |
 | **Git** | Reciente | Control de versiones |
-| PostgreSQL | 15+ | *Opcional* — auth, sesiones, aprendizaje continuo |
-| Redis | 7.x | *Opcional* — Celery (descargas, entrenamiento, ingesta) |
-| Flutter | 3.x | *Solo* para el legado en `app/` |
+| PostgreSQL | 15+ | *Opcional* — auth, sesiones, descarga de vídeo |
+| Redis | 7.x | *Opcional* — Celery (descarga remota de vídeo) |
 
 **Python 3.13 aún no está soportado** por las ruedas (*wheels*) de MediaPipe 0.10.x.
 Usa 3.11 o 3.12.
@@ -111,14 +109,6 @@ Documentación interactiva en `http://127.0.0.1:8000/docs`.
 
 En Windows existe el atajo [`scripts/start-dev-backend.ps1`](../../scripts/start-dev-backend.ps1).
 
-### 2.4. Dependencias de entrenamiento (opcional)
-
-Solo si vas a usar el módulo de aprendizaje continuo (`/dev/*`):
-
-```bash
-pip install -r requirements-train.txt
-```
-
 ---
 
 ## 3. Cliente web `appWeb/` (React + Vite)
@@ -181,7 +171,7 @@ Si usas un entorno virtual fuera del repositorio:
 
 ## 5. Servicios opcionales
 
-### PostgreSQL (sesiones, autenticación, dataset)
+### PostgreSQL (sesiones y autenticación)
 
 ```bash
 # Ajusta DATABASE_URL en backend/.env
@@ -190,9 +180,9 @@ alembic upgrade head
 ```
 
 Sin PostgreSQL el análisis en vivo y por vídeo funcionan igual; lo que se desactiva
-es la persistencia de sesiones y el módulo `/dev/*`.
+es la persistencia de sesiones, la autenticación y la descarga remota de vídeo.
 
-### Redis + Celery (descargas, entrenamiento, ingesta)
+### Redis + Celery (descarga remota de vídeo)
 
 ```bash
 cd backend
@@ -201,24 +191,7 @@ celery -A app.workers.celery_app worker --loglevel=info
 
 ---
 
-## 6. Flutter (solo legado `app/`)
-
-1. SDK desde [docs.flutter.dev/get-started/install](https://docs.flutter.dev/get-started/install).
-2. Añade `flutter/bin` al `PATH` y ejecuta `flutter doctor`.
-3. En el monorepo:
-
-```bash
-cd app
-flutter pub get
-flutter run
-```
-
-No añadas funcionalidad nueva aquí: ver la regla de alcance en
-[`.cursorrules`](../../.cursorrules).
-
----
-
-## 7. GitHub CLI (`gh`)
+## 6. GitHub CLI (`gh`)
 
 | Sistema | Instalación |
 |---------|-------------|
@@ -232,7 +205,7 @@ gh auth login
 
 ---
 
-## 8. Verificación de extremo a extremo
+## 7. Verificación de extremo a extremo
 
 Comprobación rápida de que el motor de visión funciona sobre un vídeo de referencia:
 

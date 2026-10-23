@@ -3,7 +3,7 @@
 Sistema de software para la **valoración automática de movilidad articular** y detección de asimetrías mediante **visión artificial** (MediaPipe BlazePose en servidor). Trabajo de grado — Ingeniería en Software, Tecnológico de Antioquia (2026).
 
 **Autor:** Mateo Londoño Toro  
-**Repositorio público:** https://github.com/MLToroDev/Repositorio
+**Alcance de este repositorio:** MVP de la tesis — goniometría digital de rodilla, análisis en vivo y por vídeo, e instrumentos de validación.
 
 ---
 
@@ -11,12 +11,11 @@ Sistema de software para la **valoración automática de movilidad articular** y
 
 Bio-Motion Evaluator integra:
 
-- **Cliente web operativo** ([`appWeb/`](appWeb/)) — React 19 + Vite + TypeScript: análisis en vivo desde cámara, análisis de vídeo *gold standard*, panel de métricas y herramientas de desarrollo (aprendizaje continuo).
-- **Backend** ([`backend/`](backend/)) — FastAPI (Python): inferencia de pose, goniometría digital de rodilla, clasificación de ejercicio, WebSockets y API REST.
-- **IoT opcional** ([`iot/`](iot/)) — ESP32-CAM / Raspberry Pi como fuente de vídeo.
-- **Flutter legado** ([`app/`](app/)) — Prototipo inicial Android/iOS/web; **no** es el destino de nuevas funcionalidades (ver migración a React en la memoria).
+- **Cliente web** ([`appWeb/`](appWeb/)) — React 19 + Vite + TypeScript: análisis en vivo desde cámara, análisis de vídeo *gold standard*, panel de métricas e interfaz de sustentación (`/sustentacion`).
+- **Backend** ([`backend/`](backend/)) — FastAPI (Python): inferencia de pose, goniometría digital de rodilla, clasificación de ejercicio en tiempo de ejecución, WebSockets y API REST.
+- **Validación** ([`validacion/`](validacion/)) — experimentos de exactitud y latencia, y herramientas del Nivel 2 (video-goniometría manual con Tracker).
 
-La inferencia corre en el **servidor**; los clientes capturan fotogramas, envían por WebSocket y renderizan el esqueleto y las métricas en tiempo real. Evaluación de calidad alineada con **ISO/IEC 25010** (usabilidad, mantenibilidad, escalabilidad).
+La inferencia corre en el **servidor**; el cliente captura fotogramas, envían por WebSocket y renderizan el esqueleto y las métricas en tiempo real. Evaluación de calidad alineada con **ISO/IEC 25010** (usabilidad, mantenibilidad, escalabilidad).
 
 ### Pregunta de investigación
 
@@ -37,11 +36,10 @@ Documentación de tesis y specs: [`docs/`](docs/README.md) · Arquitectura: [`do
 
 | Capa | Tecnología | Carpeta | Rol |
 |------|------------|---------|-----|
-| **Frontend web (activo)** | React 19, Vite, TypeScript | [`appWeb/`](appWeb/) | HU-03 análisis en vivo, HU-04 vídeo, configuración, Dev Tools |
-| **Backend** | Python 3.10+, FastAPI, MediaPipe | [`backend/`](backend/) | API REST, WebSockets, motor en tiempo real, Celery |
-| **Persistencia** | PostgreSQL + Alembic (opcional) | `backend/app/db/` | Sesiones, dataset 32D, jobs de entrenamiento |
-| **IoT** | ESP32-CAM / RPi | [`iot/`](iot/) | Captura remota de vídeo |
-| **Flutter (legado)** | Dart / Flutter | [`app/`](app/) | Referencia histórica; no ampliar salvo decisión explícita |
+| **Frontend web** | React 19, Vite, TypeScript | [`appWeb/`](appWeb/) | HU-03 análisis en vivo, HU-04 vídeo, configuración, sustentación |
+| **Backend** | Python 3.10+, FastAPI, MediaPipe | [`backend/`](backend/) | API REST, WebSockets, motor en tiempo real |
+| **Persistencia** | PostgreSQL + Alembic (opcional) | `backend/app/db/` | Usuarios, sesiones y métricas, trabajos de descarga |
+| **Validación** | Python (NumPy, pandas, matplotlib) | [`validacion/`](validacion/) | Experimentos de exactitud y latencia (evidencia de la tesis) |
 | **Documentación** | Markdown | [`docs/`](docs/) | Specs, guías, bitácora, diagramas |
 | **Pruebas** | pytest, vídeos locales | [`tests/`](tests/) | *Gold standard* (MP4 no versionados) |
 
@@ -49,7 +47,6 @@ Documentación de tesis y specs: [`docs/`](docs/README.md) · Arquitectura: [`do
 flowchart LR
   subgraph clients [Clientes]
     Web["appWeb React"]
-    IoT["ESP32 / RPi"]
   end
   subgraph api [Backend FastAPI]
     WSvideo["/ws/video"]
@@ -60,7 +57,6 @@ flowchart LR
   Web -->|JPEG / JSON| WSvideo
   Web --> REST
   Web --> WSpose
-  IoT --> WSvideo
   WSvideo --> MP
   WSpose --> MP
 ```
@@ -74,9 +70,9 @@ flowchart LR
 | `/live-analysis` | Cámara del navegador → `/ws/video` → overlay 2D + flexión bilateral de rodilla |
 | `/video-analysis` | Vídeos en servidor (`tests/assets/videos`) → `/ws/pose-stream` |
 | `/backend-status` | Diagnóstico de salud del API |
-| `/settings/connection` | URL del backend y claves dev |
-| `/dev/*` | Catálogo, dataset 32D, entrenamiento ONNX, modelos (requiere flags MVP) |
-| `/login`, `/sessions`, … | Sprint 4 — auth y persistencia (opcional, según `VITE_MVP_*`) |
+| `/settings/connection` | URL del backend y objetivo de repeticiones |
+| `/sustentacion` | Interfaz de sustentación (tema claro): portada, demo en vivo y resultados |
+| `/login`, `/sessions`, `/profile`, `/video-download` | Sprint 4 — auth, persistencia y descarga remota (opcional, según `VITE_MVP_*`) |
 
 Detalle del cliente: [`appWeb/README.md`](appWeb/README.md). Contratos: [`docs/spec/`](docs/spec/README.md).
 
@@ -89,9 +85,8 @@ Detalle del cliente: [`appWeb/README.md`](appWeb/README.md). Contratos: [`docs/s
 | **Python** | 3.10+ (recomendado 3.11) |
 | **Node.js** | 20+ (para `appWeb`) |
 | **Git** | Cualquier versión reciente |
-| **PostgreSQL** | Opcional (auth, sesiones, aprendizaje continuo) |
-| **Redis** | Opcional (Celery para ingestión/entrenamiento) |
-| **Flutter** | Solo si trabajas el legado en `app/` |
+| **PostgreSQL** | Opcional (auth, sesiones, descarga de vídeo) |
+| **Redis** | Opcional (Celery para la descarga remota de vídeo) |
 
 Instalación detallada: [`docs/guias/SETUP.md`](docs/guias/SETUP.md).
 
@@ -119,6 +114,8 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 **Atajo (Windows, desde la raíz):** `.\scripts\start-dev-backend.ps1`
 
+**macOS / Linux:** activa el entorno con `source .venv/bin/activate`, copia la configuración con `cp .env.example .env` y usa el mismo comando `uvicorn`.
+
 | Recurso | URL |
 |---------|-----|
 | Salud | http://localhost:8000/api/v1/health |
@@ -128,7 +125,7 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 Más endpoints y PostgreSQL: [`backend/README.md`](backend/README.md).
 
-**Celery** (opcional, ingestión/entrenamiento):
+**Celery** (opcional, solo para la descarga remota de vídeo en `/video-download`):
 
 ```bash
 celery -A app.workers.celery_app worker --loglevel=info
@@ -168,18 +165,17 @@ Pruebas alineadas al spec: [`docs/spec/live-camera-analysis.md`](docs/spec/live-
 ## Estructura del monorepo
 
 ```
-Repositorio/
-├── appWeb/          # Cliente React (frontend activo)
-├── backend/         # FastAPI + visión + workers
+bio-motion-evaluator/
+├── appWeb/          # Cliente React
+├── backend/         # FastAPI + visión (goniometría, motor en tiempo real)
 ├── validacion/      # Experimentos de exactitud y latencia (evidencia de la tesis)
 │   ├── experimentos/   # Scripts ejecutables y reproducibles
-│   ├── analisis/       # Estadística de acuerdo (MAE, Bland-Altman, ICC)
+│   ├── analisis/       # Estadística de acuerdo (MAE, Bland-Altman, ICC) y Nivel 2 (Tracker)
+│   ├── datos/          # Mediciones de referencia (los fotogramas PNG no se versionan)
 │   └── resultados/     # CSV, figuras e informes generados
-├── app/             # Flutter (legado)
-├── iot/             # Firmware / notas IoT
 ├── docs/            # Tesis, specs, guías, arquitectura
 ├── tests/           # Pruebas y assets de vídeo (MP4 en .gitignore)
-└── scripts/         # Atajos PowerShell (backend, publish)
+└── scripts/         # Atajo PowerShell para arrancar el backend
 ```
 
 ### Reproducir la validación
@@ -189,27 +185,7 @@ cd backend && PYTHONPATH=. python ../validacion/experimentos/exp1_verificacion_g
 cd backend && PYTHONPATH=. python ../validacion/experimentos/exp3_estabilidad_temporal.py
 ```
 
-Los informes y datos crudos se regeneran en `validacion/resultados/`.
-
----
-
-## Flutter (legado)
-
-El primer cliente se desarrolló en Flutter; la capa web operativa migró a **React** por limitaciones de Flutter Web en vista previa y despliegue estable de MediaPipe en cliente. Para ejecutar el legado:
-
-```bash
-cd app
-flutter pub get
-flutter run -d chrome   # o android / ios
-```
-
-Atajo Windows: `.\scripts\start-dev-flutter.ps1`
-
----
-
-## IoT
-
-Ver [`iot/README.md`](iot/README.md).
+Los informes y datos crudos se regeneran en `validacion/resultados/`. Las pruebas automáticas se ejecutan desde la raíz con `python -m pytest -q`.
 
 ---
 
