@@ -564,12 +564,25 @@ def _formatear_p_valor(p_valor: float) -> str:
     return f"p = {p_valor:.3f}"
 
 
-def formatear_resumen_markdown(resumen: dict[str, Any], titulo: str = "Resumen de acuerdo") -> str:
+def formatear_resumen_markdown(
+    resumen: dict[str, Any],
+    titulo: str = "Resumen de acuerdo",
+    *,
+    n_minimo_tramo: int = 1,
+) -> str:
     """
     Convierte la salida de :func:`resumen_acuerdo` en Markdown listo para el anexo.
 
     Función pura de presentación: no recalcula nada, solo formatea el diccionario.
+
+    ``n_minimo_tramo`` fija el ``n`` mínimo para publicar las métricas de un tramo. Con
+    el valor por defecto (1) se publican todos los tramos con datos, como hasta ahora.
+    El Nivel 2 del protocolo usa 5: un MAE sobre menos puntos es una anécdota, así que
+    esos tramos se marcan como "sin potencia" y el llamador lista aparte las
+    diferencias individuales.
     """
+    if n_minimo_tramo < 1:
+        raise ValueError("n_minimo_tramo debe ser >= 1.")
     ba = resumen["bland_altman"]
     icc = resumen["icc"]
     ic_sesgo = ba["intervalo_confianza_95_del_sesgo"]
@@ -612,6 +625,10 @@ def formatear_resumen_markdown(resumen: dict[str, Any], titulo: str = "Resumen d
     for fila in resumen["error_por_rango"]:
         if fila["n"] == 0:
             lineas.append(f"| {fila['etiqueta']} | 0 | - | - | - | - |")
+        elif fila["n"] < n_minimo_tramo:
+            lineas.append(
+                f"| {fila['etiqueta']} | {fila['n']} | sin potencia (n < {n_minimo_tramo}) | - | - | - |"
+            )
         else:
             sd_tramo = fila["desviacion_estandar_diferencias"]
             sd_texto = f"{sd_tramo:.2f}" if sd_tramo == sd_tramo else "-"

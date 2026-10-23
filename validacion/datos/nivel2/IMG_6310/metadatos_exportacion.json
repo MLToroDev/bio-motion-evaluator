@@ -1,0 +1,409 @@
+{
+  "video": "/Users/mateolondonotoro/.mounty/Disco C_C/Proyectos desarrollo/TRABAJO DE GRADO/IMG_6310.mov",
+  "modelo": "/Users/mateolondonotoro/.mounty/Disco C_C/Proyectos desarrollo/TRABAJO DE GRADO/Repositorio/backend/models/pose_landmarker_full.task",
+  "ancho": 1080,
+  "alto": 1920,
+  "fps": 30.003384476534297,
+  "frames_declarados_por_codec": 3546,
+  "frames_leidos": 2531,
+  "frames_inferidos": 2531,
+  "frames_con_pose": 2413,
+  "tasa_deteccion": 0.9533781114184117,
+  "filas_exportadas": 76,
+  "cada_n_frames": 15,
+  "desde_frame": 1400,
+  "hasta_frame": 2530,
+  "solo_muestreados": false,
+  "segundos_totales": 42.6725769170007,
+  "ms_por_frame_inferido": 16.859967173844606,
+  "fotogramas_exportados": [
+    {
+      "ordinal_muestra": 0,
+      "frame_idx": 1400,
+      "archivo_png": "m0000.png"
+    },
+    {
+      "ordinal_muestra": 1,
+      "frame_idx": 1415,
+      "archivo_png": "m0001.png"
+    },
+    {
+      "ordinal_muestra": 2,
+      "frame_idx": 1430,
+      "archivo_png": "m0002.png"
+    },
+    {
+      "ordinal_muestra": 3,
+      "frame_idx": 1445,
+      "archivo_png": "m0003.png"
+    },
+    {
+      "ordinal_muestra": 4,
+      "frame_idx": 1460,
+      "archivo_png": "m0004.png"
+    },
+    {
+      "ordinal_muestra": 5,
+      "frame_idx": 1475,
+      "archivo_png": "m0005.png"
+    },
+    {
+      "ordinal_muestra": 6,
+      "frame_idx": 1490,
+      "archivo_png": "m0006.png"
+    },
+    {
+      "ordinal_muestra": 7,
+      "frame_idx": 1505,
+      "archivo_png": "m0007.png"
+    },
+    {
+      "ordinal_muestra": 8,
+      "frame_idx": 1520,
+      "archivo_png": "m0008.png"
+    },
+    {
+      "ordinal_muestra": 9,
+      "frame_idx": 1535,
+      "archivo_png": "m0009.png"
+    },
+    {
+      "ordinal_muestra": 10,
+      "frame_idx": 1550,
+      "archivo_png": "m0010.png"
+    },
+    {
+      "ordinal_muestra": 11,
+      "frame_idx": 1565,
+      "archivo_png": "m0011.png"
+    },
+    {
+      "ordinal_muestra": 12,
+      "frame_idx": 1580,
+      "archivo_png": "m0012.png"
+    },
+    {
+      "ordinal_muestra": 13,
+      "frame_idx": 1595,
+      "archivo_png": "m0013.png"
+    },
+    {
+      "ordinal_muestra": 14,
+      "frame_idx": 1610,
+      "archivo_png": "m0014.png"
+    },
+    {
+      "ordinal_muestra": 15,
+      "frame_idx": 1625,
+      "archivo_png": "m0015.png"
+    },
+    {
+      "ordinal_muestra": 16,
+      "frame_idx": 1640,
+      "archivo_png": "m0016.png"
+    },
+    {
+      "ordinal_muestra": 17,
+      "frame_idx": 1655,
+      "archivo_png": "m0017.png"
+    },
+    {
+      "ordinal_muestra": 18,
+      "frame_idx": 1670,
+      "archivo_png": "m0018.png"
+    },
+    {
+      "ordinal_muestra": 19,
+      "frame_idx": 1685,
+      "archivo_png": "m0019.png"
+    },
+    {
+      "ordinal_muestra": 20,
+      "frame_idx": 1700,
+      "archivo_png": "m0020.png"
+    },
+    {
+      "ordinal_muestra": 21,
+      "frame_idx": 1715,
+      "archivo_png": "m0021.png"
+    },
+    {
+      "ordinal_muestra": 22,
+      "frame_idx": 1730,
+      "archivo_png": "m0022.png"
+    },
+    {
+      "ordinal_muestra": 23,
+      "frame_idx": 1745,
+      "archivo_png": "m0023.png"
+    },
+    {
+      "ordinal_muestra": 24,
+      "frame_idx": 1760,
+      "archivo_png": "m0024.png"
+    },
+    {
+      "ordinal_muestra": 25,
+      "frame_idx": 1775,
+      "archivo_png": "m0025.png"
+    },
+    {
+      "ordinal_muestra": 26,
+      "frame_idx": 1790,
+      "archivo_png": "m0026.png"
+    },
+    {
+      "ordinal_muestra": 27,
+      "frame_idx": 1805,
+      "archivo_png": "m0027.png"
+    },
+    {
+      "ordinal_muestra": 28,
+      "frame_idx": 1820,
+      "archivo_png": "m0028.png"
+    },
+    {
+      "ordinal_muestra": 29,
+      "frame_idx": 1835,
+      "archivo_png": "m0029.png"
+    },
+    {
+      "ordinal_muestra": 30,
+      "frame_idx": 1850,
+      "archivo_png": "m0030.png"
+    },
+    {
+      "ordinal_muestra": 31,
+      "frame_idx": 1865,
+      "archivo_png": "m0031.png"
+    },
+    {
+      "ordinal_muestra": 32,
+      "frame_idx": 1880,
+      "archivo_png": "m0032.png"
+    },
+    {
+      "ordinal_muestra": 33,
+      "frame_idx": 1895,
+      "archivo_png": "m0033.png"
+    },
+    {
+      "ordinal_muestra": 34,
+      "frame_idx": 1910,
+      "archivo_png": "m0034.png"
+    },
+    {
+      "ordinal_muestra": 35,
+      "frame_idx": 1925,
+      "archivo_png": "m0035.png"
+    },
+    {
+      "ordinal_muestra": 36,
+      "frame_idx": 1940,
+      "archivo_png": "m0036.png"
+    },
+    {
+      "ordinal_muestra": 37,
+      "frame_idx": 1955,
+      "archivo_png": "m0037.png"
+    },
+    {
+      "ordinal_muestra": 38,
+      "frame_idx": 1970,
+      "archivo_png": "m0038.png"
+    },
+    {
+      "ordinal_muestra": 39,
+      "frame_idx": 1985,
+      "archivo_png": "m0039.png"
+    },
+    {
+      "ordinal_muestra": 40,
+      "frame_idx": 2000,
+      "archivo_png": "m0040.png"
+    },
+    {
+      "ordinal_muestra": 41,
+      "frame_idx": 2015,
+      "archivo_png": "m0041.png"
+    },
+    {
+      "ordinal_muestra": 42,
+      "frame_idx": 2030,
+      "archivo_png": "m0042.png"
+    },
+    {
+      "ordinal_muestra": 43,
+      "frame_idx": 2045,
+      "archivo_png": "m0043.png"
+    },
+    {
+      "ordinal_muestra": 44,
+      "frame_idx": 2060,
+      "archivo_png": "m0044.png"
+    },
+    {
+      "ordinal_muestra": 45,
+      "frame_idx": 2075,
+      "archivo_png": "m0045.png"
+    },
+    {
+      "ordinal_muestra": 46,
+      "frame_idx": 2090,
+      "archivo_png": "m0046.png"
+    },
+    {
+      "ordinal_muestra": 47,
+      "frame_idx": 2105,
+      "archivo_png": "m0047.png"
+    },
+    {
+      "ordinal_muestra": 48,
+      "frame_idx": 2120,
+      "archivo_png": "m0048.png"
+    },
+    {
+      "ordinal_muestra": 49,
+      "frame_idx": 2135,
+      "archivo_png": "m0049.png"
+    },
+    {
+      "ordinal_muestra": 50,
+      "frame_idx": 2150,
+      "archivo_png": "m0050.png"
+    },
+    {
+      "ordinal_muestra": 51,
+      "frame_idx": 2165,
+      "archivo_png": "m0051.png"
+    },
+    {
+      "ordinal_muestra": 52,
+      "frame_idx": 2180,
+      "archivo_png": "m0052.png"
+    },
+    {
+      "ordinal_muestra": 53,
+      "frame_idx": 2195,
+      "archivo_png": "m0053.png"
+    },
+    {
+      "ordinal_muestra": 54,
+      "frame_idx": 2210,
+      "archivo_png": "m0054.png"
+    },
+    {
+      "ordinal_muestra": 55,
+      "frame_idx": 2225,
+      "archivo_png": "m0055.png"
+    },
+    {
+      "ordinal_muestra": 56,
+      "frame_idx": 2240,
+      "archivo_png": "m0056.png"
+    },
+    {
+      "ordinal_muestra": 57,
+      "frame_idx": 2255,
+      "archivo_png": "m0057.png"
+    },
+    {
+      "ordinal_muestra": 58,
+      "frame_idx": 2270,
+      "archivo_png": "m0058.png"
+    },
+    {
+      "ordinal_muestra": 59,
+      "frame_idx": 2285,
+      "archivo_png": "m0059.png"
+    },
+    {
+      "ordinal_muestra": 60,
+      "frame_idx": 2300,
+      "archivo_png": "m0060.png"
+    },
+    {
+      "ordinal_muestra": 61,
+      "frame_idx": 2315,
+      "archivo_png": "m0061.png"
+    },
+    {
+      "ordinal_muestra": 62,
+      "frame_idx": 2330,
+      "archivo_png": "m0062.png"
+    },
+    {
+      "ordinal_muestra": 63,
+      "frame_idx": 2345,
+      "archivo_png": "m0063.png"
+    },
+    {
+      "ordinal_muestra": 64,
+      "frame_idx": 2360,
+      "archivo_png": "m0064.png"
+    },
+    {
+      "ordinal_muestra": 65,
+      "frame_idx": 2375,
+      "archivo_png": "m0065.png"
+    },
+    {
+      "ordinal_muestra": 66,
+      "frame_idx": 2390,
+      "archivo_png": "m0066.png"
+    },
+    {
+      "ordinal_muestra": 67,
+      "frame_idx": 2405,
+      "archivo_png": "m0067.png"
+    },
+    {
+      "ordinal_muestra": 68,
+      "frame_idx": 2420,
+      "archivo_png": "m0068.png"
+    },
+    {
+      "ordinal_muestra": 69,
+      "frame_idx": 2435,
+      "archivo_png": "m0069.png"
+    },
+    {
+      "ordinal_muestra": 70,
+      "frame_idx": 2450,
+      "archivo_png": "m0070.png"
+    },
+    {
+      "ordinal_muestra": 71,
+      "frame_idx": 2465,
+      "archivo_png": "m0071.png"
+    },
+    {
+      "ordinal_muestra": 72,
+      "frame_idx": 2480,
+      "archivo_png": "m0072.png"
+    },
+    {
+      "ordinal_muestra": 73,
+      "frame_idx": 2495,
+      "archivo_png": "m0073.png"
+    },
+    {
+      "ordinal_muestra": 74,
+      "frame_idx": 2510,
+      "archivo_png": "m0074.png"
+    },
+    {
+      "ordinal_muestra": 75,
+      "frame_idx": 2525,
+      "archivo_png": "m0075.png"
+    }
+  ],
+  "nombre_video": "IMG_6310.mov",
+  "sha256_video": "e9f52ea5123438db179032f9f8e6d8494203d1f75926d7852b463170a75ffada",
+  "lado": "izquierda",
+  "csv_sistema": "/Users/mateolondonotoro/.mounty/Disco C_C/Proyectos desarrollo/TRABAJO DE GRADO/Repositorio/validacion/datos/nivel2/IMG_6310/serie_sistema.csv",
+  "sha256_csv_sistema": "a53994b8f0149f5c44d0886dc42f5b4ae00fd375732929cb46f301f5500df114",
+  "plantilla_sesion1": "/Users/mateolondonotoro/.mounty/Disco C_C/Proyectos desarrollo/TRABAJO DE GRADO/Repositorio/validacion/datos/nivel2/IMG_6310/nivel2_tracker_sesion1.csv",
+  "directorio_fotogramas": "/Users/mateolondonotoro/.mounty/Disco C_C/Proyectos desarrollo/TRABAJO DE GRADO/Repositorio/validacion/datos/nivel2/IMG_6310/frames",
+  "fecha_exportacion": "2026-10-23T17:38:56-0500"
+}

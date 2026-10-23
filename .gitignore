@@ -68,3 +68,7 @@ tests/assets/**/*.mkv
 tests/assets/**/*.MKV
 tests/assets/**/*.webm
 tests/assets/**/*.WEBM
+
+# Fotogramas del clip de validacion Nivel 2: muestran a una persona identificable (Ley 1581 de 2012).
+# Se versionan los CSV de medicion, no las imagenes.
+validacion/datos/nivel2/**/*.png

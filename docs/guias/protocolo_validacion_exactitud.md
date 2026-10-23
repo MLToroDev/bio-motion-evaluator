@@ -8,13 +8,13 @@
 | **Alcance** | Validación de exactitud de la estimación de flexión de rodilla y asimetría bilateral del motor `vision/` frente a métodos de referencia de medición angular. No cubre latencia extremo a extremo (ver reporte de latencia y Experimento de rendimiento). |
 | **Restricción de partida** | El autor **no dispone de goniómetro clínico ni de sujetos de estudio ni de aval de comité de ética**. Todo lo descrito aquí es ejecutable por **una sola persona**, con materiales de papelería y ferretería, sobre sí misma. |
 | **Naturaleza** | Este documento describe **cómo se medirá**. No contiene resultados de medición. Los resultados irán en `validacion/reportes/`. |
-| **Última revisión** | 2026-08-29 |
+| **Última revisión** | 2026-10-23 (Nivel 2: comparador Tracker y clip propio) |
 
 ## Resumen
 
 Este protocolo responde a la mitad de exactitud de la pregunta de investigación: *¿con qué exactitud, frente a métodos de referencia de medición angular, estima el sistema el ángulo de flexión de rodilla y la asimetría bilateral?*
 
-Se define una validación en tres niveles de coste creciente. El **Nivel 1** construye un patrón físico de ángulo conocido (una férula articulada con transportador impreso) y lo compara contra la salida del sistema: da error absoluto contra verdad conocida. El **Nivel 2** usa video-goniometría manual en Kinovea sobre los vídeos reales del repositorio: da acuerdo contra el método que la propia institución ya emplea. El **Nivel 3** queda descrito pero no se ejecuta ahora: es la ruta de integración si más adelante se consiguen goniómetro clínico y sujetos.
+Se define una validación en tres niveles de coste creciente. El **Nivel 1** construye un patrón físico de ángulo conocido (una férula articulada con transportador impreso) y lo compara contra la salida del sistema: da error absoluto contra verdad conocida. El **Nivel 2** usa video-goniometría manual con Tracker sobre un clip propio de una sola toma en plano sagital: da acuerdo contra un comparador de la misma clase de método (video-goniometría manual 2D) que la institución ya emplea con Kinovea. El **Nivel 3** queda descrito pero no se ejecuta ahora: es la ruta de integración si más adelante se consiguen goniómetro clínico y sujetos.
 
 Los criterios de aceptación se fijan **antes** de medir (sección [Criterios de aceptación](#criterios-de-aceptación-pre-registro)) y no se modifican después de ver los resultados.
 
@@ -24,15 +24,15 @@ Los criterios de aceptación se fijan **antes** de medir (sección [Criterios de
 
 | Magnitud del sistema | Clave en el payload | Referencia del Nivel 1 | Referencia del Nivel 2 |
 |----------------------|---------------------|------------------------|------------------------|
-| Flexión de rodilla izquierda | `left_knee_flexion_angle_deg` | Ángulo bloqueado en la férula | Ángulo medido en Kinovea |
-| Flexión de rodilla derecha | `right_knee_flexion_angle_deg` | Ángulo bloqueado en la férula | Ángulo medido en Kinovea |
-| Asimetría bilateral | `abs(izq - der)` | Derivada de las dos anteriores | Derivada de las dos anteriores |
+| Flexión de rodilla izquierda | `left_knee_flexion_angle_deg` | Ángulo bloqueado en la férula | Ángulo medido en Tracker |
+| Flexión de rodilla derecha | `right_knee_flexion_angle_deg` | Ángulo bloqueado en la férula | Ángulo medido en Tracker |
+| Asimetría bilateral | `abs(izq - der)` | Derivada de las dos anteriores | No se evalúa (se mide una sola pierna, sección 2.2) |
 
 **Convención, idéntica a la del código** (`vision/biomechanics.py::knee_angles_from_landmarks`):
 
 - *Ángulo interno* = ángulo en la rodilla entre el vector (rodilla -> cadera) y el vector (rodilla -> tobillo).
 - *Flexión* = `180 - interno`, acotado a `[0, 180]`. Pierna recta ~ 0 grados de flexión.
-- El cálculo del sistema usa las tres coordenadas `x, y, z`; el transportador y Kinovea miden **en el plano de la imagen (2D)**. Esta diferencia de dimensionalidad es una fuente de discrepancia sistemática y se declara como tal en [Amenazas a la validez](#amenazas-a-la-validez).
+- El cálculo del sistema usa las tres coordenadas `x, y, z`; el transportador y Tracker miden **en el plano de la imagen (2D)**. Esta diferencia de dimensionalidad es una fuente de discrepancia sistemática y se declara como tal en [Amenazas a la validez](#amenazas-a-la-validez).
 
 **Cuidado con la asimetría en marcha.** En el vídeo `Running.mp4`, la asimetría instantánea `|izq - der|` medida por el propio sistema tiene una media de **58,0 grados** y un máximo de **138,1 grados**. Eso **no** es un defecto del sistema ni una patología del sujeto: en carrera las dos piernas están en fases opuestas del ciclo, de modo que la diferencia instantánea mide fase, no asimetría. La asimetría solo es interpretable en ejercicios **bilaterales simultáneos** (sentadilla). En `SentadillaProfunda.mp4` la asimetría media es de 5,5 grados y la mediana de 4,9 grados, valores ya en el orden del error que queremos medir. **La validación de asimetría se hace únicamente sobre sentadilla.**
 
@@ -57,12 +57,12 @@ Para la interpretación del ICC se usan los cortes de Koo y Li (2016): `< 0,50` 
 | MAE por tramo `[0, 90)` grados | **<= 5,0 grados** | Rango de trabajo funcional habitual. |
 | MAE por tramo `[90, 135]` grados | **<= 8,0 grados**, declarándolo | En flexión alta la pierna se autoocluye en vista sagital y el error crece; se acepta un umbral relajado siempre que se reporte por separado y no se promedie con el resto. |
 
-### Criterios del Nivel 2 (contra Kinovea)
+### Criterios del Nivel 2 (contra Tracker)
 
 | Criterio | Umbral | Justificación |
 |----------|--------|---------------|
 | **Habilitante** — MAE intra-observador del propio comparador | **<= 3,0 grados** | Si el operador no se repite a sí mismo dentro de 3 grados, el comparador no tiene resolución para juzgar al sistema y el Nivel 2 se declara no concluyente. **Este criterio se evalúa primero.** |
-| MAE sistema vs. Kinovea | **<= 7,0 grados** | Umbral más laxo que el Nivel 1 porque la diferencia observada arrastra el error del comparador manual además del error del sistema. |
+| MAE sistema vs. Tracker | **<= 7,0 grados** | Umbral más laxo que el Nivel 1 porque la diferencia observada arrastra el error del comparador manual además del error del sistema. |
 | ICC(2,1) | **>= 0,85** | Corte "bueno"; se relaja respecto al Nivel 1 por la misma razón. |
 
 ### Qué pasa si no se cumplen
@@ -216,7 +216,7 @@ Es decir: **a 3,5 m, un temblor de 3 px en la posición del tobillo ya vale 1 gr
 
 **Los marcadores adhesivos NO son para MediaPipe.** MediaPipe no los usa: infiere los landmarks del cuerpo completo, y pegarle puntos no cambia su salida. Ponerlos "para que el modelo los vea" es un malentendido que hay que evitar.
 
-Los marcadores sirven para (a) **colocar la férula de forma repetible** y (b) **darle al Nivel 2 los puntos que el observador humano pinchará en Kinovea**. Son el nexo entre los dos niveles.
+Los marcadores sirven para (a) **colocar la férula de forma repetible** y (b) **darle al Nivel 2 los puntos que el observador humano pinchará en Tracker**. Son el nexo entre los dos niveles.
 
 Tres marcadores en el **lado lateral** de la pierna medida:
 
@@ -333,17 +333,48 @@ Fichero resultante: **`validacion/datos/nivel1_patron.csv`**.
 
 ---
 
-## Nivel 2 — Video-goniometría manual con Kinovea
+## Nivel 2 — Video-goniometría manual con Tracker
 
-### 2.1 Por qué Kinovea y no otra cosa
+> **Cambio de comparador (2026-10-23).** Este nivel se redactó para Kinovea. Kinovea solo funciona de forma nativa en Windows y el autor trabaja en macOS, por lo que el comparador manual pasa a ser **Tracker** (Open Source Physics). **Los criterios de aceptación pre-registrados no cambian**; cambian la herramienta, el material de vídeo (ver 2.2) y el procedimiento operativo. Este cambio se anota en la bitácora del trabajo de grado con su fecha, antes de tomar ninguna medición.
 
-Kinovea es el comparador **con validez institucional** para este trabajo: la Facultad de Educación Física del Tecnológico de Antioquia ya lo emplea en evaluación funcional manual, según se recoge en el apartado **2.3.3 (Contexto Institucional)** de la memoria. Comparar contra Kinovea no es comparar contra una herramienta arbitraria: es comparar contra **el método que la institución considera práctica válida hoy**. Ese es precisamente el argumento del trabajo — cerrar la brecha entre la observación manual y la automatización — y por tanto el comparador correcto para sostenerlo.
+### 2.1 Por qué Tracker
 
-Ventaja añadida frente al Nivel 1: se mide sobre **movimiento real y no posado**, con oclusiones, velocidad y ropa reales, y sobre los vídeos que ya están en el repositorio como activos de regresión.
+[Tracker](https://opensourcephysics.github.io/tracker-website/) es una herramienta de análisis y modelado de vídeo del proyecto Open Source Physics. Se elige por cuatro razones verificables:
 
-Limitación que compensa esa ventaja, y que hay que tener presente: **Kinovea no es un patrón de oro, es un segundo estimador con su propio error.** Lo que se calcula aquí es *acuerdo entre métodos*, no *exactitud*. De ahí que el Nivel 1 sea necesario y no redundante.
+- **Gratuita y de código abierto** (licencia GPL): cualquier tercero puede instalar la misma versión y repetir la medición, lo que encaja con la exigencia de reproducibilidad de la sección [Análisis estadístico](#análisis-estadístico).
+- **Multiplataforma** (Windows, macOS y Linux): funciona de forma nativa en el equipo del autor.
+- **Ampliamente usada para análisis de vídeo 2D**, en particular en la enseñanza de la física y en análisis de movimiento.
+- Incluye un **transportador** (*Protractor*) que mide el ángulo entre dos brazos con vértice común, fotograma a fotograma, que es exactamente la operación que exige este nivel.
 
-### 2.2 Material disponible (inventario real, medido)
+**Validez institucional, dicha con honestidad.** La Facultad de Educación Física del Tecnológico de Antioquia emplea **Kinovea** en evaluación funcional manual, según el apartado **2.3.3 (Contexto Institucional)** de la memoria. Tracker **no es esa herramienta**. El argumento se sostiene ahora por **equivalencia de método**, no por identidad de herramienta: Kinovea y Tracker pertenecen a la misma clase de método, la **video-goniometría manual 2D**, en la que un operador marca a mano tres referencias anatómicas sobre un fotograma y el programa calcula el ángulo plano que forman. Dados los mismos tres píxeles, cualquier herramienta de esta clase devuelve el mismo ángulo salvo redondeo; lo que la institución considera práctica válida es el método (goniometría sobre vídeo con marcado manual), y es el método lo que se reproduce aquí. Lo que sí puede diferir entre herramientas es la **ergonomía del marcado** (zoom, suavizado de la imagen al ampliar, forma de arrastrar los puntos), que afecta al error del operador. Por eso el error intra-observador **se mide con Tracker** en este mismo estudio (sección 2.6) y no se toma de la literatura de Kinovea. En la memoria se declara así: "comparador de la misma clase de método que el empleado por la institución", no "el comparador de la institución".
+
+Ventaja añadida frente al Nivel 1: se mide sobre **movimiento real y no posado**, con velocidad, ropa y autooclusión reales.
+
+Limitación que compensa esa ventaja, y que hay que tener presente: **Tracker no es un patrón de oro, es un segundo estimador con su propio error.** Lo que se calcula aquí es *acuerdo entre métodos*, no *exactitud*. De ahí que el Nivel 1 sea necesario y no redundante.
+
+### 2.2 Material
+
+**`SentadillaProfunda.mp4` queda descartado como material de exactitud.** Verificado fotograma a fotograma, es un **montaje de al menos tres tomas** (sujeto de frente en sentadilla hasta el frame ~55; un sujeto distinto, de frente y de pie, hasta el frame ~85; sujeto de perfil a partir del frame ~86), y la mayor parte del clip está en **plano frontal**, donde la flexión de rodilla aparece escorzada y una medición 2D no tiene sentido anatómico. El detalle está en la docstring de `validacion/analisis/exportar_para_kinovea.py` (advertencia 2). El clip se conserva como banco de pruebas del exportador y de rendimiento, no como material de validación.
+
+**Material primario: un clip propio**, grabado para este fin, que cumpla:
+
+| Requisito | Valor | Motivo |
+|-----------|-------|--------|
+| Tomas | **Una sola toma continua**, sin cortes ni edición | Un montaje produce una serie que parece una trayectoria articular y no lo es |
+| Sujetos | **Uno** (el autor) | Ver amenaza 1 |
+| Plano | **Sagital** respecto de la rodilla medida, azimut <= 20° (sección 1.8) | Es el plano en el que se define la flexión y el único en que la medición 2D es interpretable |
+| Resolución | **1920x1080**, a la tasa nativa de la cámara (30 fps o más) | Mejor resolución para marcar puntos a mano |
+| Ejercicio | **Sentadillas profundas lentas**, varias repeticiones | La lentitud reduce el desenfoque de movimiento; la profundidad cubre el rango alto de flexión |
+| Pierna medida | **Solo la más cercana a la cámara**, solo flexión | La pierna lejana queda parcialmente ocluida en vista sagital; **no se evalúa asimetría** en este nivel |
+| Condiciones de captura | Las de la sección 1.8 (altura de cámara, estabilización desactivada, enfoque y exposición bloqueados, cuerpo completo, sin contraluz) | Mismas razones que en el Nivel 1 |
+
+Nombre, duración, número de fotogramas y rango angular del clip **se fijan al exportar**: los escribe `exportar_para_kinovea.py` en `metadatos_exportacion.json` y no se anticipan aquí.
+
+`Running.mp4` queda **fuera del plan vigente**: no se ha verificado que cumpla los requisitos de una sola toma y plano sagital, y el clip propio cubre el rango de flexión de interés. Solo podría reincorporarse tras esa verificación, como conjunto secundario y reportado aparte.
+
+#### Registro histórico: inventario de los vídeos del repositorio
+
+Se conserva como registro de la versión anterior de este plan. **Ninguno de estos vídeos es material primario del Nivel 2.**
 
 | Archivo | Resolución | fps | Fotogramas | Duración | Muestras cada 10 |
 |---------|-----------|-----|------------|----------|------------------|
@@ -382,46 +413,36 @@ Cobertura por tramo angular (rodilla izquierda, porcentaje de fotogramas):
 | `[90, 120)` | 30,1 % | 15,8 % |
 | `[120, 180)` | 18,6 % | 0,5 % |
 
-**Conclusión de selección:** `SentadillaProfunda.mp4` es el vídeo primario del Nivel 2 — es el único con **1080p** (mejor resolución para pinchar puntos a mano), el único **bilateral simultáneo** (única condición en que la asimetría es interpretable) y el que mejor cubre la flexión alta. `Running.mp4` entra como vídeo secundario, para probar el sistema en movimiento rápido, **sólo con la pierna más cercana a la cámara y sólo para flexión**, no para asimetría.
+*(Nota histórica: la versión anterior concluía que `SentadillaProfunda.mp4` era el vídeo primario del Nivel 2. Esa conclusión queda **revocada** por el hallazgo del montaje y del plano frontal descrito arriba.)*
 
-### 2.3 Muestreo: cada 10 fotogramas
+### 2.3 Muestreo: cada 10 fotogramas por defecto
 
 Muestrear cada 10 fotogramas es una decisión de **viabilidad de la medición manual**, y conviene justificarla con números en lugar de presentarla como una elección de estilo.
 
-Cada medición en Kinovea (colocar tres puntos, leer, anotar) toma **30–60 segundos** con el flujo ya rodado. Medir los 183 fotogramas de `SentadillaProfunda` en las dos piernas serían 366 mediciones, entre **3 y 6 horas** — y en una segunda pasada para el error intra-observador, el doble. Inviable, y una fatiga así degrada la calidad de las mediciones finales, que es lo peor que puede pasar en el comparador de referencia.
+Cada medición manual (colocar los tres puntos del transportador, leer, anotar) toma **30–60 segundos** con el flujo ya rodado. Un clip de 10 s a 30 fps tiene 300 fotogramas: medirlos todos serían **2,5 a 5 horas**, y el doble con la segunda pasada intra-observador. Inviable, y una fatiga así degrada la calidad de las mediciones finales, que es lo peor que puede pasar en el comparador de referencia.
 
-Cada 10 fotogramas, a 25,07 fps, equivale a **una muestra cada 399 ms**. En una sentadilla completa de 7,3 s es resolución de sobra para caracterizar el error a lo largo del recorrido. No se busca reconstruir la curva temporal: se busca una **muestra representativa del rango angular**.
+Cada 10 fotogramas, a 30 fps, equivale a **una muestra cada 333 ms**: en una sentadilla lenta es resolución de sobra para cubrir el recorrido. No se busca reconstruir la curva temporal: se busca una **muestra representativa del rango angular**.
 
-**Cuántas muestras caen realmente en cada tramo** (medido, no supuesto; rodilla izquierda):
+> **Regla que hay que aceptar por escrito.** En el Nivel 2 **el MAE por tramo sólo se reporta donde `n >= 5`**; en los demás se publica la lista de diferencias individuales y se dice que no hay potencia. `analizar_nivel2.py` aplica esta regla automáticamente. Un MAE por tramo sobre 2 puntos no es un estadístico: es una anécdota.
 
-| Tramo | `SentadillaProfunda` paso 10 (n=19) | `Running` paso 30 (n=35) |
-|-------|-------------------------------------|--------------------------|
-| `[0, 30)` | 5 | 13 |
-| `[30, 60)` | **2** | 10 |
-| `[60, 90)` | **2** | 6 |
-| `[90, 120)` | 7 | 6 |
-| `[120, 180)` | 3 | **0** |
+**Cómo se fija el paso, antes de medir nada:** se exporta con paso 10 y se mira la distribución de la flexión **estimada por el sistema** en `serie_sistema.csv` (no hay todavía ninguna medición manual con la que compararla, así que esto no contamina el juicio). Si algún tramo de `[0,30) [30,60) [60,90) [90,120) [120,180]` queda con menos de 5 muestras y se quiere MAE en ese tramo, se reexporta con paso 5 **antes de abrir Tracker**, y la decisión se anota en la bitácora. Una vez empezada la sesión 1, el paso no se toca: el exportador se niega a sobrescribir una plantilla que ya contenga mediciones.
 
-> **Consecuencia que hay que aceptar por escrito.** Los cinco tramos están cubiertos, pero dos de > ellos con **n = 2**. Un MAE por tramo sobre 2 puntos no es un estadístico: es una anécdota. Por > tanto, en el Nivel 2 **el MAE por tramo sólo se reporta donde `n >= 5`**; en los demás se publica > la lista de diferencias individuales y se dice que no hay potencia. Si se quiere MAE por tramo en > todo el rango, hay que bajar el paso a 5 en `SentadillaProfunda` (38 mediciones en vez de 19) y > asumir el coste. `Running` con paso 30 **no aporta ninguna muestra por encima de 120 grados** en la > pierna izquierda: la flexión alta la cubre únicamente la sentadilla.
+*(Registro histórico: con `SentadillaProfunda` a paso 10 salían 19 muestras, con n = 2 en los tramos `[30,60)` y `[60,90)`. Ya no aplica: ver 2.2.)*
 
 **Plan de medición concreto:**
 
 | Conjunto | Vídeo | Paso | Lado | Mediciones |
 |----------|-------|------|------|-----------|
-| Principal A | `SentadillaProfunda.mp4` | 10 | izquierda | 19 |
-| Principal B | `SentadillaProfunda.mp4` | 10 | derecha | 19 |
-| Secundario | `Running.mp4` | **30** | la pierna más cercana a la cámara | 35 |
-| **Total sesión 1** | | | | **73** |
-| Intra-observador (sesión 2) | submuestra aleatoria del 33 % de las anteriores | | | **24** |
-| **Total** | | | | **97** |
+| Principal | Clip propio (2.2) | 10, o 5 según la regla anterior | la pierna más cercana a la cámara | **se fija al exportar** (= filas de `nivel2_tracker_sesion1.csv`) |
+| Intra-observador (sesión 2) | submuestra aleatoria del 33 % de la anterior, `ceil(0,33 x n)` | | | **se fija al sortear** (`sortear_sesion2.py`) |
 
-A 30–60 s cada una: **50–100 minutos**, repartidos en dos sesiones separadas al menos 48 horas. Eso sí es ejecutable.
+Las dos sesiones van separadas al menos 48 horas (sección 2.6).
 
-En `Running.mp4` se sube el paso a 30 (una muestra por segundo) porque 103 mediciones desequilibrarían el esfuerzo hacia el vídeo secundario, que además es de 640x360 y admite peor la medición manual precisa.
+**Ejecución real (2026-10-23):** clip `IMG_6310.mov`, tramo sagital de los fotogramas 1400 a 2530, **paso 15**, pierna izquierda: **76 muestras** con n >= 5 en los cinco tramos, y 26 en la sesión 2. El paso 10 previsto aquí daba 114 muestras, 55 de ellas de pie, sin ganar potencia en los tramos intermedios. La comparación de pasos y la justificación están en `validacion/datos/nivel2/IMG_6310/bitacora_nivel2.md`. El tramo se restringe con `--desde-frame` y `--hasta-frame`.
 
 ### 2.4 Alineación de fotogramas: sin ambigüedad posible
 
-Es donde este tipo de estudio se rompe en silencio: si la fila 7 del CSV no corresponde al fotograma que se midió en Kinovea, el MAE resultante es basura y nada lo delata.
+Es donde este tipo de estudio se rompe en silencio: si la fila 7 del CSV no corresponde al fotograma que se midió a mano, el MAE resultante es basura y nada lo delata.
 
 **Hallazgo relevante, comprobado sobre `SentadillaProfunda.mp4`:**
 
@@ -441,23 +462,29 @@ En cambio, el **posicionamiento directo por índice sí es fiable** en estos arc
 
 **Procedimiento de alineación, con triple seguro:**
 
-1. `exportar_para_kinovea.py` escribe el CSV del sistema **y además** vuelca los fotogramas muestreados como PNG en `validacion/datos/nivel2/<video>/frames/`, con nombre `m<ordinal:04d>_f<indice:05d>.png` (p. ej. `m0003_f00030.png`).
-2. Cada PNG lleva el **índice original rotulado en una esquina**, quemado en el píxel. Así el operador ve el número en pantalla mientras mide y no depende de ninguna convención de numeración.
-3. En Kinovea se abre la **secuencia de imágenes** (Archivo > Abrir, seleccionar el primer PNG; Kinovea detecta la serie). La posición N de la secuencia corresponde al ordinal N, y el rótulo confirma el índice original. **Kinovea no vuelve a tocar el vídeo, así que no hay forma de que su numeración interna se desincronice.**
-4. **Verificación explícita antes de medir nada:** comprobar que el primer PNG rotulado `f00000` y el último coinciden visualmente con el primer y último fotograma del vídeo abierto aparte. Anotarlo como hecho en la hoja de registro.
+1. `exportar_para_kinovea.py --exportar-fotogramas --lado <lado>` escribe el CSV del sistema **y además** vuelca los fotogramas muestreados como PNG en `validacion/datos/nivel2/<clip>/frames/`, con nombre **`m<ordinal:04d>.png`** (p. ej. `m0003.png` para el cuarto fotograma muestreado), y la plantilla `nivel2_tracker_sesion1.csv`, cuya columna `archivo_png` da la correspondencia archivo -> `frame_idx`. Cada PNG sale **del mismo arreglo** que recibe la inferencia, en la misma iteración de la pasada secuencial: la imagen es exactamente el fotograma cuyo ángulo está en el CSV. *Verificado el 2026-10-23 sobre `SentadillaProfunda.mp4` (usado solo como banco de pruebas): los 19 PNG exportados son idénticos píxel a píxel al fotograma obtenido por `CAP_PROP_POS_FRAMES` con el rótulo aplicado, y el CSV del sistema es idéntico byte a byte al de la versión anterior del exportador.*
+   > **Por qué el nombre no lleva el índice del vídeo.** La versión anterior de este protocolo proponía `m<ordinal>_f<indice>.png`. Tracker abre una secuencia de imágenes tomando los dígitos finales del nombre (hasta cinco) como contador, el resto como prefijo fijo, e incrementando de uno en uno hasta que falta un archivo (clase `org.opensourcephysics.media.core.ImageVideo` del código fuente de Open Source Physics). Con `m0000_f00000.png` el prefijo cambia en cada archivo y Tracker cargaría una sola imagen. El índice original no se pierde: va rotulado en la imagen y en la plantilla.
+2. Cada PNG lleva el **índice original rotulado** (`f00030`) en la esquina superior izquierda, en blanco sobre recuadro negro, quemado en el píxel y lejos de la pierna. Así el operador ve el número en pantalla mientras mide y no depende de ninguna convención de numeración.
+3. En Tracker se abre la **secuencia de imágenes** (sección 2.5, paso 2). El fotograma N de la secuencia en Tracker corresponde al ordinal N (`mNNNN.png`), y el rótulo confirma el índice original. **Tracker no vuelve a tocar el vídeo, así que no hay forma de que su numeración interna se desincronice.** La escala temporal que Tracker asigna a la secuencia es irrelevante y se ignora.
+4. **Verificación explícita antes de medir nada:** comprobar que Tracker muestra tantos fotogramas como filas tiene la plantilla, y que el primero y el último llevan los rótulos del primer y último `frame_idx` de la plantilla. Anotarlo como hecho en la hoja de registro.
 
-> El nombre exacto de los ficheros debe coincidir con lo que produzca `validacion/analisis/exportar_para_kinovea.py`. Si ese script usa otra convención, **manda el script** y se corrige este documento, no al revés.
+> El nombre exacto de los ficheros debe coincidir con lo que produzca `validacion/analisis/exportar_para_kinovea.py` (contrato en `validacion/analisis/plantilla_tracker.py`). Si ese script usa otra convención, **manda el script** y se corrige este documento, no al revés. *(El nombre `exportar_para_kinovea.py` es histórico y se conserva porque la memoria lo cita.)*
 
-### 2.5 Procedimiento en Kinovea
+### 2.5 Procedimiento en Tracker
 
-1. Abrir la secuencia de PNG exportada.
-2. **Configurar la lectura de posición como número de fotograma**, no como código de tiempo (clic derecho sobre el indicador de tiempo -> seleccionar número de fotogramas).
-3. Seleccionar la herramienta de **ángulo** (medición de tres puntos).
-4. Colocar los tres puntos **en este orden fijo**: **cadera (trocánter mayor) -> rodilla (epicóndilo lateral) -> tobillo (maléolo lateral)**, con el vértice en la rodilla. Los marcadores adhesivos de la sección 1.7 son la guía; en los vídeos existentes, que no los tienen, se estiman las referencias óseas por inspección — y esa estimación es justamente la principal fuente de error intra-observador.
-5. **Kinovea devuelve el ángulo interno.** Anotar ese valor en la columna `kinovea_interno_deg`. La conversión a flexión, `flexion = 180 - interno`, la hace el script de análisis, **no el operador a mano** (restar 97 veces mentalmente es una fuente de errores de transcripción gratuita).
-6. **Verificar el sentido en el primer fotograma:** si la herramienta reportara el ángulo reflejo (mayor de 180), invertir el orden de los puntos y anotarlo. Comprobarlo una vez al principio de cada sesión y dejar constancia.
-7. Ampliar (zoom) para colocar los puntos. Trabajar sin zoom sobre 640x360 es la receta segura para un error intra-observador alto.
-8. Avanzar a la siguiente imagen y repetir. Anotar cada valor **inmediatamente**, no al final.
+> Los menús se dan en la interfaz en **español** de Tracker 6.3.5, con el inglés entre paréntesis. Los marcados como **[verificado]** se comprobaron en la ejecución del 2026-10-23 (bitácora del clip); los demás se verifican al usarlos y se corrigen aquí si difieren.
+
+1. **Preparar.** Anotar la versión de Tracker (*Ayuda > Acerca de Tracker*). Comprobar que la unidad de ángulo es **grados** y no radianes (el análisis se detiene si todos los valores son menores de 2π, señal de radianes).
+2. **Abrir la secuencia [verificado].** *Archivo > Abrir* (*File > Open File…*) y seleccionar el **archivo** `frames/m0000.png`, o arrastrar ese archivo a la ventana. **No abrir ni arrastrar la carpeta**: Tracker responde "No se pudo cargar el archivo". Si pregunta si se abre una sola imagen o la secuencia, elegir la secuencia. Hacer la verificación del paso 4 de la sección 2.4: el contador de fotograma de Tracker (abajo a la izquierda) es el `ordinal_muestra`, y el rótulo de la imagen debe valer `desde_frame + ordinal x paso` (p. ej. contador 047 y rótulo `f02105` con desde 1400 y paso 15).
+3. **Crear el transportador [verificado].** *Trayectorias > Nuevo > Herramienta de Medida > Transportador* (*Track > New > Measuring Tools > Protractor*).
+4. **Permitir que se mueva por fotograma.** En el menú de la herramienta (botón con su nombre en la barra de herramientas), **desmarcar "Fijo"** (*Fixed*). Si queda fija, mover los brazos en un fotograma los mueve en todos y se pierden las mediciones anteriores.
+5. **Colocar los tres puntos**, con el vértice en la rodilla: **vértice sobre la rodilla (epicóndilo femoral lateral)**, un brazo hacia la **cadera (trocánter mayor)** y el otro hacia el **tobillo (maléolo lateral)**. Son las mismas referencias de la sección 1.7; en un clip sin marcadores adhesivos se estiman por inspección, y esa estimación es justamente la principal fuente de error intra-observador.
+6. **Ampliar (zoom)** para colocar los puntos. Trabajar sin zoom es la receta segura para un error intra-observador alto.
+7. **Verificar la convención en el primer fotograma y registrarla.** Con la pierna casi extendida, el transportador debe mostrar un valor cercano a **180** (ángulo interno) o cercano a **0** (flexión). Un valor **negativo** es solo el signo que Tracker asigna según la orientación de los brazos: el análisis toma el valor absoluto, igual que el sistema, cuyo ángulo interno sale de un arcocoseno y está siempre en `[0, 180]`. Un valor **mayor de 180** significa que se está midiendo el ángulo exterior: intercambiar los brazos. Anotar en la bitácora la convención observada (`interno` o `flexion`) y pasarla al análisis con `--convencion-tracker`. Comprobarlo al principio de cada sesión.
+8. **Anotar el valor tal cual lo muestra Tracker**, sin convertir, en la columna `tracker_angulo_deg` de la plantilla, junto con `confianza_operador`, `fecha_medicion` (ISO 8601, p. ej. `2026-10-25T10:30:00`) y `observaciones`. La conversión a flexión la hace el script, **no el operador a mano**: restar decenas de veces mentalmente es una fuente de errores de transcripción gratuita.
+9. **Avanzar** al siguiente fotograma, recolocar los tres puntos y anotar **inmediatamente**, no al final.
+10. **Alternativa a la transcripción:** *File > Export > Data* exporta la tabla del transportador (una fila por fotograma de la secuencia). Si se usa, la columna del ángulo se pega en la plantilla respetando el orden de `ordinal_muestra`, que coincide con el número de fotograma de la secuencia. Comprobar después que el número de valores coincide con el de filas.
+11. **Guardar el proyecto de Tracker** (`.trk`) en la carpeta del clip como evidencia auditable de dónde se colocaron los puntos.
 
 ### 2.6 Error intra-observador: acotar el propio comparador
 
@@ -465,39 +492,74 @@ Sin esto, el Nivel 2 no es defendible: no se puede juzgar al sistema con una reg
 
 **Procedimiento:**
 
-1. **Sesión 1:** medir los 73 puntos del plan.
-2. **Esperar 48 horas como mínimo** (idealmente una semana). Es el intervalo que rompe la memoria visual de dónde se pincharon los puntos.
-3. **Sesión 2:** volver a medir una submuestra aleatoria del **33 %** (24 puntos), **en orden aleatorizado** y **sin consultar los valores de la sesión 1**. Aleatorizar el orden con el script, no "a ojo".
-4. Calcular el acuerdo del observador consigo mismo con el mismo módulo de análisis: MAE, SD de las diferencias, ICC(2,1) y Bland-Altman.
+1. **Sesión 1:** medir todos los fotogramas de `nivel2_tracker_sesion1.csv`.
+2. **Sortear la sesión 2 con el script**, no "a ojo". La semilla por defecto es **20261023**; si se cambia, se decide y se anota en la bitácora **antes** de ejecutar el sorteo:
+   ```bash
+   cd "/Users/mateolondonotoro/.mounty/Disco C_C/Proyectos desarrollo/TRABAJO DE GRADO/Repositorio" && \
+     ~/.venvs/biomotion/bin/python validacion/analisis/sortear_sesion2.py \
+     --sesion1 validacion/datos/nivel2/<clip>/nivel2_tracker_sesion1.csv
+   ```
+   El script ordena las filas por `(video, lado, frame_idx)`, sortea `ceil(0,33 x n)` con la semilla, escribe `nivel2_tracker_sesion2.csv` (`sesion = 2`, sin valores) y **copia** los PNG elegidos a `sesion2/` renombrados `s2_0000.png`, `s2_0001.png`… en el orden aleatorizado, con la correspondencia en `sesion2/orden_sesion2.txt`. No lee ni muestra los valores de la sesión 1, y no repite un sorteo existente salvo con `--sobrescribir`.
+3. **Esperar 48 horas como mínimo** (idealmente una semana) desde la sesión 1. Es el intervalo que rompe la memoria visual de dónde se pincharon los puntos. El análisis lo comprueba con `fecha_medicion` y avisa si no se cumple.
+4. **Sesión 2:** abrir en Tracker `sesion2/s2_0000.png` como secuencia y medir con el procedimiento de la sección 2.5, **sin consultar los valores de la sesión 1** (no abrir su plantilla ni su proyecto `.trk`). Anotar en `nivel2_tracker_sesion2.csv`.
+5. Calcular el acuerdo del observador consigo mismo: MAE, SD de las diferencias, ICC(2,1) y Bland-Altman. Lo hace `analizar_nivel2.py` (sección 2.7), **antes** de calcular nada contra el sistema.
 
-**Criterio habilitante (ya fijado en el pre-registro): MAE intra-observador <= 3,0 grados.** Se evalúa **antes** de mirar el acuerdo sistema-Kinovea, para no contaminar el juicio.
+**Criterio habilitante (ya fijado en el pre-registro): MAE intra-observador <= 3,0 grados.** Se evalúa **antes** de mirar el acuerdo sistema-Tracker, para no contaminar el juicio.
 
-- Si se cumple, el comparador es utilizable y **el error intra-observador se reporta explícitamente junto al MAE sistema-Kinovea**, como cota inferior del error alcanzable: si el observador se repite con 2,5 grados de error, un MAE de 3 grados frente al sistema es indistinguible de un acuerdo perfecto.
-- Si no se cumple, hay dos salidas, y se elige **antes** de ver los datos: (a) medir tres veces cada punto y usar la mediana, o (b) declarar el Nivel 2 no concluyente y apoyar la validación en el Nivel 1. Se prefiere (a).
+- Si se cumple, el comparador es utilizable y **el error intra-observador se reporta explícitamente junto al MAE sistema-Tracker**, como cota inferior del error alcanzable: si el observador se repite con 2,5 grados de error, un MAE de 3 grados frente al sistema es indistinguible de un acuerdo perfecto.
+- Si no se cumple, hay dos salidas, y se elige **antes** de ver los datos: (a) medir tres veces cada punto y usar la mediana, o (b) declarar el Nivel 2 no concluyente y apoyar la validación en el Nivel 1. Se prefiere (a). Para (a): copiar `nivel2_tracker_sesion1.csv` como `nivel2_tracker_sesion3.csv` y `..._sesion4.csv`, poner `sesion` a 3 y 4, vaciar las columnas de valor, medir de nuevo y pasarlas con `--sesiones-extra`. La referencia pasa a ser la mediana por fotograma (con al menos tres mediciones válidas) y el informe etiqueta el resultado como **condicionado al remedio (a)**; el MAE intra-observador original se reporta igualmente. Sin sesiones extra y con el criterio incumplido, el informe etiqueta el Nivel 2 como **no concluyente** y publica las cifras sistema-Tracker solo como descripción.
 
-### 2.7 Plantilla de registro — Nivel 2
+### 2.7 Plantilla de registro y análisis — Nivel 2
 
-Fichero: **`validacion/datos/nivel2_kinovea.csv`**.
+Ficheros, todos en `validacion/datos/nivel2/<clip>/`:
+
+| Fichero | Lo escribe | Contenido |
+|---------|-----------|-----------|
+| `serie_sistema.csv` | `exportar_para_kinovea.py` | Serie del sistema en los fotogramas muestreados (formato sin cambios) |
+| `metadatos_exportacion.json` | `exportar_para_kinovea.py` | Geometría, lado, paso y huellas SHA-256 del vídeo y del CSV del sistema |
+| `frames/m0000.png`… | `exportar_para_kinovea.py` | Fotogramas rotulados de la sesión 1 |
+| **`nivel2_tracker_sesion1.csv`** | exportador (vacía) y operador | Mediciones de la sesión 1 |
+| `sesion2/s2_0000.png`…, `sesion2/orden_sesion2.txt` | `sortear_sesion2.py` | Fotogramas de la sesión 2 en orden aleatorizado |
+| **`nivel2_tracker_sesion2.csv`** | sorteo (vacía) y operador | Mediciones de la sesión 2 |
+| `*.trk` | Tracker | Proyectos de Tracker, como evidencia |
+
+Columnas de las plantillas:
 
 | Columna | Tipo | Descripción |
 |---------|------|-------------|
 | `video` | texto | Nombre del archivo de vídeo |
-| `ordinal_muestra` | entero | Posición en la secuencia exportada (0, 1, 2…) |
+| `ordinal_muestra` | entero | Posición en la secuencia exportada de la sesión 1 (0, 1, 2…); se conserva en la sesión 2 |
 | `frame_idx` | entero | **Índice original en el vídeo** — la clave de unión con el CSV del sistema |
 | `lado` | texto | `izquierda` / `derecha` |
-| `sesion` | entero | 1 o 2 (2 = repetición intra-observador) |
+| `sesion` | entero | 1, 2 (repetición intra-observador) o 3+ (remedio (a)) |
 | `fecha_medicion` | ISO 8601 | Para documentar la separación temporal entre sesiones |
-| `kinovea_interno_deg` | decimal | **Valor tal cual lo muestra Kinovea**, sin convertir |
+| `tracker_angulo_deg` | decimal | **Valor tal cual lo muestra el transportador de Tracker**, sin convertir |
 | `confianza_operador` | entero 1–3 | 1 = referencias óseas claras, 2 = dudosas, 3 = estimadas por oclusión. Permite analizar el error condicionado a la calidad de la medición |
 | `observaciones` | texto libre | Oclusión, desenfoque de movimiento, punto fuera de cuadro |
+| `archivo_png` | texto | PNG que se mide (`m0003.png` en la sesión 1, `s2_0007.png` en la sesión 2). Correspondencia archivo -> `frame_idx`; el análisis no la usa |
 
-El script de análisis añade, por unión sobre `(video, frame_idx, lado)`:
+El análisis se ejecuta con:
+
+```bash
+cd "/Users/mateolondonotoro/.mounty/Disco C_C/Proyectos desarrollo/TRABAJO DE GRADO/Repositorio" && \
+  ~/.venvs/biomotion/bin/python validacion/analisis/analizar_nivel2.py \
+  --sistema validacion/datos/nivel2/<clip>/serie_sistema.csv \
+  --sesion1 validacion/datos/nivel2/<clip>/nivel2_tracker_sesion1.csv \
+  --sesion2 validacion/datos/nivel2/<clip>/nivel2_tracker_sesion2.csv \
+  --convencion-tracker <interno|flexion>
+```
+
+El script une sobre `(video, frame_idx, lado)` y **se detiene** ante claves duplicadas, filas sin fotograma correspondiente en el sistema, filas de la sesión 2 ajenas a la sesión 1 o valores fuera de `[0, 180]`; las filas sin valor de Tracker y los fotogramas sin estimación del sistema se **descartan y se listan uno a uno** en el informe. Añade, en `validacion/resultados/nivel2_pares.csv`:
 
 | Columna | Descripción |
 |---------|-------------|
-| `kinovea_flexion_deg` | `180 - kinovea_interno_deg` |
-| `sistema_flexion_deg` | Del CSV exportado por el sistema |
-| `visibility_rodilla` | `visibility` del landmark de rodilla en ese fotograma |
+| `tracker_flexion_deg` | `180 - abs(tracker_angulo_deg)` con `--convencion-tracker interno`; `abs(tracker_angulo_deg)` con `flexion` (mediana de las sesiones si se aplica el remedio (a)) |
+| `sistema_flexion_deg` | Del CSV exportado por el sistema, según `lado` |
+| `diferencia_deg` | `sistema - Tracker` |
+
+*La `visibility` del landmark de rodilla que proponía la versión anterior no está en el CSV del sistema; el análisis no la usa y lo declara en el informe.*
+
+Salidas en `validacion/resultados/`: `nivel2_acuerdo.md` (intra-observador primero, después sistema-Tracker con los criterios del Nivel 2 y el veredicto), `nivel2_resumen.json`, `nivel2_pares.csv`, `nivel2_bland_altman.png` y `nivel2_bland_altman_intraobservador.png`.
 
 ---
 
@@ -561,15 +623,15 @@ Se declaran en la memoria, en el capítulo de resultados, **antes** de presentar
 | # | Amenaza | Alcance real | Cómo se declara y qué la acota |
 |---|---------|--------------|-------------------------------|
 | 1 | **Un solo sujeto** (el autor) | La más grave. No hay variabilidad antropométrica: ni distinta proporción de segmentos, ni distinto tejido blando sobre las referencias óseas, ni distinto tono de piel frente al detector | Se declara que los resultados **caracterizan el sistema sobre un sujeto**, no que estimen su exactitud poblacional. **No se extrapola a población.** Se identifica como el primer objetivo del Nivel 3 |
-| 2 | **Tamaño muestral pequeño** | 30 tomas (Nivel 1), 73 mediciones (Nivel 2) | Todo estadístico va con `n` e intervalo de confianza. El ICC se presenta como exploratorio. No se usan pruebas de hipótesis que exijan supuestos que `n = 30` no sostiene |
-| 3 | **Un solo dispositivo de captura** | Un modelo de cámara, un sensor, un pipeline de compresión | Se documentan modelo, resolución, fps y ajustes. Se declara que el rendimiento puede variar con otro hardware. Los vídeos del Nivel 2 provienen de fuentes distintas, lo que **mitiga parcialmente** esta amenaza |
+| 2 | **Tamaño muestral pequeño** | 30 tomas (Nivel 1); en el Nivel 2, las filas exportadas del clip propio (se fijan al exportar) | Todo estadístico va con `n` e intervalo de confianza. El ICC se presenta como exploratorio. No se usan pruebas de hipótesis que exijan supuestos que `n = 30` no sostiene |
+| 3 | **Un solo dispositivo de captura** | Un modelo de cámara, un sensor, un pipeline de compresión | Se documentan modelo, resolución, fps y ajustes. Se declara que el rendimiento puede variar con otro hardware. El clip propio del Nivel 2 se graba previsiblemente con el mismo dispositivo, así que **no mitiga** esta amenaza (la versión anterior, basada en vídeos de fuentes distintas, sí la mitigaba en parte) |
 | 4 | **Iluminación no controlada** | Sin laboratorio; luz doméstica variable | Se fotografía la escena y se anota la condición lumínica de cada sesión. Se bloquean exposición y balance de blancos. Se reporta la tasa de detección por sesión como indicador indirecto |
 | 5 | **Desfase entre eje del transportador y centro articular** | Cuantificada en la sección 1.3: hasta 9 grados con montaje pobre, por debajo de 1,2 grados por brazo con el montaje de dos anclajes | Se declara el diseño de dos anclajes y la tolerancia de colocación. Se reporta el **residuo estimado del instrumento junto al error del sistema**, para que el lector distinga uno de otro |
-| 6 | **Ausencia de patrón de oro clínico** | Ni goniómetro clínico ni sistema optoelectrónico (Vicon, OptiTrack) | Se declara sin rodeos que la referencia es un **patrón construido ad hoc** con incertidumbre propia estimada, y que Kinovea es **un segundo estimador, no un patrón de oro**. Se evita la palabra "exactitud" sin cualificar: se habla de *error frente al patrón construido* y de *acuerdo con video-goniometría manual* |
+| 6 | **Ausencia de patrón de oro clínico** | Ni goniómetro clínico ni sistema optoelectrónico (Vicon, OptiTrack) | Se declara sin rodeos que la referencia es un **patrón construido ad hoc** con incertidumbre propia estimada, y que Tracker es **un segundo estimador, no un patrón de oro**. Se evita la palabra "exactitud" sin cualificar: se habla de *error frente al patrón construido* y de *acuerdo con video-goniometría manual* |
 | 7 | **La férula altera lo que se mide** | Cuantificada: MAE de 2,0 a 3,4 grados de perturbación sobre la propia estimación, con un caso peor de 13,8 grados (sección 1.2) | Se declara y se reporta como cota de la perturbación instrumental. El montaje lateral la minimiza. **Es la razón de que el Nivel 2, sin férula, sea complementario y no redundante** |
-| 8 | **Comparación 3D contra referencia 2D** | El sistema calcula en `x, y, z`; transportador y Kinovea miden en el plano de imagen | Se declara como diferencia de definición, no como error del sistema. Se mitiga con alineación sagital estricta y se acota con el azimut del Experimento 2. El límite adoptado, **20° de azimut**, fija cuánta desalineación invalida la comparación fija cuánto azimut invalida la comparación |
+| 8 | **Comparación 3D contra referencia 2D** | El sistema calcula en `x, y, z`; transportador y Tracker miden en el plano de imagen | Se declara como diferencia de definición, no como error del sistema. Se mitiga con alineación sagital estricta y se acota con el azimut del Experimento 2. El límite adoptado, **20° de azimut**, fija cuánta desalineación invalida la comparación fija cuánto azimut invalida la comparación |
 | 9 | **Error intra-observador del comparador manual** | Desconocido a priori | Se mide explícitamente (sección 2.6) y se reporta junto al resultado, como cota inferior del error detectable. Criterio habilitante fijado a priori en 3 grados |
-| 10 | **Sesgo del propio autor midiendo su propio sistema** | El autor construye el patrón, monta la férula, mide en Kinovea y analiza | Se mitiga con: criterios de aceptación **pre-registrados** antes de medir, separación temporal y aleatorización de orden en la sesión 2, y publicación de los CSV crudos junto al reporte para que un tercero pueda recalcular. Se declara abiertamente en la memoria |
+| 10 | **Sesgo del propio autor midiendo su propio sistema** | El autor construye el patrón, monta la férula, mide en Tracker y analiza | Se mitiga con: criterios de aceptación **pre-registrados** antes de medir, separación temporal y aleatorización de orden en la sesión 2, y publicación de los CSV crudos junto al reporte para que un tercero pueda recalcular. Se declara abiertamente en la memoria |
 | 11 | **Autooclusión en flexión alta** | En vista sagital, por encima de ~110 grados la pierna se oculta tras el muslo | Anticipada en los criterios: tramo `[90,135]` con umbral relajado y **reportado por separado**. Se registra la `visibility` de cada landmark para poder condicionar el análisis a la calidad de detección |
 | 12 | **Condiciones estáticas en el Nivel 1** | El Nivel 1 mide poses mantenidas; el uso real es dinámico | Por eso existe el Nivel 2, que mide sobre movimiento real. Se declara que el error dinámico puede ser mayor que el estático, y se reporta el error de ambos niveles **por separado, sin promediarlos** |
 
@@ -613,6 +675,8 @@ MediaPipe escribe líneas `I0000`/`W0000` en stderr al inicializar; no son error
 - `docs/guias/protocolo_captura_clasificacion_ejercicios.md` — condiciones de captura (distancia, plano sagital, encuadre) de las que este protocolo hereda.
 - `docs/spec/README.md` — convención del formato de documentación técnica.
 - `backend/vision/biomechanics.py` — definición canónica de la convención angular.
-- `validacion/analisis/exportar_para_kinovea.py` — exportación de la serie del sistema y de los fotogramas muestreados.
+- `validacion/analisis/exportar_para_kinovea.py` — exportación de la serie del sistema, de los fotogramas muestreados y de la plantilla de Tracker (nombre histórico).
+- `validacion/analisis/sortear_sesion2.py` — sorteo aleatorizado de la sesión 2 (intra-observador).
+- `validacion/analisis/analizar_nivel2.py` — análisis del Nivel 2: criterio habilitante intra-observador y acuerdo sistema-Tracker.
 - `validacion/analisis/acuerdo.py` — MAE, RMSE, sesgo, Bland-Altman, ICC(2,1) y error por tramo.
 - `docs/Formato_trabajo_de_grado.md` — apartado 2.3.3 (contexto institucional, uso de Kinovea en la Facultad de Educación Física) y bitácora de decisiones.
