@@ -132,8 +132,56 @@ versionan los CSV, los metadatos y esta bitácora.
 - Cada fila de la tabla **Datos** de Tracker es un fotograma de la secuencia (`t` = ordinal x
   0,1 s; la escala temporal es arbitraria y se ignora).
 
+## 2026-10-23 — Sesión 1, primera pasada (incompleta)
+
+- Proyecto guardado por el operador: `~/Desktop/IMG_6310/sesion1.trz` a las
+  2026-10-23T18:52:25-0500 (Tracker lo empaqueta como `.trz`: un `.trk` más las imágenes).
+- Formato verificado de `framedata` del transportador en el `.trk`: por fotograma
+  `{x_tobillo, y_tobillo, x_cadera, y_cadera, x_rodilla, y_rodilla}` en píxeles de imagen; el
+  ángulo recalculado en el vértice (tercer par) coincide con la tabla **Datos** de Tracker
+  (p. ej. −178,5° en 0, 101,2° en 4, 59,9° en 6, 170,4° en 8).
+- Una entrada `null` significa que en ese fotograma **no se movió el transportador** y Tracker
+  muestra el valor del fotograma anterior (comprobado: el fotograma 75 es `null` y Tracker
+  muestra −178,9°, el valor del 74). Esos fotogramas no son mediciones propias.
+- **19 de 76 fotogramas sin medición propia:** 1, 2, 9, 10, 11, 12, 26, 39, 46, 49, 52, 53,
+  54, 55, 56, 62, 69, 72, 75. Se vuelven a medir antes de cerrar la sesión 1.
+- El punto del tobillo se mantuvo en la misma posición en la mayoría de fotogramas: es
+  coherente con el ejercicio (el pie no se desplaza en la sentadilla).
+- `confianza_operador` aún sin registrar.
+
+## 2026-10-23 — Cierre de la sesión 1
+
+- El operador volvió a medir los fotogramas sin medición propia y guardó el proyecto a las
+  **2026-10-23T19:05:47-05:00** (`~/Desktop/IMG_6310/sesion1 2.trz`). Queda **1 fotograma sin
+  medición propia: ordinal 2** (`f01430`, de pie). El operador decidió no medirlo.
+- Ningún fotograma repite exactamente las coordenadas del anterior.
+- Evidencia en el repositorio: `sesion1.trk` (coordenadas de los tres puntos por fotograma,
+  versionado) y `sesion1.trz` (proyecto con imágenes, excluido de git por Ley 1581).
+- `nivel2_tracker_sesion1.csv` rellenado desde el `.trk`: `tracker_angulo_deg` = ángulo en el
+  vértice con el signo y el redondeo a 0,1° que muestra Tracker (verificado contra la tabla
+  **Datos** en los fotogramas 0, 4, 6, 7, 8 y 74). El ordinal 2 queda **vacío** con su
+  observación: el valor que Tracker muestra ahí es el del fotograma anterior y no es una
+  medición. Resultado: **75 de 76** mediciones; el análisis descarta y lista el ordinal 2.
+- `fecha_medicion` = hora de cierre de la sesión (no hay hora por fotograma).
+
+## 2026-10-23 — Sorteo de la sesión 2
+
+- `sortear_sesion2.py`, semilla por defecto **20261023**, fracción 0,33: **26** fotogramas,
+  en orden aleatorizado en `sesion2/s2_0000.png`… (`orden_sesion2.txt`). Copiados también a
+  la copia de trabajo `~/Desktop/IMG_6310/sesion2/`.
+- El sorteo **incluye el ordinal 2**, que no tiene valor en la sesión 1. No se repite el sorteo
+  (estaba pre-especificado). Se mide igualmente en la sesión 2; el acuerdo intra-observador
+  se calcula sobre los **25** pares completos.
+- Fecha mínima de la sesión 2: **2026-10-25T19:06-05:00** (48 h después del cierre de la
+  sesión 1).
+
 ## Pendiente
 
 - [x] Convención del transportador observada en `m0000`: `interno`.
-- [ ] Fecha y hora de inicio y fin de la sesión 1.
-- [ ] Sorteo de la sesión 2 (semilla 20261023) y fecha de la sesión 2 (>= 48 h después).
+- [x] Cierre de la sesión 1 (75 de 76 mediciones).
+- [x] Sorteo de la sesión 2.
+- [x] `confianza_operador` de la sesión 1: **no anotada** por decisión del operador
+  (2026-10-23). El análisis la reporta como "sin anotar" y no se estratifica el error por
+  calidad de la medición; se declara como limitación.
+- [ ] Sesión 2 (desde 2026-10-25T19:06-05:00). Durante la sesión 2 no se abren
+  `sesion1 2.trz`, `sesion1.trk`, `nivel2_tracker_sesion1.csv` ni `serie_sistema.csv`.

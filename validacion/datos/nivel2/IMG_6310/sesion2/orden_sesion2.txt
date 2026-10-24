@@ -1,0 +1,30 @@
+# Orden de medición de la sesión 2 (Nivel 2, error intra-observador).
+# Plantilla de la sesión 1: nivel2_tracker_sesion1.csv
+# Semilla: 20261023  Fracción: 0.33  n sesión 1: 76  k sesión 2: 26
+# png_sesion2 <- png_sesion1
+s2_0000.png <- m0032.png
+s2_0001.png <- m0033.png
+s2_0002.png <- m0025.png
+s2_0003.png <- m0068.png
+s2_0004.png <- m0045.png
+s2_0005.png <- m0030.png
+s2_0006.png <- m0046.png
+s2_0007.png <- m0002.png
+s2_0008.png <- m0052.png
+s2_0009.png <- m0009.png
+s2_0010.png <- m0051.png
+s2_0011.png <- m0026.png
+s2_0012.png <- m0039.png
+s2_0013.png <- m0022.png
+s2_0014.png <- m0018.png
+s2_0015.png <- m0037.png
+s2_0016.png <- m0016.png
+s2_0017.png <- m0036.png
+s2_0018.png <- m0055.png
+s2_0019.png <- m0062.png
+s2_0020.png <- m0072.png
+s2_0021.png <- m0058.png
+s2_0022.png <- m0073.png
+s2_0023.png <- m0001.png
+s2_0024.png <- m0066.png
+s2_0025.png <- m0029.png

@@ -50,3 +50,6 @@ tests/assets/**/*.WEBM
 # Fotogramas del clip de validacion Nivel 2: muestran a una persona identificable (Ley 1581 de 2012).
 # Se versionan los CSV de medicion, no las imagenes.
 validacion/datos/nivel2/**/*.png
+# Proyectos de Tracker empaquetados (.trz): incluyen los fotogramas con la persona (Ley 1581 de 2012).
+# El .trk (solo coordenadas) si se versiona como evidencia.
+validacion/datos/nivel2/**/*.trz
