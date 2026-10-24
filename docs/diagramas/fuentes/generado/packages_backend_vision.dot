@@ -1,0 +1,54 @@
+digraph "packages_backend_vision" {
+rankdir=BT
+charset="utf-8"
+"vision" [color="#77AADD", label=<vision>, shape="box", style="filled"];
+"vision.biomechanics" [color="#77AADD", label=<vision.biomechanics>, shape="box", style="filled"];
+"vision.exercise_classifier" [color="#77AADD", label=<vision.exercise_classifier>, shape="box", style="filled"];
+"vision.feature_engine" [color="#77AADD", label=<vision.feature_engine>, shape="box", style="filled"];
+"vision.heuristic_exercise_classifier" [color="#77AADD", label=<vision.heuristic_exercise_classifier>, shape="box", style="filled"];
+"vision.landmark_filter" [color="#77AADD", label=<vision.landmark_filter>, shape="box", style="filled"];
+"vision.model_registry" [color="#77AADD", label=<vision.model_registry>, shape="box", style="filled"];
+"vision.paths" [color="#77AADD", label=<vision.paths>, shape="box", style="filled"];
+"vision.pipeline_timer" [color="#77AADD", label=<vision.pipeline_timer>, shape="box", style="filled"];
+"vision.pose_extractor" [color="#77AADD", label=<vision.pose_extractor>, shape="box", style="filled"];
+"vision.processor" [color="#77AADD", label=<vision.processor>, shape="box", style="filled"];
+"vision.realtime_engine" [color="#77AADD", label=<vision.realtime_engine>, shape="box", style="filled"];
+"vision.rep_tracker" [color="#77AADD", label=<vision.rep_tracker>, shape="box", style="filled"];
+"vision.rep_tracker_abc" [color="#77AADD", label=<vision.rep_tracker_abc>, shape="box", style="filled"];
+"vision.rep_trackers" [color="#99DDFF", label=<vision.rep_trackers>, shape="box", style="filled"];
+"vision.rep_trackers.squat" [color="#99DDFF", label=<vision.rep_trackers.squat>, shape="box", style="filled"];
+"vision.rep_trackers.unknown" [color="#99DDFF", label=<vision.rep_trackers.unknown>, shape="box", style="filled"];
+"vision.scalar_kalman" [color="#77AADD", label=<vision.scalar_kalman>, shape="box", style="filled"];
+"vision.stream_processing_plan" [color="#77AADD", label=<vision.stream_processing_plan>, shape="box", style="filled"];
+"vision.types" [color="#77AADD", label=<vision.types>, shape="box", style="filled"];
+"vision.unified_payload" [color="#77AADD", label=<vision.unified_payload>, shape="box", style="filled"];
+"vision" -> "vision.processor" [arrowhead="open", arrowtail="none"];
+"vision.exercise_classifier" -> "vision.heuristic_exercise_classifier" [arrowhead="open", arrowtail="none"];
+"vision.exercise_classifier" -> "vision.model_registry" [arrowhead="open", arrowtail="none"];
+"vision.exercise_classifier" -> "vision.scalar_kalman" [arrowhead="open", arrowtail="none"];
+"vision.exercise_classifier" -> "vision.types" [arrowhead="open", arrowtail="none"];
+"vision.feature_engine" -> "vision.biomechanics" [arrowhead="open", arrowtail="none"];
+"vision.feature_engine" -> "vision.types" [arrowhead="open", arrowtail="none"];
+"vision.heuristic_exercise_classifier" -> "vision.types" [arrowhead="open", arrowtail="none"];
+"vision.pose_extractor" -> "vision.biomechanics" [arrowhead="open", arrowtail="none"];
+"vision.pose_extractor" -> "vision.types" [arrowhead="open", arrowtail="none"];
+"vision.realtime_engine" -> "vision.exercise_classifier" [arrowhead="open", arrowtail="none"];
+"vision.realtime_engine" -> "vision.feature_engine" [arrowhead="open", arrowtail="none"];
+"vision.realtime_engine" -> "vision.model_registry" [arrowhead="open", arrowtail="none"];
+"vision.realtime_engine" -> "vision.pipeline_timer" [arrowhead="open", arrowtail="none"];
+"vision.realtime_engine" -> "vision.pose_extractor" [arrowhead="open", arrowtail="none"];
+"vision.realtime_engine" -> "vision.rep_tracker" [arrowhead="open", arrowtail="none"];
+"vision.realtime_engine" -> "vision.types" [arrowhead="open", arrowtail="none"];
+"vision.realtime_engine" -> "vision.unified_payload" [arrowhead="open", arrowtail="none"];
+"vision.rep_tracker" -> "vision.rep_tracker_abc" [arrowhead="open", arrowtail="none"];
+"vision.rep_tracker" -> "vision.rep_trackers.squat" [arrowhead="open", arrowtail="none"];
+"vision.rep_tracker" -> "vision.rep_trackers.unknown" [arrowhead="open", arrowtail="none"];
+"vision.rep_tracker" -> "vision.types" [arrowhead="open", arrowtail="none"];
+"vision.rep_tracker_abc" -> "vision.types" [arrowhead="open", arrowtail="none"];
+"vision.rep_trackers.squat" -> "vision.rep_tracker_abc" [arrowhead="open", arrowtail="none"];
+"vision.rep_trackers.squat" -> "vision.types" [arrowhead="open", arrowtail="none"];
+"vision.rep_trackers.unknown" -> "vision.rep_tracker_abc" [arrowhead="open", arrowtail="none"];
+"vision.rep_trackers.unknown" -> "vision.types" [arrowhead="open", arrowtail="none"];
+"vision.unified_payload" -> "vision.landmark_filter" [arrowhead="open", arrowtail="none"];
+"vision.unified_payload" -> "vision.types" [arrowhead="open", arrowtail="none"];
+}

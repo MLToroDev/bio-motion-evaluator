@@ -1,0 +1,448 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Def_ValidacionNivel2" name="Proceso de validación de exactitud — Nivel 2" targetNamespace="https://bio-motion-evaluator/bpmn" exporter="bio-motion-evaluator generar_bpmn.py" exporterVersion="1.0">
+  <bpmn:collaboration id="Colab_Def_ValidacionNivel2">
+    <bpmn:participant id="P_Nivel2" name="Validación de exactitud angular — Nivel 2 (video-goniometría manual con Tracker)" processRef="Proceso_P_Nivel2" />
+  </bpmn:collaboration>
+  <bpmn:process id="Proceso_P_Nivel2" name="Validación Nivel 2" isExecutable="false">
+    <bpmn:laneSet id="LaneSet_P_Nivel2">
+      <bpmn:lane id="L_Operador" name="Investigador (operador de Tracker)">
+        <bpmn:flowNodeRef>op_inicio</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>op_grabar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>op_revisar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>op_gw_paso</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>op_paso</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>op_s1_abrir</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>op_s1_medir</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>op_espera</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>op_s2</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>op_gw_rem</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>op_remedio</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>op_reportar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>op_fin</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="L_Scripts" name="Scripts de validación (validacion/analisis)">
+        <bpmn:flowNodeRef>sc_gw_exp</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>sc_exportar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>sc_sortear</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>sc_analizar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>sc_gw_intra</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>sc_reanalizar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>sc_gw_merge</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>sc_acuerdo</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>sc_informe</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="op_inicio" name="Criterios del Nivel 2 pre-registrados en la bitácora">
+      <bpmn:outgoing>Flujo_01</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="op_grabar" name="Grabar clip propio: una toma, plano sagital, 1920×1080, sentadillas lentas">
+      <bpmn:incoming>Flujo_01</bpmn:incoming>
+      <bpmn:outgoing>Flujo_02</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="sc_gw_exp">
+      <bpmn:incoming>Flujo_02</bpmn:incoming>
+      <bpmn:incoming>Flujo_08</bpmn:incoming>
+      <bpmn:outgoing>Flujo_03</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:scriptTask id="sc_exportar" name="Exportar la serie del sistema, los PNG rotulados y la plantilla de la sesión 1 (exportar_para_kinovea.py)">
+      <bpmn:incoming>Flujo_03</bpmn:incoming>
+      <bpmn:outgoing>Flujo_04</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DOA_sc_exportar_0"><bpmn:targetRef>do_serie</bpmn:targetRef></bpmn:dataOutputAssociation>
+      <bpmn:dataOutputAssociation id="DOA_sc_exportar_1"><bpmn:targetRef>do_frames</bpmn:targetRef></bpmn:dataOutputAssociation>
+    </bpmn:scriptTask>
+    <bpmn:userTask id="op_revisar" name="Revisar la flexión estimada por tramo en serie_sistema.csv">
+      <bpmn:incoming>Flujo_04</bpmn:incoming>
+      <bpmn:outgoing>Flujo_05</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="op_gw_paso" name="¿n ≥ 5 en los tramos de interés?" default="Flujo_06">
+      <bpmn:incoming>Flujo_05</bpmn:incoming>
+      <bpmn:outgoing>Flujo_06</bpmn:outgoing>
+      <bpmn:outgoing>Flujo_07</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="op_paso" name="Fijar un paso menor (p. ej. 5) y anotarlo en la bitácora">
+      <bpmn:incoming>Flujo_07</bpmn:incoming>
+      <bpmn:outgoing>Flujo_08</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="op_s1_abrir" name="Sesión 1: abrir frames/m0000.png como secuencia y verificar fotogramas y rótulos">
+      <bpmn:incoming>Flujo_06</bpmn:incoming>
+      <bpmn:outgoing>Flujo_09</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="op_s1_medir" name="Fijar la convención (interno o flexión) y medir cada fotograma con el transportador">
+      <bpmn:incoming>Flujo_09</bpmn:incoming>
+      <bpmn:outgoing>Flujo_10</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DOA_op_s1_medir_0"><bpmn:targetRef>do_s1</bpmn:targetRef></bpmn:dataOutputAssociation>
+    </bpmn:userTask>
+    <bpmn:scriptTask id="sc_sortear" name="Sortear la sesión 2: ceil(0,33 · n) filas, semilla 20261023 (sortear_sesion2.py)">
+      <bpmn:incoming>Flujo_10</bpmn:incoming>
+      <bpmn:outgoing>Flujo_11</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DOA_sc_sortear_0"><bpmn:targetRef>do_s2</bpmn:targetRef></bpmn:dataOutputAssociation>
+    </bpmn:scriptTask>
+    <bpmn:intermediateCatchEvent id="op_espera" name="Han pasado al menos 48 h desde la sesión 1">
+      <bpmn:incoming>Flujo_11</bpmn:incoming>
+      <bpmn:outgoing>Flujo_12</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="Def_op_espera"><bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT48H</bpmn:timeDuration></bpmn:timerEventDefinition>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:userTask id="op_s2" name="Sesión 2: medir sesion2/s2_*.png sin consultar la sesión 1">
+      <bpmn:incoming>Flujo_12</bpmn:incoming>
+      <bpmn:outgoing>Flujo_13</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:scriptTask id="sc_analizar" name="Analizar el Nivel 2: acuerdo intra-observador primero (analizar_nivel2.py)">
+      <bpmn:incoming>Flujo_13</bpmn:incoming>
+      <bpmn:outgoing>Flujo_14</bpmn:outgoing>
+    </bpmn:scriptTask>
+    <bpmn:exclusiveGateway id="sc_gw_intra" name="¿MAE intra-observador ≤ 3,0°?" default="Flujo_15">
+      <bpmn:incoming>Flujo_14</bpmn:incoming>
+      <bpmn:outgoing>Flujo_15</bpmn:outgoing>
+      <bpmn:outgoing>Flujo_16</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="op_gw_rem" name="¿Remedio elegido?" default="Flujo_17">
+      <bpmn:incoming>Flujo_16</bpmn:incoming>
+      <bpmn:outgoing>Flujo_17</bpmn:outgoing>
+      <bpmn:outgoing>Flujo_18</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="op_remedio" name="Remedio (a): medir tres veces cada punto y usar la mediana (sesiones 3 y 4)">
+      <bpmn:incoming>Flujo_17</bpmn:incoming>
+      <bpmn:outgoing>Flujo_19</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:scriptTask id="sc_reanalizar" name="Reanalizar con las sesiones 3 y 4: la referencia pasa a ser la mediana por fotograma (≥ 3 mediciones)">
+      <bpmn:incoming>Flujo_19</bpmn:incoming>
+      <bpmn:outgoing>Flujo_20</bpmn:outgoing>
+    </bpmn:scriptTask>
+    <bpmn:exclusiveGateway id="sc_gw_merge">
+      <bpmn:incoming>Flujo_15</bpmn:incoming>
+      <bpmn:incoming>Flujo_18</bpmn:incoming>
+      <bpmn:incoming>Flujo_20</bpmn:incoming>
+      <bpmn:outgoing>Flujo_21</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:scriptTask id="sc_acuerdo" name="Acuerdo sistema–Tracker: MAE ≤ 7,0°, ICC(2,1) ≥ 0,85; MAE por tramo solo con n ≥ 5">
+      <bpmn:incoming>Flujo_21</bpmn:incoming>
+      <bpmn:outgoing>Flujo_22</bpmn:outgoing>
+    </bpmn:scriptTask>
+    <bpmn:scriptTask id="sc_informe" name="Escribir el informe y el veredicto (nivel2_acuerdo.md y figuras)">
+      <bpmn:incoming>Flujo_22</bpmn:incoming>
+      <bpmn:outgoing>Flujo_23</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DOA_sc_informe_0"><bpmn:targetRef>do_res</bpmn:targetRef></bpmn:dataOutputAssociation>
+    </bpmn:scriptTask>
+    <bpmn:userTask id="op_reportar" name="Reportar en la memoria el MAE intra-observador junto al acuerdo y el veredicto">
+      <bpmn:incoming>Flujo_23</bpmn:incoming>
+      <bpmn:outgoing>Flujo_24</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="op_fin" name="Veredicto del Nivel 2 emitido">
+      <bpmn:incoming>Flujo_24</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:dataObject id="DO_do_serie" />
+    <bpmn:dataObjectReference id="do_serie" name="Serie del sistema y metadatos" dataObjectRef="DO_do_serie" />
+    <bpmn:dataObject id="DO_do_frames" />
+    <bpmn:dataObjectReference id="do_frames" name="PNG y plantilla de la sesión 1" dataObjectRef="DO_do_frames" />
+    <bpmn:dataObject id="DO_do_s1" />
+    <bpmn:dataObjectReference id="do_s1" name="Mediciones de la sesión 1 y proyecto de Tracker" dataObjectRef="DO_do_s1" />
+    <bpmn:dataObject id="DO_do_s2" />
+    <bpmn:dataObjectReference id="do_s2" name="PNG y plantilla de la sesión 2" dataObjectRef="DO_do_s2" />
+    <bpmn:dataObject id="DO_do_res" />
+    <bpmn:dataObjectReference id="do_res" name="Informe, resumen, pares y Bland-Altman" dataObjectRef="DO_do_res" />
+    <bpmn:sequenceFlow id="Flujo_01" sourceRef="op_inicio" targetRef="op_grabar" />
+    <bpmn:sequenceFlow id="Flujo_02" sourceRef="op_grabar" targetRef="sc_gw_exp" />
+    <bpmn:sequenceFlow id="Flujo_03" sourceRef="sc_gw_exp" targetRef="sc_exportar" />
+    <bpmn:sequenceFlow id="Flujo_04" sourceRef="sc_exportar" targetRef="op_revisar" />
+    <bpmn:sequenceFlow id="Flujo_05" sourceRef="op_revisar" targetRef="op_gw_paso" />
+    <bpmn:sequenceFlow id="Flujo_06" name="Sí" sourceRef="op_gw_paso" targetRef="op_s1_abrir" />
+    <bpmn:sequenceFlow id="Flujo_07" name="No" sourceRef="op_gw_paso" targetRef="op_paso">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">algún tramo de interés con n &lt; 5</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flujo_08" sourceRef="op_paso" targetRef="sc_gw_exp" />
+    <bpmn:sequenceFlow id="Flujo_09" sourceRef="op_s1_abrir" targetRef="op_s1_medir" />
+    <bpmn:sequenceFlow id="Flujo_10" sourceRef="op_s1_medir" targetRef="sc_sortear" />
+    <bpmn:sequenceFlow id="Flujo_11" sourceRef="sc_sortear" targetRef="op_espera" />
+    <bpmn:sequenceFlow id="Flujo_12" sourceRef="op_espera" targetRef="op_s2" />
+    <bpmn:sequenceFlow id="Flujo_13" sourceRef="op_s2" targetRef="sc_analizar" />
+    <bpmn:sequenceFlow id="Flujo_14" sourceRef="sc_analizar" targetRef="sc_gw_intra" />
+    <bpmn:sequenceFlow id="Flujo_15" name="Sí" sourceRef="sc_gw_intra" targetRef="sc_gw_merge" />
+    <bpmn:sequenceFlow id="Flujo_16" name="No" sourceRef="sc_gw_intra" targetRef="op_gw_rem">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">MAE intra-observador &gt; 3,0°</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flujo_17" name="(a)" sourceRef="op_gw_rem" targetRef="op_remedio" />
+    <bpmn:sequenceFlow id="Flujo_18" name="(b) no concluyente" sourceRef="op_gw_rem" targetRef="sc_gw_merge">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">se eligió la salida (b)</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flujo_19" sourceRef="op_remedio" targetRef="sc_reanalizar" />
+    <bpmn:sequenceFlow id="Flujo_20" sourceRef="sc_reanalizar" targetRef="sc_gw_merge" />
+    <bpmn:sequenceFlow id="Flujo_21" sourceRef="sc_gw_merge" targetRef="sc_acuerdo" />
+    <bpmn:sequenceFlow id="Flujo_22" sourceRef="sc_acuerdo" targetRef="sc_informe" />
+    <bpmn:sequenceFlow id="Flujo_23" sourceRef="sc_informe" targetRef="op_reportar" />
+    <bpmn:sequenceFlow id="Flujo_24" sourceRef="op_reportar" targetRef="op_fin" />
+    <bpmn:textAnnotation id="an_alinear"><bpmn:text>Alinear siempre por índice de fotograma (frame_idx), nunca por marca de tiempo; el exportador no sobrescribe una plantilla con mediciones.</bpmn:text></bpmn:textAnnotation>
+    <bpmn:association id="Asoc_an_alinear" associationDirection="None" sourceRef="sc_exportar" targetRef="an_alinear" />
+    <bpmn:textAnnotation id="an_remedio"><bpmn:text>La salida se elige antes de ver los datos y se prefiere (a), que se pasa al análisis con --sesiones-extra. Con (b), el Nivel 2 se declara no concluyente y la validación se apoya en el Nivel 1.</bpmn:text></bpmn:textAnnotation>
+    <bpmn:association id="Asoc_an_remedio" associationDirection="None" sourceRef="op_gw_rem" targetRef="an_remedio" />
+    <bpmn:textAnnotation id="an_veredicto"><bpmn:text>Veredicto: «concluyente: cumple / no cumple los criterios», «condicionado al remedio (a)» o «no concluyente».</bpmn:text></bpmn:textAnnotation>
+    <bpmn:association id="Asoc_an_veredicto" associationDirection="None" sourceRef="sc_informe" targetRef="an_veredicto" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="Diagrama_Def_ValidacionNivel2" name="Proceso de validación de exactitud — Nivel 2">
+    <bpmndi:BPMNPlane id="Plano_Def_ValidacionNivel2" bpmnElement="Colab_Def_ValidacionNivel2">
+      <bpmndi:BPMNShape id="P_Nivel2_di" bpmnElement="P_Nivel2" isHorizontal="true">
+        <dc:Bounds x="40" y="40" width="4130" height="640" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="L_Operador_di" bpmnElement="L_Operador" isHorizontal="true">
+        <dc:Bounds x="70" y="40" width="4100" height="320" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="L_Scripts_di" bpmnElement="L_Scripts" isHorizontal="true">
+        <dc:Bounds x="70" y="360" width="4100" height="320" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="op_inicio_di" bpmnElement="op_inicio">
+        <dc:Bounds x="217" y="107" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="180" y="147" width="110" height="40" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="op_grabar_di" bpmnElement="op_grabar">
+        <dc:Bounds x="342" y="72" width="165" height="105" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sc_gw_exp_di" bpmnElement="sc_gw_exp" isMarkerVisible="true">
+        <dc:Bounds x="590" y="420" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sc_exportar_di" bpmnElement="sc_exportar">
+        <dc:Bounds x="722" y="392" width="165" height="105" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="DOA_sc_exportar_0_di" bpmnElement="DOA_sc_exportar_0">
+        <di:waypoint x="805" y="498" />
+        <di:waypoint x="805" y="570" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DOA_sc_exportar_1_di" bpmnElement="DOA_sc_exportar_1">
+        <di:waypoint x="805" y="498" />
+        <di:waypoint x="1033" y="570" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="op_revisar_di" bpmnElement="op_revisar">
+        <dc:Bounds x="912" y="72" width="165" height="105" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="op_gw_paso_di" bpmnElement="op_gw_paso" isMarkerVisible="true">
+        <dc:Bounds x="1160" y="100" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1130" y="56" width="110" height="40" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="op_paso_di" bpmnElement="op_paso">
+        <dc:Bounds x="1102" y="222" width="165" height="105" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="op_s1_abrir_di" bpmnElement="op_s1_abrir">
+        <dc:Bounds x="1292" y="72" width="165" height="105" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="op_s1_medir_di" bpmnElement="op_s1_medir">
+        <dc:Bounds x="1482" y="72" width="165" height="105" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="DOA_op_s1_medir_0_di" bpmnElement="DOA_op_s1_medir_0">
+        <di:waypoint x="1565" y="178" />
+        <di:waypoint x="1641" y="250" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="sc_sortear_di" bpmnElement="sc_sortear">
+        <dc:Bounds x="1672" y="392" width="165" height="105" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="DOA_sc_sortear_0_di" bpmnElement="DOA_sc_sortear_0">
+        <di:waypoint x="1755" y="498" />
+        <di:waypoint x="1755" y="570" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="op_espera_di" bpmnElement="op_espera">
+        <dc:Bounds x="1927" y="107" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1890" y="147" width="110" height="40" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="op_s2_di" bpmnElement="op_s2">
+        <dc:Bounds x="2052" y="72" width="165" height="105" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sc_analizar_di" bpmnElement="sc_analizar">
+        <dc:Bounds x="2242" y="392" width="165" height="105" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sc_gw_intra_di" bpmnElement="sc_gw_intra" isMarkerVisible="true">
+        <dc:Bounds x="2490" y="420" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="2460" y="474" width="110" height="40" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="op_gw_rem_di" bpmnElement="op_gw_rem" isMarkerVisible="true">
+        <dc:Bounds x="2680" y="250" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="2566" y="255" width="110" height="40" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="op_remedio_di" bpmnElement="op_remedio">
+        <dc:Bounds x="2812" y="222" width="165" height="105" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sc_reanalizar_di" bpmnElement="sc_reanalizar">
+        <dc:Bounds x="3002" y="542" width="165" height="105" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sc_gw_merge_di" bpmnElement="sc_gw_merge" isMarkerVisible="true">
+        <dc:Bounds x="3250" y="420" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sc_acuerdo_di" bpmnElement="sc_acuerdo">
+        <dc:Bounds x="3382" y="392" width="165" height="105" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sc_informe_di" bpmnElement="sc_informe">
+        <dc:Bounds x="3572" y="392" width="165" height="105" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="DOA_sc_informe_0_di" bpmnElement="DOA_sc_informe_0">
+        <di:waypoint x="3655" y="498" />
+        <di:waypoint x="3655" y="570" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="op_reportar_di" bpmnElement="op_reportar">
+        <dc:Bounds x="3762" y="72" width="165" height="105" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="op_fin_di" bpmnElement="op_fin">
+        <dc:Bounds x="4017" y="107" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="3980" y="147" width="110" height="40" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="do_serie_di" bpmnElement="do_serie">
+        <dc:Bounds x="787" y="570" width="36" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="750" y="624" width="110" height="40" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="do_frames_di" bpmnElement="do_frames">
+        <dc:Bounds x="1015" y="570" width="36" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="978" y="624" width="110" height="40" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="do_s1_di" bpmnElement="do_s1">
+        <dc:Bounds x="1623" y="250" width="36" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1586" y="304" width="110" height="40" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="do_s2_di" bpmnElement="do_s2">
+        <dc:Bounds x="1737" y="570" width="36" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1700" y="624" width="110" height="40" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="do_res_di" bpmnElement="do_res">
+        <dc:Bounds x="3637" y="570" width="36" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="3600" y="624" width="110" height="40" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flujo_01_di" bpmnElement="Flujo_01">
+        <di:waypoint x="253" y="125" />
+        <di:waypoint x="342" y="125" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_02_di" bpmnElement="Flujo_02">
+        <di:waypoint x="508" y="125" />
+        <di:waypoint x="615" y="125" />
+        <di:waypoint x="615" y="420" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_03_di" bpmnElement="Flujo_03">
+        <di:waypoint x="640" y="445" />
+        <di:waypoint x="722" y="445" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_04_di" bpmnElement="Flujo_04">
+        <di:waypoint x="888" y="445" />
+        <di:waypoint x="900" y="445" />
+        <di:waypoint x="900" y="125" />
+        <di:waypoint x="912" y="125" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_05_di" bpmnElement="Flujo_05">
+        <di:waypoint x="1078" y="125" />
+        <di:waypoint x="1160" y="125" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_06_di" bpmnElement="Flujo_06">
+        <di:waypoint x="1210" y="125" />
+        <di:waypoint x="1292" y="125" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1218" y="107" width="70" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_07_di" bpmnElement="Flujo_07">
+        <di:waypoint x="1185" y="150" />
+        <di:waypoint x="1185" y="222" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1191" y="154" width="70" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_08_di" bpmnElement="Flujo_08">
+        <di:waypoint x="1185" y="328" />
+        <di:waypoint x="1185" y="525" />
+        <di:waypoint x="615" y="525" />
+        <di:waypoint x="615" y="470" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_09_di" bpmnElement="Flujo_09">
+        <di:waypoint x="1458" y="125" />
+        <di:waypoint x="1482" y="125" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_10_di" bpmnElement="Flujo_10">
+        <di:waypoint x="1648" y="125" />
+        <di:waypoint x="1660" y="125" />
+        <di:waypoint x="1660" y="445" />
+        <di:waypoint x="1672" y="445" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_11_di" bpmnElement="Flujo_11">
+        <di:waypoint x="1838" y="445" />
+        <di:waypoint x="1882" y="445" />
+        <di:waypoint x="1882" y="125" />
+        <di:waypoint x="1927" y="125" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_12_di" bpmnElement="Flujo_12">
+        <di:waypoint x="1963" y="125" />
+        <di:waypoint x="2052" y="125" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_13_di" bpmnElement="Flujo_13">
+        <di:waypoint x="2218" y="125" />
+        <di:waypoint x="2230" y="125" />
+        <di:waypoint x="2230" y="445" />
+        <di:waypoint x="2242" y="445" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_14_di" bpmnElement="Flujo_14">
+        <di:waypoint x="2408" y="445" />
+        <di:waypoint x="2490" y="445" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_15_di" bpmnElement="Flujo_15">
+        <di:waypoint x="2540" y="445" />
+        <di:waypoint x="3250" y="445" />
+        <bpmndi:BPMNLabel><dc:Bounds x="2548" y="427" width="70" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_16_di" bpmnElement="Flujo_16">
+        <di:waypoint x="2515" y="420" />
+        <di:waypoint x="2515" y="360" />
+        <di:waypoint x="2705" y="360" />
+        <di:waypoint x="2705" y="300" />
+        <bpmndi:BPMNLabel><dc:Bounds x="2521" y="400" width="70" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_17_di" bpmnElement="Flujo_17">
+        <di:waypoint x="2730" y="275" />
+        <di:waypoint x="2812" y="275" />
+        <bpmndi:BPMNLabel><dc:Bounds x="2738" y="257" width="70" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_18_di" bpmnElement="Flujo_18">
+        <di:waypoint x="2705" y="250" />
+        <di:waypoint x="2705" y="195" />
+        <di:waypoint x="3275" y="195" />
+        <di:waypoint x="3275" y="420" />
+        <bpmndi:BPMNLabel><dc:Bounds x="3283" y="177" width="70" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_19_di" bpmnElement="Flujo_19">
+        <di:waypoint x="2978" y="275" />
+        <di:waypoint x="2990" y="275" />
+        <di:waypoint x="2990" y="595" />
+        <di:waypoint x="3002" y="595" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_20_di" bpmnElement="Flujo_20">
+        <di:waypoint x="3168" y="595" />
+        <di:waypoint x="3275" y="595" />
+        <di:waypoint x="3275" y="470" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_21_di" bpmnElement="Flujo_21">
+        <di:waypoint x="3300" y="445" />
+        <di:waypoint x="3382" y="445" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_22_di" bpmnElement="Flujo_22">
+        <di:waypoint x="3548" y="445" />
+        <di:waypoint x="3572" y="445" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_23_di" bpmnElement="Flujo_23">
+        <di:waypoint x="3738" y="445" />
+        <di:waypoint x="3750" y="445" />
+        <di:waypoint x="3750" y="125" />
+        <di:waypoint x="3762" y="125" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_24_di" bpmnElement="Flujo_24">
+        <di:waypoint x="3928" y="125" />
+        <di:waypoint x="4017" y="125" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="an_alinear_di" bpmnElement="an_alinear">
+        <dc:Bounds x="159" y="540" width="330" height="72" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Asoc_an_alinear_di" bpmnElement="Asoc_an_alinear">
+        <di:waypoint x="805" y="498" />
+        <di:waypoint x="489" y="540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="an_remedio_di" bpmnElement="an_remedio">
+        <dc:Bounds x="2258" y="58" width="560" height="58" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Asoc_an_remedio_di" bpmnElement="Asoc_an_remedio">
+        <di:waypoint x="2705" y="250" />
+        <di:waypoint x="2705" y="116" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="an_veredicto_di" bpmnElement="an_veredicto">
+        <dc:Bounds x="3778" y="535" width="300" height="72" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Asoc_an_veredicto_di" bpmnElement="Asoc_an_veredicto">
+        <di:waypoint x="3655" y="498" />
+        <di:waypoint x="3778" y="535" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

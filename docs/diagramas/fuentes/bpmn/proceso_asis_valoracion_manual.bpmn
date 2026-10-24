@@ -1,0 +1,393 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Def_AsIsValoracionManual" name="Proceso AS-IS de valoración manual del rango de movimiento de rodilla" targetNamespace="https://bio-motion-evaluator/bpmn" exporter="bio-motion-evaluator generar_bpmn.py" exporterVersion="1.0">
+  <bpmn:collaboration id="Colab_Def_AsIsValoracionManual">
+    <bpmn:participant id="P_AsIs" name="Valoración funcional de rodilla sin el sistema (proceso actual)" processRef="Proceso_P_AsIs" />
+  </bpmn:collaboration>
+  <bpmn:process id="Proceso_P_AsIs" name="Valoración manual de rodilla" isExecutable="false">
+    <bpmn:laneSet id="LaneSet_P_AsIs">
+      <bpmn:lane id="L_Evaluado" name="Evaluado (deportista)">
+        <bpmn:flowNodeRef>eo_inicio</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>eo_gw_acceso</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>eo_omitir</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>eo_generica</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>eo_pagar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>eo_asistir</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>eo_posicion</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>eo_adaptar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>eo_gw_merge</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>eo_entrenar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>eo_fin</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="L_Evaluador" name="Evaluador (profesional)">
+        <bpmn:flowNodeRef>er_gw_instr</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>er_alinear</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>er_leer</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>er_grabar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>er_marcar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>er_gw_merge</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>er_interpretar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>er_comunicar</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="L_Herramienta" name="Herramienta manual (goniómetro / video y Kinovea)">
+        <bpmn:flowNodeRef>hm_gonio</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>hm_kinovea</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>hm_angulo</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="eo_inicio" name="Necesidad de entrenar: fase de valoración funcional">
+      <bpmn:outgoing>Flujo_01</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:exclusiveGateway id="eo_gw_acceso" name="¿Accede a una valoración profesional?" default="Flujo_02">
+      <bpmn:incoming>Flujo_01</bpmn:incoming>
+      <bpmn:outgoing>Flujo_02</bpmn:outgoing>
+      <bpmn:outgoing>Flujo_03</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="eo_omitir" name="Omitir la valoración funcional">
+      <bpmn:incoming>Flujo_03</bpmn:incoming>
+      <bpmn:outgoing>Flujo_04</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="eo_generica" name="Calentar con una rutina de movilidad genérica, «a ciegas»">
+      <bpmn:incoming>Flujo_04</bpmn:incoming>
+      <bpmn:outgoing>Flujo_05</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="eo_pagar" name="Solicitar y pagar la consulta profesional">
+      <bpmn:incoming>Flujo_02</bpmn:incoming>
+      <bpmn:outgoing>Flujo_06</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="eo_asistir" name="Asistir a la consulta presencial">
+      <bpmn:incoming>Flujo_06</bpmn:incoming>
+      <bpmn:outgoing>Flujo_07</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="er_gw_instr" name="¿Instrumento de medición?" default="Flujo_08">
+      <bpmn:incoming>Flujo_07</bpmn:incoming>
+      <bpmn:outgoing>Flujo_08</bpmn:outgoing>
+      <bpmn:outgoing>Flujo_09</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="eo_posicion" name="Adoptar y mantener la posición de medición">
+      <bpmn:incoming>Flujo_08</bpmn:incoming>
+      <bpmn:outgoing>Flujo_10</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:userTask id="er_alinear" name="Alinear el goniómetro con cadera, rodilla y tobillo">
+      <bpmn:incoming>Flujo_10</bpmn:incoming>
+      <bpmn:outgoing>Flujo_11</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:manualTask id="hm_gonio" name="Goniómetro universal: el ángulo se lee en la escala">
+      <bpmn:incoming>Flujo_11</bpmn:incoming>
+      <bpmn:outgoing>Flujo_12</bpmn:outgoing>
+    </bpmn:manualTask>
+    <bpmn:userTask id="er_leer" name="Leer y anotar el ángulo">
+      <bpmn:incoming>Flujo_12</bpmn:incoming>
+      <bpmn:outgoing>Flujo_13</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="er_grabar" name="Grabar en video al evaluado mientras ejecuta el movimiento">
+      <bpmn:incoming>Flujo_09</bpmn:incoming>
+      <bpmn:outgoing>Flujo_14</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:task id="hm_kinovea" name="Kinovea: abrir el video y avanzar al fotograma de interés">
+      <bpmn:incoming>Flujo_14</bpmn:incoming>
+      <bpmn:outgoing>Flujo_15</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:userTask id="er_marcar" name="Marcar a mano las tres referencias (cadera, rodilla, tobillo)">
+      <bpmn:incoming>Flujo_15</bpmn:incoming>
+      <bpmn:outgoing>Flujo_16</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:task id="hm_angulo" name="Kinovea: calcular el ángulo plano entre los dos brazos">
+      <bpmn:incoming>Flujo_16</bpmn:incoming>
+      <bpmn:outgoing>Flujo_17</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="er_gw_merge">
+      <bpmn:incoming>Flujo_13</bpmn:incoming>
+      <bpmn:incoming>Flujo_17</bpmn:incoming>
+      <bpmn:outgoing>Flujo_18</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="er_interpretar" name="Interpretar la medida (juicio cualitativo del profesional)">
+      <bpmn:incoming>Flujo_18</bpmn:incoming>
+      <bpmn:outgoing>Flujo_19</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="er_comunicar" name="Comunicar los hallazgos al evaluado">
+      <bpmn:incoming>Flujo_19</bpmn:incoming>
+      <bpmn:outgoing>Flujo_20</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:task id="eo_adaptar" name="Adaptar el calentamiento según las indicaciones">
+      <bpmn:incoming>Flujo_20</bpmn:incoming>
+      <bpmn:outgoing>Flujo_21</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="eo_gw_merge">
+      <bpmn:incoming>Flujo_05</bpmn:incoming>
+      <bpmn:incoming>Flujo_21</bpmn:incoming>
+      <bpmn:outgoing>Flujo_22</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="eo_entrenar" name="Ejecutar el entrenamiento (ejercicios de alta carga)">
+      <bpmn:incoming>Flujo_22</bpmn:incoming>
+      <bpmn:outgoing>Flujo_23</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="eo_fin" name="Entrenamiento realizado">
+      <bpmn:incoming>Flujo_23</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flujo_01" sourceRef="eo_inicio" targetRef="eo_gw_acceso" />
+    <bpmn:sequenceFlow id="Flujo_02" name="Sí" sourceRef="eo_gw_acceso" targetRef="eo_pagar" />
+    <bpmn:sequenceFlow id="Flujo_03" name="No" sourceRef="eo_gw_acceso" targetRef="eo_omitir">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">costo o falta de un profesional disponible</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flujo_04" sourceRef="eo_omitir" targetRef="eo_generica" />
+    <bpmn:sequenceFlow id="Flujo_05" sourceRef="eo_generica" targetRef="eo_gw_merge" />
+    <bpmn:sequenceFlow id="Flujo_06" sourceRef="eo_pagar" targetRef="eo_asistir" />
+    <bpmn:sequenceFlow id="Flujo_07" sourceRef="eo_asistir" targetRef="er_gw_instr" />
+    <bpmn:sequenceFlow id="Flujo_08" name="Goniómetro" sourceRef="er_gw_instr" targetRef="eo_posicion" />
+    <bpmn:sequenceFlow id="Flujo_09" name="Video" sourceRef="er_gw_instr" targetRef="er_grabar">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">video-goniometría manual (Kinovea)</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flujo_10" sourceRef="eo_posicion" targetRef="er_alinear" />
+    <bpmn:sequenceFlow id="Flujo_11" sourceRef="er_alinear" targetRef="hm_gonio" />
+    <bpmn:sequenceFlow id="Flujo_12" sourceRef="hm_gonio" targetRef="er_leer" />
+    <bpmn:sequenceFlow id="Flujo_13" sourceRef="er_leer" targetRef="er_gw_merge" />
+    <bpmn:sequenceFlow id="Flujo_14" sourceRef="er_grabar" targetRef="hm_kinovea" />
+    <bpmn:sequenceFlow id="Flujo_15" sourceRef="hm_kinovea" targetRef="er_marcar" />
+    <bpmn:sequenceFlow id="Flujo_16" sourceRef="er_marcar" targetRef="hm_angulo" />
+    <bpmn:sequenceFlow id="Flujo_17" sourceRef="hm_angulo" targetRef="er_gw_merge" />
+    <bpmn:sequenceFlow id="Flujo_18" sourceRef="er_gw_merge" targetRef="er_interpretar" />
+    <bpmn:sequenceFlow id="Flujo_19" sourceRef="er_interpretar" targetRef="er_comunicar" />
+    <bpmn:sequenceFlow id="Flujo_20" sourceRef="er_comunicar" targetRef="eo_adaptar" />
+    <bpmn:sequenceFlow id="Flujo_21" sourceRef="eo_adaptar" targetRef="eo_gw_merge" />
+    <bpmn:sequenceFlow id="Flujo_22" sourceRef="eo_gw_merge" targetRef="eo_entrenar" />
+    <bpmn:sequenceFlow id="Flujo_23" sourceRef="eo_entrenar" targetRef="eo_fin" />
+    <bpmn:textAnnotation id="an_acceso"><bpmn:text>Barrera de costo y de atención presencial: la valoración funcional suele omitirse.</bpmn:text></bpmn:textAnnotation>
+    <bpmn:association id="Asoc_an_acceso" associationDirection="None" sourceRef="eo_gw_acceso" targetRef="an_acceso" />
+    <bpmn:textAnnotation id="an_gonio"><bpmn:text>Goniometría manual: error típico ≈ 3,4° en flexión de rodilla (Mehta et al., 2017).</bpmn:text></bpmn:textAnnotation>
+    <bpmn:association id="Asoc_an_gonio" associationDirection="None" sourceRef="hm_gonio" targetRef="an_gonio" />
+    <bpmn:textAnnotation id="an_kinovea"><bpmn:text>Video-goniometría manual 2D, la que usa la Facultad de Educación Física (§ 2.3.3).</bpmn:text></bpmn:textAnnotation>
+    <bpmn:association id="Asoc_an_kinovea" associationDirection="None" sourceRef="hm_kinovea" targetRef="an_kinovea" />
+    <bpmn:textAnnotation id="an_variab"><bpmn:text>Concordancia entre evaluadores limitada: límites de acuerdo &gt; 18° con otros instrumentos.</bpmn:text></bpmn:textAnnotation>
+    <bpmn:association id="Asoc_an_variab" associationDirection="None" sourceRef="er_interpretar" targetRef="an_variab" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="Diagrama_Def_AsIsValoracionManual" name="Proceso AS-IS de valoración manual del rango de movimiento de rodilla">
+    <bpmndi:BPMNPlane id="Plano_Def_AsIsValoracionManual" bpmnElement="Colab_Def_AsIsValoracionManual">
+      <bpmndi:BPMNShape id="P_AsIs_di" bpmnElement="P_AsIs" isHorizontal="false">
+        <dc:Bounds x="40" y="40" width="960" height="2640" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="L_Evaluado_di" bpmnElement="L_Evaluado" isHorizontal="false">
+        <dc:Bounds x="40" y="70" width="320" height="2610" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="L_Evaluador_di" bpmnElement="L_Evaluador" isHorizontal="false">
+        <dc:Bounds x="360" y="70" width="320" height="2610" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="L_Herramienta_di" bpmnElement="L_Herramienta" isHorizontal="false">
+        <dc:Bounds x="680" y="70" width="320" height="2610" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="eo_inicio_di" bpmnElement="eo_inicio">
+        <dc:Bounds x="107" y="184" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="147" y="188" width="94" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="eo_gw_acceso_di" bpmnElement="eo_gw_acceso" isMarkerVisible="true">
+        <dc:Bounds x="100" y="302" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="133" y="272" width="94" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="eo_omitir_di" bpmnElement="eo_omitir">
+        <dc:Bounds x="215" y="408" width="120" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="eo_generica_di" bpmnElement="eo_generica">
+        <dc:Bounds x="215" y="532" width="120" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="eo_pagar_di" bpmnElement="eo_pagar">
+        <dc:Bounds x="65" y="408" width="120" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="eo_asistir_di" bpmnElement="eo_asistir">
+        <dc:Bounds x="65" y="532" width="120" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="er_gw_instr_di" bpmnElement="er_gw_instr" isMarkerVisible="true">
+        <dc:Bounds x="420" y="678" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="453" y="648" width="94" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="eo_posicion_di" bpmnElement="eo_posicion">
+        <dc:Bounds x="65" y="782" width="120" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="er_alinear_di" bpmnElement="er_alinear">
+        <dc:Bounds x="385" y="908" width="120" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="hm_gonio_di" bpmnElement="hm_gonio">
+        <dc:Bounds x="705" y="1032" width="120" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="er_leer_di" bpmnElement="er_leer">
+        <dc:Bounds x="385" y="1158" width="120" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="er_grabar_di" bpmnElement="er_grabar">
+        <dc:Bounds x="535" y="1282" width="120" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="hm_kinovea_di" bpmnElement="hm_kinovea">
+        <dc:Bounds x="855" y="1408" width="120" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="er_marcar_di" bpmnElement="er_marcar">
+        <dc:Bounds x="535" y="1532" width="120" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="hm_angulo_di" bpmnElement="hm_angulo">
+        <dc:Bounds x="855" y="1658" width="120" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="er_gw_merge_di" bpmnElement="er_gw_merge" isMarkerVisible="true">
+        <dc:Bounds x="420" y="1802" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="er_interpretar_di" bpmnElement="er_interpretar">
+        <dc:Bounds x="385" y="1908" width="120" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="er_comunicar_di" bpmnElement="er_comunicar">
+        <dc:Bounds x="385" y="2032" width="120" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="eo_adaptar_di" bpmnElement="eo_adaptar">
+        <dc:Bounds x="65" y="2158" width="120" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="eo_gw_merge_di" bpmnElement="eo_gw_merge" isMarkerVisible="true">
+        <dc:Bounds x="100" y="2302" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="eo_entrenar_di" bpmnElement="eo_entrenar">
+        <dc:Bounds x="65" y="2408" width="120" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="eo_fin_di" bpmnElement="eo_fin">
+        <dc:Bounds x="107" y="2560" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="80" y="2600" width="94" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flujo_01_di" bpmnElement="Flujo_01">
+        <di:waypoint x="125" y="220" />
+        <di:waypoint x="125" y="302" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_02_di" bpmnElement="Flujo_02">
+        <di:waypoint x="125" y="352" />
+        <di:waypoint x="125" y="408" />
+        <bpmndi:BPMNLabel><dc:Bounds x="131" y="356" width="70" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_03_di" bpmnElement="Flujo_03">
+        <di:waypoint x="150" y="328" />
+        <di:waypoint x="275" y="328" />
+        <di:waypoint x="275" y="408" />
+        <bpmndi:BPMNLabel><dc:Bounds x="158" y="332" width="70" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_04_di" bpmnElement="Flujo_04">
+        <di:waypoint x="275" y="498" />
+        <di:waypoint x="275" y="532" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_05_di" bpmnElement="Flujo_05">
+        <di:waypoint x="275" y="622" />
+        <di:waypoint x="275" y="2328" />
+        <di:waypoint x="150" y="2328" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_06_di" bpmnElement="Flujo_06">
+        <di:waypoint x="125" y="498" />
+        <di:waypoint x="125" y="532" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_07_di" bpmnElement="Flujo_07">
+        <di:waypoint x="125" y="622" />
+        <di:waypoint x="125" y="702" />
+        <di:waypoint x="420" y="702" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_08_di" bpmnElement="Flujo_08">
+        <di:waypoint x="420" y="702" />
+        <di:waypoint x="125" y="702" />
+        <di:waypoint x="125" y="782" />
+        <bpmndi:BPMNLabel><dc:Bounds x="342" y="706" width="70" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_09_di" bpmnElement="Flujo_09">
+        <di:waypoint x="470" y="702" />
+        <di:waypoint x="595" y="702" />
+        <di:waypoint x="595" y="1282" />
+        <bpmndi:BPMNLabel><dc:Bounds x="478" y="706" width="70" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_10_di" bpmnElement="Flujo_10">
+        <di:waypoint x="125" y="872" />
+        <di:waypoint x="125" y="890" />
+        <di:waypoint x="445" y="890" />
+        <di:waypoint x="445" y="908" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_11_di" bpmnElement="Flujo_11">
+        <di:waypoint x="445" y="998" />
+        <di:waypoint x="445" y="1015" />
+        <di:waypoint x="765" y="1015" />
+        <di:waypoint x="765" y="1032" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_12_di" bpmnElement="Flujo_12">
+        <di:waypoint x="765" y="1122" />
+        <di:waypoint x="765" y="1140" />
+        <di:waypoint x="445" y="1140" />
+        <di:waypoint x="445" y="1158" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_13_di" bpmnElement="Flujo_13">
+        <di:waypoint x="445" y="1248" />
+        <di:waypoint x="445" y="1802" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_14_di" bpmnElement="Flujo_14">
+        <di:waypoint x="595" y="1372" />
+        <di:waypoint x="595" y="1390" />
+        <di:waypoint x="915" y="1390" />
+        <di:waypoint x="915" y="1408" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_15_di" bpmnElement="Flujo_15">
+        <di:waypoint x="915" y="1498" />
+        <di:waypoint x="915" y="1515" />
+        <di:waypoint x="595" y="1515" />
+        <di:waypoint x="595" y="1532" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_16_di" bpmnElement="Flujo_16">
+        <di:waypoint x="595" y="1622" />
+        <di:waypoint x="595" y="1640" />
+        <di:waypoint x="915" y="1640" />
+        <di:waypoint x="915" y="1658" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_17_di" bpmnElement="Flujo_17">
+        <di:waypoint x="915" y="1748" />
+        <di:waypoint x="915" y="1828" />
+        <di:waypoint x="470" y="1828" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_18_di" bpmnElement="Flujo_18">
+        <di:waypoint x="445" y="1852" />
+        <di:waypoint x="445" y="1908" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_19_di" bpmnElement="Flujo_19">
+        <di:waypoint x="445" y="1998" />
+        <di:waypoint x="445" y="2032" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_20_di" bpmnElement="Flujo_20">
+        <di:waypoint x="445" y="2122" />
+        <di:waypoint x="445" y="2140" />
+        <di:waypoint x="125" y="2140" />
+        <di:waypoint x="125" y="2158" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_21_di" bpmnElement="Flujo_21">
+        <di:waypoint x="125" y="2248" />
+        <di:waypoint x="125" y="2302" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_22_di" bpmnElement="Flujo_22">
+        <di:waypoint x="125" y="2352" />
+        <di:waypoint x="125" y="2408" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_23_di" bpmnElement="Flujo_23">
+        <di:waypoint x="125" y="2498" />
+        <di:waypoint x="125" y="2560" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="an_acceso_di" bpmnElement="an_acceso">
+        <dc:Bounds x="385" y="178" width="260" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Asoc_an_acceso_di" bpmnElement="Asoc_an_acceso">
+        <di:waypoint x="150" y="328" />
+        <di:waypoint x="385" y="258" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="an_gonio_di" bpmnElement="an_gonio">
+        <dc:Bounds x="852" y="815" width="135" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Asoc_an_gonio_di" bpmnElement="Asoc_an_gonio">
+        <di:waypoint x="825" y="1078" />
+        <di:waypoint x="852" y="965" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="an_kinovea_di" bpmnElement="an_kinovea">
+        <dc:Bounds x="702" y="1140" width="135" height="135" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Asoc_an_kinovea_di" bpmnElement="Asoc_an_kinovea">
+        <di:waypoint x="855" y="1452" />
+        <di:waypoint x="837" y="1275" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="an_variab_di" bpmnElement="an_variab">
+        <dc:Bounds x="532" y="1928" width="135" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Asoc_an_variab_di" bpmnElement="Asoc_an_variab">
+        <di:waypoint x="505" y="1952" />
+        <di:waypoint x="532" y="1952" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

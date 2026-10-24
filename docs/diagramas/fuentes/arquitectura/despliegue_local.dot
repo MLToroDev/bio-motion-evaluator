@@ -1,0 +1,72 @@
+// Diagrama de despliegue (UML) tal como se ejecuta el sistema: un portátil de
+// desarrollo o de demostración. Fuentes: docs/guias/SETUP.md (§2–§5), backend/README.md,
+// backend/docker-compose.yml, appWeb/package.json, backend/app/config.py.
+// No hay infraestructura de producción en el repositorio y no se representa.
+digraph despliegue {
+  charset="utf-8";
+  graph [rankdir=TB, fontname="Helvetica", fontsize=13, bgcolor="white", nodesep=0.4, ranksep=0.65,
+         pad=0.3, newrank=true, compound=true];
+  node [shape=note, style=filled, fillcolor="white", color="#333333", fontname="Helvetica", fontsize=11,
+        margin="0.15,0.08"];
+  edge [fontname="Helvetica", fontsize=11, color="#333333", arrowsize=0.9];
+
+  subgraph cluster_portatil {
+    label=<<FONT POINT-SIZE="11">«device»</FONT><BR/><B>Portátil de desarrollo / demostración</B> (macOS o Windows, localhost)>;
+    labeljust="l"; style="rounded,filled"; fillcolor="#FAFAFA"; color="#555555"; penwidth=2; margin=16;
+
+    subgraph cluster_navegador {
+      label=<<FONT POINT-SIZE="10">«execution environment»</FONT><BR/><B>Navegador web</B> (Chrome)>; labeljust="l";
+      style="rounded,filled"; fillcolor="#F6FBF7"; color="#777777"; margin=12;
+      spa [label=<<FONT POINT-SIZE="10">«artifact»</FONT><BR/><B>appWeb</B> (SPA React)<BR/>/sustentacion (principal) · /inicio (completa)>];
+      camara [label=<<FONT POINT-SIZE="10">«device»</FONT><BR/><B>Cámara web</B><BR/>getUserMedia>, shape=box3d];
+    }
+
+    subgraph cluster_node {
+      label=<<FONT POINT-SIZE="10">«execution environment»</FONT><BR/><B>Node.js</B> (npm)>; labeljust="l";
+      style="rounded,filled"; fillcolor="#FFFDF5"; color="#777777"; margin=12;
+      vite [label=<<FONT POINT-SIZE="10">«component»</FONT><BR/><B>Servidor de desarrollo Vite</B><BR/>npm run dev · puerto 5173>, shape=component, fillcolor="#FFFFFF"];
+      preview [label=<<FONT POINT-SIZE="10">«artifact» · alternativa</FONT><BR/><B>appWeb/dist/</B><BR/>npm run build · vite preview (4173)>, style="dashed,filled"];
+    }
+
+    subgraph cluster_python {
+      label=<<FONT POINT-SIZE="10">«execution environment»</FONT><BR/><B>Python 3.12</B> (entorno virtual)>; labeljust="l";
+      style="rounded,filled"; fillcolor="#F7FAFE"; color="#777777"; margin=12;
+      uvicorn [label=<<FONT POINT-SIZE="10">«component»</FONT><BR/><B>uvicorn app.main:app</B><BR/>FastAPI · puerto 8000<BR/>/api/v1 · /ws/video · /ws/pose-stream>, shape=component, fillcolor="#FFFFFF"];
+      backend [label=<<FONT POINT-SIZE="10">«artifact»</FONT><BR/>backend/app + backend/vision>];
+      modelo [label=<<FONT POINT-SIZE="10">«artifact»</FONT><BR/>models/pose_landmarker_full.task<BR/><FONT POINT-SIZE="10">(scripts/download_models.py)</FONT>>];
+      onnx [label=<<FONT POINT-SIZE="10">«artifact»</FONT><BR/>vision/models/manifest.json<BR/>exercise_rf_a0eac3d7.onnx>];
+      videos [label=<<FONT POINT-SIZE="10">«artifact»</FONT><BR/>tests/assets/videos<BR/><FONT POINT-SIZE="10">catálogo de referencia</FONT>>, shape=folder];
+      celery [label=<<FONT POINT-SIZE="10">«component» · opcional</FONT><BR/><B>Celery worker</B><BR/>celery -A app.workers.celery_app worker<BR/>yt-dlp → data/downloads>, shape=component, style="dashed,filled", fillcolor="#FFFFFF"];
+    }
+
+    subgraph cluster_docker {
+      label=<<FONT POINT-SIZE="10">«execution environment» · opcional</FONT><BR/><B>Docker</B> (backend/docker-compose.yml)>;
+      labeljust="l"; style="rounded,dashed"; color="#777777"; margin=12;
+      redis [label=<<FONT POINT-SIZE="10">«container» · opcional</FONT><BR/><B>redis:7-alpine</B><BR/>puerto 6379 · volumen redis_data>, shape=cylinder, style="dashed,filled", fillcolor="#FDEDEC"];
+    }
+
+    postgres [label=<<FONT POINT-SIZE="10">«database» · opcional (instalación local)</FONT><BR/><B>PostgreSQL</B><BR/>DATABASE_URL (p. ej. localhost:5432/bio_motion)<BR/>esquema: alembic upgrade head>, shape=cylinder, style="dashed,filled", fillcolor="#EAF6EC"];
+  }
+
+  internet [label=<<FONT POINT-SIZE="10">«external» · opcional</FONT><BR/><B>Internet</B><BR/>sitios de video (yt-dlp) · Hugging Face Inference API>, shape=box, style="rounded,dashed,filled", fillcolor="#FFFFFF"];
+
+  camara -> spa [label="MediaStream"];
+  spa -> vite [label=<HTTP :5173<BR/>carga de la SPA>, dir=back, arrowtail=vee, arrowhead=none];
+  spa -> preview [label="HTTP :4173", style=dashed, dir=back, arrowtail=vee, arrowhead=none];
+  spa -> uvicorn [label=<HTTP :8000 (REST JSON)<BR/>WS :8000 (/ws/video, /ws/pose-stream)>, penwidth=1.8];
+  uvicorn -> backend [style=dashed, arrowhead=vee, label="«deploy»"];
+  uvicorn -> modelo [style=dashed, arrowhead=vee, label="lee"];
+  uvicorn -> onnx [style=dashed, arrowhead=vee, label="lee"];
+  uvicorn -> videos [style=dashed, arrowhead=vee, label="lee"];
+  uvicorn -> postgres [style=dashed, label="TCP (asyncpg)"];
+  uvicorn -> redis [style=dashed, label="TCP :6379 (broker)"];
+  celery -> redis [style=dashed, label="TCP :6379"];
+  celery -> postgres [style=dashed, label="TCP (psycopg2)"];
+  celery -> internet [style=dashed, label="HTTPS"];
+  uvicorn -> internet [style=dashed, label="HTTPS (si HF_INFERENCE_URL)"];
+
+  // Maquetación (no son relaciones): servicios opcionales bajo el entorno Python.
+  modelo -> redis [style=invis];
+  onnx -> postgres [style=invis];
+  postgres -> internet [style=invis];
+}

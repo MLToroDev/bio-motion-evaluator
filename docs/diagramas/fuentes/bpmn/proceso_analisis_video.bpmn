@@ -1,0 +1,918 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Def_AnalisisVideo" name="Proceso de análisis de video" targetNamespace="https://bio-motion-evaluator/bpmn" exporter="bio-motion-evaluator generar_bpmn.py" exporterVersion="1.0">
+  <bpmn:error id="Err_Catalogo" name="Catálogo no disponible" />
+  <bpmn:error id="Err_Conexion" name="Servidor no disponible" />
+  <bpmn:error id="Err_Config" name="Configuración inválida" />
+  <bpmn:error id="Err_Fuente" name="Video no disponible" />
+  <bpmn:error id="Err_Proceso" name="Error de procesamiento" />
+  <bpmn:collaboration id="Colab_Def_AnalisisVideo">
+    <bpmn:participant id="P_Cliente" name="Análisis de video — appWeb (/video-analysis)" processRef="Proceso_P_Cliente" />
+    <bpmn:participant id="P_Servidor" name="Servidor de inferencia — FastAPI" processRef="Proceso_P_Servidor" />
+    <bpmn:messageFlow id="Mensaje_01" name="GET" sourceRef="cl_cat" targetRef="rs_inicio" />
+    <bpmn:messageFlow id="Mensaje_02" name="{filenames}" sourceRef="rs_fin" targetRef="cl_cat" />
+    <bpmn:messageFlow id="Mensaje_03" name="Apertura" sourceRef="cl_ws" targetRef="ws_inicio" />
+    <bpmn:messageFlow id="Mensaje_04" name="Configuración inicial" sourceRef="cl_cfg" targetRef="ws_cfg" />
+    <bpmn:messageFlow id="Mensaje_05" name="stream_profile" sourceRef="ws_perfil" targetRef="cl_msg" />
+    <bpmn:messageFlow id="Mensaje_06" name="Payload v1" sourceRef="ws_enviar" targetRef="cl_msg" />
+    <bpmn:messageFlow id="Mensaje_07" name="{error}" sourceRef="ws_err_fuente" targetRef="cl_msg" />
+    <bpmn:messageFlow id="Mensaje_08" name="{error}" sourceRef="ws_err_proc" targetRef="cl_msg" />
+    <bpmn:messageFlow id="Mensaje_09" name="Cierre 4000" sourceRef="ws_err_json" targetRef="cl_cierre" />
+    <bpmn:messageFlow id="Mensaje_10" name="stream_done y cierre 1000" sourceRef="ws_done" targetRef="cl_cierre" />
+  </bpmn:collaboration>
+  <bpmn:process id="Proceso_P_Cliente" name="Análisis de video en el cliente" isExecutable="false">
+    <bpmn:laneSet id="LaneSet_P_Cliente">
+      <bpmn:lane id="L_Evaluador" name="Evaluador">
+        <bpmn:flowNodeRef>ev_inicio</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ev_abrir</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ev_config</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ev_revisar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ev_fin</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="L_Cliente" name="Cliente web (useVideoAnalysis · useVideoAnalysisSession)">
+        <bpmn:flowNodeRef>cl_cat</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>cl_gw_cat</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>cl_err_cat</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>cl_fin_cat</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>cl_lista</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>cl_ws</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>cl_gw_con</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>cl_err_con</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>cl_fin_con</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>cl_cfg</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>cl_gw_bucle</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>cl_gw_evento</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>cl_msg</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>cl_cierre</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>cl_gw_tipo</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>cl_frame</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>cl_perfil</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>cl_error</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>cl_fin_error</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>cl_gw_merge</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>cl_resumen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>cl_dialogo</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="ev_inicio" name="Análisis de video solicitado">
+      <bpmn:outgoing>Flujo_01</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="ev_abrir" name="Abrir «Análisis de video»">
+      <bpmn:incoming>Flujo_01</bpmn:incoming>
+      <bpmn:outgoing>Flujo_02</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="ev_config" name="Elegir el video y configurar FPS, vista previa y ejercicio; pulsar «Iniciar»">
+      <bpmn:incoming>Flujo_07</bpmn:incoming>
+      <bpmn:outgoing>Flujo_08</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="ev_revisar" name="Revisar el resumen y descargar el CSV (opcional)">
+      <bpmn:incoming>Flujo_27</bpmn:incoming>
+      <bpmn:outgoing>Flujo_28</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="ev_fin" name="Análisis completado">
+      <bpmn:incoming>Flujo_28</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="cl_cat" name="Solicitar el catálogo de videos (GET gold-standard-videos)">
+      <bpmn:incoming>Flujo_02</bpmn:incoming>
+      <bpmn:outgoing>Flujo_03</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="cl_gw_cat" name="¿Catálogo obtenido?" default="Flujo_04">
+      <bpmn:incoming>Flujo_03</bpmn:incoming>
+      <bpmn:outgoing>Flujo_04</bpmn:outgoing>
+      <bpmn:outgoing>Flujo_05</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="cl_err_cat" name="Mostrar error de lista (HTTP o red)">
+      <bpmn:incoming>Flujo_05</bpmn:incoming>
+      <bpmn:outgoing>Flujo_06</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="cl_fin_cat" name="Catálogo no disponible">
+      <bpmn:incoming>Flujo_06</bpmn:incoming>
+      <bpmn:errorEventDefinition id="Def_cl_fin_cat" errorRef="Err_Catalogo" />
+    </bpmn:endEvent>
+    <bpmn:task id="cl_lista" name="Mostrar la lista y preseleccionar el primer video">
+      <bpmn:incoming>Flujo_04</bpmn:incoming>
+      <bpmn:outgoing>Flujo_07</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:serviceTask id="cl_ws" name="Abrir WebSocket /ws/pose-stream">
+      <bpmn:incoming>Flujo_08</bpmn:incoming>
+      <bpmn:outgoing>Flujo_09</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="cl_gw_con" name="¿Conexión abierta?" default="Flujo_10">
+      <bpmn:incoming>Flujo_09</bpmn:incoming>
+      <bpmn:outgoing>Flujo_10</bpmn:outgoing>
+      <bpmn:outgoing>Flujo_11</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="cl_err_con" name="Mostrar «No se pudo conectar (WebSocket)»">
+      <bpmn:incoming>Flujo_11</bpmn:incoming>
+      <bpmn:outgoing>Flujo_12</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="cl_fin_con" name="Servidor no disponible">
+      <bpmn:incoming>Flujo_12</bpmn:incoming>
+      <bpmn:errorEventDefinition id="Def_cl_fin_con" errorRef="Err_Conexion" />
+    </bpmn:endEvent>
+    <bpmn:sendTask id="cl_cfg" name="Enviar PoseStreamConfig (source = file, video_filename, target_fps…)">
+      <bpmn:incoming>Flujo_10</bpmn:incoming>
+      <bpmn:outgoing>Flujo_13</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:exclusiveGateway id="cl_gw_bucle">
+      <bpmn:incoming>Flujo_13</bpmn:incoming>
+      <bpmn:incoming>Flujo_24</bpmn:incoming>
+      <bpmn:outgoing>Flujo_14</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:eventBasedGateway id="cl_gw_evento">
+      <bpmn:incoming>Flujo_14</bpmn:incoming>
+      <bpmn:outgoing>Flujo_15</bpmn:outgoing>
+      <bpmn:outgoing>Flujo_16</bpmn:outgoing>
+    </bpmn:eventBasedGateway>
+    <bpmn:intermediateCatchEvent id="cl_msg" name="Mensaje JSON recibido">
+      <bpmn:incoming>Flujo_15</bpmn:incoming>
+      <bpmn:outgoing>Flujo_17</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="Def_cl_msg" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:intermediateCatchEvent id="cl_cierre" name="WebSocket cerrado">
+      <bpmn:incoming>Flujo_16</bpmn:incoming>
+      <bpmn:outgoing>Flujo_25</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="Def_cl_cierre" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:exclusiveGateway id="cl_gw_tipo" name="¿Tipo de mensaje?" default="Flujo_18">
+      <bpmn:incoming>Flujo_17</bpmn:incoming>
+      <bpmn:outgoing>Flujo_18</bpmn:outgoing>
+      <bpmn:outgoing>Flujo_19</bpmn:outgoing>
+      <bpmn:outgoing>Flujo_20</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="cl_frame" name="Acumular fotograma, CSV y series; actualizar vista previa, overlay y métricas">
+      <bpmn:incoming>Flujo_18</bpmn:incoming>
+      <bpmn:outgoing>Flujo_21</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="cl_perfil" name="Registrar el perfil de procesamiento (stream_profile)">
+      <bpmn:incoming>Flujo_19</bpmn:incoming>
+      <bpmn:outgoing>Flujo_22</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="cl_error" name="Detener y mostrar el error (statusError)">
+      <bpmn:incoming>Flujo_20</bpmn:incoming>
+      <bpmn:outgoing>Flujo_23</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="cl_fin_error" name="Análisis interrumpido">
+      <bpmn:incoming>Flujo_23</bpmn:incoming>
+      <bpmn:terminateEventDefinition id="Def_cl_fin_error" />
+    </bpmn:endEvent>
+    <bpmn:exclusiveGateway id="cl_gw_merge">
+      <bpmn:incoming>Flujo_21</bpmn:incoming>
+      <bpmn:incoming>Flujo_22</bpmn:incoming>
+      <bpmn:outgoing>Flujo_24</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="cl_resumen" name="Construir el resumen del análisis (AnalysisSummary)">
+      <bpmn:incoming>Flujo_25</bpmn:incoming>
+      <bpmn:outgoing>Flujo_26</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="cl_dialogo" name="Mostrar el resumen en un diálogo y el aviso de fin">
+      <bpmn:incoming>Flujo_26</bpmn:incoming>
+      <bpmn:outgoing>Flujo_27</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="Flujo_01" sourceRef="ev_inicio" targetRef="ev_abrir" />
+    <bpmn:sequenceFlow id="Flujo_02" sourceRef="ev_abrir" targetRef="cl_cat" />
+    <bpmn:sequenceFlow id="Flujo_03" sourceRef="cl_cat" targetRef="cl_gw_cat" />
+    <bpmn:sequenceFlow id="Flujo_04" name="Sí" sourceRef="cl_gw_cat" targetRef="cl_lista" />
+    <bpmn:sequenceFlow id="Flujo_05" name="No" sourceRef="cl_gw_cat" targetRef="cl_err_cat">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">respuesta HTTP no válida o error de red</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flujo_06" sourceRef="cl_err_cat" targetRef="cl_fin_cat" />
+    <bpmn:sequenceFlow id="Flujo_07" sourceRef="cl_lista" targetRef="ev_config" />
+    <bpmn:sequenceFlow id="Flujo_08" sourceRef="ev_config" targetRef="cl_ws" />
+    <bpmn:sequenceFlow id="Flujo_09" sourceRef="cl_ws" targetRef="cl_gw_con" />
+    <bpmn:sequenceFlow id="Flujo_10" name="Sí" sourceRef="cl_gw_con" targetRef="cl_cfg" />
+    <bpmn:sequenceFlow id="Flujo_11" name="No" sourceRef="cl_gw_con" targetRef="cl_err_con">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">onerror antes de abrir</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flujo_12" sourceRef="cl_err_con" targetRef="cl_fin_con" />
+    <bpmn:sequenceFlow id="Flujo_13" sourceRef="cl_cfg" targetRef="cl_gw_bucle" />
+    <bpmn:sequenceFlow id="Flujo_14" sourceRef="cl_gw_bucle" targetRef="cl_gw_evento" />
+    <bpmn:sequenceFlow id="Flujo_15" sourceRef="cl_gw_evento" targetRef="cl_msg" />
+    <bpmn:sequenceFlow id="Flujo_16" sourceRef="cl_gw_evento" targetRef="cl_cierre" />
+    <bpmn:sequenceFlow id="Flujo_17" sourceRef="cl_msg" targetRef="cl_gw_tipo" />
+    <bpmn:sequenceFlow id="Flujo_18" name="Fotograma" sourceRef="cl_gw_tipo" targetRef="cl_frame" />
+    <bpmn:sequenceFlow id="Flujo_19" name="stream_profile" sourceRef="cl_gw_tipo" targetRef="cl_perfil">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">el mensaje trae stream_profile</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flujo_20" name="Error" sourceRef="cl_gw_tipo" targetRef="cl_error">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">el mensaje trae error (distinto de sin_frame)</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flujo_21" sourceRef="cl_frame" targetRef="cl_gw_merge" />
+    <bpmn:sequenceFlow id="Flujo_22" sourceRef="cl_perfil" targetRef="cl_gw_merge" />
+    <bpmn:sequenceFlow id="Flujo_23" sourceRef="cl_error" targetRef="cl_fin_error" />
+    <bpmn:sequenceFlow id="Flujo_24" sourceRef="cl_gw_merge" targetRef="cl_gw_bucle" />
+    <bpmn:sequenceFlow id="Flujo_25" sourceRef="cl_cierre" targetRef="cl_resumen" />
+    <bpmn:sequenceFlow id="Flujo_26" sourceRef="cl_resumen" targetRef="cl_dialogo" />
+    <bpmn:sequenceFlow id="Flujo_27" sourceRef="cl_dialogo" targetRef="ev_revisar" />
+    <bpmn:sequenceFlow id="Flujo_28" sourceRef="ev_revisar" targetRef="ev_fin" />
+    <bpmn:textAnnotation id="an_catalogo"><bpmn:text>El cliente no sube archivos: analiza un video del catálogo de referencia del servidor. La descarga por URL (/api/v1/download, Celery) es un flujo aparte que no alimenta este catálogo.</bpmn:text></bpmn:textAnnotation>
+    <bpmn:textAnnotation id="an_cierre"><bpmn:text>stream_done se ignora; el fin se detecta al cerrarse el WebSocket. «DETENER» del evaluador cierra la conexión y también muestra el resumen si hubo fotogramas.</bpmn:text></bpmn:textAnnotation>
+    <bpmn:association id="Asoc_an_cierre" associationDirection="None" sourceRef="cl_cierre" targetRef="an_cierre" />
+  </bpmn:process>
+  <bpmn:process id="Proceso_P_Servidor" name="Procesamiento de video en el servidor" isExecutable="false">
+    <bpmn:laneSet id="LaneSet_P_Servidor">
+      <bpmn:lane id="L_Rest" name="API REST /api/v1">
+        <bpmn:flowNodeRef>rs_inicio</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>rs_listar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>rs_fin</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="L_Ws" name="WebSocket /ws/pose-stream">
+        <bpmn:flowNodeRef>ws_inicio</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ws_cfg</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ws_gw_json</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ws_err_json</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ws_fin_json</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ws_turno</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ws_fuente</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ws_gw_fuente</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ws_err_fuente</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ws_fin_fuente</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ws_plan</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ws_perfil</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ws_productor</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ws_gw_bucle</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ws_tomar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ws_gw_fin</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ws_done</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ws_fin</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ws_proceso</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ws_borde</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ws_enviar</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ws_err_proc</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ws_fin_proc</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="rs_inicio" name="Petición GET recibida">
+      <bpmn:outgoing>Flujo_29</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="Def_rs_inicio" />
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="rs_listar" name="Listar archivos de tests/assets/videos">
+      <bpmn:incoming>Flujo_29</bpmn:incoming>
+      <bpmn:outgoing>Flujo_30</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="rs_fin" name="Lista enviada">
+      <bpmn:incoming>Flujo_30</bpmn:incoming>
+      <bpmn:messageEventDefinition id="Def_rs_fin" />
+    </bpmn:endEvent>
+    <bpmn:startEvent id="ws_inicio" name="Conexión aceptada">
+      <bpmn:outgoing>Flujo_31</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="Def_ws_inicio" />
+    </bpmn:startEvent>
+    <bpmn:receiveTask id="ws_cfg" name="Recibir PoseStreamConfig (primer mensaje)">
+      <bpmn:incoming>Flujo_31</bpmn:incoming>
+      <bpmn:outgoing>Flujo_32</bpmn:outgoing>
+    </bpmn:receiveTask>
+    <bpmn:exclusiveGateway id="ws_gw_json" name="¿JSON válido?" default="Flujo_33">
+      <bpmn:incoming>Flujo_32</bpmn:incoming>
+      <bpmn:outgoing>Flujo_33</bpmn:outgoing>
+      <bpmn:outgoing>Flujo_34</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="ws_err_json" name="Cerrar la conexión (código 4000)">
+      <bpmn:incoming>Flujo_34</bpmn:incoming>
+      <bpmn:outgoing>Flujo_35</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="ws_fin_json" name="Configuración inválida">
+      <bpmn:incoming>Flujo_35</bpmn:incoming>
+      <bpmn:errorEventDefinition id="Def_ws_fin_json" errorRef="Err_Config" />
+    </bpmn:endEvent>
+    <bpmn:task id="ws_turno" name="Esperar turno (una sola sesión de pose-stream activa)">
+      <bpmn:incoming>Flujo_33</bpmn:incoming>
+      <bpmn:outgoing>Flujo_36</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:serviceTask id="ws_fuente" name="Abrir el video del catálogo (VideoSource)">
+      <bpmn:incoming>Flujo_36</bpmn:incoming>
+      <bpmn:outgoing>Flujo_37</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="ws_gw_fuente" name="¿Archivo y configuración válidos?" default="Flujo_38">
+      <bpmn:incoming>Flujo_37</bpmn:incoming>
+      <bpmn:outgoing>Flujo_38</bpmn:outgoing>
+      <bpmn:outgoing>Flujo_39</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sendTask id="ws_err_fuente" name="Enviar {error} y cerrar (código 4000)">
+      <bpmn:incoming>Flujo_39</bpmn:incoming>
+      <bpmn:outgoing>Flujo_40</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:endEvent id="ws_fin_fuente" name="Video no disponible">
+      <bpmn:incoming>Flujo_40</bpmn:incoming>
+      <bpmn:errorEventDefinition id="Def_ws_fin_fuente" errorRef="Err_Fuente" />
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="ws_plan" name="Construir el perfil de procesamiento y crear el motor de análisis">
+      <bpmn:incoming>Flujo_38</bpmn:incoming>
+      <bpmn:outgoing>Flujo_41</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sendTask id="ws_perfil" name="Enviar stream_profile">
+      <bpmn:incoming>Flujo_41</bpmn:incoming>
+      <bpmn:outgoing>Flujo_42</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:task id="ws_productor" name="Iniciar el hilo productor de fotogramas (cola de 2)">
+      <bpmn:incoming>Flujo_42</bpmn:incoming>
+      <bpmn:outgoing>Flujo_43</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="ws_gw_bucle">
+      <bpmn:incoming>Flujo_43</bpmn:incoming>
+      <bpmn:incoming>Flujo_50</bpmn:incoming>
+      <bpmn:outgoing>Flujo_44</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="ws_tomar" name="Tomar el siguiente fotograma de la cola">
+      <bpmn:incoming>Flujo_44</bpmn:incoming>
+      <bpmn:outgoing>Flujo_45</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="ws_gw_fin" name="¿Fin del video?" default="Flujo_46">
+      <bpmn:incoming>Flujo_45</bpmn:incoming>
+      <bpmn:outgoing>Flujo_46</bpmn:outgoing>
+      <bpmn:outgoing>Flujo_47</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sendTask id="ws_done" name="Enviar stream_done y cerrar (código 1000)">
+      <bpmn:incoming>Flujo_47</bpmn:incoming>
+      <bpmn:outgoing>Flujo_48</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:endEvent id="ws_fin" name="Video procesado">
+      <bpmn:incoming>Flujo_48</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="ws_proceso" name="Reducir resolución, estimar pose y calcular ángulos (modo VIDEO)">
+      <bpmn:incoming>Flujo_46</bpmn:incoming>
+      <bpmn:outgoing>Flujo_49</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:boundaryEvent id="ws_borde" name="Error inesperado" attachedToRef="ws_proceso">
+      <bpmn:outgoing>Flujo_51</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="Def_ws_borde" />
+    </bpmn:boundaryEvent>
+    <bpmn:sendTask id="ws_enviar" name="Codificar vista previa, enviar payload v1 y esperar al ritmo objetivo">
+      <bpmn:incoming>Flujo_49</bpmn:incoming>
+      <bpmn:outgoing>Flujo_50</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:sendTask id="ws_err_proc" name="Enviar {error} y cerrar (código 1011)">
+      <bpmn:incoming>Flujo_51</bpmn:incoming>
+      <bpmn:outgoing>Flujo_52</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:endEvent id="ws_fin_proc" name="Error de procesamiento">
+      <bpmn:incoming>Flujo_52</bpmn:incoming>
+      <bpmn:errorEventDefinition id="Def_ws_fin_proc" errorRef="Err_Proceso" />
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flujo_29" sourceRef="rs_inicio" targetRef="rs_listar" />
+    <bpmn:sequenceFlow id="Flujo_30" sourceRef="rs_listar" targetRef="rs_fin" />
+    <bpmn:sequenceFlow id="Flujo_31" sourceRef="ws_inicio" targetRef="ws_cfg" />
+    <bpmn:sequenceFlow id="Flujo_32" sourceRef="ws_cfg" targetRef="ws_gw_json" />
+    <bpmn:sequenceFlow id="Flujo_33" name="Sí" sourceRef="ws_gw_json" targetRef="ws_turno" />
+    <bpmn:sequenceFlow id="Flujo_34" name="No" sourceRef="ws_gw_json" targetRef="ws_err_json">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">JSONDecodeError</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flujo_35" sourceRef="ws_err_json" targetRef="ws_fin_json" />
+    <bpmn:sequenceFlow id="Flujo_36" sourceRef="ws_turno" targetRef="ws_fuente" />
+    <bpmn:sequenceFlow id="Flujo_37" sourceRef="ws_fuente" targetRef="ws_gw_fuente" />
+    <bpmn:sequenceFlow id="Flujo_38" name="Sí" sourceRef="ws_gw_fuente" targetRef="ws_plan" />
+    <bpmn:sequenceFlow id="Flujo_39" name="No" sourceRef="ws_gw_fuente" targetRef="ws_err_fuente">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">ValueError o FileNotFoundError</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flujo_40" sourceRef="ws_err_fuente" targetRef="ws_fin_fuente" />
+    <bpmn:sequenceFlow id="Flujo_41" sourceRef="ws_plan" targetRef="ws_perfil" />
+    <bpmn:sequenceFlow id="Flujo_42" sourceRef="ws_perfil" targetRef="ws_productor" />
+    <bpmn:sequenceFlow id="Flujo_43" sourceRef="ws_productor" targetRef="ws_gw_bucle" />
+    <bpmn:sequenceFlow id="Flujo_44" sourceRef="ws_gw_bucle" targetRef="ws_tomar" />
+    <bpmn:sequenceFlow id="Flujo_45" sourceRef="ws_tomar" targetRef="ws_gw_fin" />
+    <bpmn:sequenceFlow id="Flujo_46" name="No" sourceRef="ws_gw_fin" targetRef="ws_proceso" />
+    <bpmn:sequenceFlow id="Flujo_47" name="Sí" sourceRef="ws_gw_fin" targetRef="ws_done">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">la cola entrega el fin de stream</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flujo_48" sourceRef="ws_done" targetRef="ws_fin" />
+    <bpmn:sequenceFlow id="Flujo_49" sourceRef="ws_proceso" targetRef="ws_enviar" />
+    <bpmn:sequenceFlow id="Flujo_50" sourceRef="ws_enviar" targetRef="ws_gw_bucle" />
+    <bpmn:sequenceFlow id="Flujo_51" sourceRef="ws_borde" targetRef="ws_err_proc" />
+    <bpmn:sequenceFlow id="Flujo_52" sourceRef="ws_err_proc" targetRef="ws_fin_proc" />
+    <bpmn:textAnnotation id="an_plan"><bpmn:text>Perfil según resolución × FPS nativos: reducción a 720/960 px, stride de inferencia y techo de FPS.</bpmn:text></bpmn:textAnnotation>
+    <bpmn:association id="Asoc_an_plan" associationDirection="None" sourceRef="ws_plan" targetRef="an_plan" />
+    <bpmn:textAnnotation id="an_proceso"><bpmn:text>flexión = 180° − interno sobre world_landmarks; payload con landmarks filtrados por visibilidad.</bpmn:text></bpmn:textAnnotation>
+    <bpmn:association id="Asoc_an_proceso" associationDirection="None" sourceRef="ws_proceso" targetRef="an_proceso" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="Diagrama_Def_AnalisisVideo" name="Proceso de análisis de video">
+    <bpmndi:BPMNPlane id="Plano_Def_AnalisisVideo" bpmnElement="Colab_Def_AnalisisVideo">
+      <bpmndi:BPMNShape id="P_Cliente_di" bpmnElement="P_Cliente" isHorizontal="false">
+        <dc:Bounds x="40" y="40" width="790" height="3015" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="L_Evaluador_di" bpmnElement="L_Evaluador" isHorizontal="false">
+        <dc:Bounds x="40" y="70" width="170" height="2985" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="L_Cliente_di" bpmnElement="L_Cliente" isHorizontal="false">
+        <dc:Bounds x="210" y="70" width="620" height="2985" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="P_Servidor_di" bpmnElement="P_Servidor" isHorizontal="false">
+        <dc:Bounds x="890" y="40" width="640" height="3015" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="L_Rest_di" bpmnElement="L_Rest" isHorizontal="false">
+        <dc:Bounds x="890" y="70" width="170" height="2985" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="L_Ws_di" bpmnElement="L_Ws" isHorizontal="false">
+        <dc:Bounds x="1060" y="70" width="470" height="2985" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ev_inicio_di" bpmnElement="ev_inicio">
+        <dc:Bounds x="107" y="184" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="147" y="188" width="94" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ev_abrir_di" bpmnElement="ev_abrir">
+        <dc:Bounds x="65" y="282" width="120" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ev_config_di" bpmnElement="ev_config">
+        <dc:Bounds x="65" y="782" width="120" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ev_revisar_di" bpmnElement="ev_revisar">
+        <dc:Bounds x="65" y="2282" width="120" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ev_fin_di" bpmnElement="ev_fin">
+        <dc:Bounds x="107" y="2434" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="147" y="2438" width="94" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="cl_cat_di" bpmnElement="cl_cat">
+        <dc:Bounds x="385" y="408" width="120" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="cl_gw_cat_di" bpmnElement="cl_gw_cat" isMarkerVisible="true">
+        <dc:Bounds x="420" y="552" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="453" y="522" width="94" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="cl_err_cat_di" bpmnElement="cl_err_cat">
+        <dc:Bounds x="535" y="658" width="120" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="cl_fin_cat_di" bpmnElement="cl_fin_cat">
+        <dc:Bounds x="577" y="810" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="617" y="814" width="94" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="cl_lista_di" bpmnElement="cl_lista">
+        <dc:Bounds x="385" y="658" width="120" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="cl_ws_di" bpmnElement="cl_ws">
+        <dc:Bounds x="385" y="908" width="120" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="cl_gw_con_di" bpmnElement="cl_gw_con" isMarkerVisible="true">
+        <dc:Bounds x="420" y="1052" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="453" y="1022" width="94" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="cl_err_con_di" bpmnElement="cl_err_con">
+        <dc:Bounds x="535" y="1032" width="120" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="cl_fin_con_di" bpmnElement="cl_fin_con">
+        <dc:Bounds x="727" y="1060" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="767" y="1064" width="94" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="cl_cfg_di" bpmnElement="cl_cfg">
+        <dc:Bounds x="385" y="1158" width="120" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="cl_gw_bucle_di" bpmnElement="cl_gw_bucle" isMarkerVisible="true">
+        <dc:Bounds x="420" y="1302" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="cl_gw_evento_di" bpmnElement="cl_gw_evento">
+        <dc:Bounds x="420" y="1428" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="cl_msg_di" bpmnElement="cl_msg">
+        <dc:Bounds x="427" y="1560" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="465" y="1594" width="94" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="cl_cierre_di" bpmnElement="cl_cierre">
+        <dc:Bounds x="277" y="1634" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="179" y="1638" width="94" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="cl_gw_tipo_di" bpmnElement="cl_gw_tipo" isMarkerVisible="true">
+        <dc:Bounds x="420" y="1678" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="453" y="1648" width="94" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="cl_frame_di" bpmnElement="cl_frame">
+        <dc:Bounds x="385" y="1782" width="120" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="cl_perfil_di" bpmnElement="cl_perfil">
+        <dc:Bounds x="535" y="1782" width="120" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="cl_error_di" bpmnElement="cl_error">
+        <dc:Bounds x="685" y="1782" width="120" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="cl_fin_error_di" bpmnElement="cl_fin_error">
+        <dc:Bounds x="727" y="1934" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="700" y="1974" width="94" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="cl_gw_merge_di" bpmnElement="cl_gw_merge" isMarkerVisible="true">
+        <dc:Bounds x="420" y="1928" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="cl_resumen_di" bpmnElement="cl_resumen">
+        <dc:Bounds x="235" y="2032" width="120" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="cl_dialogo_di" bpmnElement="cl_dialogo">
+        <dc:Bounds x="235" y="2158" width="120" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="rs_inicio_di" bpmnElement="rs_inicio">
+        <dc:Bounds x="957" y="434" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="997" y="438" width="94" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="rs_listar_di" bpmnElement="rs_listar">
+        <dc:Bounds x="915" y="532" width="120" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="rs_fin_di" bpmnElement="rs_fin">
+        <dc:Bounds x="957" y="684" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="997" y="688" width="94" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ws_inicio_di" bpmnElement="ws_inicio">
+        <dc:Bounds x="1277" y="934" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1317" y="938" width="94" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ws_cfg_di" bpmnElement="ws_cfg">
+        <dc:Bounds x="1235" y="1158" width="120" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ws_gw_json_di" bpmnElement="ws_gw_json" isMarkerVisible="true">
+        <dc:Bounds x="1270" y="1302" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1303" y="1272" width="94" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ws_err_json_di" bpmnElement="ws_err_json">
+        <dc:Bounds x="1085" y="1408" width="120" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ws_fin_json_di" bpmnElement="ws_fin_json">
+        <dc:Bounds x="1127" y="1528" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1100" y="1568" width="94" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ws_turno_di" bpmnElement="ws_turno">
+        <dc:Bounds x="1235" y="1408" width="120" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ws_fuente_di" bpmnElement="ws_fuente">
+        <dc:Bounds x="1235" y="1532" width="120" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ws_gw_fuente_di" bpmnElement="ws_gw_fuente" isMarkerVisible="true">
+        <dc:Bounds x="1270" y="1678" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1303" y="1648" width="94" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ws_err_fuente_di" bpmnElement="ws_err_fuente">
+        <dc:Bounds x="1085" y="1782" width="120" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ws_fin_fuente_di" bpmnElement="ws_fin_fuente">
+        <dc:Bounds x="1127" y="1903" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1100" y="1943" width="94" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ws_plan_di" bpmnElement="ws_plan">
+        <dc:Bounds x="1235" y="1782" width="120" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ws_perfil_di" bpmnElement="ws_perfil">
+        <dc:Bounds x="1235" y="1908" width="120" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ws_productor_di" bpmnElement="ws_productor">
+        <dc:Bounds x="1235" y="2032" width="120" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ws_gw_bucle_di" bpmnElement="ws_gw_bucle" isMarkerVisible="true">
+        <dc:Bounds x="1270" y="2178" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ws_tomar_di" bpmnElement="ws_tomar">
+        <dc:Bounds x="1235" y="2282" width="120" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ws_gw_fin_di" bpmnElement="ws_gw_fin" isMarkerVisible="true">
+        <dc:Bounds x="1270" y="2428" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1303" y="2398" width="94" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ws_done_di" bpmnElement="ws_done">
+        <dc:Bounds x="1085" y="2532" width="120" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ws_fin_di" bpmnElement="ws_fin">
+        <dc:Bounds x="1127" y="2653" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1100" y="2693" width="94" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ws_proceso_di" bpmnElement="ws_proceso">
+        <dc:Bounds x="1235" y="2532" width="120" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ws_borde_di" bpmnElement="ws_borde">
+        <dc:Bounds x="1337" y="2578" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1310" y="2618" width="94" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ws_enviar_di" bpmnElement="ws_enviar">
+        <dc:Bounds x="1235" y="2658" width="120" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ws_err_proc_di" bpmnElement="ws_err_proc">
+        <dc:Bounds x="1385" y="2782" width="120" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ws_fin_proc_di" bpmnElement="ws_fin_proc">
+        <dc:Bounds x="1427" y="2934" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1400" y="2974" width="94" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flujo_01_di" bpmnElement="Flujo_01">
+        <di:waypoint x="125" y="220" />
+        <di:waypoint x="125" y="282" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_02_di" bpmnElement="Flujo_02">
+        <di:waypoint x="125" y="372" />
+        <di:waypoint x="125" y="390" />
+        <di:waypoint x="445" y="390" />
+        <di:waypoint x="445" y="408" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_03_di" bpmnElement="Flujo_03">
+        <di:waypoint x="445" y="498" />
+        <di:waypoint x="445" y="552" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_04_di" bpmnElement="Flujo_04">
+        <di:waypoint x="445" y="602" />
+        <di:waypoint x="445" y="658" />
+        <bpmndi:BPMNLabel><dc:Bounds x="451" y="606" width="70" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_05_di" bpmnElement="Flujo_05">
+        <di:waypoint x="470" y="578" />
+        <di:waypoint x="595" y="578" />
+        <di:waypoint x="595" y="658" />
+        <bpmndi:BPMNLabel><dc:Bounds x="478" y="582" width="70" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_06_di" bpmnElement="Flujo_06">
+        <di:waypoint x="595" y="748" />
+        <di:waypoint x="595" y="810" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_07_di" bpmnElement="Flujo_07">
+        <di:waypoint x="445" y="748" />
+        <di:waypoint x="445" y="765" />
+        <di:waypoint x="125" y="765" />
+        <di:waypoint x="125" y="782" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_08_di" bpmnElement="Flujo_08">
+        <di:waypoint x="125" y="872" />
+        <di:waypoint x="125" y="890" />
+        <di:waypoint x="445" y="890" />
+        <di:waypoint x="445" y="908" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_09_di" bpmnElement="Flujo_09">
+        <di:waypoint x="445" y="998" />
+        <di:waypoint x="445" y="1052" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_10_di" bpmnElement="Flujo_10">
+        <di:waypoint x="445" y="1102" />
+        <di:waypoint x="445" y="1158" />
+        <bpmndi:BPMNLabel><dc:Bounds x="451" y="1106" width="70" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_11_di" bpmnElement="Flujo_11">
+        <di:waypoint x="470" y="1078" />
+        <di:waypoint x="535" y="1078" />
+        <bpmndi:BPMNLabel><dc:Bounds x="478" y="1082" width="70" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_12_di" bpmnElement="Flujo_12">
+        <di:waypoint x="655" y="1078" />
+        <di:waypoint x="727" y="1078" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_13_di" bpmnElement="Flujo_13">
+        <di:waypoint x="445" y="1248" />
+        <di:waypoint x="445" y="1302" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_14_di" bpmnElement="Flujo_14">
+        <di:waypoint x="445" y="1352" />
+        <di:waypoint x="445" y="1428" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_15_di" bpmnElement="Flujo_15">
+        <di:waypoint x="445" y="1478" />
+        <di:waypoint x="445" y="1560" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_16_di" bpmnElement="Flujo_16">
+        <di:waypoint x="420" y="1452" />
+        <di:waypoint x="295" y="1452" />
+        <di:waypoint x="295" y="1634" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_17_di" bpmnElement="Flujo_17">
+        <di:waypoint x="445" y="1596" />
+        <di:waypoint x="445" y="1678" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_18_di" bpmnElement="Flujo_18">
+        <di:waypoint x="445" y="1728" />
+        <di:waypoint x="445" y="1782" />
+        <bpmndi:BPMNLabel><dc:Bounds x="451" y="1732" width="70" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_19_di" bpmnElement="Flujo_19">
+        <di:waypoint x="470" y="1702" />
+        <di:waypoint x="595" y="1702" />
+        <di:waypoint x="595" y="1782" />
+        <bpmndi:BPMNLabel><dc:Bounds x="603" y="1684" width="70" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_20_di" bpmnElement="Flujo_20">
+        <di:waypoint x="470" y="1702" />
+        <di:waypoint x="745" y="1702" />
+        <di:waypoint x="745" y="1782" />
+        <bpmndi:BPMNLabel><dc:Bounds x="753" y="1684" width="70" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_21_di" bpmnElement="Flujo_21">
+        <di:waypoint x="445" y="1872" />
+        <di:waypoint x="445" y="1928" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_22_di" bpmnElement="Flujo_22">
+        <di:waypoint x="595" y="1872" />
+        <di:waypoint x="595" y="1952" />
+        <di:waypoint x="470" y="1952" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_23_di" bpmnElement="Flujo_23">
+        <di:waypoint x="745" y="1872" />
+        <di:waypoint x="745" y="1934" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_24_di" bpmnElement="Flujo_24">
+        <di:waypoint x="420" y="1952" />
+        <di:waypoint x="370" y="1952" />
+        <di:waypoint x="370" y="1328" />
+        <di:waypoint x="420" y="1328" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_25_di" bpmnElement="Flujo_25">
+        <di:waypoint x="295" y="1670" />
+        <di:waypoint x="295" y="2032" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_26_di" bpmnElement="Flujo_26">
+        <di:waypoint x="295" y="2122" />
+        <di:waypoint x="295" y="2158" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_27_di" bpmnElement="Flujo_27">
+        <di:waypoint x="295" y="2248" />
+        <di:waypoint x="295" y="2265" />
+        <di:waypoint x="125" y="2265" />
+        <di:waypoint x="125" y="2282" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_28_di" bpmnElement="Flujo_28">
+        <di:waypoint x="125" y="2372" />
+        <di:waypoint x="125" y="2434" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_29_di" bpmnElement="Flujo_29">
+        <di:waypoint x="975" y="470" />
+        <di:waypoint x="975" y="532" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_30_di" bpmnElement="Flujo_30">
+        <di:waypoint x="975" y="622" />
+        <di:waypoint x="975" y="684" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_31_di" bpmnElement="Flujo_31">
+        <di:waypoint x="1295" y="970" />
+        <di:waypoint x="1295" y="1158" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_32_di" bpmnElement="Flujo_32">
+        <di:waypoint x="1295" y="1248" />
+        <di:waypoint x="1295" y="1302" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_33_di" bpmnElement="Flujo_33">
+        <di:waypoint x="1295" y="1352" />
+        <di:waypoint x="1295" y="1408" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1301" y="1356" width="70" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_34_di" bpmnElement="Flujo_34">
+        <di:waypoint x="1270" y="1328" />
+        <di:waypoint x="1145" y="1328" />
+        <di:waypoint x="1145" y="1408" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1192" y="1332" width="70" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_35_di" bpmnElement="Flujo_35">
+        <di:waypoint x="1145" y="1498" />
+        <di:waypoint x="1145" y="1528" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_36_di" bpmnElement="Flujo_36">
+        <di:waypoint x="1295" y="1498" />
+        <di:waypoint x="1295" y="1532" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_37_di" bpmnElement="Flujo_37">
+        <di:waypoint x="1295" y="1622" />
+        <di:waypoint x="1295" y="1678" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_38_di" bpmnElement="Flujo_38">
+        <di:waypoint x="1295" y="1728" />
+        <di:waypoint x="1295" y="1782" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1301" y="1732" width="70" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_39_di" bpmnElement="Flujo_39">
+        <di:waypoint x="1270" y="1702" />
+        <di:waypoint x="1145" y="1702" />
+        <di:waypoint x="1145" y="1782" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1192" y="1706" width="70" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_40_di" bpmnElement="Flujo_40">
+        <di:waypoint x="1145" y="1872" />
+        <di:waypoint x="1145" y="1903" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_41_di" bpmnElement="Flujo_41">
+        <di:waypoint x="1295" y="1872" />
+        <di:waypoint x="1295" y="1908" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_42_di" bpmnElement="Flujo_42">
+        <di:waypoint x="1295" y="1998" />
+        <di:waypoint x="1295" y="2032" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_43_di" bpmnElement="Flujo_43">
+        <di:waypoint x="1295" y="2122" />
+        <di:waypoint x="1295" y="2178" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_44_di" bpmnElement="Flujo_44">
+        <di:waypoint x="1295" y="2228" />
+        <di:waypoint x="1295" y="2282" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_45_di" bpmnElement="Flujo_45">
+        <di:waypoint x="1295" y="2372" />
+        <di:waypoint x="1295" y="2428" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_46_di" bpmnElement="Flujo_46">
+        <di:waypoint x="1295" y="2478" />
+        <di:waypoint x="1295" y="2532" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1301" y="2482" width="70" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_47_di" bpmnElement="Flujo_47">
+        <di:waypoint x="1270" y="2452" />
+        <di:waypoint x="1145" y="2452" />
+        <di:waypoint x="1145" y="2532" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1192" y="2456" width="70" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_48_di" bpmnElement="Flujo_48">
+        <di:waypoint x="1145" y="2622" />
+        <di:waypoint x="1145" y="2653" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_49_di" bpmnElement="Flujo_49">
+        <di:waypoint x="1295" y="2622" />
+        <di:waypoint x="1295" y="2658" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_50_di" bpmnElement="Flujo_50">
+        <di:waypoint x="1235" y="2702" />
+        <di:waypoint x="1220" y="2702" />
+        <di:waypoint x="1220" y="2202" />
+        <di:waypoint x="1270" y="2202" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_51_di" bpmnElement="Flujo_51">
+        <di:waypoint x="1373" y="2596" />
+        <di:waypoint x="1445" y="2596" />
+        <di:waypoint x="1445" y="2782" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_52_di" bpmnElement="Flujo_52">
+        <di:waypoint x="1445" y="2872" />
+        <di:waypoint x="1445" y="2934" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Mensaje_01_di" bpmnElement="Mensaje_01">
+        <di:waypoint x="505" y="432" />
+        <di:waypoint x="957" y="432" />
+        <bpmndi:BPMNLabel><dc:Bounds x="861" y="402" width="90" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Mensaje_02_di" bpmnElement="Mensaje_02">
+        <di:waypoint x="957" y="702" />
+        <di:waypoint x="860" y="702" />
+        <di:waypoint x="860" y="472" />
+        <di:waypoint x="505" y="472" />
+        <bpmndi:BPMNLabel><dc:Bounds x="861" y="672" width="90" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Mensaje_03_di" bpmnElement="Mensaje_03">
+        <di:waypoint x="505" y="952" />
+        <di:waypoint x="1277" y="952" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1181" y="922" width="90" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Mensaje_04_di" bpmnElement="Mensaje_04">
+        <di:waypoint x="505" y="1202" />
+        <di:waypoint x="1235" y="1202" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1139" y="1172" width="90" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Mensaje_05_di" bpmnElement="Mensaje_05">
+        <di:waypoint x="1235" y="1982" />
+        <di:waypoint x="860" y="1982" />
+        <di:waypoint x="860" y="1562" />
+        <di:waypoint x="463" y="1562" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1139" y="1986" width="90" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Mensaje_06_di" bpmnElement="Mensaje_06">
+        <di:waypoint x="1235" y="2732" />
+        <di:waypoint x="860" y="2732" />
+        <di:waypoint x="860" y="1566" />
+        <di:waypoint x="463" y="1566" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1139" y="2736" width="90" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Mensaje_07_di" bpmnElement="Mensaje_07">
+        <di:waypoint x="1085" y="1828" />
+        <di:waypoint x="860" y="1828" />
+        <di:waypoint x="860" y="1572" />
+        <di:waypoint x="463" y="1572" />
+        <bpmndi:BPMNLabel><dc:Bounds x="989" y="1798" width="90" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Mensaje_08_di" bpmnElement="Mensaje_08">
+        <di:waypoint x="1385" y="2828" />
+        <di:waypoint x="860" y="2828" />
+        <di:waypoint x="860" y="1576" />
+        <di:waypoint x="463" y="1576" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1289" y="2798" width="90" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Mensaje_09_di" bpmnElement="Mensaje_09">
+        <di:waypoint x="1085" y="1452" />
+        <di:waypoint x="860" y="1452" />
+        <di:waypoint x="860" y="1642" />
+        <di:waypoint x="313" y="1642" />
+        <bpmndi:BPMNLabel><dc:Bounds x="989" y="1422" width="90" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Mensaje_10_di" bpmnElement="Mensaje_10">
+        <di:waypoint x="1085" y="2578" />
+        <di:waypoint x="860" y="2578" />
+        <di:waypoint x="860" y="1662" />
+        <di:waypoint x="313" y="1662" />
+        <bpmndi:BPMNLabel><dc:Bounds x="989" y="2548" width="90" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="an_catalogo_di" bpmnElement="an_catalogo">
+        <dc:Bounds x="528" y="159" width="270" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="an_cierre_di" bpmnElement="an_cierre">
+        <dc:Bounds x="58" y="915" width="130" height="430" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Asoc_an_cierre_di" bpmnElement="Asoc_an_cierre">
+        <di:waypoint x="277" y="1652" />
+        <di:waypoint x="188" y="1345" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="an_plan_di" bpmnElement="an_plan">
+        <dc:Bounds x="1392" y="1802" width="115" height="210" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Asoc_an_plan_di" bpmnElement="Asoc_an_plan">
+        <di:waypoint x="1355" y="1828" />
+        <di:waypoint x="1392" y="1828" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="an_proceso_di" bpmnElement="an_proceso">
+        <dc:Bounds x="1078" y="2052" width="115" height="290" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Asoc_an_proceso_di" bpmnElement="Asoc_an_proceso">
+        <di:waypoint x="1235" y="2578" />
+        <di:waypoint x="1192" y="2342" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

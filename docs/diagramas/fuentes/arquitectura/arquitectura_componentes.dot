@@ -1,0 +1,102 @@
+// Diagrama de arquitectura (componentes y contenedores) de Bio-Motion Evaluator.
+// Cada elemento se verificó en el código: appWeb/src/router.tsx, backend/app/main.py,
+// backend/app/api/**, backend/vision/**, backend/app/config.py, backend/app/workers/**,
+// backend/docker-compose.yml. Bordes discontinuos = componente opcional.
+digraph arquitectura {
+  charset="utf-8";
+  graph [rankdir=TB, fontname="Helvetica", fontsize=13, bgcolor="white", nodesep=0.35, ranksep=0.6,
+         pad=0.3, newrank=true, compound=true];
+  node [shape=box, style="rounded,filled", fillcolor="white", color="#333333", fontname="Helvetica",
+        fontsize=12, margin="0.18,0.10"];
+  edge [fontname="Helvetica", fontsize=11, color="#333333", arrowsize=0.9];
+
+  subgraph cluster_navegador {
+    label=<<B>Navegador web (cliente)</B>>; labeljust="l"; style="rounded,filled"; fillcolor="#F6FBF7";
+    color="#9A9A9A"; margin=14;
+    camara [label=<<FONT POINT-SIZE="10">«dispositivo»</FONT><BR/><B>Cámara</B><BR/><FONT POINT-SIZE="10">getUserMedia (https o localhost)</FONT>>, shape=box3d, style=filled, fillcolor="#FFFFFF"];
+    subgraph cluster_appweb {
+      label=<<B>appWeb</B> — SPA React 19 + TypeScript (Vite)>; labeljust="l"; style="rounded,filled";
+      fillcolor="#FFFFFF"; color="#666666"; margin=12;
+      sustentacion [label=<<FONT POINT-SIZE="10">«interfaz principal» · tema claro</FONT><BR/><B>Modo sustentación</B><BR/>/sustentacion: Portada, Demostración, Resultados<BR/><FONT POINT-SIZE="10">«/» redirige aquí</FONT>>, fillcolor="#E8F1FB"];
+      completa [label=<<FONT POINT-SIZE="10">«interfaz secundaria» · tema oscuro</FONT><BR/><B>Interfaz completa</B><BR/>/inicio, /live-analysis, /video-analysis,<BR/>/backend-status, /settings/connection<BR/><FONT POINT-SIZE="10">login, sesiones, perfil y descarga: solo con PostgreSQL</FONT>>, fillcolor="#EEEEEE"];
+      hooks [label=<<FONT POINT-SIZE="10">«hooks»</FONT><BR/><B>useLiveAnalysisSession</B> · <B>useVideoAnalysisSession</B><BR/>captura JPEG, contrapresión, parseo del payload v1>, fillcolor="#FFFFFF"];
+      overlay [label=<<FONT POINT-SIZE="10">«componentes»</FONT><BR/><B>PoseSkeletonCanvas</B> · <B>PoseSkeleton3DPanel</B><BR/>DashboardPanel · AnalysisSummaryDialog>, fillcolor="#FFFFFF"];
+    }
+  }
+
+  subgraph cluster_servidor {
+    label=<<B>Servidor de inferencia</B> — FastAPI sobre uvicorn (puerto 8000)>; labeljust="l";
+    style="rounded,filled"; fillcolor="#F7FAFE"; color="#9A9A9A"; margin=14;
+    rest [label=<<FONT POINT-SIZE="10">«API REST»</FONT><BR/><B>/api/v1</B><BR/>health · analyze/pose · analysis/gold-standard-videos<BR/>auth/token (JWT) · sessions · download>, fillcolor="#E8F1FB"];
+    wsvideo [label=<<FONT POINT-SIZE="10">«WebSocket»</FONT><BR/><B>/ws/video</B><BR/>JPEG desde el navegador → payload v1>, fillcolor="#E3F4F4"];
+    wspose [label=<<FONT POINT-SIZE="10">«WebSocket»</FONT><BR/><B>/ws/pose-stream</B><BR/>video leído en el servidor (catálogo, cámara, URL)<BR/>stream_profile, payload v1 + vista previa JPEG>, fillcolor="#E3F4F4"];
+    subgraph cluster_vision {
+      label=<<B>Núcleo de visión</B> — backend/vision + app.services.pose>; labeljust="l";
+      style="rounded,filled"; fillcolor="#FFFFFF"; color="#666666"; margin=12;
+      motor [label=<<B>RealtimeEngineSession</B><BR/>orquestación por fotograma>, fillcolor="#E8F1FB"];
+      mediapipe [label=<<B>MediaPipe Pose Landmarker</B><BR/>(BlazePose, 33 landmarks + world_landmarks)>, fillcolor="#FDEDEC"];
+      biomecanica [label=<<B>biomechanics</B><BR/>flexión = 180° − interno sobre world_landmarks>, fillcolor="#FFF6E0"];
+      clasificacion [label=<<B>FeatureEngine</B> · <B>HysteresisClassifier</B> · <B>RepTrackerRouter</B><BR/>clasificador heurístico u ONNX Runtime>, fillcolor="#EAF6EC"];
+      fuente [label=<<B>VideoSource</B> · <B>StreamProcessingPlan</B><BR/>OpenCV: archivo, cámara del servidor, URL>, fillcolor="#FFFFFF"];
+    }
+  }
+
+  subgraph cluster_disco {
+    label=<<B>Disco local del servidor</B>>; labeljust="l"; style="rounded,filled"; fillcolor="#FFFDF5";
+    color="#9A9A9A"; margin=14;
+    modelo [label=<<FONT POINT-SIZE="10">«artefacto»</FONT><BR/>models/pose_landmarker_full.task>, shape=note, style=filled, fillcolor="#FFFFFF"];
+    onnx [label=<<FONT POINT-SIZE="10">«artefacto»</FONT><BR/>vision/models/manifest.json<BR/>+ exercise_rf_a0eac3d7.onnx>, shape=note, style=filled, fillcolor="#FFFFFF"];
+    catalogo [label=<<FONT POINT-SIZE="10">«carpeta»</FONT><BR/>tests/assets/videos<BR/><FONT POINT-SIZE="10">catálogo de referencia (no versionado)</FONT>>, shape=folder, style=filled, fillcolor="#FFFFFF"];
+    descargas [label=<<FONT POINT-SIZE="10">«carpeta»</FONT><BR/>data/downloads>, shape=folder, style=filled, fillcolor="#FFFFFF"];
+  }
+
+  subgraph cluster_opcional {
+    label=<<B>Servicios opcionales</B>>; labeljust="l"; style="rounded,dashed"; color="#9A9A9A"; margin=14;
+    postgres [label=<<FONT POINT-SIZE="10">«base de datos» · opcional</FONT><BR/><B>PostgreSQL</B><BR/>users · sessions · session_metrics<BR/>video_download_jobs>, shape=cylinder, style="dashed,filled", fillcolor="#EAF6EC"];
+    redis [label=<<FONT POINT-SIZE="10">«broker» · opcional</FONT><BR/><B>Redis 7</B> (docker-compose)>, shape=cylinder, style="dashed,filled", fillcolor="#FDEDEC"];
+    celery [label=<<FONT POINT-SIZE="10">«worker» · opcional</FONT><BR/><B>Celery</B> video_worker<BR/>download_and_process_video (yt-dlp)>, style="rounded,dashed,filled", fillcolor="#F3ECF8"];
+  }
+
+  subgraph cluster_externo {
+    label=<<B>Servicios externos (opcionales)</B>>; labeljust="l"; style="rounded,dashed"; color="#9A9A9A"; margin=14;
+    hf [label=<<B>Hugging Face Inference API</B><BR/><FONT POINT-SIZE="10">solo si HF_INFERENCE_URL está definida</FONT>>, style="rounded,dashed,filled", fillcolor="#FFFFFF"];
+    sitios [label=<<B>Sitios de video</B><BR/><FONT POINT-SIZE="10">origen de las descargas por URL</FONT>>, style="rounded,dashed,filled", fillcolor="#FFFFFF"];
+  }
+
+  camara -> hooks [label="MediaStream"];
+  sustentacion -> hooks [label="Demo"];
+  completa -> hooks;
+  hooks -> overlay [label="landmarks, ángulos"];
+
+  hooks -> wsvideo [label=<WebSocket · JPEG ↑ / JSON ↓>, penwidth=1.6];
+  hooks -> wspose [label=<WebSocket · config ↑ / JSON ↓>, penwidth=1.6];
+  completa -> rest [label=<HTTP · JSON>, penwidth=1.6];
+
+  wsvideo -> motor;
+  wspose -> fuente;
+  fuente -> motor;
+  rest -> motor [label="analyze/pose"];
+  motor -> mediapipe;
+  motor -> biomecanica;
+  motor -> clasificacion;
+
+  mediapipe -> modelo [style=dashed, arrowhead=vee, label="carga"];
+  clasificacion -> onnx [style=dashed, arrowhead=vee, label="carga"];
+  fuente -> catalogo [style=dashed, arrowhead=vee, label="lee"];
+
+  rest -> postgres [style=dashed, label="SQLAlchemy (asyncpg)"];
+  rest -> redis [style=dashed, label="encola tarea"];
+  redis -> celery [style=dashed, label="entrega tarea"];
+  celery -> postgres [style=dashed, label="estado del trabajo"];
+  celery -> descargas [style=dashed, label="escribe"];
+  celery -> sitios [style=dashed, label="HTTPS"];
+  rest -> hf [style=dashed, label="HTTPS (analyze/pose)"];
+
+  // Maquetación (no son relaciones): navegador arriba, servidor en medio, almacenamiento y
+  // servicios opcionales abajo.
+  overlay -> rest [style=invis];
+  overlay -> wspose [style=invis];
+  biomecanica -> redis [style=invis];
+  clasificacion -> catalogo [style=invis];
+  mediapipe -> hf [style=invis];
+}

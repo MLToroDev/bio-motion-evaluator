@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1320" viewBox="0 0 2400 1320">
+<rect x="0" y="0" width="2400" height="1320" fill="#ffffff"/>
+<defs><marker id="punta" markerWidth="14" markerHeight="14" refX="12" refY="7" orient="auto"><path d="M0,0 L14,7 L0,14 z" fill="#1f2328"/></marker></defs>
+<line x1="90" y1="660" x2="1900" y2="660" stroke="#1f2328" stroke-width="6" marker-end="url(#punta)"/>
+<rect x="1900" y="480" width="440" height="360" rx="18" fill="#eff4ff" stroke="#2563eb" stroke-width="3"/>
+<text x="2120.0" y="532.0" font-family="Helvetica, Arial, sans-serif" font-size="20" font-weight="bold" fill="#2563eb" text-anchor="middle"><tspan x="2120.0" dy="0.0">Efecto</tspan></text>
+<text x="2120.0" y="578.0" font-family="Helvetica, Arial, sans-serif" font-size="24" font-weight="bold" fill="#1f2328" text-anchor="middle"><tspan x="2120.0" dy="0.0">La valoración del rango de</tspan><tspan x="2120.0" dy="30.0">movimiento de rodilla es</tspan><tspan x="2120.0" dy="30.0">costosa, depende de un</tspan><tspan x="2120.0" dy="30.0">profesional y su medición</tspan><tspan x="2120.0" dy="30.0">manual es variable: quien</tspan><tspan x="2120.0" dy="30.0">entrena suele quedarse sin una</tspan><tspan x="2120.0" dy="30.0">medida objetiva</tspan></text>
+<line x1="270" y1="150" x2="600" y2="660" stroke="#1f2328" stroke-width="3.5"/>
+<rect x="90.0" y="90" width="360" height="52" rx="10" fill="#f3f4f6" stroke="#1f2328" stroke-width="2"/>
+<text x="270.0" y="124.0" font-family="Helvetica, Arial, sans-serif" font-size="24" font-weight="bold" fill="#1f2328" text-anchor="middle"><tspan x="270.0" dy="0.0">Método</tspan></text>
+<line x1="102.5" y1="277.5" x2="352.5" y2="277.5" stroke="#1f2328" stroke-width="2"/>
+<circle cx="352.5" cy="277.5" r="4" fill="#1f2328"/>
+<text x="338.5" y="301.5" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="normal" fill="#1f2328" text-anchor="end"><tspan x="338.5" dy="0.0">Protocolos de valoración (p.</tspan><tspan x="338.5" dy="23.8">ej. FMS) que exigen atención</tspan><tspan x="338.5" dy="23.8">presencial</tspan></text>
+<line x1="185.0" y1="405.0" x2="435.0" y2="405.0" stroke="#1f2328" stroke-width="2"/>
+<circle cx="435.0" cy="405.0" r="4" fill="#1f2328"/>
+<text x="421.0" y="429.0" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="normal" fill="#1f2328" text-anchor="end"><tspan x="421.0" dy="0.0">Evaluación funcional por</tspan><tspan x="421.0" dy="23.8">observación manual tradicional</tspan></text>
+<line x1="267.5" y1="532.5" x2="517.5" y2="532.5" stroke="#1f2328" stroke-width="2"/>
+<circle cx="517.5" cy="532.5" r="4" fill="#1f2328"/>
+<text x="503.5" y="556.5" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="normal" fill="#1f2328" text-anchor="end"><tspan x="503.5" dy="0.0">Preparación pre-entrenamiento</tspan><tspan x="503.5" dy="23.8">genérica, sin información</tspan><tspan x="503.5" dy="23.8">biomecánica</tspan></text>
+<line x1="810" y1="150" x2="1140" y2="660" stroke="#1f2328" stroke-width="3.5"/>
+<rect x="630.0" y="90" width="360" height="52" rx="10" fill="#f3f4f6" stroke="#1f2328" stroke-width="2"/>
+<text x="810.0" y="124.0" font-family="Helvetica, Arial, sans-serif" font-size="24" font-weight="bold" fill="#1f2328" text-anchor="middle"><tspan x="810.0" dy="0.0">Medición</tspan></text>
+<line x1="642.5" y1="277.5" x2="892.5" y2="277.5" stroke="#1f2328" stroke-width="2"/>
+<circle cx="892.5" cy="277.5" r="4" fill="#1f2328"/>
+<text x="878.5" y="301.5" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="normal" fill="#1f2328" text-anchor="end"><tspan x="878.5" dy="0.0">Error típico de la goniometría</tspan><tspan x="878.5" dy="23.8">manual ≈ 3,4° en flexión de</tspan><tspan x="878.5" dy="23.8">rodilla</tspan></text>
+<line x1="725.0" y1="405.0" x2="975.0" y2="405.0" stroke="#1f2328" stroke-width="2"/>
+<circle cx="975.0" cy="405.0" r="4" fill="#1f2328"/>
+<text x="961.0" y="429.0" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="normal" fill="#1f2328" text-anchor="end"><tspan x="961.0" dy="0.0">Concordancia entre evaluadores</tspan><tspan x="961.0" dy="23.8">limitada (límites de acuerdo &gt;</tspan><tspan x="961.0" dy="23.8">18° con otros instrumentos)</tspan></text>
+<line x1="807.5" y1="532.5" x2="1057.5" y2="532.5" stroke="#1f2328" stroke-width="2"/>
+<circle cx="1057.5" cy="532.5" r="4" fill="#1f2328"/>
+<text x="1043.5" y="556.5" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="normal" fill="#1f2328" text-anchor="end"><tspan x="1043.5" dy="0.0">Sin una magnitud propia y</tspan><tspan x="1043.5" dy="23.8">repetible para el usuario</tspan></text>
+<line x1="1350" y1="150" x2="1680" y2="660" stroke="#1f2328" stroke-width="3.5"/>
+<rect x="1170.0" y="90" width="360" height="52" rx="10" fill="#f3f4f6" stroke="#1f2328" stroke-width="2"/>
+<text x="1350.0" y="124.0" font-family="Helvetica, Arial, sans-serif" font-size="24" font-weight="bold" fill="#1f2328" text-anchor="middle"><tspan x="1350.0" dy="0.0">Personas</tspan></text>
+<line x1="1182.5" y1="277.5" x2="1432.5" y2="277.5" stroke="#1f2328" stroke-width="2"/>
+<circle cx="1432.5" cy="277.5" r="4" fill="#1f2328"/>
+<text x="1418.5" y="301.5" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="normal" fill="#1f2328" text-anchor="end"><tspan x="1418.5" dy="0.0">Requiere la intervención y la</tspan><tspan x="1418.5" dy="23.8">presencia de un profesional</tspan></text>
+<line x1="1265.0" y1="405.0" x2="1515.0" y2="405.0" stroke="#1f2328" stroke-width="2"/>
+<circle cx="1515.0" cy="405.0" r="4" fill="#1f2328"/>
+<text x="1501.0" y="429.0" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="normal" fill="#1f2328" text-anchor="end"><tspan x="1501.0" dy="0.0">Quien entrena depende del</tspan><tspan x="1501.0" dy="23.8">juicio cualitativo de un</tspan><tspan x="1501.0" dy="23.8">tercero o de ninguno</tspan></text>
+<line x1="1347.5" y1="532.5" x2="1597.5" y2="532.5" stroke="#1f2328" stroke-width="2"/>
+<circle cx="1597.5" cy="532.5" r="4" fill="#1f2328"/>
+<text x="1583.5" y="556.5" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="normal" fill="#1f2328" text-anchor="end"><tspan x="1583.5" dy="0.0">Usuarios que cargan peso sin</tspan><tspan x="1583.5" dy="23.8">conocer sus restricciones de</tspan><tspan x="1583.5" dy="23.8">movilidad</tspan></text>
+<line x1="270" y1="1170" x2="600" y2="660" stroke="#1f2328" stroke-width="3.5"/>
+<rect x="90.0" y="1178" width="360" height="52" rx="10" fill="#f3f4f6" stroke="#1f2328" stroke-width="2"/>
+<text x="270.0" y="1212.0" font-family="Helvetica, Arial, sans-serif" font-size="24" font-weight="bold" fill="#1f2328" text-anchor="middle"><tspan x="270.0" dy="0.0">Herramientas y tecnología</tspan></text>
+<line x1="130.0" y1="1000.0" x2="380.0" y2="1000.0" stroke="#1f2328" stroke-width="2"/>
+<circle cx="380.0" cy="1000.0" r="4" fill="#1f2328"/>
+<text x="366.0" y="966.2" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="normal" fill="#1f2328" text-anchor="end"><tspan x="366.0" dy="0.0">Sin un instrumento accesible</tspan><tspan x="366.0" dy="23.8">para producir la medida</tspan></text>
+<line x1="240.0" y1="830.0" x2="490.0" y2="830.0" stroke="#1f2328" stroke-width="2"/>
+<circle cx="490.0" cy="830.0" r="4" fill="#1f2328"/>
+<text x="476.0" y="748.8" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="normal" fill="#1f2328" text-anchor="end"><tspan x="476.0" dy="0.0">Herramientas manuales</tspan><tspan x="476.0" dy="23.8">dependientes del operador</tspan><tspan x="476.0" dy="23.8">(goniómetro; video con</tspan><tspan x="476.0" dy="23.8">Kinovea)</tspan></text>
+<line x1="810" y1="1170" x2="1140" y2="660" stroke="#1f2328" stroke-width="3.5"/>
+<rect x="630.0" y="1178" width="360" height="52" rx="10" fill="#f3f4f6" stroke="#1f2328" stroke-width="2"/>
+<text x="810.0" y="1212.0" font-family="Helvetica, Arial, sans-serif" font-size="24" font-weight="bold" fill="#1f2328" text-anchor="middle"><tspan x="810.0" dy="0.0">Entorno</tspan></text>
+<line x1="670.0" y1="1000.0" x2="920.0" y2="1000.0" stroke="#1f2328" stroke-width="2"/>
+<circle cx="920.0" cy="1000.0" r="4" fill="#1f2328"/>
+<text x="906.0" y="942.5" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="normal" fill="#1f2328" text-anchor="end"><tspan x="906.0" dy="0.0">Gimnasios donde se entrena con</tspan><tspan x="906.0" dy="23.8">alta carga sin valoración</tspan><tspan x="906.0" dy="23.8">funcional previa</tspan></text>
+<line x1="780.0" y1="830.0" x2="1030.0" y2="830.0" stroke="#1f2328" stroke-width="2"/>
+<circle cx="1030.0" cy="830.0" r="4" fill="#1f2328"/>
+<text x="1016.0" y="796.2" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="normal" fill="#1f2328" text-anchor="end"><tspan x="1016.0" dy="0.0">La valoración se presta en</tspan><tspan x="1016.0" dy="23.8">atención presencial</tspan></text>
+<line x1="1350" y1="1170" x2="1680" y2="660" stroke="#1f2328" stroke-width="3.5"/>
+<rect x="1170.0" y="1178" width="360" height="52" rx="10" fill="#f3f4f6" stroke="#1f2328" stroke-width="2"/>
+<text x="1350.0" y="1212.0" font-family="Helvetica, Arial, sans-serif" font-size="24" font-weight="bold" fill="#1f2328" text-anchor="middle"><tspan x="1350.0" dy="0.0">Costos</tspan></text>
+<line x1="1210.0" y1="1000.0" x2="1460.0" y2="1000.0" stroke="#1f2328" stroke-width="2"/>
+<circle cx="1460.0" cy="1000.0" r="4" fill="#1f2328"/>
+<text x="1446.0" y="918.8" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="normal" fill="#1f2328" text-anchor="end"><tspan x="1446.0" dy="0.0">Consulta profesional ≈ 46 000</tspan><tspan x="1446.0" dy="23.8">a más de 100 000 COP en</tspan><tspan x="1446.0" dy="23.8">Medellín (referencia de</tspan><tspan x="1446.0" dy="23.8">mercado)</tspan></text>
+<line x1="1320.0" y1="830.0" x2="1570.0" y2="830.0" stroke="#1f2328" stroke-width="2"/>
+<circle cx="1570.0" cy="830.0" r="4" fill="#1f2328"/>
+<text x="1556.0" y="772.5" font-family="Helvetica, Arial, sans-serif" font-size="19" font-weight="normal" fill="#1f2328" text-anchor="end"><tspan x="1556.0" dy="0.0">La fase de valoración</tspan><tspan x="1556.0" dy="23.8">funcional se omite por su</tspan><tspan x="1556.0" dy="23.8">costo</tspan></text>
+</svg>
