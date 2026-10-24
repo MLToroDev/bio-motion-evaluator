@@ -53,7 +53,7 @@ export default function SustentacionLayout() {
           ))}
         </nav>
 
-        <Link to="/" className="sus__exit" title="Volver a la interfaz completa de desarrollo">
+        <Link to="/inicio" className="sus__exit" title="Ir a la interfaz completa: video, diagnóstico y conexión">
           Interfaz completa →
         </Link>
       </header>

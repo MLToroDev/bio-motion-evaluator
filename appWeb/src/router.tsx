@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom';
 import { MvpRouteGuard } from './components/MvpRouteGuard';
 import AppLayout from './layouts/AppLayout';
 import BackendStatus from './pages/BackendStatus';
@@ -22,10 +22,16 @@ function sprint4(el: ReactNode) {
 
 const router = createBrowserRouter([
   {
+    // La interfaz de sustentación es la entrada principal del MVP.
     path: '/',
+    element: <Navigate to="/sustentacion" replace />,
+  },
+  {
+    // Interfaz completa (tema oscuro): análisis de video, diagnóstico y
+    // configuración de la conexión, que la de sustentación no incluye.
     element: <AppLayout />,
     children: [
-      { index: true, element: <Home /> },
+      { path: 'inicio', element: <Home /> },
       { path: 'login', element: sprint4(<Login />) },
       { path: 'live-analysis', element: <LiveAnalysis /> },
       { path: 'video-analysis', element: <VideoAnalysis /> },
@@ -37,9 +43,9 @@ const router = createBrowserRouter([
     ],
   },
   {
-    // Interfaz de sustentación: tema claro y mínimo, pensada para
-    // proyectarse en aula. Convive con la interfaz completa sin
-    // sustituirla; ver appWeb/src/pages/sustentacion/.
+    // Interfaz de sustentación: tema claro y mínimo, entrada principal del
+    // MVP. La interfaz completa sigue disponible en /inicio; ver
+    // appWeb/src/pages/sustentacion/.
     path: '/sustentacion',
     element: <SustentacionLayout />,
     children: [

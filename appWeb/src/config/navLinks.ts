@@ -8,7 +8,7 @@ export type NavLinkDef = {
 };
 
 const CORE_LINKS: NavLinkDef[] = [
-  { to: '/', label: 'Inicio', end: true, tier: 'core' },
+  { to: '/inicio', label: 'Inicio', end: true, tier: 'core' },
   // Interfaz de sustentación (tema claro, mínima). Vive fuera de este layout
   // y tiene su propia navegación; ver src/pages/sustentacion/.
   { to: '/sustentacion', label: 'Modo sustentación', tier: 'core' },

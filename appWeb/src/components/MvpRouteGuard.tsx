@@ -14,7 +14,7 @@ export function MvpRouteGuard({ kind, children }: { kind: GuardKind; children: R
 
   useEffect(() => {
     if (kind === 'sprint4' && checking) return;
-    if (!allowed) navigate('/', { replace: true });
+    if (!allowed) navigate('/inicio', { replace: true });
   }, [allowed, checking, kind, navigate]);
 
   if (!allowed) return null;
