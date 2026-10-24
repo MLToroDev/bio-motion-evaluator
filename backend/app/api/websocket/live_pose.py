@@ -33,6 +33,7 @@ from typing import NamedTuple
 import cv2
 import numpy as np
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from pydantic import ValidationError
 
 from app.config import settings
 from app.models.schemas import PoseStreamConfig
@@ -170,8 +171,10 @@ async def pose_stream(ws: WebSocket) -> None:
     except WebSocketDisconnect:
         log.info("Cliente desconectó /ws/pose-stream (sin iniciar sesión)")
         return
-    except json.JSONDecodeError as exc:
-        log.warning("JSON inválido en /ws/pose-stream: %s", exc)
+    except (ValidationError, json.JSONDecodeError) as exc:
+        # Pydantic v2 reporta con ValidationError tanto el JSON mal formado como los
+        # campos fuera de rango; ambos casos cierran con 4000.
+        log.warning("Configuración inválida en /ws/pose-stream: %s", exc)
         try:
             await ws.close(code=4000)
         except Exception:  # noqa: BLE001
