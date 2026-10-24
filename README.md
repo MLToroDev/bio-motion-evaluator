@@ -19,10 +19,10 @@ La inferencia corre en el **servidor**; el cliente captura fotogramas, envían p
 
 ### Pregunta de investigación
 
-> ¿Con qué **exactitud**, frente a métodos de referencia de medición angular, y bajo qué
-> **latencia** extremo a extremo puede una arquitectura cliente-servidor con inferencia de
-> pose en el servidor estimar el ángulo de flexión de rodilla y la asimetría bilateral en
-> tiempo real sobre hardware de consumo?
+> ¿Con qué **exactitud**, frente a un método de referencia de medición angular, estima el
+> ángulo de flexión de rodilla una arquitectura cliente-servidor con inferencia de pose en el
+> servidor, y bajo qué **latencia** extremo a extremo entrega en tiempo real ese ángulo y la
+> asimetría bilateral sobre hardware de consumo?
 
 El trabajo no se limita a construir el sistema: lo **mide**. Los instrumentos de validación
 son ejecutables y reproducibles y viven en [`validacion/`](validacion/); el protocolo de
@@ -219,6 +219,6 @@ Pendiente de definición según política institucional del trabajo de grado. Co
 
 ## Referencia académica (extracto)
 
-> *Bio-Motion Evaluator implementa y **evalúa** la goniometría digital de rodilla mediante visión artificial (MediaPipe BlazePose) sobre una arquitectura cliente-servidor con inferencia en servidor, separando captura, inferencia y visualización. El trabajo caracteriza la exactitud de la medición angular frente a métodos de referencia y su latencia extremo a extremo sobre hardware de consumo.*
+> *Bio-Motion Evaluator implementa y **evalúa** la goniometría digital de rodilla mediante visión artificial (MediaPipe BlazePose) sobre una arquitectura cliente-servidor con inferencia en servidor, separando captura, inferencia y visualización. El trabajo caracteriza la exactitud del ángulo de flexión de rodilla frente a un método de referencia y la latencia extremo a extremo del sistema sobre hardware de consumo.*
 
 Palabras clave: visión artificial, estimación de pose, goniometría digital, FastAPI, React, WebSocket, biomecánica, ISO/IEC 25010.

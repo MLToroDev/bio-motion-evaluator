@@ -365,10 +365,10 @@ Fecha de ejecución: {date.today().isoformat()}.
 
 Este experimento responde la mitad de latencia de la pregunta de investigación:
 
-> ¿Con qué exactitud, frente a métodos de referencia de medición angular, y **bajo qué
-> latencia extremo a extremo** puede una arquitectura cliente-servidor con inferencia de
-> pose en el servidor estimar el ángulo de flexión de rodilla y la asimetría bilateral en
-> tiempo real sobre hardware de consumo?
+> ¿Con qué exactitud, frente a un método de referencia de medición angular, estima el
+> ángulo de flexión de rodilla una arquitectura cliente-servidor con inferencia de pose en
+> el servidor, y **bajo qué latencia extremo a extremo** entrega en tiempo real ese ángulo y
+> la asimetría bilateral sobre hardware de consumo?
 
 La latencia sólo es interpretable junto al hardware que la produce, así que se declara primero.
 

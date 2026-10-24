@@ -24,10 +24,10 @@ export default function Portada() {
           Pregunta de investigación
         </p>
         <p>
-          ¿Con qué <strong>exactitud</strong>, frente a métodos de referencia de medición angular, y
-          bajo qué <strong>latencia</strong> puede una arquitectura cliente-servidor con inferencia
-          de pose en el servidor estimar el ángulo de flexión de rodilla y la asimetría bilateral en
-          tiempo real sobre hardware de consumo?
+          ¿Con qué <strong>exactitud</strong>, frente a un método de referencia de medición angular,
+          estima el ángulo de flexión de rodilla una arquitectura cliente-servidor con inferencia de
+          pose en el servidor, y bajo qué <strong>latencia</strong> entrega en tiempo real ese ángulo
+          y la asimetría bilateral sobre hardware de consumo?
         </p>
       </div>
 

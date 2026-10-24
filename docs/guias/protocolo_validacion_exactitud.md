@@ -5,14 +5,14 @@
 | Campo | Valor |
 |-------|-------|
 | **Estado** | Activo (documento operativo, listo para ejecutar) |
-| **Alcance** | Validación de exactitud de la estimación de flexión de rodilla y asimetría bilateral del motor `vision/` frente a métodos de referencia de medición angular. No cubre latencia extremo a extremo (ver reporte de latencia y Experimento de rendimiento). |
+| **Alcance** | Validación de exactitud de la estimación de flexión de rodilla del motor `vision/` frente a un método de referencia de medición angular. No cubre la exactitud de la asimetría bilateral (la pierna alejada de la cámara queda ocluida en plano sagital) ni la latencia extremo a extremo (ver reporte de latencia y Experimento de rendimiento). |
 | **Restricción de partida** | El autor **no dispone de goniómetro clínico ni de sujetos de estudio ni de aval de comité de ética**. Todo lo descrito aquí es ejecutable por **una sola persona**, con materiales de papelería y ferretería, sobre sí misma. |
 | **Naturaleza** | Este documento describe **cómo se medirá**. No contiene resultados de medición. Los resultados irán en `validacion/reportes/`. |
 | **Última revisión** | 2026-10-23 (Nivel 2: comparador Tracker y clip propio) |
 
 ## Resumen
 
-Este protocolo responde a la mitad de exactitud de la pregunta de investigación: *¿con qué exactitud, frente a métodos de referencia de medición angular, estima el sistema el ángulo de flexión de rodilla y la asimetría bilateral?*
+Este protocolo responde a la mitad de exactitud de la pregunta de investigación: *¿con qué exactitud, frente a un método de referencia de medición angular, estima el sistema el ángulo de flexión de rodilla?* La asimetría bilateral se calcula a partir de los ángulos de ambas rodillas; su exactitud frente a una referencia queda fuera de esta validación, porque en plano sagital la pierna alejada de la cámara queda ocluida.
 
 Se define una validación en tres niveles de coste creciente. El **Nivel 1** construye un patrón físico de ángulo conocido (una férula articulada con transportador impreso) y lo compara contra la salida del sistema: da error absoluto contra verdad conocida. El **Nivel 2** usa video-goniometría manual con Tracker sobre un clip propio de una sola toma en plano sagital: da acuerdo contra un comparador de la misma clase de método (video-goniometría manual 2D) que la institución ya emplea con Kinovea. El **Nivel 3** queda descrito pero no se ejecuta ahora: es la ruta de integración si más adelante se consiguen goniómetro clínico y sujetos.
 

@@ -231,7 +231,7 @@ Desde la perspectiva de la Ingeniería de Software, existe una oportunidad para 
 Esta elección se declara como **limitación de alcance**: el trabajo valida la tecnología sobre la articulación donde la medida es más tratable, no sobre la de mayor carga lesional. Extender el método al hombro exigiría resolver antes la estimación de rotación axial, un problema abierto en visión monocular. La pregunta no es, por tanto, *si es posible construir* el sistema —lo es, y se construyó—, sino **cuánto puede confiarse en lo que mide y a qué velocidad responde**, que es la condición previa para cualquier uso posterior de esos datos.
 
 **Pregunta Problema:**  
-¿Con qué exactitud, frente a métodos de referencia de medición angular, y bajo qué latencia extremo a extremo puede una arquitectura cliente-servidor con inferencia de pose en el servidor estimar el ángulo de flexión de rodilla y la asimetría bilateral en tiempo real sobre hardware de consumo?
+¿Con qué exactitud, frente a un método de referencia de medición angular, estima el ángulo de flexión de rodilla una arquitectura cliente-servidor con inferencia de pose en el servidor, y bajo qué latencia extremo a extremo entrega en tiempo real ese ángulo y la asimetría bilateral sobre hardware de consumo?
 
 Se trata de una pregunta **verificable**: su respuesta no es una descripción del sistema, sino un conjunto de magnitudes medidas —error angular en grados, límites de acuerdo, latencia por etapa en milisegundos— que pueden contrastarse, reproducirse y refutarse.
 
@@ -277,15 +277,15 @@ Tras una revisión en el repositorio institucional del Tecnológico de Antioquia
 
 # OBJETIVO GENERAL
 
-Desarrollar y evaluar un sistema web cliente-servidor de goniometría digital de rodilla basado en estimación de pose (MediaPipe BlazePose), determinando su exactitud frente a métodos de referencia de medición angular y su latencia extremo a extremo, con el fin de establecer su viabilidad como herramienta de valoración objetiva del rango de movimiento sobre hardware de consumo.
+Desarrollar y evaluar un sistema web cliente-servidor de goniometría digital de rodilla basado en estimación de pose (MediaPipe BlazePose), determinando la exactitud del ángulo de flexión de rodilla frente a un método de referencia de medición angular y la latencia extremo a extremo del sistema, con el fin de establecer su viabilidad como herramienta de valoración objetiva del rango de movimiento sobre hardware de consumo.
 
 # OBJETIVOS ESPECÍFICOS
 
 1. **Especificación y delimitación de la medida.** Definir los requerimientos funcionales y el contrato de datos del sistema, delimitando la métrica objeto de estudio —ángulo de flexión de rodilla bilateral e índice de asimetría— y formalizando su convención anatómica de cálculo.
 2. **Diseño de la arquitectura.** Diseñar e implementar una arquitectura cliente-servidor desacoplada, con captura en el cliente e inferencia de pose en el servidor, comunicada mediante contratos versionados REST y WebSocket, bajo estándares de usabilidad y mantenibilidad.
 3. **Implementación del módulo de goniometría digital.** Implementar el núcleo de procesamiento que estime los puntos anatómicos y calcule en tiempo real el ángulo de flexión de rodilla bilateral y el índice de asimetría, con superposición del esqueleto y panel de métricas.
-5. **Validación de la exactitud.** Diseñar y ejecutar un protocolo de validación de la exactitud de la medición angular frente a métodos de referencia, descomponiendo el error del sistema en sus fuentes y reportando error absoluto, sesgo, límites de acuerdo e índices de concordancia.
-6. **Caracterización del rendimiento y calidad.** Caracterizar la latencia extremo a extremo y el reparto de tiempos por etapa del pipeline bajo distintas configuraciones de captura, y evaluar la calidad del producto conforme a la norma ISO/IEC 25010.
+5. **Validación de la exactitud.** Diseñar y ejecutar un protocolo de validación de la exactitud del ángulo de flexión de rodilla frente a un método de referencia, descomponiendo el error del sistema en sus fuentes y reportando error absoluto, sesgo, límites de acuerdo e índices de concordancia.
+6. **Caracterización del rendimiento y de la calidad técnica.** Caracterizar la latencia extremo a extremo y el reparto de tiempos por etapa del pipeline bajo distintas configuraciones de captura, y evaluar la calidad técnica del producto conforme a la norma ISO/IEC 25010 en las características verificables mediante evidencia técnica (adecuación funcional, eficiencia de desempeño, fiabilidad y mantenibilidad).
 
 Los objetivos 1 a 3 corresponden a la **construcción** del sistema y se abordan en los sprints 1 a 4. Los objetivos 4 y 5 constituyen la **evaluación** que responde la pregunta de investigación y se abordan en el sprint 5.
 
@@ -895,8 +895,8 @@ concentra en el sprint 5, que responde la pregunta de investigación.
 
 ## Objetivo del sprint
 
-**Responder la pregunta de investigación.** Determinar la **exactitud** de la medición
-angular frente a métodos de referencia y **caracterizar la latencia** extremo a extremo
+**Responder la pregunta de investigación.** Determinar la **exactitud** del ángulo de
+flexión de rodilla frente a un método de referencia y **caracterizar la latencia** extremo a extremo
 del sistema. Es el sprint que convierte el software construido en evidencia verificable.
 
 ## Historias de usuario y backlog técnico
