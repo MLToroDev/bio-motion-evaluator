@@ -47,6 +47,26 @@ export default function Portada() {
 
       <hr className="sus-divider" />
 
+      <p className="sus-eyebrow" style={{ marginBottom: '0.75rem' }}>
+        Manuales
+      </p>
+      <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', margin: '0 0 2rem' }}>
+        <a
+          href={`${import.meta.env.BASE_URL}manuales/manual_usuario.pdf`}
+          download
+          className="sus-btn sus-btn--outline"
+        >
+          Descargar manual de usuario (PDF)
+        </a>
+        <a
+          href={`${import.meta.env.BASE_URL}manuales/manual_instalacion.pdf`}
+          download
+          className="sus-btn sus-btn--outline"
+        >
+          Descargar manual de instalación (PDF)
+        </a>
+      </div>
+
       <div className="sus-grid">
         <div className="sus-card">
           <p className="sus-card__label">Autor</p>

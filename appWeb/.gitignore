@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Copia generada de docs/manuales/*.pdf (ver scripts/copiar_manuales.mjs)
+public/manuales/
