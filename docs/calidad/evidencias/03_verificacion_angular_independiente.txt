@@ -1,0 +1,45 @@
+$ PYTHONPATH=backend ~/.venvs/biomotion/bin/python <scratch>/verificar_angulo.py
+# Fecha: 2026-10-23 20:11 -05
+# Script (copia literal):
+#   """Verificacion independiente y rapida del calculo angular (no reemplaza exp1).
+#   Construye landmarks sinteticos con angulo verdadero conocido y mide el error de
+#   vision.biomechanics.knee_angles_from_landmarks."""
+#   import math, random
+#   import numpy as np
+#   from vision.biomechanics import knee_angles_from_landmarks
+#   
+#   random.seed(25010)
+#   def landmarks(theta_deg, knee, fem, tib, e1, e2):
+#       lm = [{"x": 0.0, "y": 0.0, "z": 0.0} for _ in range(33)]
+#       t = math.radians(theta_deg)
+#       H = knee + fem * e1
+#       A = knee + tib * (math.cos(t) * e1 + math.sin(t) * e2)
+#       for (h, k, a) in ((23, 25, 27), (24, 26, 28)):
+#           lm[h] = dict(zip("xyz", map(float, H)))
+#           lm[k] = dict(zip("xyz", map(float, knee)))
+#           lm[a] = dict(zip("xyz", map(float, A)))
+#       return lm
+#   
+#   def base():
+#       v = np.random.default_rng(random.randrange(10**9)).normal(size=(2, 3))
+#       e1 = v[0] / np.linalg.norm(v[0]); w = v[1] - v[1] @ e1 * e1
+#       return e1, w / np.linalg.norm(w)
+#   
+#   errs = []
+#   n = 0
+#   for theta10 in range(0, 1801, 5):  # 0..180 grados, paso 0.5
+#       theta = theta10 / 10
+#       for _ in range(20):
+#           knee = np.array([random.uniform(-1, 1) for _ in range(3)])
+#           e1, e2 = base()
+#           r = knee_angles_from_landmarks(landmarks(theta, knee, random.uniform(0.2, 0.6), random.uniform(0.2, 0.6), e1, e2))
+#           flex_true = 180.0 - theta
+#           errs.append(abs(r["left_knee_flexion_angle_deg"] - flex_true)); n += 1
+#   errs = np.array(errs)
+#   print(f"casos evaluados: {n} (theta 0..180 paso 0.5 x 20 geometrias aleatorias, semilla 25010)")
+#   print(f"error absoluto de flexion: max = {errs.max():.3e} grados | p99 = {np.percentile(errs, 99):.3e} | media = {errs.mean():.3e}")
+#   peor = np.argmax(errs); print(f"peor caso en theta = {(peor // 20) * 0.5:.1f} grados")
+# Salida:
+casos evaluados: 7220 (theta 0..180 paso 0.5 x 20 geometrias aleatorias, semilla 25010)
+error absoluto de flexion: max = 1.207e-06 grados | p99 = 2.842e-13 | media = 4.038e-10
+peor caso en theta = 0.0 grados

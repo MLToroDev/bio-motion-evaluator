@@ -1,0 +1,61 @@
+$ cd backend && PYTHONPATH=. ~/.venvs/biomotion/bin/python -u <scratch>/sondas_api.py
+# Fecha: 2026-10-23 20:18 -05 | App en proceso con fastapi.testclient (sin red, sin puertos abiertos); configuracion efectiva de la maquina del autor, sin DATABASE_URL
+# Script (copia literal):
+#   """Sondas de fiabilidad/seguridad sobre la app FastAPI en proceso (TestClient).
+#   No abre puertos, no usa red externa ni imprime valores de configuracion sensibles."""
+#   import json, logging
+#   logging.disable(logging.CRITICAL)
+#   from fastapi.testclient import TestClient
+#   from starlette.websockets import WebSocketDisconnect
+#   from app.main import app
+#   
+#   def ws_probe(nombre, path, first=None, first_bytes=None, max_msgs=3):
+#       try:
+#           with c.websocket_connect(path) as ws:
+#               if first is not None: ws.send_text(first)
+#               if first_bytes is not None: ws.send_bytes(first_bytes)
+#               msgs = []
+#               try:
+#                   while len(msgs) < max_msgs:
+#                       m = ws.receive()
+#                       if m["type"] == "websocket.close":
+#                           print(f"[{nombre}] cierre code={m.get('code')} mensajes_previos={msgs}"); return
+#                       msgs.append((m.get("text") or "")[:240])
+#               except WebSocketDisconnect as e:
+#                   print(f"[{nombre}] cierre code={e.code} mensajes_previos={msgs}"); return
+#               print(f"[{nombre}] conexion abierta tras {max_msgs} mensaje(s); la sonda cierra: {msgs}")
+#       except Exception as e:
+#           print(f"[{nombre}] EXCEPCION NO CONTROLADA en servidor: {type(e).__name__}: {str(e)[:160]}")
+#   
+#   with TestClient(app, raise_server_exceptions=False) as c:
+#       r = c.get("/api/v1/health"); print("[health]", r.status_code, r.json())
+#       r = c.get("/"); print("[root]", r.status_code, r.json())
+#       r = c.get("/api/v1/sessions"); print("[sessions sin token]", r.status_code, r.text[:80])
+#       r = c.get("/api/v1/sessions", headers={"Authorization": "Bearer token-invalido"}); print("[sessions token invalido]", r.status_code, r.text[:80])
+#       for origen in ("http://localhost:5173", "https://sitio-ajeno.example"):
+#           r = c.options("/api/v1/health", headers={"Origin": origen, "Access-Control-Request-Method": "GET"})
+#           print(f"[CORS preflight {origen}]", r.status_code, "allow-origin=", r.headers.get("access-control-allow-origin"), "allow-credentials=", r.headers.get("access-control-allow-credentials"))
+#       ws_probe("pose-stream JSON invalido", "/ws/pose-stream", first="{esto no es json")
+#       ws_probe("pose-stream config fuera de rango (target_fps=999)", "/ws/pose-stream", first=json.dumps({"source": "file", "video_filename": "SentadillaProfunda.mp4", "target_fps": 999}))
+#       ws_probe("pose-stream archivo inexistente", "/ws/pose-stream", first=json.dumps({"source": "file", "video_filename": "no_existe.mp4"}))
+#       ws_probe("pose-stream path traversal", "/ws/pose-stream", first=json.dumps({"source": "file", "video_filename": "../../app/main.py"}))
+#       ws_probe("ws/video primer mensaje invalido", "/ws/video", first="{no json")
+#       ws_probe("ws/video JPEG corrupto", "/ws/video", first=json.dumps({"analyze_pose": True}), first_bytes=b"no-es-un-jpeg", max_msgs=1)
+# Salida:
+[health] 200 {'status': 'ok', 'version': '0.1.0'}
+[root] 200 {'service': 'bio-motion-evaluator-api', 'docs': '/docs', 'health': '/api/v1/health'}
+[sessions sin token] 503 {"detail":"DATABASE_URL not configured"}
+[sessions token invalido] 503 {"detail":"DATABASE_URL not configured"}
+[CORS preflight http://localhost:5173] 200 allow-origin= * allow-credentials= None
+[CORS preflight https://sitio-ajeno.example] 200 allow-origin= * allow-credentials= None
+[pose-stream JSON invalido] EXCEPCION NO CONTROLADA en servidor: ValidationError: 1 validation error for PoseStreamConfig
+  Invalid JSON: key must be a string at line 1 column 2 [type=json_invalid, input_value='{esto no es json', input_type=s
+[pose-stream config fuera de rango (target_fps=999)] EXCEPCION NO CONTROLADA en servidor: ValidationError: 1 validation error for PoseStreamConfig
+target_fps
+  Input should be less than or equal to 60 [type=less_than_equal, input_value=999, input_type=int]
+    For fu
+[pose-stream archivo inexistente] cierre code=4000 mensajes_previos=['{"error":"No existe el vídeo: <RUTA_ABSOLUTA_DEL_SERVIDOR>/bio-motion-evaluator/tests/assets/videos/no_existe.mp4"}']
+[pose-stream path traversal] cierre code=4000 mensajes_previos=['{"error":"Use solo el nombre del archivo (sin rutas relativas)."}']
+[ws/video primer mensaje invalido] cierre code=4000 mensajes_previos=['{"error":"Primer mensaje inválido. Usa {\\"analyze_pose\\": true} antes de los JPEG."}']
+[ws/video JPEG corrupto] conexion abierta tras 1 mensaje(s); la sonda cierra: ['{"schema_version":1,"frame_index":0,"server_ts_ms":1792804664685,"pose_ok":false,"note":"No se pudo decodificar la imagen","landmarks":[],"knees":null,"exercise_label":"unknown","exercise_confidence":0.0,"rep_phase":"idle","rep_count":0,"qu']
+exit=0

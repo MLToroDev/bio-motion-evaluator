@@ -1,0 +1,95 @@
+$ cd appWeb && npm run lint ; echo "exit=$?"
+# Fecha: 2026-10-23 20:12 -05
+
+> appweb@0.0.0 lint
+> eslint .
+
+
+<repo>/appWeb/src/components/PoseSkeletonCanvas.tsx
+  186:39  error    Error: Cannot call impure function during render
+
+`performance.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+<repo>/appWeb/src/components/PoseSkeletonCanvas.tsx:186:39
+  184 |   const blendStartRef = useRef(0);
+  185 |   const adaptiveBlendMsRef = useRef(120);
+> 186 |   const lastPoseTimestampRef = useRef(performance.now());
+      |                                       ^^^^^^^^^^^^^^^^^ Cannot call impure function
+  187 |   const lastSeenRef = useRef<LandmarkMap[] | null>(null);
+  188 |   const mirrorRef = useRef(mirrorHorizontal);
+  189 |   const aspectRef = useRef(contentAspect);  react-hooks/purity
+  336:6   warning  React Hook useEffect has a missing dependency: 'landmarksRef'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       react-hooks/exhaustive-deps
+
+<repo>/appWeb/src/components/VideoPreviewOverlays.tsx
+   4:14  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+  12:14  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+<repo>/appWeb/src/hooks/useVideoAnalysisSession.ts
+  157:3   error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+<repo>/appWeb/src/hooks/useVideoAnalysisSession.ts:157:3
+  155 | export function useVideoAnalysisSession(opts?: UseVideoAnalysisSessionOptions) {
+  156 |   const onSessionEndedRef = useRef(opts?.onSessionEnded);
+> 157 |   onSessionEndedRef.current = opts?.onSessionEnded;
+      |   ^^^^^^^^^^^^^^^^^^^^^^^^^ Cannot update ref during render
+  158 |
+  159 |   const [ui, setUi] = useState<VideoAnalysisUiState>(initialUi);
+  160 |  react-hooks/refs
+  404:11  error  'leftSeries' is never reassigned. Use 'const' instead                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            prefer-const
+  405:11  error  'rightSeries' is never reassigned. Use 'const' instead                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           prefer-const
+  482:3   error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+<repo>/appWeb/src/hooks/useVideoAnalysisSession.ts:482:3
+  480 |
+  481 |   const processEventStable = useRef(processEvent);
+> 482 |   processEventStable.current = processEvent;
+      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^ Cannot update ref during render
+  483 |
+  484 |   const start = useCallback(
+  485 |     async (params: SessionStartParams): Promise<string | null> => {                                                                react-hooks/refs
+  579:15  error  'connectTimeoutId' is never reassigned. Use 'const' instead                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      prefer-const
+
+<repo>/appWeb/src/pages/ConnectionConfig/hooks/useConnectionConfig.ts
+  9:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+<repo>/appWeb/src/pages/ConnectionConfig/hooks/useConnectionConfig.ts:9:5
+   7 |
+   8 |   useEffect(() => {
+>  9 |     setBase(readApiBase());
+     |     ^^^^^^^ Avoid calling setState() directly within an effect
+  10 |     const g = readTargetRepGoal();
+  11 |     setGoal(g != null ? String(g) : '');
+  12 |   }, []);  react-hooks/set-state-in-effect
+
+<repo>/appWeb/src/pages/Home/hooks/useHome.ts
+  11:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+<repo>/appWeb/src/pages/Home/hooks/useHome.ts:11:5
+   9 |
+  10 |   useEffect(() => {
+> 11 |     setApiBase(readApiBase());
+     |     ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  12 |     setLastSession(readLastSessionSummary());
+  13 |   }, []);
+  14 |  react-hooks/set-state-in-effect
+
+✖ 11 problems (10 errors, 1 warning)
+  2 errors and 0 warnings potentially fixable with the `--fix` option.
+
+exit=1

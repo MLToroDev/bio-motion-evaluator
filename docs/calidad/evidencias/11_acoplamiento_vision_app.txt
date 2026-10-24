@@ -1,0 +1,31 @@
+# Acoplamiento entre el nucleo de vision (backend/vision) y la capa de aplicacion (backend/app). Fecha: 2026-10-23 20:21 -05
+$ rg -n "^\s*(from|import) (app|fastapi|starlette|sqlalchemy)" backend/vision -g "!._*"
+backend/vision/unified_payload.py:9:from app.config import settings
+backend/vision/heuristic_exercise_classifier.py:10:from app.models.schemas import ExerciseClassifierConfig
+backend/vision/pose_extractor.py:17:from app.services.pose.mediapipe import (
+backend/vision/realtime_engine.py:10:from app.models.schemas import ExerciseClassifierConfig
+backend/vision/exercise_classifier.py:11:from app.models.schemas import ExerciseClassifierConfig
+backend/vision/exercise_classifier.py:103:    from app.config import settings
+backend/vision/feature_engine.py:12:from app.models.schemas import ExerciseClassifierConfig
+
+$ rg -l "^\s*(from|import) app" backend/vision -g "!._*" | wc -l   # modulos de vision que dependen de app
+       6
+$ fd -e py . backend/vision -E "._*" | wc -l
+      21
+
+$ rg -n "^\s*(from|import) " backend/vision/biomechanics.py backend/vision/landmark_filter.py   # funciones de goniometria
+backend/vision/biomechanics.py:19:from __future__ import annotations
+backend/vision/biomechanics.py:21:import math
+backend/vision/biomechanics.py:22:from typing import Any, TypedDict
+backend/vision/biomechanics.py:24:import numpy as np
+backend/vision/landmark_filter.py:4:from __future__ import annotations
+backend/vision/landmark_filter.py:6:from typing import Any
+
+$ rg -n "^\s*(from|import) vision" backend/app -g "!._*"   # app -> vision (sentido esperado)
+backend/app/api/websocket/video.py:10:from vision.realtime_engine import RealtimeEngineSession
+backend/app/api/websocket/live_pose.py:41:from vision.paths import resolve_gold_standard_video
+backend/app/api/websocket/live_pose.py:42:from vision.processor import VideoSource
+backend/app/api/websocket/live_pose.py:43:from vision.realtime_engine import RealtimeEngineSession
+backend/app/api/websocket/live_pose.py:44:from vision.stream_processing_plan import (
+backend/app/api/v1/gold_standard_videos.py:8:from vision.paths import list_gold_standard_video_filenames
+backend/app/api/v1/pose.py:7:from vision.realtime_engine import RealtimeEngineSession

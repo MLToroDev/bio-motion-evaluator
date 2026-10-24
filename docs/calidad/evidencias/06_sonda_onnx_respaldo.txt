@@ -1,0 +1,31 @@
+$ cd backend && PYTHONPATH=. ~/.venvs/biomotion/bin/python <scratch>/sonda_onnx.py
+# Fecha: 2026-10-23 20:13 -05
+# Script (copia literal):
+#   """Reproduce la carga del clasificador ONNX y el respaldo heuristico."""
+#   import json, logging, pathlib
+#   logging.basicConfig(level=logging.WARNING, format="%(levelname)s %(name)s: %(message)s")
+#   import onnxruntime as ort
+#   m = pathlib.Path("vision/models/exercise_rf_a0eac3d7.onnx")
+#   print("onnxruntime", ort.__version__, "| modelo:", m)
+#   try:
+#       ort.InferenceSession(str(m), providers=["CPUExecutionProvider"]); print("carga directa: OK")
+#   except Exception as e:
+#       print("carga directa: FALLA ->", type(e).__name__, str(e)[-160:])
+#   from app.config import settings
+#   from vision.exercise_classifier import build_classifier
+#   from vision.model_registry import ModelRegistry
+#   import inspect; print("firma ModelRegistry:", inspect.signature(ModelRegistry))
+#   reg = ModelRegistry(pathlib.Path("."))
+#   man = reg.load_active_manifest()
+#   print("manifest activo:", None if man is None else man.path)
+#   clf = build_classifier(settings.exercise_classifier_config(), reg)
+#   print("clasificador resultante:", type(clf).__name__, "-> interno:", type(getattr(clf, "_inner", None)).__name__)
+# Salida:
+WARNING vision.exercise_classifier: Clasificador ONNX no disponible, usando heurístico: [ONNXRuntimeError] : 1 : FAIL : Load model from vision/models/exercise_rf_a0eac3d7.onnx failed:/Users/runner/work/1/s/onnxruntime/core/graph/model.cc:181 onnxruntime::Model::Model(onnx::ModelProto &&, const onnxruntime::PathString &, const onnxruntime::IOnnxRuntimeOpSchemaRegistryList *, const logging::Logger &, const onnxruntime::ModelOptions &) Unsupported model IR version: 11, max supported IR version: 10
+
+onnxruntime 1.21.1 | modelo: vision/models/exercise_rf_a0eac3d7.onnx
+carga directa: FALLA -> Fail :IOnnxRuntimeOpSchemaRegistryList *, const logging::Logger &, const onnxruntime::ModelOptions &) Unsupported model IR version: 11, max supported IR version: 10
+
+firma ModelRegistry: (backend_root: 'Path', manifest_path: 'Path | None' = None) -> None
+manifest activo: vision/models/exercise_rf_a0eac3d7.onnx
+clasificador resultante: HysteresisClassifier -> interno: HeuristicExerciseClassifier

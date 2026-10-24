@@ -1,0 +1,19 @@
+# ruff 0.6.9 (reglas por defecto: E4, E7, E9, F), venv desechable, sobre la copia sin BOM. Fecha: 2026-10-23 20:20 -05
+# El repositorio no tiene configuracion de ruff/flake8 propia.
+$ ruff check --no-cache --statistics backend/app backend/vision
+6	E741	[ ] ambiguous-variable-name
+1	F401	[*] unused-import
+1	F841	[*] unused-variable
+exit=1
+
+$ ruff check --no-cache --output-format concise backend/app backend/vision
+  backend/app/api/v1/download.py:108:29: F841 [*] Local variable `e` is assigned to but never used
+  backend/app/workers/tasks.py:5:28: F401 [*] `sqlalchemy.orm.Session` imported but unused
+  backend/vision/feature_engine.py:37:9: E741 Ambiguous variable name: `l`
+  backend/vision/feature_engine.py:39:9: E741 Ambiguous variable name: `l`
+  backend/vision/feature_engine.py:92:9: E741 Ambiguous variable name: `l`
+  backend/vision/feature_engine.py:217:13: E741 Ambiguous variable name: `l`
+  backend/vision/rep_trackers/squat.py:35:13: E741 Ambiguous variable name: `l`
+  backend/vision/rep_trackers/squat.py:54:13: E741 Ambiguous variable name: `l`
+  Found 8 errors.
+  [*] 2 fixable with the `--fix` option.

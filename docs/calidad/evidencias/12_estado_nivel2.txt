@@ -1,0 +1,11 @@
+# Estado del Nivel 2 (exactitud frente a Tracker). Fecha: 2026-10-23 20:21 -05
+# Solo se cuentan filas con valor; NO se calcula ningun estadistico sistema-Tracker para no romper el cegamiento antes de la sesion 2.
+$ awk -F, 'NR>1' nivel2_tracker_sesion1.csv | wc -l ; columna tracker_angulo_deg (7) no vacia
+nivel2_tracker_sesion1.csv: filas=76 con_medicion=75
+$ awk -F, 'NR>1' nivel2_tracker_sesion2.csv | wc -l ; columna tracker_angulo_deg (7) no vacia
+nivel2_tracker_sesion2.csv: filas=26 con_medicion=0
+$ awk -F, 'NR>1' serie_sistema.csv | wc -l
+serie_sistema.csv: filas=76
+
+$ rg -n "^- \[ \]" bitacora_nivel2.md
+186:- [ ] Sesión 2 (desde 2026-10-25T19:06-05:00). Durante la sesión 2 no se abren

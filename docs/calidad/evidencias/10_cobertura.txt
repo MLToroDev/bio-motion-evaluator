@@ -1,0 +1,72 @@
+# coverage 7.6.1 en venv desechable (Python 3.12.13) que reutiliza las dependencias de ~/.venvs/biomotion via PYTHONPATH.
+# Base de datos de cobertura en el scratch (COVERAGE_FILE); no se escribe nada en el repositorio. Fecha: 2026-10-23 20:20 -05
+$ COVERAGE_FILE=<scratch>/.coverage PYTHONPATH=<site-packages biomotion> python -m coverage run --source=backend/app,backend/vision,validacion/analisis -m pytest -q -p no:cacheprovider
+92 passed
+$ python -m coverage report
+Name                                              Stmts   Miss  Cover
+---------------------------------------------------------------------
+backend/app/__init__.py                               0      0   100%
+backend/app/api/__init__.py                           0      0   100%
+backend/app/api/deps.py                              21     21     0%
+backend/app/api/v1/__init__.py                        0      0   100%
+backend/app/api/v1/auth.py                           28     28     0%
+backend/app/api/v1/download.py                       62     62     0%
+backend/app/api/v1/gold_standard_videos.py            9      9     0%
+backend/app/api/v1/health.py                          7      7     0%
+backend/app/api/v1/pose.py                           24     24     0%
+backend/app/api/v1/router.py                          9      9     0%
+backend/app/api/v1/sessions.py                       78     78     0%
+backend/app/api/websocket/__init__.py                 0      0   100%
+backend/app/api/websocket/live_pose.py              237    237     0%
+backend/app/api/websocket/video.py                   91     91     0%
+backend/app/config.py                                66     66     0%
+backend/app/db/__init__.py                            0      0   100%
+backend/app/db/base.py                                2      2     0%
+backend/app/db/models.py                             45     45     0%
+backend/app/db/session.py                            78     78     0%
+backend/app/main.py                                  28     28     0%
+backend/app/models/__init__.py                        0      0   100%
+backend/app/models/schemas.py                       131    131     0%
+backend/app/paths.py                                  3      3     0%
+backend/app/services/__init__.py                      0      0   100%
+backend/app/services/inference/__init__.py            0      0   100%
+backend/app/services/inference/huggingface.py        23     23     0%
+backend/app/services/pose/__init__.py                 0      0   100%
+backend/app/services/pose/mediapipe.py              154    123    20%
+backend/app/services/video/__init__.py                0      0   100%
+backend/app/services/video/downloader.py             56     56     0%
+backend/vision/__init__.py                            2      0   100%
+backend/vision/biomechanics.py                       88     23    74%
+backend/vision/exercise_classifier.py               110    110     0%
+backend/vision/feature_engine.py                    185    185     0%
+backend/vision/heuristic_exercise_classifier.py      52     52     0%
+backend/vision/landmark_filter.py                    23      2    91%
+backend/vision/model_registry.py                     66     66     0%
+backend/vision/paths.py                              31      7    77%
+backend/vision/pipeline_timer.py                     41     41     0%
+backend/vision/pose_extractor.py                     25     15    40%
+backend/vision/processor.py                          69     55    20%
+backend/vision/realtime_engine.py                    73     73     0%
+backend/vision/rep_tracker.py                        27     27     0%
+backend/vision/rep_tracker_abc.py                     8      8     0%
+backend/vision/rep_trackers/__init__.py               0      0   100%
+backend/vision/rep_trackers/squat.py                 62     62     0%
+backend/vision/rep_trackers/unknown.py               11     11     0%
+backend/vision/scalar_kalman.py                      22     22     0%
+backend/vision/stream_processing_plan.py             77     77     0%
+backend/vision/types.py                              31      0   100%
+backend/vision/unified_payload.py                    14     14     0%
+validacion/analisis/__init__.py                       0      0   100%
+validacion/analisis/acuerdo.py                      204     11    95%
+validacion/analisis/analizar_nivel2.py              417     74    82%
+validacion/analisis/demostracion_sintetica.py        72     72     0%
+validacion/analisis/exportar_para_kinovea.py        230    157    32%
+validacion/analisis/plantilla_tracker.py             45      3    93%
+validacion/analisis/sortear_sesion2.py              101     32    68%
+---------------------------------------------------------------------
+TOTAL                                              3238   2320    28%
+
+# Subtotales por paquete (awk sobre la tabla anterior):
+backend/app/: sentencias=1152 sin_ejecutar=1121 cobertura=2.7%
+backend/vision/: sentencias=1017 sin_ejecutar=850 cobertura=16.4%
+validacion/analisis/: sentencias=1069 sin_ejecutar=349 cobertura=67.4%

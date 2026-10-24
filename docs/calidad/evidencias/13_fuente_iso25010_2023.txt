@@ -1,0 +1,36 @@
+# Verificacion de la version del modelo ISO/IEC 25010. Consulta: 2026-10-23 20:21 -05
+# Fuente: vista previa oficial (paginas preliminares) de ISO/IEC 25010:2023(E), distribuida por VDE Verlag para IEC:
+#   https://www.vde-verlag.de/iec-normen/preview-pdf/info_isoiec25010{ed2.0}en.pdf
+# Ficha del catalogo ISO: https://www.iso.org/standard/78176.html (respondio HTTP 403 al acceso automatizado).
+# Extracto textual (pdftotext) de la portada, el alcance y el prologo; cita breve con fines de referencia:
+
+INTERNATIONAL                                    ISO/IEC
+STANDARD                                          25010
+                                                      Second edition
+                                                            2023-11
+[...]
+This second edition of ISO/IEC 25010, together with the first edition of ISO/IEC 25002 and the first
+edition of ISO/IEC 25019, cancels and replaces ISO/IEC 25010:2011, which has been technically revised.
+The main changes are as follows:
+— This document revises the product quality model part of ISO/IEC 25010:2011. The other parts are
+  moved to ISO/IEC 25002 on quality models overview and usage and ISO/IEC 25019 on quality-in-
+  use model. The quality characteristics and subcharacteristics of the product quality model are
+  revised for the purpose of better understanding and fitting the state of the art of ICT (information
+  and communication technology).
+— The target of the product quality model has been extended to include various types of ICT product
+  and information system.
+— Safety has been added as a quality characteristic with subcharacteristics, i.e. operational constraint,
+  risk identification, fail safe, hazard warning and safe integration.
+— Usability and portability have been replaced with interaction capability and flexibility respectively.
+— Inclusivity and self-descriptiveness, resistance, and scalability have been added as subcharacteristics
+  of interaction capability, security, and flexibility respectively.
+— User interface aesthetics and maturity have been replaced with user engagement and faultlessness
+  respectively.
+— Accessibility has been split into inclusivity and user assistance.
+iv                                                  ﻿                   © ISO/IEC 2023 – All rights reserved
+        
+[...]
+communication technology) products and software products. The product quality model is composed
+of nine characteristics (which are further subdivided into subcharacteristics) that relate to quality
+properties of the products. The characteristics and subcharacteristics provide a reference model for
+the quality of the products to be specified, measured and evaluated.

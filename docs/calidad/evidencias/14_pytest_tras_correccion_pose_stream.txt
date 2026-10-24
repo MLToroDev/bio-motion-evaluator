@@ -1,0 +1,17 @@
+$ ~/.venvs/biomotion/bin/python -m pytest -q
+# Fecha: 2026-10-23 20:42 -0500 | Host: Darwin arm64 | Python 3.12.13
+# Tras la corrección de backend/app/api/websocket/live_pose.py (captura de pydantic.ValidationError en el primer mensaje de /ws/pose-stream)
+........................................................................ [ 75%]
+.......................                                                  [100%]
+95 passed in 4.17s
+
+$ ~/.venvs/biomotion/bin/python -m pytest -q tests/test_pose_stream_config_invalida.py -v
+============================= test session starts ==============================
+platform darwin -- Python 3.12.13, pytest-9.1.1, pluggy-1.6.0
+rootdir: <raíz del repositorio bio-motion-evaluator>
+configfile: pytest.ini
+plugins: asyncio-1.4.0, anyio-4.14.2
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 3 items
+tests/test_pose_stream_config_invalida.py ...                            [100%]
+============================== 3 passed in 1.19s ===============================
