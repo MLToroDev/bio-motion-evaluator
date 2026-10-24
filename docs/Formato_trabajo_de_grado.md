@@ -1265,20 +1265,56 @@ anisotropía y el caso de prueba se añadió después para impedir su regreso. S
 así deliberadamente, porque una matriz de pruebas que solo contiene casos que siempre
 pasaron no aporta información sobre la calidad del sistema.
 
-## Pruebas de usabilidad
+## Pruebas de usuario
 
-Se aplicó evaluación heurística y prueba de tareas guiadas con usuarios de contexto fitness, enfocada en comprender si el flujo permite completar una medición en menos de 5 minutos sin asistencia técnica.
+### Evaluación heurística interna (realizada)
 
+Antes de instrumentar la prueba con usuarios externos, el equipo de desarrollo ejecutó una evaluación heurística interna sobre los flujos principales (análisis en vivo, análisis por video), enfocada en detectar bloqueos de navegación y errores de interpretación de los estados semánticos.
 
-| Métrica                                                 | Objetivo           | Resultado observado (iteración actual)          |
-| ------------------------------------------------------- | ------------------ | ----------------------------------------------- |
-| Tiempo de inicio de análisis en vivo                    | <= 2 minutos       | Cumplido en entorno local con backend levantado |
-| Finalización de flujo de video (`/video-analysis`)      | <= 5 minutos       | Cumplido; depende del tamaño del video          |
-| Comprensión de estados semánticos (verde/amarillo/rojo) | >= 80% de usuarios | Cumplido cualitativamente en pruebas internas   |
-| Errores de navegación críticos                          | 0 bloqueantes      | Sin bloqueantes en rutas principales del router |
-
+| Métrica                                            | Objetivo      | Resultado observado                             |
+| --------------------------------------------------- | -------------- | ------------------------------------------------ |
+| Tiempo de inicio de análisis en vivo               | <= 2 minutos  | Cumplido en entorno local con backend levantado |
+| Finalización de flujo de video (`/video-analysis`) | <= 5 minutos  | Cumplido; depende del tamaño del video          |
+| Errores de navegación críticos                     | 0 bloqueantes | Sin bloqueantes en rutas principales del router |
 
 **Mejoras derivadas:** incorporación de accesos directos a Dev Tools en inicio, mensajes de error más accionables y separación clara entre análisis en vivo y análisis por archivo.
+
+**Alcance y limitación declarada.** Esta evaluación fue ejecutada por el propio equipo de desarrollo, no por usuarios externos al proyecto. No sustituye una prueba de usuario formal y no se reporta como tal: se documenta únicamente como control de calidad interno previo al protocolo con usuarios reales, definido a continuación.
+
+### Protocolo de pruebas de usuario (planificado, pendiente de ejecución)
+
+**Estado: pendiente de ejecución** a la fecha de esta memoria. Esta sección define el protocolo que se ejecutará antes de la sustentación, en respuesta a la observación del jurado de evaluación (04/06/2026): *"Le falta [...] las Pruebas de Usuario"*. Los resultados observados reemplazarán este protocolo una vez ejecutado, siguiendo el mismo estándar de honestidad metodológica aplicado en § 7.2 y § 7.3.
+
+**Objetivo.** Evaluar si una persona sin entrenamiento previo en el sistema puede completar una medición de movilidad articular sin asistencia técnica, en un tiempo razonable y con una percepción de usabilidad aceptable.
+
+**Participantes.** N >= 5 personas del contexto fitness (entrenadores o usuarios de gimnasio), sin participación previa en el desarrollo del proyecto. Cinco participantes es el tamaño mínimo recomendado por Nielsen (2000) para detectar la mayoría de los problemas de usabilidad de una interfaz mediante pruebas cualitativas moderadas.
+
+**Tareas guionadas**, alineadas con el Manual de usuario (§ *Manual de usuario*):
+
+| ID | Tarea                                                                              | Corresponde a                        |
+| --- | ------------------------------------------------------------------------------------ | --------------------------------------- |
+| T1 | Verificar que el backend está disponible desde la pantalla principal              | Manual de usuario, paso 1            |
+| T2 | Iniciar un análisis en vivo desde la cámara y obtener una lectura de ángulo       | Manual de usuario, pasos 3–4 (HU-03) |
+| T3 | Interpretar el estado semántico (verde/amarillo/rojo) mostrado durante la medición | Manual de usuario, paso 4             |
+| T4 | Analizar un video de referencia y revisar el resumen de sesión al finalizar       | Manual de usuario, paso 5 (HU-04)    |
+
+El módulo de aprendizaje continuo (`/dev/*`) queda fuera de las tareas de usuario final: es infraestructura de soporte de Nivel 2 (§ *Definición del alcance*), dirigida a perfil técnico, no evaluada como parte del núcleo.
+
+**Instrumento.** System Usability Scale (SUS; Brooke, 1996): cuestionario estandarizado de 10 ítems en escala Likert de 5 puntos, aplicado inmediatamente después de completar las tareas T1–T4. Se complementa con observación directa (éxito/fracaso por tarea, tiempo por tarea, verbalización *think-aloud*) y una pregunta abierta de percepción cualitativa.
+
+**Métricas y criterio de aceptación.**
+
+| Métrica                                            | Criterio de aceptación                                            |
+| ----------------------------------------------------- | --------------------------------------------------------------------- |
+| Tasa de éxito por tarea (T1–T4)                    | >= 80 % de los participantes completa cada tarea sin asistencia   |
+| Tiempo de finalización de T2 (análisis en vivo)   | <= 2 minutos, consistente con la evaluación heurística interna    |
+| Tiempo de finalización de T4 (análisis por video) | <= 5 minutos                                                       |
+| Puntaje SUS                                        | >= 68 (percentil 50 de la banda normativa de Bangor et al., 2008) |
+| Errores de navegación críticos                     | 0 bloqueantes                                                       |
+
+**Procedimiento.** Sesión individual moderada (presencial o remota), de aproximadamente 20 minutos: consentimiento informado, tareas T1–T4 con verbalización en voz alta, cuestionario SUS y cierre con pregunta abierta. No se recolectan datos personales ni clínicos; solo desempeño de tarea y percepción de usabilidad.
+
+**Cronograma.** A ejecutar antes de la sustentación final; los resultados se incorporarán a esta memoria en el capítulo de Resultados y Discusión (§ 7), reemplazando esta sección de protocolo por los datos observados.
 
 # Despliegue del sistema
 
@@ -1882,6 +1918,12 @@ Moore, E., Chalmers, S., Milanese, S., & Fuller, J. T. (2019). Factors influenci
 
 Sabo, A., Mittal, N., Deshpande, A., Clarke, H., & Taati, B. (2023). Automated, vision-based goniometry and range of motion calculation in individuals with suspected Ehlers-Danlos syndromes/generalized hypermobility spectrum disorders: A comparison of pose-estimation libraries to goniometric measurements. *IEEE Journal of Translational Engineering in Health and Medicine*, *12*, 140–150. https://doi.org/10.1109/JTEHM.2023.3327691
 
+Brooke, J. (1996). SUS: A "quick and dirty" usability scale. In P. W. Jordan, B. Thomas, B. A. Weerdmeester, & A. L. McClelland (Eds.), *Usability Evaluation in Industry* (pp. 189–194). Taylor & Francis.
+
+Bangor, A., Kortum, P. T., & Miller, J. T. (2008). An empirical evaluation of the System Usability Scale. *International Journal of Human-Computer Interaction*, *24*(6), 574–594. [https://doi.org/10.1080/10447310802205776](https://doi.org/10.1080/10447310802205776)
+
+Nielsen, J. (2000). *Why you only need to test with 5 users*. Nielsen Norman Group. Recuperado de [https://www.nngroup.com/articles/why-you-only-need-to-test-with-5-users/](https://www.nngroup.com/articles/why-you-only-need-to-test-with-5-users/)
+
 # BITÁCORA DE DESARROLLO Y DECISIONES
 
 Esta sección se amplía de forma incremental durante el proyecto. Sirve como registro auditable para el **Capítulo 6** (decisiones de implementación, incidencias relevantes y trazabilidad hacia código o specs).
@@ -1897,6 +1939,23 @@ Esta sección se amplía de forma incremental durante el proyecto. Sirve como re
 Las entradas nuevas se añaden **al inicio** de la lista (más reciente arriba), salvo que se indique orden cronológico inverso para un apéndice institucional.
 
 ## Entradas
+
+### 2026-09-22 — Honestidad en Pruebas de usuario y protocolo formal pendiente de ejecución
+
+- **Ámbito:** `docs`
+- **Tipo:** gobernanza documental / corrección de evaluación previa
+- **Descripción:** La evaluación del jurado (04/06/2026) señaló ausencia de Pruebas de
+  Usuario. La sección "Pruebas de usabilidad" existente reportaba resultados
+  ("cumplido cualitativamente en pruebas internas") que en realidad correspondían a una
+  evaluación heurística ejecutada por el propio equipo de desarrollo, no por usuarios
+  externos — una imprecisión que un jurado detecta fácilmente. Se separó en dos
+  subsecciones: **evaluación heurística interna** (lo real ejecutado, con su limitación
+  declarada) y **protocolo de pruebas de usuario** (planificado, pendiente de ejecución),
+  con objetivo, N >= 5 participantes (Nielsen, 2000), tareas guionadas mapeadas al
+  Manual de usuario, instrumento SUS (Brooke, 1996; umbral de aceptación de Bangor et al.,
+  2008) y criterios de aceptación explícitos. No se reportan resultados de usuario porque
+  aún no se han ejecutado.
+- **Trazabilidad:** `docs/Formato_trabajo_de_grado.md` § *Pruebas de usuario*, § *Referencias*.
 
 ### 2026-08-29 — Interfaz de sustentación (tema claro, mínima) en `appWeb`
 
