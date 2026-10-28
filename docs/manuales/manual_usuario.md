@@ -42,8 +42,10 @@ se flexiona.
 > certificado** y no reemplaza la valoración clínica ni la goniometría manual.
 
 - La **validación de la exactitud del ángulo de flexión de rodilla** frente a un método de referencia de medición
-  angular (goniómetro o video-goniometría manual) está **en curso**: el protocolo está diseñado, pero la medición
-  comparativa no se ha completado. Por eso el sistema **no declara una exactitud clínica**.
+  angular se **ejecutó** con video-goniometría manual (Tracker), según un protocolo preregistrado, y su resultado es
+  **no concluyente según el criterio preregistrado**: el error del propio comparador manual (3,07°) quedó por
+  encima del umbral exigido (3,0°). Las cifras frente a Tracker (concordancia ICC 0,978; error medio de 8,1°) son
+  **solo descriptivas**. Por eso el sistema **no declara una exactitud clínica**.
 - La **exactitud de la asimetría bilateral no está validada**: en el plano sagital la pierna más lejana a la cámara
   queda parcialmente oculta, y la validación prevista se hace solo sobre la pierna más cercana.
 - Diferencias de asimetría por debajo de **5°** no se distinguen del ruido propio del estimador; no deben
@@ -106,7 +108,7 @@ El menú superior tiene tres opciones:
 |--------|------|-----------|
 | **Inicio** | `/sustentacion` | Portada: identidad del trabajo y pregunta de investigación |
 | **Demostración** | `/sustentacion/demo` | Medición de la rodilla en vivo con la cámara |
-| **Resultados** | `/sustentacion/resultados` | Cifras medidas en el trabajo y lo que queda pendiente |
+| **Resultados** | `/sustentacion/resultados` | Cifras medidas en el trabajo, resultado de la validación externa y lo que no se midió |
 
 En la esquina superior derecha, el enlace **Interfaz completa →** abre las funciones avanzadas (capítulo 8).
 
@@ -184,14 +186,16 @@ de ejercicio.
 
 ![Vista Resultados, parte superior: exactitud del cálculo angular, defecto corregido, tolerancia de cámara, piso de ruido de la asimetría, latencia y rendimiento.](img/05_resultados_parte1.png){width=85%}
 
-![Vista Resultados, parte inferior: lo que no se midió (validación con referencia externa pendiente; profundidad de MediaPipe sin validar) y la aportación del trabajo.](img/05_resultados_parte2.png){width=85%}
+![Vista Resultados, parte inferior: validación con referencia externa (Tracker), con resultado no concluyente; lo que no se midió (profundidad de MediaPipe sin validar) y la aportación del trabajo.](img/05_resultados_parte2.png){width=85%}
 
 1. En el menú superior, haga clic en **Resultados**.
-2. Desplácese hacia abajo para leer las tres secciones: **Exactitud**, **Latencia y rendimiento** y **Lo que no se
-   midió**.
-3. Tenga en cuenta la sección **Lo que no se midió**: la validación del ángulo de flexión frente a una referencia
-   externa está **pendiente**, por lo que el sistema no afirma una exactitud clínica; la asimetría bilateral tampoco
-   está validada.
+2. Desplácese hacia abajo para leer las cuatro secciones: **Exactitud**, **Latencia y rendimiento**, **Validación
+   con referencia externa** y **Lo que no se midió**.
+3. Tenga en cuenta la sección **Validación con referencia externa**: la comparación con video-goniometría manual en
+   Tracker se ejecutó y su resultado es **no concluyente según el criterio preregistrado**, porque el comparador
+   manual no alcanzó la resolución exigida (3,07° frente a 3,0°). Sus cifras (ICC 0,978; error medio de 8,1° en el
+   ángulo 3D) son **solo descriptivas**, y el análisis del ángulo 2D (4,2°) es exploratorio, no preregistrado. Por eso
+   el sistema no afirma una exactitud clínica; la asimetría bilateral tampoco está validada.
 
 Esta vista es de solo lectura: no depende de la cámara ni de una medición.
 

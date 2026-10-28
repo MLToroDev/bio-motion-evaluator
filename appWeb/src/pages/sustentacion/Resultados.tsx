@@ -3,7 +3,9 @@
  *
  * Las cifras proceden de los experimentos reproducibles de `validacion/`
  * y coinciden con el § 7 de la memoria. Lo que no se midió se declara
- * como pendiente y no se presenta como resultado.
+ * como pendiente y no se presenta como resultado. El Nivel 2 (Tracker)
+ * sale de `validacion/resultados/nivel2_acuerdo.md`: su veredicto
+ * preregistrado es «no concluyente» y sus cifras son descriptivas.
  */
 export default function Resultados() {
   return (
@@ -97,20 +99,36 @@ export default function Resultados() {
         </div>
       </div>
 
-      {/* ─── Pendiente ─── */}
-      <h2 className="sus-h2" style={{ marginTop: '2.75rem' }}>3 · Lo que no se midió</h2>
+      {/* ─── Referencia externa (Nivel 2) ─── */}
+      <h2 className="sus-h2" style={{ marginTop: '2.75rem' }}>3 · Validación con referencia externa</h2>
+      <p className="sus-lead">
+        Protocolo preregistrado, ejecutado y reportado completo: 75 fotogramas medidos a mano en
+        Tracker y 26 repetidos días después para acotar el error del propio comparador.
+      </p>
 
       <div className="sus-grid">
-        <div className="sus-card sus-card--pending">
-          <p className="sus-card__label">Validación con referencia externa</p>
-          <p className="sus-card__value">Pendiente</p>
+        <div className="sus-card sus-card--warn">
+          <p className="sus-card__label">Validación con referencia externa (Tracker)</p>
+          <p className="sus-card__value">No concluyente</p>
           <p className="sus-card__foot">
-            El protocolo está diseñado e instrumentado, y el análisis estadístico construido y
-            verificado. No se ha ejecutado: este trabajo <strong>no afirma exactitud que no
-            midió</strong>.
+            Concordancia excelente (<strong>ICC 0,978</strong>) y error medio de{' '}
+            <strong>8,1 grados</strong> en el ángulo 3D, con sesgo que depende del rango. El
+            comparador manual se repitió con 3,07 grados de error frente a los 3,0 exigidos, así
+            que según el criterio preregistrado el resultado <strong>no es concluyente</strong> y
+            esas cifras son solo descriptivas.
+          </p>
+          <p className="sus-card__foot">
+            Exploratorio, no preregistrado: el ángulo 2D del plano de la imagen difiere de Tracker
+            4,2 grados de media; buena parte de la diferencia viene de comparar un ángulo 3D con su
+            proyección 2D.
           </p>
         </div>
+      </div>
 
+      {/* ─── Pendiente ─── */}
+      <h2 className="sus-h2" style={{ marginTop: '2.75rem' }}>4 · Lo que no se midió</h2>
+
+      <div className="sus-grid">
         <div className="sus-card sus-card--pending">
           <p className="sus-card__label">Profundidad de MediaPipe</p>
           <p className="sus-card__value">Sin validar</p>
