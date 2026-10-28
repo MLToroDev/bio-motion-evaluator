@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<object class="org.opensourcephysics.cabrillo.tracker.TrackerPanel">
+    <property name="semantic_version" type="string">6.3.5</property>
+    <property name="width" type="double">1080.0</property>
+    <property name="height" type="double">1920.0</property>
+    <property name="magnification" type="double">-1.0</property>
+    <property name="center_x" type="int">491</property>
+    <property name="center_y" type="int">378</property>
+    <property name="videoclip" type="object">
+    <object class="org.opensourcephysics.media.core.VideoClip">
+        <property name="video" type="object">
+        <object class="org.opensourcephysics.media.core.ImageVideo">
+            <property name="path" type="string">videos/s2_0000.png</property>
+            <property name="delta_t" type="double">100.0</property>
+        </object>
+        </property>
+        <property name="video_framecount" type="int">26</property>
+        <property name="startframe" type="int">0</property>
+        <property name="stepsize" type="int">1</property>
+        <property name="stepcount" type="int">26</property>
+        <property name="starttime" type="double">0.0</property>
+        <property name="readout" type="string">frame</property>
+        <property name="playallsteps" type="boolean">true</property>
+    </object>
+    </property>
+    <property name="clipcontrol" type="object">
+    <object class="org.opensourcephysics.media.core.StepperClipControl">
+        <property name="rate" type="double">1.0</property>
+        <property name="delta_t" type="double">100.0</property>
+        <property name="frame" type="int">25</property>
+    </object>
+    </property>
+    <property name="coords" type="object">
+    <object class="org.opensourcephysics.media.core.ImageCoordSystem">
+        <property name="fixedorigin" type="boolean">true</property>
+        <property name="fixedangle" type="boolean">true</property>
+        <property name="fixedscale" type="boolean">true</property>
+        <property name="locked" type="boolean">false</property>
+        <property name="framedata" type="array" class="[Lorg.opensourcephysics.media.core.ImageCoordSystem$FrameData;">
+            <property name="[0]" type="object">
+            <object class="org.opensourcephysics.media.core.ImageCoordSystem$FrameData">
+                <property name="xorigin" type="double">320.0</property>
+                <property name="yorigin" type="double">240.0</property>
+                <property name="angle" type="double">0.0</property>
+                <property name="xscale" type="double">1.0</property>
+                <property name="yscale" type="double">1.0</property>
+            </object>
+            </property>
+        </property>
+    </object>
+    </property>
+    <property name="time_unit" type="string">s</property>
+    <property name="length_unit" type="string">m</property>
+    <property name="mass_unit" type="string">kg</property>
+    <property name="radians" type="boolean">false</property>
+    <property name="units_visible" type="boolean">true</property>
+    <property name="tracks" type="collection" class="java.util.ArrayList">
+        <property name="item" type="object">
+        <object class="org.opensourcephysics.cabrillo.tracker.CoordAxes">
+            <property name="name" type="string">ejes</property>
+            <property name="color" type="object">
+            <object class="java.awt.Color">
+                <property name="red" type="int">200</property>
+                <property name="green" type="int">0</property>
+                <property name="blue" type="int">200</property>
+                <property name="alpha" type="int">255</property>
+            </object>
+            </property>
+            <property name="footprint" type="string">Footprint.BoldSimpleAxes</property>
+            <property name="visible" type="boolean">false</property>
+            <property name="trail" type="boolean">false</property>
+        </object>
+        </property>
+        <property name="item" type="object">
+        <object class="org.opensourcephysics.cabrillo.tracker.Protractor">
+            <property name="name" type="string">transportador A</property>
+            <property name="color" type="object">
+            <object class="java.awt.Color">
+                <property name="red" type="int">0</property>
+                <property name="green" type="int">140</property>
+                <property name="blue" type="int">40</property>
+                <property name="alpha" type="int">255</property>
+            </object>
+            </property>
+            <property name="footprint" type="string">ProtractorFootprint.Circle3</property>
+            <property name="visible" type="boolean">true</property>
+            <property name="trail" type="boolean">false</property>
+            <property name="fixed" type="boolean">false</property>
+            <property name="framedata" type="array" class="[[D">
+                <property name="array" type="string">{{545.0726552179656,1788.110964332893,517.1730515191545,1080.4755614266842,534.9273447820342,1417.8071334214003},{545.0726552179656,1788.110964332893,565.3632760898282,1065.2575957727872,489.2734478203434,1415.2708058124174},{545.0726552179656,1788.110964332893,565.3632760898282,1065.2575957727872,529.8546895640686,1422.8797886393659},{545.0726552179656,1788.110964332893,565.3632760898282,1065.2575957727872,547.6089828269484,1435.56142668428},{545.0726552179656,1788.110964332893,522.2457067371201,1060.1849405548217,547.6089828269484,1435.56142668428},{545.0726552179656,1788.110964332893,684.5706737120211,1341.7173051519153,337.0937912813738,1498.9696169088506},{545.0726552179656,1788.110964332893,555.2179656538968,1070.330250990753,537.4636723910171,1425.4161162483488},{545.0726552179656,1788.110964332893,522.2457067371201,1060.1849405548217,522.2457067371201,1430.4887714663143},{550.1453104359313,1790.6472919418757,532.3910171730514,1088.0845442536327,529.8546895640686,1445.7067371202113},{550.1453104359313,1790.6472919418757,575.5085865257595,1052.5759577278732,529.8546895640686,1445.7067371202113},{550.1453104359313,1790.6472919418757,534.9273447820342,1060.1849405548217,529.8546895640686,1445.7067371202113},{550.1453104359313,1790.6472919418757,555.2179656538968,1072.8665785997357,529.8546895640686,1445.7067371202113},{550.1453104359313,1790.6472919418757,555.2179656538968,1072.8665785997357,570.4359313077938,1448.2430647291942},{550.1453104359313,1790.6472919418757,715.006605019815,1534.4782034346104,352.31175693527075,1516.7239101717305},{550.1453104359313,1790.6472919418757,588.1902245706736,1057.6486129458387,562.8269484808453,1438.0977542932628},{550.1453104359313,1790.6472919418757,674.4253632760897,1118.5204755614266,456.30118890356664,1440.6340819022457},{550.1453104359313,1790.6472919418757,737.8335535006604,1387.3712021136064,367.5297225891677,1498.9696169088506},{550.1453104359313,1790.6472919418757,730.2245706737119,1493.896961690885,367.5297225891677,1498.9696169088506},{550.1453104359313,1790.6472919418757,534.9273447820342,1072.8665785997357,547.6089828269484,1448.2430647291942},{550.1453104359313,1790.6472919418757,534.9273447820342,1072.8665785997357,567.899603698811,1450.7793923381769},{550.1453104359313,1790.6472919418757,735.2972258916775,1519.2602377807134,372.60237780713334,1516.7239101717305},{550.1453104359313,1790.6472919418757,740.3698811096432,1481.2153236459708,372.60237780713334,1498.9696169088506},{550.1453104359313,1790.6472919418757,697.2523117569351,1148.9564068692205,446.1558784676353,1435.56142668428},{550.1453104359313,1790.6472919418757,545.0726552179656,1052.5759577278732,534.9273447820342,1438.0977542932628},{550.1453104359313,1790.6472919418757,722.6155878467634,1258.018494055482,387.8203434610303,1483.7516512549537},{550.1453104359313,1790.6472919418757,720.0792602377805,1549.6961690885073,342.16644649933943,1524.332892998679}}</property>
+            </property>
+            <property name="ruler_visible" type="boolean">false</property>
+        </object>
+        </property>
+    </property>
+    <property name="selectedtrack" type="string">transportador A</property>
+    <property name="dividers" type="array" class="[D">
+        <property name="array" type="string">{0.6729986431478969,0.4423305588585018,1.0,0.27137042062415195}</property>
+    </property>
+    <property name="views" type="array" class="[[Lorg.opensourcephysics.cabrillo.tracker.TView;">
+        <property name="[1]" type="array" class="[Lorg.opensourcephysics.cabrillo.tracker.TView;">
+            <property name="[1]" type="object">
+            <object class="org.opensourcephysics.cabrillo.tracker.TableTView">
+                <property name="selected_track" type="string">transportador A</property>
+                <property name="track_columns" type="array" class="[[Ljava.lang.String;">
+                    <property name="[0]" type="array" class="[Ljava.lang.String;">
+                        <property name="[0]" type="string">transportador A</property>
+                        <property name="[1]" type="string">t</property>
+                        <property name="[2]" type="string">θ</property>
+                    </property>
+                </property>
+                <property name="column_formats" type="array" class="[[[Ljava.lang.String;">
+                    <property name="[0]" type="array" class="[[Ljava.lang.String;">
+                        <property name="[0]" type="array" class="[Ljava.lang.String;">
+                            <property name="[0]" type="string">transportador A</property>
+                            <property name="[1]" type="string">t</property>
+                            <property name="[2]" type="string">0.000</property>
+                        </property>
+                        <property name="[1]" type="array" class="[Ljava.lang.String;">
+                            <property name="[0]" type="string">transportador A</property>
+                            <property name="[1]" type="string">θ</property>
+                            <property name="[2]" type="string">0.0</property>
+                        </property>
+                        <property name="[2]" type="array" class="[Ljava.lang.String;">
+                            <property name="[0]" type="string">transportador A</property>
+                            <property name="[1]" type="string">step</property>
+                            <property name="[2]" type="string">0</property>
+                        </property>
+                        <property name="[3]" type="array" class="[Ljava.lang.String;">
+                            <property name="[0]" type="string">transportador A</property>
+                            <property name="[1]" type="string">frame</property>
+                            <property name="[2]" type="string">0</property>
+                        </property>
+                    </property>
+                </property>
+            </object>
+            </property>
+        </property>
+    </property>
+    <property name="selected_view_types" type="array" class="[I">
+        <property name="array" type="string">{0,1,2,3}</property>
+    </property>
+    <property name="selected_track_views" type="string">transportador A,null;null,transportador A;null,null;null,null</property>
+    <property name="toolbar" type="object">
+    <object class="org.opensourcephysics.cabrillo.tracker.TToolBar">
+        <property name="trace" type="boolean">false</property>
+        <property name="position" type="boolean">true</property>
+        <property name="velocity" type="boolean">false</property>
+        <property name="acceleration" type="boolean">false</property>
+        <property name="labels" type="boolean">true</property>
+        <property name="multiply_by_mass" type="boolean">false</property>
+        <property name="trail_length" type="int">15</property>
+        <property name="stretch" type="int">1</property>
+        <property name="stretch_acceleration" type="int">1</property>
+    </object>
+    </property>
+</object>

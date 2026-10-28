@@ -175,6 +175,47 @@ versionan los CSV, los metadatos y esta bitácora.
 - Fecha mínima de la sesión 2: **2026-10-25T19:06-05:00** (48 h después del cierre de la
   sesión 1).
 
+## 2026-10-27 — Sesión 2 y análisis preregistrado
+
+- Sesión 2 guardada por el operador a las **2026-10-27T22:02:04-05:00**
+  (`~/Desktop/carpeta sin título1/carpeta sin título/s2_0000.trz`; copiado como
+  `sesion2.trz`, fuera de git, y `sesion2.trk`). Separación con la sesión 1: 98,9 h.
+- Validación del proyecto: 26 imágenes idénticas a las del sorteo; transportador no fijo;
+  **26 de 26 fotogramas con medición propia**; ningún fotograma repite las coordenadas del
+  anterior. `nivel2_tracker_sesion2.csv` rellenado desde el `.trk` con el mismo método que la
+  sesión 1.
+- `analizar_nivel2.py --convencion-tracker interno` (salidas en `validacion/resultados/nivel2_*`):
+
+| Criterio preregistrado | Resultado | Umbral | Veredicto |
+|---|---|---|---|
+| Habilitante: MAE intra-observador (n = 25) | 3,07° (SD 3,95; ICC 0,997) | ≤ 3,0° | No cumple |
+| MAE sistema vs. Tracker (n = 75) | 8,13° (sesgo −2,43°; LoA −20,41 a +15,54) | ≤ 7,0° | No cumple |
+| ICC(2,1) sistema vs. Tracker | 0,978 | ≥ 0,85 | Cumple |
+
+- **Veredicto del protocolo: Nivel 2 no concluyente** (criterio habilitante no cumplido). La
+  salida preelegida es el remedio (a), medir tres veces y usar la mediana; sin él, el resultado
+  se publica solo como descripción.
+- Error sistema − Tracker por tramo: sesgo +5,7° en [0, 30), −9,8° en [30, 60), −14,2° en
+  [60, 90), −6,5° en [90, 120) y −7,6° en [120, 180]; desviación dentro de cada tramo de 3,5° a
+  5,6°. El error es sistemático y depende del rango.
+
+## 2026-10-27 — Análisis exploratorio (NO preregistrado): ángulo 2D frente a 3D
+
+- Hipótesis, formulada después de ver el patrón por tramo: el sistema calcula la flexión en
+  3D (`world_landmarks`) y Tracker en 2D (proyección en el plano de la imagen); con la rodilla
+  fuera del plano sagital en la sentadilla, ambas cantidades difieren aunque ninguna sea
+  errónea.
+- Prueba: se repitió la inferencia del sistema sobre el clip (fotogramas 0 a 2530, modo VIDEO,
+  igual que la exportación) y, en los 75 fotogramas con medición, se calculó además la flexión
+  2D de la rodilla izquierda con los landmarks normalizados escalados a píxeles. Control: la
+  flexión 3D recalculada coincide con `serie_sistema.csv` (diferencia máxima 0,00°).
+- Resultado frente a Tracker (sesión 1): 3D MAE 8,13° (SD 9,17°); **2D MAE 4,21°
+  (sesgo −2,62°; SD 4,59°)**. Por tramo, MAE 3D | 2D: [0, 30) 6,78 | 4,59; [30, 60) 9,97 | 3,99;
+  [60, 90) 14,18 | 6,13; [90, 120) 6,52 | 3,62; [120, 180] 7,61 | 2,26.
+- Lectura: la mayor parte de la diferencia sistema−Tracker se explica por la diferencia de
+  dimensionalidad de las dos medidas, no por error de la estimación de pose. Es un análisis
+  post hoc: **no modifica el veredicto preregistrado**.
+
 ## Pendiente
 
 - [x] Convención del transportador observada en `m0000`: `interno`.
@@ -183,5 +224,19 @@ versionan los CSV, los metadatos y esta bitácora.
 - [x] `confianza_operador` de la sesión 1: **no anotada** por decisión del operador
   (2026-10-23). El análisis la reporta como "sin anotar" y no se estratifica el error por
   calidad de la medición; se declara como limitación.
-- [ ] Sesión 2 (desde 2026-10-25T19:06-05:00). Durante la sesión 2 no se abren
-  `sesion1 2.trz`, `sesion1.trk`, `nivel2_tracker_sesion1.csv` ni `serie_sistema.csv`.
+- [x] Sesión 2 (2026-10-27, 26 de 26 mediciones).
+- [x] Análisis preregistrado: Nivel 2 no concluyente.
+- [x] Decisión sobre el remedio (a): **no se aplica** (ver entrada siguiente).
+
+## 2026-10-27 — Decisión: salida (b), Nivel 2 no concluyente
+
+- El operador no dispone de tiempo para las sesiones 3 y 4 que exige el remedio (a)
+  (dos mediciones adicionales de los 76 fotogramas en días distintos). Se toma la salida (b)
+  prevista en el protocolo §2.6: el Nivel 2 se declara **no concluyente** y las cifras
+  sistema−Tracker se publican **solo como descripción**.
+- No se modifica, elimina ni repite ninguna medición de las sesiones 1 y 2. Los valores
+  reportados son los de los CSV con las huellas SHA-256 que lista `nivel2_acuerdo.md`.
+- El análisis exploratorio 2D frente a 3D se conserva como script reproducible
+  (`validacion/analisis/exploratorio_2d_vs_3d.py`) y se reporta como post hoc.
+- Trabajo futuro: aplicar el remedio (a) o el Nivel 1 (patrón físico), y evaluar el acuerdo de
+  un ángulo sagital proyectado del sistema con la goniometría 2D.

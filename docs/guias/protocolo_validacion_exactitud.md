@@ -7,8 +7,8 @@
 | **Estado** | Activo (documento operativo, listo para ejecutar) |
 | **Alcance** | Validación de exactitud de la estimación de flexión de rodilla del motor `vision/` frente a un método de referencia de medición angular. No cubre la exactitud de la asimetría bilateral (la pierna alejada de la cámara queda ocluida en plano sagital) ni la latencia extremo a extremo (ver reporte de latencia y Experimento de rendimiento). |
 | **Restricción de partida** | El autor **no dispone de goniómetro clínico ni de sujetos de estudio ni de aval de comité de ética**. Todo lo descrito aquí es ejecutable por **una sola persona**, con materiales de papelería y ferretería, sobre sí misma. |
-| **Naturaleza** | Este documento describe **cómo se medirá**. No contiene resultados de medición. Los resultados irán en `validacion/reportes/`. |
-| **Última revisión** | 2026-10-23 (Nivel 2: comparador Tracker y clip propio) |
+| **Naturaleza** | Este documento describe **cómo se medirá**. No contiene resultados de medición, salvo la nota de ejecución del Nivel 2 (sección 2.8), que solo remite a los resultados de `validacion/resultados/`. |
+| **Última revisión** | 2026-10-27 (nota de ejecución y resultado del Nivel 2, sección 2.8; criterios de aceptación sin cambios). Anterior: 2026-10-23 (Nivel 2: comparador Tracker y clip propio) |
 
 ## Resumen
 
@@ -560,6 +560,16 @@ El script une sobre `(video, frame_idx, lado)` y **se detiene** ante claves dupl
 *La `visibility` del landmark de rodilla que proponía la versión anterior no está en el CSV del sistema; el análisis no la usa y lo declara en el informe.*
 
 Salidas en `validacion/resultados/`: `nivel2_acuerdo.md` (intra-observador primero, después sistema-Tracker con los criterios del Nivel 2 y el veredicto), `nivel2_resumen.json`, `nivel2_pares.csv`, `nivel2_bland_altman.png` y `nivel2_bland_altman_intraobservador.png`.
+
+### 2.8 Ejecución y resultado (2026-10-27)
+
+> Nota de ejecución. **No modifica** los criterios de aceptación ni el procedimiento de las secciones anteriores.
+
+- **Ejecución:** clip `IMG_6310.mov`, pierna izquierda. Sesión 1 cerrada el 2026-10-23 (75 de 76 mediciones); sesión 2 el 2026-10-27 (26 de 26), 98,9 h después. Ninguna medición se modificó, eliminó ni repitió. Registro fechado en `validacion/datos/nivel2/IMG_6310/bitacora_nivel2.md`.
+- **Resultado del análisis preregistrado** (`validacion/resultados/nivel2_acuerdo.md`, `nivel2_resumen.json`): criterio habilitante, MAE intra-observador **3,07°** (n = 25) frente a <= 3,0° → **no cumple**. **Veredicto: Nivel 2 no concluyente.**
+- **Salida elegida:** el remedio (a) no se aplicó por falta de tiempo para las sesiones 3 y 4; se toma la salida **(b)** de la sección 2.6. Las cifras sistema-Tracker (n = 75: MAE 8,13°, ICC(2,1) 0,978) se publican **solo como descripción**.
+- **Análisis exploratorio, no preregistrado:** `validacion/resultados/nivel2_exploratorio_2d_vs_3d.md` (script `validacion/analisis/exploratorio_2d_vs_3d.py`) compara el ángulo 2D del plano de la imagen con Tracker. Es post hoc y no cambia el veredicto.
+- **Pendiente:** remedio (a) o Nivel 1 para obtener una evidencia concluyente de exactitud.
 
 ---
 
